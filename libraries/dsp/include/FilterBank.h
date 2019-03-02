@@ -233,28 +233,31 @@ namespace dsp
         ///
         /// <param name="windowSize"> The length of the signal to filter. </param>
         /// <param name="sampleRate"> The sample rate of the input signal. </param>
+        /// <param name="fftSize"> The size of the FFT. </param>
         /// <param name="numFilters"> The total number of filters in the filter bank. </param>
         /// <param name="offset"> The offset. </param>
-        MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, double offset = 0);
+        MelFilterBank(size_t windowSize, double sampleRate, size_t fftSize, size_t numFilters, double offset = 0);
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="windowSize"> The length of the signal to filter. </param>
         /// <param name="sampleRate"> The sample rate of the input signal. </param>
+        /// <param name="fftSize"> The size of the FFT. </param>
         /// <param name="numFilters"> The total number of filters in the filter bank. </param>
         /// <param name="numFiltersToUse"> The number of active filters to use. The first N filters will be active. </param>
         /// <param name="offset"> The offset. </param>
-        MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse, double offset = 0);
+        MelFilterBank(size_t windowSize, double sampleRate, size_t fftSize, size_t numFilters, size_t numFiltersToUse, double offset = 0);
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="windowSize"> The length of the signal to filter. </param>
         /// <param name="sampleRate"> The sample rate of the input signal. </param>
+        /// <param name="fftSize"> The size of the FFT. </param>
         /// <param name="numFilters"> The total number of filters in the filter bank. </param>
         /// <param name="beginFilter"> The index of the first active filter. </param>
         /// <param name="endFilter"> The index one beyond the last active filter. </param>
         /// <param name="offset"> The offset. </param>
-        MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter, double offset = 0);
+        MelFilterBank(size_t windowSize, double sampleRate, size_t fftSize, size_t numFilters, size_t beginFilter, size_t endFilter, double offset = 0);
 
         /// <summary> Gets the name of this type. </summary>
         ///
@@ -267,8 +270,12 @@ namespace dsp
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
+        void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
         void InitializeBins();
+
+    private:
+        size_t _fftSize;
     };
 
     // Helper functions

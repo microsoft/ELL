@@ -90,7 +90,7 @@ def sliding_window_frame(source, window_size, shift_amount):
         yield buffer[:window_size]
 
 
-def get_wav_features(input_filename, transform, sample_rate, window_size, shift):
+def get_wav_features(input_filename, transform, sample_rate, window_size, shift, auto_scale):
     """
     Transform the given .wav input file into a set of features given the required sample rate
     window size and shift.  The window size is the number of features we need to give the
@@ -99,7 +99,7 @@ def get_wav_features(input_filename, transform, sample_rate, window_size, shift)
     """
     transform_input_size = transform.input_size
     channels = 1  # we only do mono audio right now...
-    source = wav_reader.WavReader(sample_rate, channels)
+    source = wav_reader.WavReader(sample_rate, channels, auto_scale)
     source.open(input_filename, transform_input_size)
     # apply the featurizing transform
     transform.open(source)
@@ -116,7 +116,7 @@ def get_wav_features(input_filename, transform, sample_rate, window_size, shift)
         yield features
 
 
-def _get_dataset(entry_map, transform, sample_rate, window_size, shift):
+def _get_dataset(entry_map, transform, sample_rate, window_size, shift, auto_scale):
     data_rows = []
     label_rows = []
 
@@ -130,7 +130,7 @@ def _get_dataset(entry_map, transform, sample_rate, window_size, shift):
 
         for file in entry_map[e]:
             full_path = os.path.join(e, file)
-            file_features = list(get_wav_features(full_path, transform, sample_rate, window_size, shift))
+            file_features = list(get_wav_features(full_path, transform, sample_rate, window_size, shift, auto_scale))
             if len(file_features) > 0:
                 labels = [label for r in file_features]
                 data_rows.append(file_features)
@@ -146,23 +146,26 @@ def _get_dataset(entry_map, transform, sample_rate, window_size, shift):
     return Dataset(features, label_names, parameters)
 
 
-def make_dataset(list_file, featurizer_path, sample_rate, window_size, shift):
+def make_dataset(list_file, featurizer_path, sample_rate, window_size, shift, auto_scale=True, use_cache=True):
 
     """
     Create a dataset given the input list file, a featurizer, the desired .wav sample rate,
     classifier window_size and window shift amount.  The dataset is saved to the same file name
-    with .npz extension.
+    with .npz extension.  This will do nothing if dataset is already created, unless use_cache=False.
     """
+    dataset_name = os.path.basename(list_file)
+    dataset_path = os.path.splitext(dataset_name)[0] + ".npz"
+    if use_cache and os.path.isfile(dataset_path):
+        return
+
     transform = featurizer.AudioTransform(featurizer_path, 0)
 
     entry_map = parse_list_file(list_file)
 
-    dataset = _get_dataset(entry_map, transform, sample_rate, window_size, shift)
+    dataset = _get_dataset(entry_map, transform, sample_rate, window_size, shift, auto_scale)
     if len(dataset.features) == 0:
         print("No features found in list file")
 
-    dataset_name = os.path.basename(list_file)
-    dataset_path = os.path.splitext(dataset_name)[0] + ".npz"
     print("Saving: {}".format(dataset_path))
     dataset.save(dataset_path)
 
@@ -177,6 +180,8 @@ if __name__ == "__main__":
     arg_parser.add_argument("--sample_rate", "-r", help="Sample rate of input", type=int, default=16000)
     arg_parser.add_argument("--window_size", "-ws", help="Classifier window size (default: 80)", type=int, default=80)
     arg_parser.add_argument("--shift", "-s", help="Classifier shift amount (default: 10)", type=int, default=10)
+    arg_parser.add_argument("--audo_scale", help="Whether to scale audio input to range [-1, 1] (default: false)",
+                            action="store_true")
     args = arg_parser.parse_args()
 
-    make_dataset(args.list_file, args.featurizer, args.sample_rate, args.window_size, args.shift)
+    make_dataset(args.list_file, args.featurizer, args.sample_rate, args.window_size, args.shift, args.auto_scale)

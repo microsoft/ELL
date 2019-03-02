@@ -41,12 +41,13 @@ class AudioDemo(Frame):
     """ A demo application class that provides simple GUI for testing featurizer+classifier on
     microphone or wav file input. """
 
-    def __init__(self, featurizer_model=None, classifier_model=None,
+    def __init__(self, featurizer_model=None, classifier_model=None, auto_scale=True,
                  sample_rate=None, channels=None, input_device=None, categories=None,
                  image_width=80, threshold=None, wav_file=None, clear=5, serial=None):
         """ Initialize AudioDemo object
         featurizer_model - the path to the ELL featurizer
         classifier_model - the path to the ELL classifier
+        auto_scale - auto scale audio input to range [-1, 1]
         sample_rate - sample rate to featurizer is expecting
         channels - number of channels featurizer is expecting
         input_device - optional id of microphone to use
@@ -86,7 +87,7 @@ class AudioDemo(Frame):
             self.wav_filename = self.settings[self.WAV_FILE_KEY]
 
         self.wav_file_list = None
-
+        self.auto_scale = auto_scale
         self.sample_rate = sample_rate if sample_rate is not None else 16000
         self.channels = channels if channels is not None else 1
         self.input_device = input_device
@@ -330,7 +331,7 @@ class AudioDemo(Frame):
             input_channel = self.serial
         else:
             if self.microphone is None:
-                self.microphone = microphone.Microphone(False)
+                self.microphone = microphone.Microphone(True, False)
 
             num_channels = 1
             self.microphone.open(self.featurizer.input_size, self.sample_rate, num_channels, self.input_device)
@@ -574,13 +575,13 @@ class AudioDemo(Frame):
         self.load_classifier(self.classifier_model)
 
 
-def main(featurizer_model=None, classifier=None, sample_rate=None, channels=None, input_device=None, categories=None,
-         image_width=80, threshold=None, wav_file=None, clear=5, serial=None):
+def main(featurizer_model=None, classifier=None, auto_scale=True, sample_rate=None, channels=None, input_device=None,
+         categories=None, image_width=80, threshold=None, wav_file=None, clear=5, serial=None):
     """ Main function to create root UI and AudioDemo object, then run the main UI loop """
     root = tk.Tk()
     root.geometry("800x800")
-    app = AudioDemo(featurizer_model, classifier, sample_rate, channels, input_device, categories, image_width,
-                    threshold, wav_file, clear, serial)
+    app = AudioDemo(featurizer_model, classifier, auto_scale, sample_rate, channels, input_device, categories,
+                    image_width, threshold, wav_file, clear, serial)
     root.bind("+", app.on_plus_key)
     root.bind("-", app.on_minus_key)
     while True:
@@ -620,6 +621,8 @@ if __name__ == "__main__":
                             type=float, default=5)
     arg_parser.add_argument("--serial", help="Name of serial port to read (default None)",
                             default=None)
+    arg_parser.add_argument("--auto_scale", help="Whether to auto scale audio input to range [-1, 1]",
+                            action="store_true")
     args = arg_parser.parse_args()
 
     if args.serial and args.input_device:
@@ -628,6 +631,6 @@ if __name__ == "__main__":
     if args.list_devices:
         microphone.list_devices()
     else:
-        main(args.featurizer, args.classifier,
+        main(args.featurizer, args.classifier, args.auto_scale,
              args.sample_rate, args.channels, args.input_device, args.categories,
              args.image_width, args.threshold, args.wav_file, args.clear, args.serial)

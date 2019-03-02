@@ -27,7 +27,8 @@ class RemoteRunner:
     def __init__(self, cluster=None, ipaddress=None, username=None, password=None,
                  source_dir=None, target_dir=None, copyback_files=None, copyback_dir=None,
                  command=None, logfile=None, start_clean=True, cleanup=True,
-                 timeout=None, all=None, source_files=None, apikey=None):
+                 timeout=None, all=None, source_files=None, apikey=None,
+                 platform=None):
 
         self.cluster = cluster
         if isinstance(cluster, str):
@@ -38,6 +39,8 @@ class RemoteRunner:
         self.source_dir = source_dir
         self.source_files = source_files
         self.target_dir = target_dir
+        if isinstance(copyback_files, str):
+            copyback_files = [copyback_files]
         self.copyback_files = copyback_files
         self.copyback_dir = copyback_dir
         self.command = command
@@ -45,6 +48,7 @@ class RemoteRunner:
         self.cleanup = cleanup
         self.logfile = logfile
         self.timeout = timeout
+        self.platform = platform
 
         self.all = all
         self.machine = None
@@ -71,7 +75,7 @@ class RemoteRunner:
     def lock_machine(self):
         if not self.ipaddress:
             # then this is a pi cluster server, so find a free machine
-            self.machine = self.cluster.wait_for_free_machine(self.command)
+            self.machine = self.cluster.wait_for_free_machine(self.command, rePlatform=self.platform)
             self.print("Using machine at " + self.machine.ip_address)
             self.ipaddress = self.machine.ip_address
         elif self.cluster:
@@ -280,7 +284,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(message)s")
 
     import argparse
-    arg_parser = argparse.ArgumentParser("remoterunnder executes remote commands on a given machine")
+    arg_parser = argparse.ArgumentParser("remoterunner executes remote commands on a given machine")
 
     arg_parser.add_argument("--ipaddress", help="Address of machine to run commands on", required=True)
     arg_parser.add_argument("--cluster", help="URL of picluster server", default=None)
@@ -288,6 +292,8 @@ if __name__ == "__main__":
     arg_parser.add_argument("--username", help="Username for logon to remote machine", default=None)
     arg_parser.add_argument("--password", help="Password for logon to remote machine", default=None)
     arg_parser.add_argument("--command", help="The command to run on the remote machine", default=None)
+    arg_parser.add_argument("--platform", help="Optional restriction on remote machine platform (e.g. ARMv7)",
+                            default=None)
     arg_parser.add_argument("--timeout", type=int, default=300,
                             help="Timeout for the command in seconds (default 300 seconds)")
 
@@ -297,5 +303,5 @@ if __name__ == "__main__":
 
     runner = RemoteRunner(ipaddress=args.ipaddress, cluster=args.cluster, username=args.username,
                           password=args.password, command=args.command,
-                          timeout=args.timeout, apikey=args.apikey)
+                          timeout=args.timeout, apikey=args.apikey, platform=args.platform)
     runner.run_command()

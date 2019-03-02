@@ -16,10 +16,11 @@ import pyaudio
 
 
 class WavReader:
-    def __init__(self, sample_rate=16000, channels=1):
+    def __init__(self, sample_rate=16000, channels=1, auto_scale=True):
         """ Initialize the wav reader with the type of audio you want returned.
         sample_rate  Rate you want audio converted to (default 16 kHz)
         channels     Number of channels you want output (default 1)
+        auto_scale   Whether to scale numbers to the range -1 to 1.
         """
         self.input_stream = None
         self.audio = pyaudio.PyAudio()
@@ -30,6 +31,8 @@ class WavReader:
         self.sample_width = 0
         self.read_size = None
         self.dtype = None
+        self.auto_scale = auto_scale
+        self.audio_scale_factor = 1
 
     def open(self, filename, buffer_size, speaker=None):
         """ open a wav file for reading
@@ -45,7 +48,9 @@ class WavReader:
         self.actual_rate = self.wav_file.getframerate()
         self.sample_width = self.wav_file.getsampwidth()
         # assumes signed integer used in raw audio, so for example, the max for 16bit is 2^15 (32768)
-        self.audio_scale_factor = 1 / pow(2, (8 * self.sample_width) - 1)
+        if self.auto_scale:
+            self.audio_scale_factor = 1 / pow(2, (8 * self.sample_width) - 1)
+
         if self.requested_rate == 0:
             raise Exception("Requested rate cannot be zero")
         self.buffer_size = int(math.ceil((self.read_size * self.actual_rate) / self.requested_rate))

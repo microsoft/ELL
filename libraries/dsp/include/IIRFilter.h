@@ -28,15 +28,18 @@ namespace dsp
     ///     a0*y[t] + a1*y[t-1] + a2*y[t-2] + ... = b0*x[t] + b1*x[t-1] + b2*x[t-2]
     /// -->
     ///     y[t] = (b0*x[t] + b1*x[t-1] + b2*x[t-2] ... - a1*y[t-1] - a2*y[t-2] + ...) / a0
+    ///
+    /// But for the purpose of this class the "a0" coefficient is dropped and assumed to be
+    /// equal to 1.
     template <typename ValueType>
     class IIRFilter : public utilities::IArchivable
     {
     public:
         /// <summary> Construct a filter given the feedforward and recursive filter coefficients. </summary>
         ///
-        /// <param name="b"> The feedforward coefficients for the filter. </param>
-        /// <param name="a"> The recursive coefficients for the filter. </param>
-        IIRFilter(std::vector<ValueType> b, std::vector<ValueType> a); // a are the coeffs on past output values (feedback), and b are the coeffs on input values (feedforward / FIR part)
+        /// <param name="b"> The coefficients that operate on input values (feed forward). </param>
+        /// <param name="a"> The coefficients that operate on past output values, not including a0 (feedback). </param>
+        IIRFilter(std::vector<ValueType> b, std::vector<ValueType> a);
 
         /// <summary> Filter a new input sample. <summary>
         ///
@@ -113,15 +116,17 @@ namespace dsp
         assert(_a.size() == _previousOutput.Size());
         for (size_t index = 0; index < _b.size(); index++)
         {
-            output += _b[index] * _previousInput[static_cast<int>(index)];
+            output += _b[index] * _previousInput[index];
         }
 
-        for (size_t index = 0; index < _a.size(); index++)
+        if (_a.size() > 0)
         {
-            output -= _a[index] * _previousOutput[static_cast<int>(index)];
+            for (size_t index = 0; index < _a.size(); index++)
+            {
+                output -= _a[index] * _previousOutput[index];
+            }
+            _previousOutput.Append(output);
         }
-
-        _previousOutput.Append(output);
         return output;
     }
 

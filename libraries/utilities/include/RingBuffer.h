@@ -15,34 +15,37 @@ namespace ell
 {
 namespace utilities
 {
-    /// <summary> A simple fixed-length ring buffer. </summary>
+    /// <summary> A simple fixed-length ring buffer.  A ring buffer holds a fixed size
+    /// of the most recent items appended and older items are forgotten. </summary>
     template <typename T>
     class RingBuffer
     {
     public:
-        /// <summary> Constructor </summary>
+        /// <summary> The constructor size parameter determines how much history this buffer can remember.
+        /// This size is fixed and Append will truncate input so it only ever remembers this many items.
+        /// The buffer is initialized with zeros. </summary>
         ///
-        /// <param name="size"> The length of the buffer. </param>
+        /// <param name="size"> The size of the buffer.  </param>
         RingBuffer(size_t size);
 
-        /// <summary> Get the length of the buffer </summary>
+        /// <summary> Get the size of the buffer.  This is fixed at construction time and does not change.  </summary>
         ///
-        /// <returns> The length of the buffer. </returns>
+        /// <returns> The size of the buffer. </returns>
         size_t Size() const;
 
-        /// <summary> Access an element in the buffer </summary>
+        /// <summary> Access an element in the buffer in order of most recent to oldest item.</summary>
         ///
         /// <param name="index"> The index into the buffer. </param>
         ///
         /// <returns> A mutable reference to the element at the given index. </returns>
-        T& operator[](int index);
+        T& operator[](size_t index);
 
-        /// <summary> Access an element in the buffer </summary>
+        /// <summary> Access an element in the buffer in order of most recent to oldest item.</summary>
         ///
         /// <param name="index"> The index into the buffer. </param>
         ///
         /// <returns> A const reference to the element at the given index. </returns>
-        const T& operator[](int index) const;
+        const T& operator[](size_t index) const;
 
         /// <summary> Add a new element at the end of the buffer. </summary>
         ///
@@ -58,7 +61,7 @@ namespace utilities
         void Resize(size_t size);
 
     private:
-        size_t GetBufferIndex(int inputIndex) const;
+        size_t GetBufferIndex(size_t inputIndex) const;
 
         std::vector<T> _buffer;
         size_t _currentPos = 0;
@@ -96,20 +99,20 @@ namespace utilities
     }
 
     template <typename T>
-    size_t RingBuffer<T>::GetBufferIndex(int entryIndex) const
+    size_t RingBuffer<T>::GetBufferIndex(size_t entryIndex) const
     {
         int size = static_cast<int>(Size());
         return (size + _currentPos - entryIndex) % (int)size; // Note: it's important the RHS argument to % is a signed int
     }
 
     template <typename T>
-    const T& RingBuffer<T>::operator[](int index) const
+    const T& RingBuffer<T>::operator[](size_t index) const
     {
         return _buffer[GetBufferIndex(index)];
     }
 
     template <typename T>
-    T& RingBuffer<T>::operator[](int index)
+    T& RingBuffer<T>::operator[](size_t index)
     {
         return _buffer[GetBufferIndex(index)];
     }

@@ -12,9 +12,8 @@ datatable: true
 
 <p>
 These models use different neural network architectures with different sizes to trade off accuracy and speed. The plot below shows how each of the
-models performs in terms of accuracy (how often the most confident prediction is right) versus speed (milliseconds per audio prediction).
-Click and drag to pan around. Zoom in and out with your mouse's scrollwheel.  Click on a model to go to the gallery page where you can download
-that model.</p>
+models performs in terms of accuracy (how often the most confident prediction is right) versus speed (milliseconds per audio prediction on a Raspberry Pi 3 device).
+Click and drag to pan around. Zoom in and out with your mouse's scrollwheel.  Click on a model to go to the gallery page where you can download that model.</p>
 <br/>
 <div id='plot' ></div>
 
@@ -160,7 +159,7 @@ window.onload = function () {
 <tr>
   <th>Architecture</th>
   <th>Accuracy</th>
-  <th>msec/frame<br>on a PC</th>
+  <th>msec/frame</th>
   <th>Model name</th>
 </tr>
 </thead>

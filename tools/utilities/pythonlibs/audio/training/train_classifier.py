@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 ###################################################################################################
 #
 #  Project:  Embedded Learning Library (ELL)
@@ -24,7 +24,7 @@ from torch.utils.data import Dataset, DataLoader
 
 
 class KeywordSpotter(nn.Module):
-    """ This baseclass provides the PyTorch Module pattern for definining and training keyword spotters """
+    """ This baseclass provides the PyTorch Module pattern for defining and training keyword spotters """
 
     def __init__(self, input_dim, num_keywords, batch_first=False):
         """
@@ -153,36 +153,48 @@ class KeywordSpotter(nn.Module):
 class GRUKeywordSpotter(KeywordSpotter):
     """This class is a PyTorch Module that implements a 2 layer GRU based audio classifier"""
 
-    def __init__(self, input_dim, num_keywords, hidden_dim):
+    def __init__(self, input_dim, num_keywords, hidden_dim, num_layers):
         """
         Initialize the KeywordSpotter with the following parameters:
         input_dim - the size of the input audio frame in # samples.
         hidden_dim - the size of the hidden state of the GRU nodes
         num_keywords - the number of predictions to come out of the model.
+        num_layers - the number of GRU layers to use
         """
-        super(GRUKeywordSpotter, self).__init__(input_dim, num_keywords)
         self.hidden_dim = hidden_dim
+        self.additional_layers = num_layers - 1
+        super(GRUKeywordSpotter, self).__init__(input_dim, num_keywords)
 
         # The GRU takes audio sequences as input, and outputs hidden states
         # with dimensionality hidden_dim.
         self.gru1 = nn.GRU(input_dim, hidden_dim)
-        self.gru2 = nn.GRU(hidden_dim, hidden_dim)
+        self.gru_layers = [None] * self.additional_layers
+        input_size = hidden_dim
+        hidden_size = hidden_dim
+        last_output_size = hidden_dim
+        for i in range(self.additional_layers):
+            self.gru_layers[i] = nn.GRU(input_size, hidden_size)
+            self.add_module("gru{}".format(i), self.gru_layers[i])
+            last_output_size = hidden_size
+            input_size = hidden_size
+            hidden_size = num_keywords  # layer 3 can reduce output to num_keywords.
 
         # The linear layer is a fully connected layer that maps from hidden state space
         # to number of expected keywords
-        self.hidden2keyword = nn.Linear(hidden_dim, num_keywords)
+        self.hidden2keyword = nn.Linear(last_output_size, num_keywords)
         self.init_hidden()
 
     def init_hidden(self):
         """ Clear the hidden state for the GRU nodes """
         self.hidden1 = None
-        self.hidden2 = None
+        self.hidden_states = [None] * self.additional_layers
 
     def forward(self, input):
         """ Perform the forward processing of the given input and return the prediction """
         # input is shape: [seq,batch,feature]
         gru_out, self.hidden1 = self.gru1(input, self.hidden1)
-        gru_out, self.hidden2 = self.gru2(gru_out, self.hidden2)
+        for i in range(self.additional_layers):
+            gru_out, self.hidden_states[i] = self.gru_layers[i](gru_out, self.hidden_states[i])
         keyword_space = self.hidden2keyword(gru_out)
         result = F.log_softmax(keyword_space, dim=2)
         # return the mean across the sequence length to produce the
@@ -196,37 +208,49 @@ class GRUKeywordSpotter(KeywordSpotter):
 class LSTMKeywordSpotter(KeywordSpotter):
     """This class is a PyTorch Module that implements a 2 layer LSTM based audio classifier"""
 
-    def __init__(self, input_dim, num_keywords, hidden_dim):
+    def __init__(self, input_dim, num_keywords, hidden_dim, num_layers):
         """
         Initialize the KeywordSpotter with the following parameters:
         input_dim - the size of the input audio frame in # samples.
         hidden_dim - the size of the hidden state of the LSTM nodes
         num_keywords - the number of predictions to come out of the model.
+        num_layers - the number of GRU layers to use
         """
-        super(LSTMKeywordSpotter, self).__init__(input_dim, num_keywords)
         self.hidden_dim = hidden_dim
         self.input_dim = input_dim
+        self.additional_layers = num_layers - 1
+        super(LSTMKeywordSpotter, self).__init__(input_dim, num_keywords)
 
         # The LSTM takes audio sequences as input, and outputs hidden states
         # with dimensionality hidden_dim.
         self.lstm1 = nn.LSTM(input_dim, hidden_dim)
-        self.lstm2 = nn.LSTM(hidden_dim, hidden_dim)
+        self.lstm_layers = [None] * self.additional_layers
+        input_size = hidden_dim
+        hidden_size = hidden_dim
+        last_output_size = hidden_dim
+        for i in range(self.additional_layers):
+            self.lstm_layers[i] = nn.LSTM(input_size, hidden_size)
+            self.add_module("lstm{}".format(i), self.lstm_layers[i])
+            last_output_size = hidden_size
+            input_size = hidden_size
+            hidden_size = num_keywords  # layer 3 can reduce output to num_keywords.
 
         # The linear layer is a fully connected layer that maps from hidden state space
         # to number of expected keywords
-        self.hidden2keyword = nn.Linear(hidden_dim, num_keywords)
+        self.hidden2keyword = nn.Linear(last_output_size, num_keywords)
         self.init_hidden()
 
     def init_hidden(self):
         """ Clear the hidden state for the LSTM nodes """
         self.hidden1 = None
-        self.hidden2 = None
+        self.hidden_states = [None] * self.additional_layers
 
     def forward(self, input):
         """ Perform the forward processing of the given input and return the prediction """
         # input is shape: [seq,batch,feature]
         lstm_out, self.hidden1 = self.lstm1(input, self.hidden1)
-        lstm_out, self.hidden2 = self.lstm2(lstm_out, self.hidden2)
+        for i in range(self.additional_layers):
+            lstm_out, self.hidden_states[i] = self.lstm_layers[i](lstm_out, self.hidden_states[i])
         keyword_space = self.hidden2keyword(lstm_out)
         result = F.log_softmax(keyword_space, dim=2)
         # return the mean across the sequence length to produce the
@@ -286,20 +310,20 @@ class AudioDataset(Dataset):
         return sample
 
 
-def create_model(arch, input_size, num_keywords, hidden_units):
+def create_model(arch, input_size, num_keywords, hidden_units, num_layers):
     if arch == "GRU":
-        return GRUKeywordSpotter(input_size, num_keywords, hidden_units)
+        return GRUKeywordSpotter(input_size, num_keywords, hidden_units, num_layers)
     elif arch == "LSTM":
-        return LSTMKeywordSpotter(input_size, num_keywords, hidden_units)
+        return LSTMKeywordSpotter(input_size, num_keywords, hidden_units, num_layers)
     else:
         raise Exception("Model architecture '{}' not supported".format(arch))
 
 
 def train(epochs=30, hidden_units=128, learning_rate=1e-3, weight_decay=1e-5, batch_size=128, filename=None,
-          evaluate_only=False, categories_file=None, wav_directory=None, architecture="GRU"):
+          evaluate_only=False, categories_file=None, wav_directory=None, architecture="GRU", num_layers=2):
 
     if filename is None:
-        filename = architecture + "KeywordSpotter.pt"
+        filename = "{}{}KeywordSpotter.pt".format(architecture, hidden_units)
 
     # load the featurized data
     if not os.path.isdir(wav_directory):
@@ -346,7 +370,8 @@ def train(epochs=30, hidden_units=128, learning_rate=1e-3, weight_decay=1e-5, ba
         print("Loading {}...".format(validation_file))
         validation_data = AudioDataset(validation_file, keywords)
 
-        model = create_model(architecture, training_data.input_size, training_data.num_keywords, hidden_units)
+        model = create_model(architecture, training_data.input_size, training_data.num_keywords, hidden_units,
+                             num_layers)
         if device:
             model.cuda()  # move the processing to GPU
         model.fit(training_data, validation_data, batch_size, epochs, learning_rate, weight_decay, device)
@@ -363,7 +388,7 @@ def train(epochs=30, hidden_units=128, learning_rate=1e-3, weight_decay=1e-5, ba
     if model is None:
         msg = "Loading trained model with input size {}, hidden units {} and num keywords {}"
         print(msg.format(test_data.input_size, hidden_units, test_data.num_keywords))
-        model = create_model(architecture, test_data.input_size, test_data.num_keywords, hidden_units)
+        model = create_model(architecture, test_data.input_size, test_data.num_keywords, hidden_units, num_layers)
         model.load_state_dict(torch.load(filename))
         if model and device:
             model.cuda()  # move the processing to GPU

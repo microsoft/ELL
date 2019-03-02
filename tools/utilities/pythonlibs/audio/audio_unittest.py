@@ -93,7 +93,8 @@ class AudioUnitTest(unittest.TestCase):
         self.sample_rate = item["sample_rate"]
 
         return make_featurizer.make_featurizer(filename, self.sample_rate, self.input_size, self.input_size,
-                                               filterbank_type="mel", filterbank_size=self.num_filters, log_node=True)
+                                               filterbank_type="mel", filterbank_size=self.num_filters, log_node=True,
+                                               filterbank_nfft=256)
 
     def compile_model(self, model_file, outputdir, module_name):
         self.wrap_model(model_file, outputdir, module_name, "python")

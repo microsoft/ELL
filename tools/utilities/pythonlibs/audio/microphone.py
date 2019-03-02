@@ -29,7 +29,7 @@ def list_devices():
 class Microphone:
     """ This class wraps the pyaudio library and it's input stream callback providing a simple to
     use Microphone class that you can simply read from """
-    def __init__(self, console=True):
+    def __init__(self, auto_scale=True, console=True):
         """ Create Microphone object.
         console - specifies whether you are running from console app, if so this will listen for
         stdin "x" so user can tell you app to close the microphone """
@@ -42,6 +42,8 @@ class Microphone:
         self.console = console
         self.stdin_thread = None
         self.input_stream = None
+        self.auto_scale = auto_scale
+        self.audio_scale_factor = 1
 
     def open(self, sample_size, sample_rate, num_channels, input_device=None):
         """ Open the microphone so it returns chunks of audio samples of the given sample_size
@@ -71,7 +73,8 @@ class Microphone:
                                             input=True,
                                             frames_per_buffer=buffer_size,
                                             stream_callback=self._on_recording_callback)
-        self.audio_scale_factor = 1 / 32768  # since we are using pyaudio.paInt16.
+        if self.auto_scale:
+            self.audio_scale_factor = 1 / 32768  # since we are using pyaudio.paInt16.
         self.closed = False
         if self.console:
             # since our read call blocks the UI we use a separate thread to monitor user input

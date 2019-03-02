@@ -274,7 +274,7 @@ def test_mel_filterbank(testing):
 
     input_node = mb.AddInputNode(model, input_shape, ell.nodes.PortType.real)
     filterbank_node = mb.AddMelFilterBankNode(model, ell.nodes.PortElements(input_node.GetOutputPort("output")),
-                                              sample_rate, num_filters, num_filters)
+                                              sample_rate, size, num_filters, num_filters)
     outputNode = mb.AddOutputNode(model, output_shape, ell.nodes.PortElements(filterbank_node.GetOutputPort("output")))
 
     map = ell.model.Map(model, input_node, ell.nodes.PortElements(outputNode.GetOutputPort("output")))

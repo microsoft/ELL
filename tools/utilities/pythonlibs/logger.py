@@ -23,6 +23,8 @@ def add_logging_args(arg_parser):
 
 class Log:
     def __init__(self, verbosity, logfile, logmode, format):
+        """ create new Log object.  See https://docs.python.org/3/library/logging.html#logrecord-attributes for
+        information on possible format strings """
         logging.basicConfig(level=verbosity, format=format)
         self.verbosity = verbosity
         self.silent = verbosity == 0

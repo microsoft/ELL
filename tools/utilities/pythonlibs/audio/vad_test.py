@@ -38,12 +38,13 @@ import vad
 class VadTest(Frame):
     """ A demo class that provides simple GUI for testing voice activity detection on microphone or wav file input. """
 
-    def __init__(self, featurizer_path, input_device, wav_file, sample_rate):
+    def __init__(self, featurizer_path, input_device, wav_file, sample_rate, auto_scale):
         """ Initialize the VadTest object:
         featurizer_path - path to the ELL featurizer to use
         input_device - id of the microphone to use
         wav_file - optional wav_file to use when you click play
         sample_rate - the sample rate to resample the incoming audio
+        auto_scale - auto scale audio input to the range [-1, 1]
         """
         super().__init__()
 
@@ -53,6 +54,7 @@ class VadTest(Frame):
         self.output_clear_time = 5000
         self.channels = 1
         self.init_ui()
+        self.auto_scale = auto_scale
 
         self.get_settings_file_name()
         self.load_settings()
@@ -470,7 +472,7 @@ class VadTest(Frame):
 
         self.read_ui_settings()
         self.reading_input = False
-        self.wav_file = wav_reader.WavReader(self.sample_rate, self.channels)
+        self.wav_file = wav_reader.WavReader(self.sample_rate, self.channels, auto_scale=self.auto_scale)
         self.wav_file.open(filename, self.featurizer.input_size, self.speaker)
         self.setup_spectrogram_image()
 
@@ -499,7 +501,7 @@ class VadTest(Frame):
         process the audio and we setup a UI animation function to draw the sliding spectrogram image, this way
         the UI update doesn't interfere with the smoothness of the microphone readings """
         if self.microphone is None:
-            self.microphone = microphone.Microphone(False)
+            self.microphone = microphone.Microphone(True, False)
 
         self.stop()
         self.read_ui_settings()
@@ -553,11 +555,11 @@ class VadTest(Frame):
         self.reading_input = False
 
 
-def main(featurizer, input_device, wav_file, sample_rate):
+def main(featurizer, input_device, wav_file, sample_rate, auto_scale):
     """ Main function to create root UI and AudioDemo object, then run the main UI loop """
     root = tk.Tk()
     root.geometry("800x800")
-    app = VadTest(featurizer, input_device, wav_file, sample_rate)
+    app = VadTest(featurizer, input_device, wav_file, sample_rate, auto_scale)
     root.bind("+", app.on_plus_key)
     root.bind("-", app.on_minus_key)
     while True:
@@ -578,10 +580,11 @@ if __name__ == "__main__":
                             default=1, type=int)
     arg_parser.add_argument("--list_devices", help="List available input devices", action="store_true")
     arg_parser.add_argument("--wav_file", help="Provide an input wav file to test", default=None)
+    arg_parser.add_argument("--auto_scale", help="Auto-scale autio input to range [-1,1]", action="store_true")
     arg_parser.add_argument("--sample_rate", type=int, help="The sample rate that featurizer is setup to use",
                             default=16000)
     args = arg_parser.parse_args()
     if args.list_devices:
         microphone.list_devices()
     else:
-        main(args.featurizer, args.input_device, args.wav_file, args.sample_rate)
+        main(args.featurizer, args.input_device, args.wav_file, args.sample_rate, args.auto_scale)

@@ -373,6 +373,7 @@ static void TestMelFilterBankNode()
     const ValueType epsilon = static_cast<ValueType>(1e-6);
     const size_t numFilters = 13;
     const size_t windowSize = 512;
+    const size_t fftSize = 512;
     const double sampleRate = 16000;
 
     std::vector<ValueType> signal(windowSize);
@@ -381,7 +382,7 @@ static void TestMelFilterBankNode()
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ValueType>>(windowSize);
-    auto filters = dsp::MelFilterBank(windowSize, sampleRate, numFilters);
+    auto filters = dsp::MelFilterBank(windowSize, sampleRate, fftSize, numFilters);
     auto outputNode = model.AddNode<nodes::MelFilterBankNode<ValueType>>(inputNode->output, filters);
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });

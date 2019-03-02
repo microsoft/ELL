@@ -13,6 +13,7 @@
 Utility for creating ELL featurizer models
 """
 import argparse
+import math
 import os
 
 import find_ell_root  # noqa: F401
@@ -36,7 +37,7 @@ def _get_tensor_shape(shape):
 
 def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, filterbank_size,
                   nfft=None, iir_node=False, log_node=False, dct_node=False, power_spec=False,
-                  log_delta=1.0):
+                  log_delta=1.0, filterbank_nfft=None):
     builder = ell.model.ModelBuilder()
     ell_model = ell.model.Model()
 
@@ -49,8 +50,10 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
 
     # Add optional IIR filter
     if iir_node:
-        a_coeffs = [-0.95]
-        b_coeffs = [1.0]
+        # this simulates a simple pre-emphasis filter that matches what python_speech_features does
+        # in the fbank function.
+        a_coeffs = []  # no feed forward
+        b_coeffs = [1.0, -0.97]  # subtract 0.97 of previous input
         port = ell.nodes.PortElements(last_node.GetOutputPort("output"))
         last_node = iir_node = builder.AddIIRFilterNode(ell_model, port, b_coeffs, a_coeffs)
         last_node.SetMetadataValue("iir", "true")
@@ -67,7 +70,12 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
     if nfft:
         last_node = builder.AddFFTNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")), nfft)
     else:
+        inputSize = last_node.GetOutputPort("output").Size()
+        nfft = int(math.pow(2, math.ceil(math.log2(inputSize))))
         last_node = builder.AddFFTNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")))
+
+    if not filterbank_nfft:
+        filterbank_nfft = nfft
 
     if power_spec:
         fft_size = last_node.GetOutputPort("output").Size()
@@ -83,7 +91,8 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
     # Add filterbank
     port = ell.nodes.PortElements(last_node.GetOutputPort("output"))
     if filterbank_type == "mel":
-        last_node = builder.AddMelFilterBankNode(ell_model, port, sample_rate, filterbank_size, num_filters)
+        last_node = builder.AddMelFilterBankNode(ell_model, port, sample_rate, filterbank_nfft, filterbank_size,
+                                                 num_filters)
     elif filterbank_type == "linear":
         last_node = builder.AddLinearFilterBankNode(ell_model, port, sample_rate, filterbank_size, num_filters)
 
@@ -121,7 +130,7 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
 
 def make_featurizer(output_filename, sample_rate, window_size, input_buffer_size, filterbank_type,
                     filterbank_size, nfft=None, iir_node=False, log_node=False, dct_node=False, power_spec=False,
-                    log_delta=1.0):
+                    log_delta=1.0, filterbank_nfft=None):
     """
     Create a new featurizer ELL model:
     output_filename     - the output ELL model file name
@@ -134,6 +143,7 @@ def make_featurizer(output_filename, sample_rate, window_size, input_buffer_size
     iir_node            - whether to insert an IIR filter node
     log_node            - whether to append a logarithm node
     dct_node            - whether to include a DCT node in the model
+    filterbank_nfft     - allows you to override the nfft parameter on the MelFilterBank (for testing only)
     """
     # Create output directory if necessary
     output_directory = os.path.dirname(output_filename)
@@ -141,7 +151,8 @@ def make_featurizer(output_filename, sample_rate, window_size, input_buffer_size
         os.makedirs(output_directory)
 
     map = _create_model(sample_rate, window_size, input_buffer_size, filterbank_type,
-                        filterbank_size, nfft, iir_node, log_node, dct_node, power_spec, log_delta)
+                        filterbank_size, nfft, iir_node, log_node, dct_node, power_spec, log_delta,
+                        filterbank_nfft)
 
     # print("Saving model {}".format(output_filename))
     map.Save(output_filename)

@@ -198,6 +198,8 @@ namespace model
 
     void Map::Reset()
     {
+        value::ContextGuard<> guard(_computeContext);
+
         _model.Reset();
     }
 

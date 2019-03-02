@@ -197,6 +197,11 @@ namespace dsp
     void TriangleFilterBank::SetBins(const std::vector<size_t>& bins)
     {
         _bins = bins;
+        if (std::any_of(bins.begin(), bins.end(), [this](size_t v) { return v > _windowSize; }))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange,
+                "TriangleFilterBank::SetBins received a value that is outside the _windowSize");
+        }
     }
 
     //
@@ -249,25 +254,24 @@ namespace dsp
     // MelFilterBank
     //
 
-    MelFilterBank::MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, double offset) :
-        MelFilterBank(windowSize, sampleRate, numFilters, 0, numFilters, offset)
+    MelFilterBank::MelFilterBank(size_t windowSize, double sampleRate, size_t fftSize, size_t numFilters, double offset) :
+        MelFilterBank(windowSize, sampleRate, fftSize, numFilters, 0, numFilters, offset)
     {
     }
 
-    MelFilterBank::MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t numFiltersToUse, double offset) :
-        MelFilterBank(windowSize, sampleRate, numFilters, 0, numFiltersToUse, offset)
+    MelFilterBank::MelFilterBank(size_t windowSize, double sampleRate, size_t fftSize, size_t numFilters, size_t numFiltersToUse, double offset) :
+        MelFilterBank(windowSize, sampleRate, fftSize, numFilters, 0, numFiltersToUse, offset)
     {
     }
 
-    MelFilterBank::MelFilterBank(size_t windowSize, double sampleRate, size_t numFilters, size_t beginFilter, size_t endFilter, double offset) :
-        TriangleFilterBank(windowSize, sampleRate, numFilters, beginFilter, endFilter, offset)
+    MelFilterBank::MelFilterBank(size_t windowSize, double sampleRate, size_t fftSize, size_t numFilters, size_t beginFilter, size_t endFilter, double offset) :
+        TriangleFilterBank(windowSize, sampleRate, numFilters, beginFilter, endFilter, offset), _fftSize(fftSize)
     {
         MelFilterBank::InitializeBins();
     }
 
     void MelFilterBank::InitializeBins()
     {
-        const auto windowSize = GetWindowSize();
         const auto numFilters = NumFilters();
         const auto sampleRate = GetSampleRate();
 
@@ -282,15 +286,25 @@ namespace dsp
         {
             auto melPoint = index * melInc + loMel;
             auto freqPoint = MelToFreq(melPoint);
-            bins[index] = static_cast<int>(freqPoint * (windowSize + 1) / sampleRate);
+            bins[index] = static_cast<int>(freqPoint * (_fftSize + 1) / sampleRate);
         }
 
         SetBins(bins);
     }
 
+    void MelFilterBank::WriteToArchive(utilities::Archiver& archiver) const
+    {
+        TriangleFilterBank::WriteToArchive(archiver);
+        archiver["fftSize"] << _fftSize;
+    }
+
     void MelFilterBank::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         TriangleFilterBank::ReadFromArchive(archiver);
+        if (archiver.HasNextPropertyName("fftSize"))
+        {
+            archiver["fftSize"] >> _fftSize;
+        }
         InitializeBins();
     }
 

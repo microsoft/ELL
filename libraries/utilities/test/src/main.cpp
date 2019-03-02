@@ -15,6 +15,7 @@
 #include "MemoryLayout_test.h"
 #include "ObjectArchive_test.h"
 #include "PropertyBag_test.h"
+#include "RingBuffer_test.h"
 #include "TypeFactory_test.h"
 #include "TypeName_test.h"
 #include "Variant_test.h"
@@ -41,6 +42,8 @@ int main(int argc, char* argv[])
     try
     {
         std::string basePath = ell::utilities::GetDirectoryPath(argv[0]);
+
+        TestRingBuffer();
 
         // Format tests
         TestMatchFormat();

@@ -40,7 +40,7 @@ def test_keyword_spotter(featurizer_model, classifier_model, categories, wav_fil
         reader = wav_reader.WavReader(sample_rate, CHANNELS)
         reader.open(wav_file, transform.input_size, the_speaker)
     else:
-        reader = microphone.Microphone(True)
+        reader = microphone.Microphone(True, True)
         reader.open(transform.input_size, sample_rate, CHANNELS)
         print("Please type 'x' and enter to terminate this app...")
 

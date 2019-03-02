@@ -36,7 +36,7 @@ namespace dsp
         /// </summary>
         VoiceActivityDetector();
 
-        /// <summary> Construct new voice activity recorder  </summary>
+        /// <summary> Construct new voice activity detector  </summary>
         ///
         /// <param name="sampleRate"> The sample rate of input signal. </param>
         /// <param name="windowSize"> The size of the window (should equal the size of the data given to each process call). </param>

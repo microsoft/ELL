@@ -91,7 +91,7 @@ public:
     InputNode AddInputNode(Model model, const ell::api::math::TensorShape& outputShape, PortType type);
     InputNode AddInputNode(Model model, const PortMemoryLayout& memoryLayout, PortType type);
     Node AddLinearFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse, double offset = 0);
-    Node AddMelFilterBankNode(Model model, PortElements input, double sampleRate, int numFilters, int numFiltersToUse, double offset = 0);
+    Node AddMelFilterBankNode(Model model, PortElements input, double sampleRate, int fftSize, int numFilters, int numFiltersToUse, double offset = 0);
     OutputNode AddOutputNode(Model model, const ell::api::math::TensorShape& outputShape, PortElements input);
     OutputNode AddOutputNode(Model model, const PortMemoryLayout& memoryLayout, PortElements input);
     Node AddReinterpretLayoutNode(Model model, PortElements input, PortMemoryLayout outputMemoryLayout);

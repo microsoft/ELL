@@ -118,6 +118,7 @@ set(test_src
   test/src/MemoryLayout_test.cpp
   test/src/ObjectArchive_test.cpp
   test/src/PropertyBag_test.cpp
+  test/src/RingBuffer_test.cpp
   test/src/TypeFactory_test.cpp
   test/src/TypeName_test.cpp
   test/src/Variant_test.cpp
@@ -133,6 +134,7 @@ set(test_include
   test/include/MemoryLayout_test.h
   test/include/ObjectArchive_test.h
   test/include/PropertyBag_test.h
+  test/include/RingBuffer_test.h
   test/include/TypeFactory_test.h
   test/include/TypeName_test.h
   test/include/Variant_test.h
@@ -142,7 +144,7 @@ set(test_include
 source_group("src" FILES ${test_src})
 source_group("include" FILES ${test_include})
 
-add_executable(${test_name} ${test_src} ${test_include} ${include})
+add_executable(${test_name} ${test_src} ${test_include})
 target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 
 target_link_libraries(${test_name} utilities testing)
