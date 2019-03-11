@@ -65,9 +65,10 @@ namespace model
         // Verify each of the supplied inputs is necessary
         std::unordered_set<const InputPortBase*> inputs(_inputs.begin(), _inputs.end());
         std::unordered_set<const InputPortBase*> unseenInputs(_inputs.begin(), _inputs.end());
+        std::unordered_set<const InputPortBase*> visitedNodes;
         for (const OutputPortBase* output : _outputs)
         {
-            VerifyInputs(output, inputs, unseenInputs);
+            VerifyInputs(output, inputs, unseenInputs, visitedNodes);
         }
 
         if (!unseenInputs.empty())
@@ -76,21 +77,25 @@ namespace model
         }
     }
 
-    void Submodel::VerifyInputs(const OutputPortBase* output, const std::unordered_set<const InputPortBase*>& inputs, std::unordered_set<const InputPortBase*>& unseenInputs)
+    void Submodel::VerifyInputs(const OutputPortBase* output, const std::unordered_set<const InputPortBase*>& inputs, std::unordered_set<const InputPortBase*>& unseenInputs, std::unordered_set<const InputPortBase*>& visitedNodes)
     {
         auto node = output->GetNode();
         for (auto input : node->GetInputPorts())
         {
-            if (inputs.find(input) != inputs.end())
+            if (visitedNodes.find(input) == visitedNodes.end())
             {
-                if (unseenInputs.find(input) != unseenInputs.end())
+                visitedNodes.insert(input);
+                if (inputs.find(input) != inputs.end())
                 {
-                    unseenInputs.erase(unseenInputs.find(input));
+                    if (unseenInputs.find(input) != unseenInputs.end())
+                    {
+                        unseenInputs.erase(unseenInputs.find(input));
+                    }
                 }
-            }
-            else
-            {
-                VerifyInputs(&(input->GetReferencedPort()), inputs, unseenInputs);
+                else
+                {
+                    VerifyInputs(&(input->GetReferencedPort()), inputs, unseenInputs, visitedNodes);
+                }
             }
         }
     }

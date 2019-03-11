@@ -1044,6 +1044,11 @@ class OnnxReshapeConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Reshape")
 
+    def convert(self, onnx_node):
+        node = super().convert(onnx_node)
+        self.remove_input_tensors(node)
+        return node
+
     def get_output_shapes(self):
         # second input is the tensor that describes how to reshape the input.
         tensor = self.get_tensor(self.node.inputs[1])[0]

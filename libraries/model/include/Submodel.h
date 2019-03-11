@@ -82,7 +82,7 @@ namespace model
     private:
         friend void swap(Submodel& a, Submodel& b);
         void VerifyInputs();
-        void VerifyInputs(const OutputPortBase* output, const std::unordered_set<const InputPortBase*>& inputs, std::unordered_set<const InputPortBase*>& unseenInputs);
+        void VerifyInputs(const OutputPortBase* output, const std::unordered_set<const InputPortBase*>& inputs, std::unordered_set<const InputPortBase*>& unseenInputs, std::unordered_set<const InputPortBase*>& visitedNodes);
 
         Model _model;
         std::vector<const InputPortBase*> _inputs;
