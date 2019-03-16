@@ -202,7 +202,6 @@ namespace nodes
 
         // Get LLVM references for all node inputs
         auto input = compiler.EnsurePortEmitted(this->input);
-        auto resetTrigger = compiler.EnsurePortEmitted(this->resetTrigger);
         auto inputWeights = compiler.EnsurePortEmitted(this->inputWeights);
         auto hiddenWeights = compiler.EnsurePortEmitted(this->hiddenWeights);
         auto inputBias = compiler.EnsurePortEmitted(this->inputBias);
@@ -315,15 +314,7 @@ namespace nodes
         // resetFunction.Print("### LSTM Node was reset\n"); // this is a handy way to debug whether the VAD node is working or not.
         module.EndResetFunction();
 
-        // if the reset trigger drops to zero then it means it is time to reset this node, but only do this when signal transitions from 1 to 0
-        // Allocate global variable to hold the previous trigger value so we can detect the change in state.
-        auto lastSignal = module.Global<int>(compiler.GetGlobalName(*this, "lastSignal"), 0);
-        auto lastSignalValue = function.LocalScalar(function.Load(lastSignal));
-        auto resetTriggerValue = function.LocalScalar(function.CastValue<int>(function.Load(resetTrigger)));
-        function.If((resetTriggerValue == 0) && (lastSignalValue == 1), [resetFunctionName](emitters::IRFunctionEmitter& fn) {
-            fn.Call(resetFunctionName);
-        });
-        function.Store(lastSignal, resetTriggerValue);
+        this->CompileReset(compiler, function, resetFunctionName);
     }
 
     template <typename ValueType>

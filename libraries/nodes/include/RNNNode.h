@@ -90,6 +90,7 @@ namespace nodes
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        virtual void CompileReset(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, std::string resetFunctionName);
         bool HasState() const override { return true; }
 
         void WriteToArchive(utilities::Archiver& archiver) const override;

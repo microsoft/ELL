@@ -157,7 +157,7 @@ namespace nodes
     {
         // Helper function for Compute to use to figure out if node should be reset using the _resetTrigger input.
         bool result = false;
-        
+
         if (this->_resetTrigger.Size() > 0)
         {
             auto triggerValue = this->_resetTrigger.GetInputElement(0).ReferencedPort()->GetDoubleOutput(0);
@@ -216,7 +216,6 @@ namespace nodes
 
         // Get LLVM references for all node inputs
         auto input = compiler.EnsurePortEmitted(this->input);
-        auto resetTrigger = compiler.EnsurePortEmitted(this->resetTrigger);
         auto inputWeights = compiler.EnsurePortEmitted(this->inputWeights);
         auto hiddenWeights = compiler.EnsurePortEmitted(this->hiddenWeights);
         auto inputBias = compiler.EnsurePortEmitted(this->inputBias);
@@ -270,8 +269,16 @@ namespace nodes
         // resetFunction.Print("### LSTM Node was reset\n"); // this is a handy way to debug whether the VAD node is working or not.
         module.EndResetFunction();
 
-        // if the reset trigger drops to zero then it means it is time to reset this node, but only do this when signal transitions from 1 to 0
+        CompileReset(compiler, function, resetFunctionName);
+    }
+
+    template <typename ValueType>
+    void RNNNode<ValueType>::CompileReset(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function, std::string resetFunctionName)
+    {
+        // if the reset trigger drops to zero then it means it is time to reset this node, but only do this when signal transitions from not 0 to 0
         // Allocate global variable to hold the previous trigger value so we can detect the change in state.
+        emitters::IRModuleEmitter& module = function.GetModule();
+        auto resetTrigger = compiler.EnsurePortEmitted(this->resetTrigger);
         auto lastSignal = module.Global<int>(compiler.GetGlobalName(*this, "lastSignal"), 0);
         auto lastSignalValue = function.LocalScalar(function.Load(lastSignal));
         auto resetTriggerValue = function.LocalScalar(function.CastValue<int>(function.Load(resetTrigger)));
