@@ -4,6 +4,35 @@
 
 CMake automatically determines your processor architecture and chooses the right version of OpenBLAS. To override this, use the `-DPROCESSOR_HINT` CMake command line option. For example, for the Intel Haswell processor architecture, add the command line argument `-DPROCESSOR_HINT=haswell`.
 
+## Manually building OpenBLAS on Windows
+
+If you find that you have a CPU that is not supported by the versions of OpenBlas that
+are included in the nuget package listed in `external/packages.config` then you can build and
+install OpenBlas manually by following these steps:
+```
+git clone https://github.com/xianyi/OpenBLAS
+cd OpenBLAS
+mkdir build
+cd build
+cmake -G "Visual Studio 15 2017 Win64" ..
+cmake --build . --config Release
+```
+Then from an `Administrator` command prompt run the following install comamnd, from the above build folder:
+```
+cmake --build . --config Release --target INSTALL
+```
+This will put a version of OpenBlas that works for your CPU at `c:\Program Files\OpenBlas`.
+Now if you delete your ELL build folder and re-run the cmake step you should see output like this, which confirms that cmake found your new library:
+```
+-- Found OpenBlas in C:\Program Files/OpenBlas
+-- Using BLAS include path: C:/Program Files/OpenBLAS/include
+-- Using BLAS library: C:/Program Files/OpenBLAS/lib/libopenblas.lib
+```
+Lastly, be sure to add the following path to your PATH environment so that the ELL binaries can actually find `libopenblas.dll`:
+```
+set PATH=%PATH%;c:\Program Files\OpenBlas\bin
+```
+
 ## Testing ELL
 
 There are some optional components that you can build and test depending on
