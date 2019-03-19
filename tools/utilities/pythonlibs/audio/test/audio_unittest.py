@@ -18,7 +18,8 @@ from shutil import rmtree
 script_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(script_path))
 sys.path.append(os.path.join(script_path, ".."))
-sys.path.append(os.path.join(script_path, "training"))
+sys.path.append(os.path.join(script_path, "..", ".."))
+sys.path.append(os.path.join(script_path, "..", "training"))
 
 import find_ell  # noqa: F401
 import ell  # noqa: F401
@@ -26,16 +27,16 @@ from download_helper import *  # noqa: F403
 import logger
 import make_featurizer
 
-sys.path.append(os.path.join(script_path, "..", "..", "..", "importers", "onnx"))
+sys.path.append(os.path.join(script_path, "..", "..", "..", "..", "importers", "onnx"))
 import onnx_import
 
-sys.path.append(os.path.join(script_path, "..", "..", "..", "wrap"))
+sys.path.append(os.path.join(script_path, "..", "..", "..", "..", "wrap"))
 import wrap
 import buildtools
 
 _log = logger.init()
 
-example_data = os.path.join(script_path, "..", "..", "..", "..", "examples", "data")
+example_data = os.path.join(script_path, "..", "..", "..", "..", "..", "examples", "data")
 
 
 class AudioUnitTest(unittest.TestCase):
@@ -137,7 +138,8 @@ class AudioUnitTest(unittest.TestCase):
                                                  self.categories_file,
                                                  self.wav_file,
                                                  threshold=0.95,
-                                                 sample_rate=self.sample_rate)
+                                                 sample_rate=self.sample_rate,
+                                                 auto_scale=True)
         if not result or result[2] != "seven":
             raise Exception("Did not get expected prediction 'seven': {}".format(result))
 

@@ -18,14 +18,10 @@ import sys
 sys.path += [os.path.join(os.path.dirname(__file__), "..")]
 import numpy as np
 
-from dataset import Dataset, NULL_LABEL_NAME
+from dataset import Dataset
 import featurizer
 import wav_reader
-
-
-def is_null_class(name):
-    """ returns true if the name represents the null class, like _background_noise_ """
-    return name.startswith("_")
+import noise_mixer
 
 
 def parse_list_file(list_file):
@@ -80,7 +76,7 @@ def sliding_window_frame(source, window_size, shift_amount):
             buffer = buffer[shift_amount:]
 
     # return the remainder, if any, to ensure we at least return 1 full frame
-    if buffer is not None and len(buffer) < window_size:
+    if buffer is not None and len(buffer) < window_size and len(buffer) > window_size / 4:
         shape = buffer.shape
         if len(shape) == 2:
             new_sample = np.zeros((window_size - len(buffer), shape[1]))
@@ -90,7 +86,7 @@ def sliding_window_frame(source, window_size, shift_amount):
         yield buffer[:window_size]
 
 
-def get_wav_features(input_filename, transform, sample_rate, window_size, shift, auto_scale):
+def get_wav_features(input_filename, transform, sample_rate, window_size, shift, auto_scale, mixer):
     """
     Transform the given .wav input file into a set of features given the required sample rate
     window size and shift.  The window size is the number of features we need to give the
@@ -101,6 +97,11 @@ def get_wav_features(input_filename, transform, sample_rate, window_size, shift,
     channels = 1  # we only do mono audio right now...
     source = wav_reader.WavReader(sample_rate, channels, auto_scale)
     source.open(input_filename, transform_input_size)
+
+    if mixer:
+        mixer.open(source)
+        source = mixer
+
     # apply the featurizing transform
     transform.open(source)
 
@@ -116,21 +117,22 @@ def get_wav_features(input_filename, transform, sample_rate, window_size, shift,
         yield features
 
 
-def _get_dataset(entry_map, transform, sample_rate, window_size, shift, auto_scale):
+def _get_dataset(entry_map, categories, transform, sample_rate, window_size, shift, auto_scale, mixer):
     data_rows = []
     label_rows = []
 
     for e in entry_map:
         label = os.path.basename(e)
+        if label not in categories:
+            raise Exception("label {} not found in categories file".format(label))
 
-        if is_null_class(label):  # special class directory
-            label = NULL_LABEL_NAME
         total = 0
         print("Transforming {} files from {} ... ".format(len(entry_map[e]), label), end='', flush=True)
 
         for file in entry_map[e]:
             full_path = os.path.join(e, file)
-            file_features = list(get_wav_features(full_path, transform, sample_rate, window_size, shift, auto_scale))
+            file_features = list(get_wav_features(full_path, transform, sample_rate, window_size, shift, auto_scale,
+                                                  mixer))
             if len(file_features) > 0:
                 labels = [label for r in file_features]
                 data_rows.append(file_features)
@@ -143,10 +145,11 @@ def _get_dataset(entry_map, transform, sample_rate, window_size, shift, auto_sca
     label_names = np.concatenate(label_rows, axis=0)
     # remember these settings in the dataset
     parameters = (sample_rate, transform.input_size, transform.output_size, window_size, shift)
-    return Dataset(features, label_names, parameters)
+    return Dataset(features, label_names, categories, parameters)
 
 
-def make_dataset(list_file, featurizer_path, sample_rate, window_size, shift, auto_scale=True, use_cache=True):
+def make_dataset(list_file, categories_path, featurizer_path, sample_rate, window_size, shift, auto_scale=True,
+                 use_cache=True, noise_path=None, max_noise_ratio=0.1, noise_selection=0.1):
 
     """
     Create a dataset given the input list file, a featurizer, the desired .wav sample rate,
@@ -161,8 +164,15 @@ def make_dataset(list_file, featurizer_path, sample_rate, window_size, shift, au
     transform = featurizer.AudioTransform(featurizer_path, 0)
 
     entry_map = parse_list_file(list_file)
+    categories = [x.strip() for x in open(categories_path, 'r').readlines()]
 
-    dataset = _get_dataset(entry_map, transform, sample_rate, window_size, shift, auto_scale)
+    mixer = None
+    if noise_path:
+        noise_files = [os.path.join(noise_path, f) for f in os.listdir(noise_path)
+                       if os.path.splitext(f)[1] == ".wav"]
+        mixer = noise_mixer.AudioNoiseMixer(noise_files, max_noise_ratio, noise_selection)
+
+    dataset = _get_dataset(entry_map, categories, transform, sample_rate, window_size, shift, auto_scale, mixer)
     if len(dataset.features) == 0:
         print("No features found in list file")
 
@@ -176,12 +186,25 @@ if __name__ == "__main__":
 
     # options
     arg_parser.add_argument("--list_file", "-l", help="The path to the list file to process")
+    arg_parser.add_argument("--categories", "-c",
+                            help="The full list of labels (a given list file might only see a subset of these)")
     arg_parser.add_argument("--featurizer", "-f", help="Compiled featurizer module to use", default="featurizer/mfcc")
     arg_parser.add_argument("--sample_rate", "-r", help="Sample rate of input", type=int, default=16000)
     arg_parser.add_argument("--window_size", "-ws", help="Classifier window size (default: 80)", type=int, default=80)
     arg_parser.add_argument("--shift", "-s", help="Classifier shift amount (default: 10)", type=int, default=10)
-    arg_parser.add_argument("--audo_scale", help="Whether to scale audio input to range [-1, 1] (default: false)",
+    arg_parser.add_argument("--auto_scale", help="Whether to scale audio input to range [-1, 1] (default: false)",
                             action="store_true")
+    arg_parser.add_argument("--noise_path", help="Path to noise folder, if provided noise from this folder will be "
+                            "mixed with some of the audio files in list_file", default="GRU")
+    arg_parser.add_argument("--max_noise_ratio", type=float, default=0.1,
+                            help="Specifies the ratio of noise to audio (default 0.1)")
+    arg_parser.add_argument("--noise_selection", type=float, default=0.1,
+                            help="Ratio of audio files to mix with noise (default 0.1)")
     args = arg_parser.parse_args()
 
-    make_dataset(args.list_file, args.featurizer, args.sample_rate, args.window_size, args.shift, args.auto_scale)
+    if args.noise and not os.path.isdir(args.noise):
+        print("Noise dir '{}' not found".format(args.noise))
+        sys.exit(1)
+
+    make_dataset(args.list_file, args.categories, args.featurizer, args.sample_rate, args.window_size, args.shift,
+                 args.auto_scale, args.noise_path, args.max_noise_ratio, args.noise_selection)

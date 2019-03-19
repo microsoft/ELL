@@ -22,14 +22,13 @@ def package_dir():
 
 
 def ensure_openblas():
-    import platform
-    if platform.system() == "Windows":
+    if os.name == "nt":
         path = os.getenv("PATH")
         if "OpenBLASLibs" in path:
             return
 
         head,tail = os.path.split(__this_file_directory)
-        while (tail != ""):
+        while tail != "":
             # find the build tools info
             tools = os.path.join(head,"ell_build_tools.json")
             if (os.path.isfile(tools)):

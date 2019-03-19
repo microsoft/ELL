@@ -10,8 +10,6 @@
 
 import numpy as np
 
-NULL_LABEL_NAME = "<null>"
-
 
 class Dataset(object):
     """
@@ -19,12 +17,13 @@ class Dataset(object):
     A labelled dataset contains a "truth" label for each row of data that can be used in a supervised
     training process.
     """
-    def __init__(self, features, label_names, parameters):
+    def __init__(self, features, label_names, valid_classes, parameters):
         """
         Create new Dataset from the given features and label names and parameters.  The parameters
         can be any tuple that is application specific.  For example, in the case of audio one might
         want to store the sample rate, window size and other audio specific parameters associated
-        with the featurized data.
+        with the featurized data.  The valid_classes list all possible labels and label_names might only
+        mention a subset of these.
         """
 
         # Keep rows with finite entries (there are lots of NaNs initially)
@@ -42,6 +41,7 @@ class Dataset(object):
         self.class_weights = None
         self.class_distribution = None
         self.parameters = parameters
+        self.valid_classes = valid_classes
 
         self._init()
 
@@ -65,36 +65,29 @@ class Dataset(object):
             features = data["features"]
             label_names = data["labels"]
             parameters = data["parameters"]
+            valid_classes = data["valid_classes"]
 
-        result = Dataset(features, label_names, parameters)
+        result = Dataset(features, label_names, valid_classes, parameters)
         result.file_name = filename
         return result
 
     def save(self, filename):
         """ Save the dataset fo a numpy .npz file """
         self.file_name = filename
-        np.savez(filename, features=self.features, labels=self.label_names, parameters=self.parameters)
+        np.savez(filename, features=self.features, labels=self.label_names, valid_classes=self.valid_classes,
+                 parameters=self.parameters)
 
     def _process_labels(self):
-        self.valid_classes = sorted(set(self.label_names))
-
-        # Get valid category names
-        if NULL_LABEL_NAME in self.valid_classes:
-            self.valid_classes.remove(NULL_LABEL_NAME)
-
         # Generate map from name -> label value, starting with index 1 (reserving 0 for 'null')
-        self.categories = {item[0]: item[1] + 1 for item in zip(self.valid_classes, range(len(self.valid_classes)))}
-        self.categories[NULL_LABEL_NAME] = 0
+        self.categories = {item[0]: item[1] for item in zip(self.valid_classes, range(len(self.valid_classes)))}
         self.category_names = {d[1]: d[0] for d in self.categories.items()}  # map from label value -> name
         self.num_classes = len(self.categories)
 
-        # Replace bad label names with NULL_LABEL_NAME
-        valid_class_set = set(self.valid_classes)
-        filtered_names = [(l if l in valid_class_set else NULL_LABEL_NAME) for l in self.label_names]
-        self.raw_labels = np.array([self.categories[n] for n in filtered_names])
+        self.raw_labels = np.array([self.categories[n] for n in self.label_names])
         self.labels = self.raw_labels
 
-        # Deal with multiclass datasets
+        # Deal with multiclass datasets, create a vector [0,1,0,0,0,...] for each expected label row
+        # where the 1 in this vector is the location of the expected label.
         self.multiclass = self.num_classes > 2
         if self.multiclass:
             self.labels = self.to_categorical(self.raw_labels, self.num_classes)

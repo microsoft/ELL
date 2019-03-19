@@ -322,7 +322,7 @@ class VadTest(Frame):
         if not os.path.isdir(settings_dir):
             os.makedirs(settings_dir)
         with open(self.settings_file_name, "w") as f:
-            f.write(json.dumps(self.settings))
+            json.dump(self.settings, f, indent=2)
 
     def on_rec_button_click(self):
         """ called when user clicks the record button, same button is used to "stop" recording. """

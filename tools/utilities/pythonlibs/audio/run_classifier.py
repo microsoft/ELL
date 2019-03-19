@@ -25,7 +25,7 @@ SMOOTHING = 0  # default no smoothing
 
 
 def test_keyword_spotter(featurizer_model, classifier_model, categories, wav_file, threshold, sample_rate,
-                         output_speaker=False):
+                         output_speaker=False, auto_scale=False):
     predictor = classifier.AudioClassifier(classifier_model, categories, threshold, SMOOTHING)
     transform = featurizer.AudioTransform(featurizer_model, predictor.input_size)
 
@@ -37,7 +37,7 @@ def test_keyword_spotter(featurizer_model, classifier_model, categories, wav_fil
         the_speaker = None
         if output_speaker:
             the_speaker = speaker.Speaker()
-        reader = wav_reader.WavReader(sample_rate, CHANNELS)
+        reader = wav_reader.WavReader(sample_rate, CHANNELS, auto_scale)
         reader.open(wav_file, transform.input_size, the_speaker)
     else:
         reader = microphone.Microphone(True, True)
@@ -83,7 +83,9 @@ if __name__ == "__main__":
                         help="Audio sample rate expected by classifier")
     parser.add_argument("--threshold", "-t", help="Classifier threshold (default 0.6)", default=THRESHOLD, type=float)
     parser.add_argument("--speaker", help="Output audio to the speaker.", action='store_true')
+    parser.add_argument("--auto_scale", help="Whether to auto-scale audio input to range [-1, 1] (default false).",
+                        action='store_true')
 
     args = parser.parse_args()
     test_keyword_spotter(args.featurizer, args.classifier, args.categories, args.wav_file, args.threshold,
-                         args.sample_rate, args.speaker)
+                         args.sample_rate, args.speaker, args.auto_scale)

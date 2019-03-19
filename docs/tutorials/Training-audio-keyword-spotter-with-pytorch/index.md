@@ -43,14 +43,12 @@ After you have installed and built the ELL compiler, you also need to set an env
 [Windows] set ELL_ROOT=d:\git\ell
 ```
 
-Subsequent scripts depend on this path being set correctly.  Now make a new working folder and copy the scripts from this location:
+Subsequent scripts depend on this path being set correctly.  Now make a new working folder:
 
 ```shell
 mkdir tutorial
 cd tutorial
 
-[Linux] cp $ELL_ROOT/tools/utilities/pythonlibs/audio/training
-[Windows] copy %ELL_ROOT%\tools\utilities\pythonlibs\audio\training
 ```
 
 ## Installing PyTorch
@@ -123,14 +121,14 @@ As shown in the [earlier tutorial](/ELL/tutorials/Getting-started-with-audio-key
 This featurizer is created as an ELL model using the `make_featurizer` command:
 
 ```
-python make_featurizer.py --sample_rate 8000 --window_size 256 --input_buffer_size 256 --filterbank_size 40 --log
+python make_featurizer.py --sample_rate 16000 --window_size 512 --input_buffer_size 512 --filterbank_size 80 --filterbank_type mel --log
 ```
 
 You should see a message saying "Saving **featurizer.ell**" and if you print this using the following command line:
 
 ```shell
-[Linux] %ELL_Root%/build/bin/print -imap featurizer.ell 
-[Windows] %ELL_Root%\build\bin\release\print -imap featurizer.ell -fmt dgml -of graph.dgml
+[Linux] %ELL_ROOT%/build/bin/print -imap featurizer.ell 
+[Windows] %ELL_ROOT%\build\bin\release\print -imap featurizer.ell -fmt dgml -of graph.dgml
 ```
 
 then you will see the following nodes:
@@ -182,19 +180,22 @@ popd
 Now you have a compiled featurizer, so you can preprocess all the audio files using this featurizer and create a compressed numpy dataset with the result.  This large dataset will contain one row per audio file, where each row contains all the featurizer output for that file.  The featurizer output is smaller than the raw audio, but it will still end up being a pretty big file, (about 1.2 GB).  Of course it depends how many files you include in the set.  Remember for best training results the more files the better, so  you will use the **training_list.txt** you created earlier which selected 1600 files per keyword.  You need three datasets created from each of the list files in your audio folder using `make_dataset` as follows:
 
 ```shell
-python make_dataset.py --list_file audio/training_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 8000 
-python make_dataset.py --list_file audio/validation_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 8000 
-python make_dataset.py --list_file audio/testing_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 8000 
+python make_dataset.py --list_file audio/training_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --auto_scale
+python make_dataset.py --list_file audio/validation_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --auto_scale
+python make_dataset.py --list_file audio/testing_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --auto_scale
 ```
 
 Where the **audio** folder contains your unpacked .wav files.  If your audio files are in a different location then simply provide the full path to it in the above commands.  
 
-The reason for the `--sample_rate 8000` argument is that small low powered target devices might not be able to record and process audio at very high rates.
+The reason for the `--sample_rate 16000` argument is that small low powered target devices might not be able to record and process audio at very high rates.
 So while your host PC can probably do 96kHz audio and higher just fine, this tutorial shows you how to down sample the audio to something that will run on a tiny target device.  The main point being that you will get the best results if you train the model on audio that is sampled at the same rate that your target device will be recording.
+
+The `--auto_scale` option converts raw integer audio values to floating point numbers in the range [-1, 1]. 
 
 Creating the datasets will take a while, about 10 minutes or more, so now is a great time to grab a cup of tea.  It will produce three files in your working folder named **training.npz**, **validation.npz** and **testing.npz** which you will use below.
 
-You will notice in the output that the _background\_noise_ folder has been mapped to the special category named `<null>`.  Any folder starting with an underscore is mapped this way and it is a handy way to provide "negative samples" that you want your model to learn to ignore.  Negative examples are important if you want a model that doesn't produce too many false positives.
+You will notice in the output that any folder starting with "_" special category named `<null>`. This means you can add negative audio samples to these folders so the
+model learns to ignore words also rather than falsely recognizing them as one of the 30 words you want to recognize.
 
 ## Train the Keyword Spotter
 
@@ -275,10 +276,10 @@ popd
 
 ## Testing the Model
 
-So you can now take the new compiled keyword spotter for a spin and see how it works.  You can measure the accuracy of the ELL model using the testing list.  The `eval_test.py` script will do that:
+So you can now take the new compiled keyword spotter for a spin and see how it works.  You can measure the accuracy of the ELL model using the testing list.  The `test_ell_model.py` script will do that:
 
 ```shell
-python eval_test.py --classifier KeywordSpotter/model --featurizer compiled_featurizer/mfcc --sample_rate 8000 --list_file audio/testing_list.txt --categories categories.txt --reset
+python test_ell_model.py --classifier KeywordSpotter/model --featurizer compiled_featurizer/mfcc --sample_rate 16000 --list_file audio/testing_list.txt --categories categories.txt --reset --auto_scale
 ```
 
 This is going back to the raw .wav file input and refeaturizing each .wav file using the compiled featurizer.  This is similar to what you will do on your target device while processing microphone input.  As a result this test pass will take a little longer (about 2 minutes).  You will see every file scroll by telling you which one passed or failed with 
@@ -309,13 +310,13 @@ The final pass rate printed here is 88.49% which is close to the pytorch test ac
 But how will this model perform on a continuous stream of audio from a microphone?  You can try this out using the following tool:
 
 ```
-[Linux] python $ELL_ROOT/tools/utilities/pythonlibs/audio/view_audio.py --classifier KeywordSpotter\model --featurizer compiled_featurizer/mfcc --categories categories.txt --sample_rate 8000 --threshold 0.8
+[Linux] python $ELL_ROOT/tools/utilities/pythonlibs/audio/view_audio.py --classifier KeywordSpotter\model --featurizer compiled_featurizer/mfcc --categories categories.txt --sample_rate 16000 --threshold 0.8 --auto_scale
 
-[Windows] python %ELL_ROOT%\tools\utilities\pythonlibs\audio\view_audio.py --classifier KeywordSpotter\model --featurizer compiled_featurizer/mfcc --categories categories.txt --sample_rate 8000 --threshold 0.8
+[Windows] python %ELL_ROOT%\tools\utilities\pythonlibs\audio\view_audio.py --classifier KeywordSpotter\model --featurizer compiled_featurizer/mfcc --categories categories.txt --sample_rate 16000 --threshold 0.8 --auto_scale
 ```
 
 Speak some words from `categories.txt` slowly and clearly.  You will find that the accuracy is not as good, it recoginizes the first word you speak, but nothing else.
-If you run the `eval_test.py` script without "--reset" argument then the test is run as one continuous steam of audio with no model reset between each .wav file.
+If you run the `test_ell_model.py` script without "--reset" argument then the test is run as one continuous steam of audio with no model reset between each .wav file.
 In this case you will see the test score drop to about 70%.  So why is this?
 Well, remember the trainer has one row per wav recording and this helps the trainer know when to reset the GRU node hidden state.
 See the **init_hidden** method.
@@ -326,7 +327,7 @@ By default ELL does not reset the hidden state so the GRU state blurs together o
 So how can you fix this?  Well, this is where Voice Activity Detection (VAD) can come in handy.  ELL actually has a node called VoiceActivityDetectorNode that you can add to the model.  The input is the same featurizer input that the classifier uses, and the output is an integer value 0 if there is no activity detected and 1 if there is activity.  This output signal can then be piped into the GRU nodes as a "reset_trigger".  The GRU nodes will then reset themselves when they see that trigger change from 1 to 0 (the end of a word).  To enable this you will need to edit the ELL **GRUKeywordSpotter.ell** file using the `add_vad.py` script:
 
 ```
-python add_vad.py GRUKeywordSpotter.ell --sample_rate 8000 --window_size 256 --tau_up 1.5 --tau_down 0.09 --large_input 4 --gain_att 0.01 --threshold_up 3.5 --threshold_down 0.9 --level_threshold 0.02
+python add_vad.py GRUKeywordSpotter.ell --sample_rate 16000 --window_size 512 --tau_up 1.5 --tau_down 0.09 --large_input 4 --gain_att 0.01 --threshold_up 3.5 --threshold_down 0.9 --level_threshold 0.02
 ```
 
 This will edit the ELL model, remove the dummy reset triggers on the two GRU nodes and replace them with a VoiceActivityDetectorNode.  Your new GRUKeywordSpotter.ell should now look like this:
@@ -336,13 +337,13 @@ This will edit the ELL model, remove the dummy reset triggers on the two GRU nod
 **Note:** you can use the following tool to generate these graphs:
 
 ```
-[Linux] %ELL_ROOT%\build\bin\release\print -imap GRUKeywordSpotter.ell -fmt dot -of graph.dot
+[Linux] $ELL_ROOT/build/bin/release/print -imap GRUKeywordSpotter.ell -fmt dot -of graph.dot
 [Windows] %ELL_ROOT%\build\bin\release\print -imap GRUKeywordSpotter.ell -fmt dgml -of graph.dgml
 ```
 
 And you can view graph.dgml using Visual Studio.  On Linux you can use the `dot` format which can be viewed using GraphViz.
 
-You can now compile this new GRUKeywordSpotter.ell model using `wrap.py` as before and try it out.  You should see the `eval_test` accuracy increase back up from 70% to about 85%.  The VoiceActivityDetector is not perfect on all the audio test samples, especially those with high background noise.  The VoiceActivityDetector has many parameters that you can see in `add_vad.py`.  These parameters can be tuned for your particular device to get the best result.  You can use the `<ELL_ROOT>/tools/utilities/pythonlibs/audio/vad_test.py` tool to help with that.
+You can now compile this new GRUKeywordSpotter.ell model using `wrap.py` as before and try it out.  You should see the `test_ell_model` accuracy increase back up from 70% to about 85%.  The VoiceActivityDetector is not perfect on all the audio test samples, especially those with high background noise.  The VoiceActivityDetector has many parameters that you can see in `add_vad.py`.  These parameters can be tuned for your particular device to get the best result.  You can use the `<ELL_ROOT>/tools/utilities/pythonlibs/audio/vad_test.py` tool to help with that.
 
 You can also use the `view_audio.py` script again and see how it behaves when you speak the 30 different keywords listed in categories.txt.  You should notice that it works better now because of the VoiceActivityDetection whereas previously you had to click "stop" and "record" to reset the model. Now it resets automatically and is able to recognize the next keyword after a small silence.  You still cannot speak the keywords too quickly, so this solution is not perfect.  Understanding full conversation speech is a different kind of problem that requires bigger models and audio datasets that include whole phrases.
 
@@ -399,7 +400,7 @@ You can now experiment with different model architectures.  For example, what ha
 There are many other things you could try.  So long as the trainer still shows a decreasing loss across epochs then it should train ok.  You know you have a broken model if the loss never decreases.
 
 As you can see, PyTorch makes it pretty easy to experiment.
-To learn more about PyTorch see their [excelent tutorials](https://pytorch.org/tutorials/).
+To learn more about PyTorch see their [excellent tutorials](https://pytorch.org/tutorials/).
 
 ## Next steps
 
@@ -409,7 +410,7 @@ There are also lots of things you can experiment with as listed above.  You can 
 
 Another dimension you can play with is mixing noise with your clean .wav files.  This can give you a much bigger dataset and a model that performs better in noisy locations.  Of course, this depends on what kind of noise you care about.  Crowds of people? Industrial machinery? Just the hum of computers and HVAC systems in an Office environment?  It depends on your application.  You can experiment using the noise files included in the speech_commands dataset.
 
-The <a href="https://github.com/Microsoft/ELL-models/tree/master/models/speech_commands_v0.01">github speech commands gallery</a> contains some other types of models, some based on LSTM nodes, for example.  The GRU architecture does well on smaller sized models, but LSTM hits the highest score
+The [github speech commands gallery](https://github.com/Microsoft/ELL-models/tree/master/models/speech_commands_v0.01) contains some other types of models, some based on LSTM nodes, for example.  The GRU architecture does well on smaller sized models, but LSTM hits the highest score
 when it maximizes the hidden state size.  You can also see on the gallery that the 8kHz audio is faster, but it loses accuracy.
 
 ## Troubleshooting

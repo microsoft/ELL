@@ -157,6 +157,7 @@ class AudioDemo(Frame):
     def load_settings(self):
         """ load the previously saved settings from disk, if any """
         self.settings = {}
+        print("loading settings from: {}".format(self.settings_file_name))
         if os.path.isfile(self.settings_file_name):
             with open(self.settings_file_name, "r") as f:
                 self.settings = json.load(f)
@@ -167,7 +168,7 @@ class AudioDemo(Frame):
         if not os.path.isdir(settings_dir):
             os.makedirs(settings_dir)
         with open(self.settings_file_name, "w") as f:
-            f.write(json.dumps(self.settings))
+            json.dump(self.settings, f, indent=2)
 
     def load_featurizer_model(self, featurizer_model):
         """ load the given compiled ELL featurizer for use in processing subsequent audio input """
@@ -292,7 +293,7 @@ class AudioDemo(Frame):
 
         self.stop()
         self.reading_input = False
-        self.wav_file = wav_reader.WavReader(self.sample_rate, self.channels)
+        self.wav_file = wav_reader.WavReader(self.sample_rate, self.channels, self.auto_scale)
         self.wav_file.open(filename, self.featurizer.input_size, self.speaker)
 
         def update_func(frame_index):
@@ -331,7 +332,7 @@ class AudioDemo(Frame):
             input_channel = self.serial
         else:
             if self.microphone is None:
-                self.microphone = microphone.Microphone(True, False)
+                self.microphone = microphone.Microphone(auto_scale=self.auto_scale, console=False)
 
             num_channels = 1
             self.microphone.open(self.featurizer.input_size, self.sample_rate, num_channels, self.input_device)

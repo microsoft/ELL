@@ -5,17 +5,19 @@ An ELL model from the Gallery
 import os
 import os.path
 import sys
+
 import numpy as np
 from .condabuildtools import CondaBuildTools
 
 _buildtools = CondaBuildTools()
 
+
 def _is_file_newer(file1, file2):
     return os.path.getmtime(file1) >= os.path.getmtime(file2)
 
+
 def _is_windows(target):
-    import platform
-    return target.lower() == 'host' and platform.system() == 'Windows' or target == 'windows'
+    return target.lower() == "host" and os.name == "nt" or target.lower() == "windows"
 
 
 class PretrainedModel:
@@ -48,9 +50,9 @@ class PretrainedModel:
 
         if not cache or not os.path.exists(local_file):
             print('downloading model ' + self.model_name + ' ...', flush=True)
+            base_uri = 'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/'
             zip_path, _ = urllib.request.urlretrieve(
-                'https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/'
-                + self.model_name + '/' + self.model_name + '.ell.zip', local_zip_file)
+                base_uri + self.model_name + '/' + self.model_name + '.ell.zip', local_zip_file)
             import zipfile
             with zipfile.ZipFile(zip_path, 'r') as zipref:
                 ellfiles = [n for n in zipref.namelist() if n[-4:] == '.ell']
@@ -87,13 +89,12 @@ class PretrainedModel:
         if not os.path.exists(cmakefile) or _is_file_newer(inpath + '.ell', cmakefile) \
            or not os.path.exists(outpath + '.bc'):
             compiled = ellmap.Compile(target, self.name, 'model_predict',
-                dtype=np.float32)
+                                      dtype=np.float32)
             compiled.WriteBitcode(outpath + '.bc')
             compiled.WriteSwigInterface(outpath + '.i')
 
             if not os.path.exists(outpath + '.bc'):
-                raise Exception("compile failed to produce output file: " +
-                    os.path.exists(outpath + '.bc'))
+                raise Exception("compile failed to produce output file: " + os.path.exists(outpath + '.bc'))
 
             if _buildtools.swig(outdir, self.name, 'python') is None:
                 return None
@@ -122,7 +123,8 @@ class PretrainedModel:
             if not os.path.exists('include'):
                 shutil.copytree(os.path.join(pkg_dir, 'include'), 'include')
             if _is_windows(target):
-                _buildtools.run(['cmake', '-G', 'Visual Studio 15 2017 Win64', '-DPROCESSOR_HINT=haswell', '.'], shell=True)
+                _buildtools.run(['cmake', '-G', 'Visual Studio 15 2017 Win64', '-DPROCESSOR_HINT=haswell', '.'],
+                                shell=True)
                 _buildtools.run(['cmake', '--build', '.', '--config', 'Release'], shell=True)
             else:
                 _buildtools.run('cmake .', shell=True)
@@ -160,7 +162,7 @@ class PretrainedModel:
         ]
 
     def load(self):
-        model_dir = os.path.abspath(os.path.join(self.local_path, 'host')) # can only load 'host'
+        model_dir = os.path.abspath(os.path.join(self.local_path, 'host'))  # can only load 'host'
         if not os.path.exists(model_dir):
             raise Exception("must build for target platform 'host' before loading")
         sys.path.append(model_dir)
@@ -169,7 +171,7 @@ class PretrainedModel:
         self.model = __import__(self.name)
         return self.model
 
-    def prepare_image(self, image, reorderToRGB = False):
+    def prepare_image(self, image, reorderToRGB=False):
         """ Prepare an image for use with a model. Typically, this involves:
         - Resize and center crop to the required width and height while preserving the image's aspect ratio.
         Simple resize may result in a stretched or squashed image which will affect the model's ability

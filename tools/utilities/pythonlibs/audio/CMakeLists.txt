@@ -17,11 +17,6 @@ if(${PYTHON_ENABLED})
     copy_newer_files(${module_name} lib_src)
     
     add_subdirectory(training)
-
-    # unit test
-    if(${ONNX})
-        set (test_name ${module_name}_test)
-        add_test(NAME ${test_name} COMMAND ${PYTHON_EXECUTABLE} -m unittest audio_unittest.py)
-    endif() # ONNX
+    add_subdirectory(test)
 
 endif()  # PYTHON_ENABLED

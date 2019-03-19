@@ -16,7 +16,7 @@ import numpy as np
 class AudioClassifier:
     """
     This class wraps an ELL audio classifier model and adds some nice features, like mapping the
-    predictions to a string label, any categorry starting with "_" will be ignored.  It also
+    predictions to a string label, any category starting with "_" will be classified as null.  It also
     does some optional posterior smoothing on the predictions since audio model outputs
     tend to be rather noisy. It also supports a threshold value so any prediction less than this
     probability is ignored.
@@ -81,11 +81,12 @@ class AudioClassifier:
             output = self._smooth(output)
 
         prediction = self._get_prediction(output)
-        if prediction and prediction not in self.ignore_list:
+        if prediction is not None:
             label = ""
             if self.categories and prediction < len(self.categories):
                 label = self.categories[prediction]
-            return (prediction, output[prediction], label)
+            if label not in self.ignore_list:
+                return (prediction, output[prediction], label)
 
         return (None, None, None)
 

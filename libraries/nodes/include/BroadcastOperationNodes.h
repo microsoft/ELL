@@ -511,7 +511,7 @@ namespace nodes
         auto prevInputDimensionOffsets = prevInputDimensionOffsetsIn;
         auto inputValues = inputValuesIn;
 
-        const auto& outputLayout = GetOutputMemoryLayout();
+        model::PortMemoryLayout outputLayout = GetOutputMemoryLayout();
         const auto outputGlobalOffset = static_cast<int>(outputLayout.GetFirstEntryOffset());
         const auto& outputSize = outputLayout.GetLogicalDimensionActiveSize();
         const auto& outputIncrement = outputLayout.GetLogicalDimensionIncrement();

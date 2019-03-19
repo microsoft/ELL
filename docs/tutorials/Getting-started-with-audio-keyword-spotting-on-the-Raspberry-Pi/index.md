@@ -56,15 +56,16 @@ On your computer, open a terminal window and activate your Anaconda environment.
 Create a directory for this tutorial anywhere on your computer and `cd` into it.
 
 ## Download the featurizer model and the classifier model
-On your laptop or desktop computer, download this [ELL featurizer model file](https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/Cinnamon/f_16000_512_160_mel_40_40_log.zip) and this [ELL classifier model file](https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/Cinnamon/gru_f_16000_512_160_mel_40_40_log.zip) into your new tutorial directory. 
+On your laptop or desktop computer, download this [ELL featurizer model file](https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/RunnerBean/featurizer.ell.zip) and this [ELL classifier model file](https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/RunnerBean/GRU100KeywordSpotter.ell.zip) into your new tutorial directory. 
 
 
-Save the files locally as **featurizer_16k.ell.zip** and **classifier_16k.ell.zip**.
+Save the files locally as **featurizer.ell.zip** and **GRU100KeywordSpotter.ell.zip**.
 The 16k suffix is to remind us that these models expect 16 kHz audio input:
 
 ```shell
-curl --location -o featurizer_16k.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/Cinnamon/f_16000_512_160_mel_40_40_log.zip
-curl --location -o classifier_16k.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/Cinnamon/gru_f_16000_512_160_mel_40_40_log.zip
+curl --location -O https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/RunnerBean/featurizer.ell.zip
+
+curl --location -O https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/RunnerBean/GRU100KeywordSpotter.ell.zip
 ```
 
 Unzip the compressed files and rename them to the shorter names:
@@ -73,12 +74,10 @@ Unzip the compressed files and rename them to the shorter names:
 On Linux computers, you can install unzip using the **apt-get install unzip** command.
 
 ```shell
-unzip featurizer_16k.ell.zip
-unzip classifier_16k.ell.zip
-[Linux/macOS] mv f_16000_512_160_mel_40_40_log.ell featurizer_16k.ell
-[Linux/macOS] mv gru_f_16000_512_160_mel_40_40_log.ell classifier_16k.ell
-[Windows] ren f_16000_512_160_mel_40_40_log.ell featurizer_16k.ell
-[Windows] ren gru_f_16000_512_160_mel_40_40_log.ell classifier_16k.ell
+unzip featurizer.ell.zip
+unzip GRU100KeywordSpotter.ell.zip
+[Linux/macOS] mv GRU100KeywordSpotter.ell classifier.ell
+[Windows] ren GRU100KeywordSpotter.ell classifier.ell
 ```
 
 Next, download the **categories.txt** file from [here](https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/categories.txt) and save it in the directory.
@@ -90,19 +89,19 @@ curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/ma
 This file contains the names of the 30 keywords that the model is trained to recognize and one category reserved for background noise.
 For example, if the model recognizes category 11, you can read line 11 of the categories.txt file to find out that it recognized the word "happy."
 
-There should now be a **featurizer_16k.ell** file and a **classifier_16k.ell** file in your directory.
+There should now be a **featurizer.ell** file and a **classifier.ell** file in your directory.
 
 ## Compile and run the model on your laptop or desktop computer
 
 Before deploying the model to the Raspberry Pi device, practice deploying it to your laptop or desktop computer. 
-Deploying an ELL model requires two steps. First, you'll run the **wrap** tool, which both compiles the `featurizer_16k.ell` and `classifier_16k.ell` models into machine code and generates a CMake project to build a Python wrapper for it. 
+Deploying an ELL model requires two steps. First, you'll run the **wrap** tool, which both compiles the `featurizer.ell` and `classifier.ell` models into machine code and generates a CMake project to build a Python wrapper for it. 
 Second, you'll call **CMake** to build the Python library.
 
 Run **wrap** as follows, replacing `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).
 
 ```shell
-python <ELL-root>/tools/wrap/wrap.py --model_file featurizer_16k.ell --target host --outdir featurizer_16k --module_name mfcc
-python <ELL-root>/tools/wrap/wrap.py --model_file classifier_16k.ell --target host --outdir classifier_16k --module_name model
+python <ELL-root>/tools/wrap/wrap.py --model_file featurizer.ell --target host --outdir compiled_featurizer --module_name mfcc
+python <ELL-root>/tools/wrap/wrap.py --model_file classifier.ell --target host --outdir compiled_classifier --module_name model
 ```
 
 Here, you used the command line option of `--target host`, which tells **wrap** to generate machine code for execution on the laptop or desktop computer, rather than machine code for the Raspberry Pi device.
@@ -110,13 +109,13 @@ This results in the following output.
 
 ```
 compiling model...
-generating python interfaces for featurizer_16k in featurizer_16k
+generating python interfaces for featurizer in featurizer
 running opt...
 running llc...
-success, now you can build the 'featurizer_16k' folder
+success, now you can build the 'featurizer' folder
 ```
-Similar output results for the classifier_16k model.
-The **wrap** tool creates a CMake project, so you should have two new directories, named **featurizer_16k** and **classifier_16k**.
+Similar output results for the classifier model.
+The **wrap** tool creates a CMake project, so you should have two new directories, named **compiled_featurizer** and **compiled_classifier**.
 You can now build these using a build script:
 
 ```shell
@@ -126,7 +125,7 @@ cd build
 [Windows] cmake -G "Visual Studio 15 2017 Win64" .. && cmake --build . --config Release && cd ..\..
 ```
 
-Run this script on both the featurizer_16k and classifier_16k folders.
+Run this script on both the compiled_featurizer and compiled_classifier folders.
 
 Now, you are almost ready to use these compiled models. Before you do, copy over some Python helper code.
 This code uses the **pyaudio** library to read .wav files or to read input from your microphone by converting the raw PCM data
@@ -144,74 +143,11 @@ The next step is to create a Python script that
 2. Sends audio to the featurizer model 
 3. Send the featurizer model output to the classifier model
 4. Interprets the classifier model's output.
-(View the full script [here](https://github.com/Microsoft/ELL/raw/master/tools/utilities/pythonlibs/audio/test_audio.py).)
+(View the full script [here](https://github.com/Microsoft/ELL/raw/master/tools/utilities/pythonlibs/audio/run_classifier.py).)
 
-Now, create an empty text file named **test_audio.py**, import a few dependencies, and copy in the code snippets below.
-
-
-```python
-import argparse
-import os
-import sys
-
-import numpy as np
-
-# the audio helper code
-import classifier
-import featurizer
-import microphone
-import platform
-import speaker
-import wav_reader
-```
-
-Next, set up some configuration variables. You can tweak these values to get different results:
-
-```python
-THRESHOLD = 0.6 # only report predictions with greater than 60% confidence
-SAMPLE_RATE = 16000 # classifier was trained on 16kHz samples
-CHANNELS = 1 # classifier was trained on mono audio
-SMOOTHING = 0.2 # 0.2 second smoothing window on classifier output
-NOISE_LABEL = [0] # tell classifier to ignore predictions of background noise
-```
-
-Next, define the command line arguments, because you'll want to specify the location of the models you just built and provide an input file for processing:
-
-```python
-parser = argparse.ArgumentParser("Test the audio featurizer and classifier against microphone or wav file input")
-parser.add_argument("--wav_file", help="optional path to wav file to test", default=None)
-parser.add_argument("--featurizer", "-f", help="specify path to featurizer model (*.ell or compiled_folder/model_name)", required=True)
-parser.add_argument("--classifier", "-c", help="specify path to classifier model (*.ell or compiled_folder/model_name)", required=True)
-parser.add_argument("--categories", "-cat", help="specify path to categories file", required=True)
-parser.add_argument("--sample_rate", "-s", help="Audio sample rate expected by classifier", default=SAMPLE_RATE, type=int)
-parser.add_argument("--threshold", "-t", help="Classifier threshold (default 0.6)", default=THRESHOLD, type=float)
-
-args = parser.parse_args() # parse the command line
-```
-
-Load the featurizer model and classifier models into these helper classes:
-
-```python
-predictor = classifier.AudioClassifier(args.classifier, args.categories, NOISE_LABEL, args.threshold, SMOOTHING)
-transform = featurizer.AudioTransform(args.featurizer, predictor.input_size)
-```
-
-To set up your input stream, use the **WavReader** class to read wav_file input and use the **Microphone** class to read audio from your microphone.
-
-```python
-if args.wav_file:
-    speaker = speaker.Speaker()  # output wav file to speakers at the same time
-    reader = wav_reader.WavReader(args.sample_rate, CHANNELS)
-    reader.open(args.wav_file, transform.input_size, speaker)
-else:
-    reader = microphone.Microphone(True)
-    reader.open(transform.input_size, args.sample_rate, CHANNELS)
-    print("Please type 'x' and enter to terminate this app...")
-
-transform.open(reader)
-```
-
-Read the featurized audio in a loop, pass it to the classifier, and print any results that exceed your desired threshold:
+Now, one of the audio scripts you just copied is named `run_classifier.py` and so you will use
+that here.  The inner loop inside that script is transforming the audio using the featurizer
+and then calling predict as follows:
 
 ```python
 while True:
@@ -225,31 +161,28 @@ while True:
             print("<<< DETECTED ({}) {}% {} >>>".format(prediction, percent, label))
 ```
 
-Finally, try it out using the .wav file included with this tutorial, using the compiled featurizer model and classifier model:
+So try it out using the `seven.wav` file included with this tutorial, using the compiled featurizer model and classifier model:
 
 ```shell
-python test_audio.py --featurizer featurizer_16k/mfcc --classifier classifier_16k/model --categories categories.txt --wav_file seven.wav --sample_rate 16000
+python run_classifier.py --featurizer compiled_featurizer/mfcc --classifier compiled_classifier/model --categories categories.txt --wav_file seven.wav --sample_rate 16000 --auto_scale
 ```
 
 Output similar to this will be displayed:
 
 ```
-<<< DETECTED (20) 61% seven >>>
-<<< DETECTED (20) 65% seven >>>
-<<< DETECTED (20) 76% seven >>>
-<<< DETECTED (20) 79% seven >>>
-<<< DETECTED (20) 92% seven >>>
-<<< DETECTED (20) 97% seven >>>
-<<< DETECTED (20) 97% seven >>>
-<<< DETECTED (20) 97% seven >>>
-<<< DETECTED (20) 97% seven >>>
-<<< DETECTED (20) 97% seven >>>
-<<< DETECTED (20) 97% seven >>>
-Average processing time: 0.0005599459012349447
+<<< DETECTED (20) 99% 'seven' >>>
+<<< DETECTED (20) 99% 'seven' >>>
+<<< DETECTED (20) 99% 'seven' >>>
+<<< DETECTED (20) 99% 'seven' >>>
+<<< DETECTED (20) 99% 'seven' >>>
+<<< DETECTED (20) 99% 'seven' >>>
+<<< DETECTED (20) 99% 'seven' >>>
+<<< DETECTED (20) 99% 'seven' >>>
+Average processing time: 0.00040631294250488277
 ```
 
 As the audio is streaming to the classifier, it begins to detect the word.
-When it passes the confidence threshold of 0.6, it starts printing the results, and you can see that as the word completes the classifier gets more confident, climbing to 97% confidence in this example.
+When it passes the confidence threshold of 0.6, it starts printing the results, and you can see that as the word completes the classifier gets more confident, climbing to 99% confidence in this example.
 The confidence will then drop off as the audio ends because the classifier runs past the end of the word.
 The average processing time shows how long the feature and classifier models took to execute each frame of audio input in seconds,
 so the time shown here is half a millisecond, which is not bad, it means these models will be able to easily keep up with real-time audio input.
@@ -259,15 +192,14 @@ Use the following tips and information to adjust noise levels, use a USB microph
 * **Modulating output.** To experiment with the configuration, set the threshold and smoothing value to zero and see all the output from the classifier.
 This will make the classifier output more noisy, which is why some smoothing of the output is recommended.
 
-* **USB microphone.** If you have a USB microphone attached to your computer, try running `test_audio.py` with no wav_file and it will process your voice input.
+* **USB microphone.** If you have a USB microphone attached to your computer, try running `run_classifier.py` with no wav_file and it will process your voice input.
 When you use a microphone you will need to make sure the gain is high.  Test your microphone using your favorite voice recorder app, and if 
 the audio recording is nice and loud then it should work well.
 The classifier was trained on auto-gain leveled input, so if your microphone is too quiet the classifier will not work.
-Because the microphone input is an infinite stream you will also see a much longer "tail" on the classifier output as it drops back to 60% during the "silence" period between your spoken keywords.
+Because the microphone input is an infinite stream you will also see a much longer "tail" on the classifier output as it drops back to 60% during the "silence" period between your spoken keywords.  Type 'x' to terminate the script.
 
 * **Testing models.** Play with the `view_audio.py` to see a simple [GUI](https://en.wikipedia.org/wiki/Graphical_user_interface) app for testing the models.
-It has the same command line arguments as `test_audio.py` and a few more, like `--threshold 0.5` and `--ignore_label 0`.
-This app also shows you what your mel spectrograms look like.
+It has the same command line arguments as `run_classifier.py` and a few more, like `--threshold 0.5` and `--ignore_label 0` and don't forget `--auto_scale`. This app also shows you what your mel spectrograms look like.
 
 ## Compile the model for execution on the Raspberry Pi device
 
@@ -276,21 +208,21 @@ The only difference is you call **wrap** with the command line argument `--targe
 In preparation for this, delete these folders so that the **wrap** tool can create new folders with Pi 3 code in them.
 
 ```shell
-rm -rf featurizer_16k
-rm -rf classifier_16k
+rm -rf compiled_featurizer
+rm -rf compiled_classifier
 ```
 
 Then run this:
 
 ```shell
-python <ELL-root>/tools/wrap/wrap.py --model_file featurizer_16k.ell --target pi3 --outdir featurizer_16k --module_name mfcc
-python <ELL-root>/tools/wrap/wrap.py --model_file classifier_16k.ell --target pi3 --outdir classifier_16k --module_name model
+python <ELL-root>/tools/wrap/wrap.py --model_file featurizer.ell --target pi3 --outdir compiled_compiled_featurizer --module_name mfcc
+python <ELL-root>/tools/wrap/wrap.py --model_file classifier.ell --target pi3 --outdir compiled_compiled_classifier --module_name model
 ```
 
 You are ready to move to the Raspberry Pi.
 If your Pi is accessible over the network, copy the directory using the Unix `scp` tool or the Windows [WinSCP](https://winscp.net/eng/index.php) tool.
 
-After you copy the entire tutorial folder over to your Raspberry Pi, continue with the build steps you did earlier, only on the Pi this time. Specifically, build the **featurizer_16k** and **classifier_16k** projects.
+After you copy the entire tutorial folder over to your Raspberry Pi, continue with the build steps you did earlier, only on the Pi this time. Specifically, build the **compiled_featurizer** and **compiled_classifier** projects.
 
 Install pyaudio components:
 
@@ -299,16 +231,17 @@ sudo apt-get install python-pyaudio
 pip install pyaudio
 ```
 
-Now you can run the **test_audio.py** script on the Pi with the same command line arguments you used earlier and see how it does.
+Now you can run the **run_classifier.py** script on the Pi with the same command line arguments you used earlier and see how it does.
 On the Pi you will see an average processing time of about 2.3 milliseconds, which means real-time audio processing is possible here too.
 
 ## Next steps
 
 The [ELL gallery](/ELL/gallery/) offers different models for keyword spotting. Some are slow and accurate, while others are faster and less accurate. Different models can even lead to different power draw on the Raspberry Pi. Repeat the steps above with different models.  
-If you choose to use audio models for 8 kHz audio (name contains f_8000) then you will need to pass the following argument to test_audio.py: `--sample_rate 8000`.
 
 This tutorial used the **wrap** tool as a convenient way to compile the model and prepare for building its Python wrapper. To learn more, read the [wrap documentation](https://github.com/Microsoft/ELL/blob/master/tools/wrap/README.md).
 
 ## Troubleshooting
+
+If you are not getting any results from run_classifier.py or view_audio.py then check the `sample_rate` information in `train_results.json` file from the model gallery.  If you see a sample rate of 8000 then you need to pass this information to run_classifier.py as the command line argument: `--sample_rate 8000`.  Similarly, check if 'auto_scale' was set to `true`, and if so pass `--auto_scale` to the python script.  
 
 Look for troubleshooting tips at the end of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup).

@@ -71,14 +71,13 @@ class WavReader:
             audio_format = self.audio.get_format_from_width(self.sample_width)
             speaker.open(audio_format, self.requested_channels, self.requested_rate)
 
-    def read(self):
+    def read_raw(self):
         """ Reads the next chunk of audio (returns buffer_size provided to open)
-        It returns the data converted to floating point numbers between -1 and 1, scaled by the range of
-        values possible for the given audio format.
+        It returns the raw data buffers converted to the target rate without any scaling.
         """
-
         if self.wav_file is None:
             return None
+
         data = self.wav_file.readframes(self.buffer_size)
         if len(data) == 0:
             return None
@@ -93,6 +92,17 @@ class WavReader:
             # convert the audio to the desired recording rate
             data, self.cvstate = audioop.ratecv(data, self.sample_width, self.requested_channels, self.actual_rate,
                                                 self.requested_rate, self.cvstate)
+        return data
+
+    def read(self):
+        """ Reads the next chunk of audio (returns buffer_size provided to open)
+        It returns the data converted to floating point numbers between -1 and 1, scaled by the range of
+        values possible for the given audio format.
+        """
+
+        data = self.read_raw()
+        if data is None:
+            return None
 
         if self.speaker:
             self.speaker.write(data)

@@ -8,6 +8,8 @@
 
 #include "FilterBank.h"
 
+#include <utilities/include/StringUtil.h>
+
 #include <algorithm>
 #include <cmath>
 #include <string>
@@ -197,10 +199,13 @@ namespace dsp
     void TriangleFilterBank::SetBins(const std::vector<size_t>& bins)
     {
         _bins = bins;
-        if (std::any_of(bins.begin(), bins.end(), [this](size_t v) { return v > _windowSize; }))
+        for (auto v : bins)
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange,
-                "TriangleFilterBank::SetBins received a value that is outside the _windowSize");
+            if (v > _windowSize)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange,
+                    utilities::FormatString("TriangleFilterBank::SetBins received a value %d that is outside the _windowSize %d", (int)v, (int)_windowSize));
+            }
         }
     }
 
@@ -304,6 +309,10 @@ namespace dsp
         if (archiver.HasNextPropertyName("fftSize"))
         {
             archiver["fftSize"] >> _fftSize;
+        }
+        else
+        {
+            _fftSize = GetWindowSize();
         }
         InitializeBins();
     }

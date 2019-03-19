@@ -117,7 +117,8 @@ class AudioModelTester:
             elif not self.silent:
                 self.logger.error("FAILED: {}, expecting {}, path={}".format(prediction, expected, name))
 
-    def run_test(self, featurizer_model, classifier_model, list_file, max_tests, dataset, categories, sample_rate):
+    def run_test(self, featurizer_model, classifier_model, list_file, max_tests, dataset, categories, sample_rate,
+                 auto_scale):
         """
         Run the test using the given input models (featurizer and classifier) which may or may not be compiled.
         The test set is defined by a list_file or a dataset.  The list file lists .wav files which we will featurize
@@ -153,7 +154,7 @@ class AudioModelTester:
                 expected = name.split('/')[0]
                 wav_file = os.path.join(wav_dir, name)
                 # open the wav file.
-                reader = wav_reader.WavReader(sample_rate)
+                reader = wav_reader.WavReader(sample_rate, 1, auto_scale)
                 reader.open(wav_file, transform.input_size, None)
                 transform.open(reader)
                 prediction, confidence, _, elapsed = self.get_prediction(name, transform, predictor)
@@ -216,6 +217,8 @@ if __name__ == "__main__":
     parser.add_argument("--reset", "-r", help="do a GRU reset between each test file", action="store_true")
     parser.add_argument("--max_tests", type=int, help="maximum number of words chosen at random from each word list",
                         default=None)
+    parser.add_argument("--auto_scale", help="Whether to auto-scale audio input to range [-1, 1] (default false).",
+                        action='store_true')
 
     logger.add_logging_args(parser)
     args = parser.parse_args()
@@ -233,4 +236,4 @@ if __name__ == "__main__":
 
     test = AudioModelTester(args.reset)
     test.run_test(args.featurizer, args.classifier, args.list_file, args.max_tests, args.dataset, args.categories,
-                  sample_rate)
+                  sample_rate, args.auto_scale)

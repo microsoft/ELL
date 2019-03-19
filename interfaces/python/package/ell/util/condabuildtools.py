@@ -1,9 +1,11 @@
+import os
+import sys
+
 from .. import package_dir
 from .buildtools import EllBuildTools
 import platform
-import os
-import sys
-sys.path += [os.path.dirname(os.path.abspath(__file__)) ]
+sys.path += [os.path.dirname(os.path.abspath(__file__))]
+
 
 class CondaBuildTools(EllBuildTools):
     def __init__(self):
@@ -17,7 +19,7 @@ class CondaBuildTools(EllBuildTools):
     def find_tools(self):
         try:
             # see if we are in development mode inside an ell folder.
-            root = self.get_ell_build()
+            self.get_ell_build()
             super(CondaBuildTools, self).find_tools()
         except:
             # then we are in production mode, so use the conda installed tools
@@ -36,14 +38,14 @@ class CondaBuildTools(EllBuildTools):
         paths = os.getenv("PATH").split(':')
         condapath = [x for x in paths if "anaconda" in x]
         if len(condapath):
-            return condapath[0]            
+            return condapath[0]
         else:
             raise Exception("Cannot find anaconda in the PATH in your Azure Notebook environment")
 
     def GetLocalAnacondaBinDir(self):
         save_verbose = self.verbose
         self.verbose = False
-        if platform.system() == 'Windows':
+        if os.name == "nt":
             condacmd = "conda.bat"
 
         output = self.run([condacmd, "env", "list"], print_output=False).split('\n')
@@ -55,7 +57,7 @@ class CondaBuildTools(EllBuildTools):
 
         self.verbose = save_verbose
 
-        if platform.system() == 'Windows':
+        if os.name == "nt":
             condabin = os.path.join(condadir, 'Library', 'bin')
         else:
             condabin = os.path.join(condadir, 'bin')

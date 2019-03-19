@@ -20,6 +20,10 @@ def load_list_file(filename):
         return [e.strip() for e in fp.readlines()]
 
 
+def is_background_noise(filename):
+    return "_background_noise_" in filename
+
+
 def make_training_list(wav_files, max_files_per_directory):
     """
     Create a training list file given the directory where the wav files are organized into subdirectories,
@@ -36,7 +40,9 @@ def make_training_list(wav_files, max_files_per_directory):
     list_file_name = os.path.join(wav_files, "training_list.txt")
     keywords = []
     for f in os.listdir(wav_files):
-        if os.path.isdir(os.path.join(wav_files, f)):
+        if is_background_noise(f):  # skip the background noise folder.
+            continue
+        elif os.path.isdir(os.path.join(wav_files, f)):
             keywords += [f]
     keywords.sort()
 
@@ -52,7 +58,6 @@ def make_training_list(wav_files, max_files_per_directory):
                     if entry in ignore_list:
                         skipped += 1
                     else:
-                        file_list += [entry]
                         file_list += [entry]
                         count += 1
 
