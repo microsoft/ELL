@@ -23,9 +23,9 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 script_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(script_path, '..', '..', '..', 'utilities/pythonlibs'))
+sys.path.append(os.path.join(script_path, '..', '..', '..', 'utilities', 'pythonlibs'))
 sys.path.append(os.path.join(script_path, '..', '..'))
-sys.path.append(os.path.join(script_path, '../../common/test'))
+sys.path.append(os.path.join(script_path, '..', '..', 'common', 'test'))
 sys.path.append(os.path.join(script_path, '..'))
 
 import find_ell

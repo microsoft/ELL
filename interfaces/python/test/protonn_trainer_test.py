@@ -1,23 +1,24 @@
-import sys
 import os
 import numpy as np
-import ell_helper
+import ell_helper  # noqa: 401
 import find_ell
 import ell
 from testing import Testing
 
-def get_accuracy(predictor, dataset, input_size):
+
+def get_accuracy(predictor, dataset, input_size, predictFunction):
     # compute training accuracy.
     total = dataset.NumExamples()
     true_positive = 0
     for i in range(total):
         example = dataset.GetExample(i)
-        result = predictor.Predict(example.GetData())
+        result = predictFunction(example.GetData().ToArray())
         answer = np.argmax(result)
         expected = example.GetLabel()
         if answer == expected:
             true_positive += 1
     return true_positive / total
+
 
 def test():
     testing = Testing()
@@ -45,7 +46,7 @@ def test():
 
     total = dataset.NumExamples()
     features = dataset.NumFeatures()
-    testing.ProcessTest("Proton dataset loaded", testing.IsEqual(int(total), 200))
+    testing.ProcessTest("ProtoNN dataset loaded", testing.IsEqual(int(total), 200))
 
     trainer.SetDataset(dataset)
 
@@ -57,18 +58,36 @@ def test():
 
     predictor = trainer.GetPredictor()
 
-    accuracy = get_accuracy(predictor, dataset, features)
+    accuracy = get_accuracy(predictor, dataset, features, predictor.Predict)
     print("Accuracy %f" % (accuracy))
-    testing.ProcessTest("Proton accuracy test", testing.IsEqual(int(accuracy), 1))
+    testing.ProcessTest("ProtoNN accuracy test", testing.IsEqual(int(accuracy), 1))
 
     map = predictor.GetMap()
     map.Save("protonnTestData.ell")
     testing.ProcessTest("Saving  protonnTestData.ell", testing.IsEqual(os.path.isfile("protonnTestData.ell"), True))
 
+    # make sure we can compile this map.
+    try:
+        compilerSettings = ell.model.MapCompilerOptions()
+        compilerSettings.useBlas = False
+        optimizerSettings = ell.model.ModelOptimizerOptions()
+        compiledMap = map.CompileDouble("host", "protonn", "predict", compilerSettings, optimizerSettings)
+        compiled = True
+    except Exception as e:
+        print("Compile ProtoNN model failed: {}", e)
+        compiled = False
+
+    testing.ProcessTest("Compiling protonnTestData.ell", testing.IsEqual(compiled, True))
+    if compiled:
+        accuracy = get_accuracy(predictor, dataset, features, compiledMap.ComputeDouble)
+        print("Compiled Accuracy %f" % (accuracy))
+        testing.ProcessTest("ProtoNN compiled accuracy test", testing.IsEqual(int(accuracy), 1))
+
     if testing.DidTestFail():
         raise Exception("protonn_trainer_test failed")
 
     return 0
+
 
 if __name__ == "__main__":
     test()
