@@ -47,6 +47,7 @@ void TestCompilableBinaryPredicateNode();
 void TestCompilableMultiplexerNode();
 void TestCompilableTypeCastNode(size_t dimension);
 void TestReinterpretLayoutNode();
+void TestReinterpretLayoutNodeWithPadding();
 void TestReorderDataNode1();
 void TestReorderDataNode2();
 void TestReorderDataNode3();

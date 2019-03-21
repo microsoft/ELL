@@ -796,7 +796,7 @@ void TestReinterpretLayoutNode()
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(model::MemoryShape{ 1, 1, size });
     auto constantNode = model.AddNode<ConstantNode<ElementType>>(constants, model::MemoryShape{ size, 1, 1 });
 
-    // now re-interpret the contantNode so it's shape matches the input node.
+    // now re-interpret the contantNode so its shape matches the input node.
     auto reinterpret = model.AddNode<ReinterpretLayoutNode<ElementType>>(constantNode->output, model::MemoryShape{ 1, 1, size });
 
     // And do a binary operation on the input (binary operation would complain if the shapes don't match).
@@ -809,6 +809,49 @@ void TestReinterpretLayoutNode()
         auto compiledMap = compiler.Compile(map);
         std::vector<std::vector<ElementType>> signal{ std::vector<ElementType>(size) };
         std::vector<std::vector<ElementType>> expected{ constants };
+        VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
+    });
+}
+
+void TestReinterpretLayoutNodeWithPadding()
+{
+    using ElementType = float;
+    const int rows = 3;
+    const int cols = 4;
+    const int size = rows * cols;
+    std::vector<ElementType> constants(size);
+    std::iota(constants.begin(), constants.end(), 0); // values 0-(r*c)-1
+    model::Model model;
+
+    // create two inputs that are deliberately different shapes
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(model::MemoryShape{ rows - 2, cols - 2 });
+    auto constantNode = model.AddNode<ConstantNode<ElementType>>(constants); // implicit layout is a 1D vector of size rows*cols (== 12)
+
+    // reinterpret linear vector as a 4x3 block of memory with 1 element of "padding" around the edge
+    auto reinterpret = model.AddNode<ReinterpretLayoutNode<ElementType>>(constantNode->output, model::PortMemoryLayout(model::MemoryShape{ rows - 2, cols - 2 }, model::MemoryShape{ rows, cols }, model::MemoryShape{ 1, 1 }));
+
+    // And do a binary operation on the input (binary operation would complain if the shapes don't match).
+    auto addition = model.AddNode<BinaryOperationNode<ElementType>>(inputNode->output, reinterpret->output, BinaryOperationType::add);
+
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", addition->output } });
+    std::string name = "TestReinterpretLayoutNodeWithPadding";
+    TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
+        model::IRMapCompiler compiler;
+        auto compiledMap = compiler.Compile(map);
+        std::vector<ElementType> inputVec((rows - 2) * (cols - 2), static_cast<ElementType>(10));
+        std::vector<std::vector<ElementType>> signal{ inputVec };
+        auto expectedVec = inputVec;
+        for (int i = 0; i < static_cast<int>(inputVec.size()); ++i)
+        {
+            // compute index into "constants" array
+            int r = i / (cols - 2);
+            int c = i % (cols - 2);
+            int index = ((r + 1) * cols) + (c + 1);
+
+            // add input to appropriate location
+            expectedVec[i] += constants[index];
+        }
+        std::vector<std::vector<ElementType>> expected{ expectedVec };
         VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
     });
 }

@@ -14,7 +14,7 @@ namespace ell
 {
 namespace nodes
 {
-    /// <summary> A node that can reinterpret the input port layout to a new shape, so long as the total number of elements remains the same </summary>
+    /// <summary> A node that can reinterpret the input port layout to a new shape, so long as the total memory size remains the same </summary>
     template <typename ValueType>
     class ReinterpretLayoutNode : public model::CompilableNode
     {
@@ -28,7 +28,7 @@ namespace nodes
         /// <summary> Default constructor. </summary>
         ReinterpretLayoutNode();
 
-        /// <summary> Constructor with input and new outputMemoryLayout </summary>
+        /// <summary> Constructor with input and new output memory layout </summary>
         ///
         /// <param name="input"> The input to reinterpret. </param>
         /// <param name="outputMemoryLayout"> The memory layout of the output.  </param>
@@ -37,7 +37,7 @@ namespace nodes
         /// <summary> Gets information about the input memory layout </summary>
         model::PortMemoryLayout GetInputMemoryLayout() const { return _input.GetMemoryLayout(); }
 
-        /// <summary> Gets information about the input memory layout </summary>
+        /// <summary> Gets information about the output memory layout </summary>
         model::PortMemoryLayout GetOutputMemoryLayout() const { return _output.GetMemoryLayout(); }
 
         /// <summary> Returns true if the node can accept input with this memory layout order, else false </summary>
@@ -46,7 +46,7 @@ namespace nodes
         /// <returns> If the node can accept the input memory layout order, true, else false </returns>
         bool CanAcceptInputLayout(const utilities::DimensionOrder& order) const override
         {
-            return GetInputMemoryLayout().GetLogicalDimensionOrder() == order;
+            return true;;
         }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -116,10 +116,10 @@ namespace nodes
         _output(this, defaultOutputPortName, outputMemoryLayout)
     {
         auto inputMemoryLayout = _input.GetMemoryLayout();
-        if (inputMemoryLayout.GetActiveSize().NumElements() != outputMemoryLayout.GetActiveSize().NumElements())
+        if (inputMemoryLayout.GetMemorySize() != outputMemoryLayout.GetMemorySize())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument,
-                                            "Error: input and output layouts must have same number of elements");
+                                            "Error: input and output layouts must have same memory size");
         }
     }
 
@@ -145,7 +145,7 @@ namespace nodes
         auto input = function.LocalArray(compiler.EnsurePortEmitted(this->input));
         auto output = function.LocalArray(compiler.EnsurePortEmitted(this->output));
         // simple pass through.  Would be nice to optimize this copy out all together...
-        function.MemoryCopy<ValueType>(input, output, _output.GetMemoryLayout().NumElements());
+        function.MemoryCopy<ValueType>(input, output, _output.GetMemoryLayout().GetMemorySize());
     }
 
     template <typename ValueType>
