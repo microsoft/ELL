@@ -17,9 +17,9 @@ using namespace utilities;
 
 namespace value
 {
-    Scalar Accumulate(Tensor tensor, Scalar initialValue)
+    Scalar Sum(Tensor tensor)
     {
-        Scalar result = initialValue;
+        Scalar result = Allocate(tensor.Type(), ScalarLayout);
 
         For(tensor, [&](auto row, auto column, auto channel) {
             result += tensor(row, column, channel);

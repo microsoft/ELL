@@ -24,9 +24,9 @@ using namespace utilities;
 
 namespace value
 {
-    Scalar Accumulate(Vector input, Scalar initalValue)
+    Scalar Sum(Vector input)
     {
-        Scalar result = initalValue;
+        Scalar result = Allocate(input.GetType(), ScalarLayout);
 
         For(input, [&](auto index) { result += input(index); });
 

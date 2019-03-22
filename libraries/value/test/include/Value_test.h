@@ -28,7 +28,7 @@ void Tensor_test3();
 void Tensor_slice_test1();
 void Casting_test1();
 void If_test1();
-void Accumulate_test();
+void Sum_test();
 void Dot_test();
 void Intrinsics_test1();
 void Intrinsics_test2();

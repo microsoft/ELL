@@ -26,7 +26,7 @@ namespace value
         All
     };
 
-    Scalar Accumulate(Tensor tensor, Scalar initialValue);
+    Scalar Sum(Tensor tensor);
 
     /// <summary> Creates a for loop over the tensor </summary>
     /// <param name="tensor"> The instance of Tensor that references the data over which to iterate </param>

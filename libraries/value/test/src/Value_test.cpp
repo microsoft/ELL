@@ -984,9 +984,9 @@ void If_test1()
     });
 }
 
-void Accumulate_test()
+void Sum_test()
 {
-    auto fn = DeclareFunction("Accumulate_test").Define([]() -> void {
+    auto fn = DeclareFunction("Sum_test").Define([]() -> void {
         bool ok = true;
         for (int i = 1; i < 10; ++i)
         {
@@ -996,11 +996,11 @@ void Accumulate_test()
 
             v = reference;
 
-            Scalar result = Accumulate(v, Cast(0, v.GetType()));
+            Scalar result = Sum(v);
             If(result != std::accumulate(reference.begin(), reference.end(), 0.f),
                [&] { InvokeForContext<ComputeContext>([&](auto&) { ok = false; }); });
         }
-        testing::ProcessTest("Accumulate test", ok);
+        testing::ProcessTest("Sum test", ok);
     });
 
     InvokeForContext<ComputeContext>([&](auto&) { fn(); });

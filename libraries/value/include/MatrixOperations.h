@@ -22,7 +22,7 @@ namespace value
     class Matrix;
     class Vector;
 
-    Scalar Accumulate(Matrix matrix, Scalar initialValue);
+    Scalar Sum(Matrix matrix, Scalar initialValue);
 
     /// <summary> Creates a for loop over the matrix </summary>
     /// <param name="matrix"> The instance of Matrix that references the data over which to iterate </param>

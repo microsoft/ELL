@@ -34,7 +34,7 @@ namespace value
 
     Scalar Dot(Vector, Vector);
 
-    Scalar Accumulate(Vector input, Scalar initialValue);
+    Scalar Sum(Vector input);
 
     /// <summary> Creates a for loop over the vector </summary>
     /// <param name="vector"> The instance of Vector that references the data over which to iterate </param>

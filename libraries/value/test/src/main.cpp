@@ -38,7 +38,7 @@ int main()
             Tensor_test3();
             Tensor_slice_test1();
             Casting_test1();
-            Accumulate_test();
+            Sum_test();
             Dot_test();
             Intrinsics_test1();
             Intrinsics_test2();

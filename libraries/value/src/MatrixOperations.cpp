@@ -17,9 +17,9 @@ using namespace utilities;
 
 namespace value
 {
-    Scalar Accumulate(Matrix matrix, Scalar initialValue)
+    Scalar Sum(Matrix matrix)
     {
-        Scalar result = initialValue;
+        Scalar result = Allocate(matrix.Type(), ScalarLayout);
 
         For(matrix, [&](auto row, auto column) {
             result += matrix(row, column);
