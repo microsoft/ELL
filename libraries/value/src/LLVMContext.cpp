@@ -189,9 +189,9 @@ namespace value
 
         LLVMValue ToLLVMValue(Value value) { return value.Get<Emittable>().GetDataAs<LLVMValue>(); }
 
-        auto SimpleNumericalFunctionIntrinsic(IRFunctionEmitter& fnEmitter, LLVMFunction (IRRuntime::*intrinsicFn)(VariableType)) -> std::function<Value(std::vector<Value>)>
+        auto SimpleNumericalFunctionIntrinsic(LLVMFunction (IRRuntime::*intrinsicFn)(VariableType)) -> std::function<Value(IRFunctionEmitter&, std::vector<Value>)>
         {
-            return [&fnEmitter, intrinsicFn](std::vector<Value> args) -> Value {
+            return [intrinsicFn](IRFunctionEmitter& fnEmitter, std::vector<Value> args) -> Value {
                 if (args.size() != 1)
                 {
                     throw InputException(InputExceptionErrors::invalidSize);
@@ -244,9 +244,9 @@ namespace value
             };
         }
 
-        auto PowFunctionIntrinsic(IRFunctionEmitter& fnEmitter) -> std::function<Value(std::vector<Value>)>
+        auto PowFunctionIntrinsic() -> std::function<Value(IRFunctionEmitter&, std::vector<Value>)>
         {
-            return [&fnEmitter](std::vector<Value> args) -> Value {
+            return [](IRFunctionEmitter& fnEmitter, std::vector<Value> args) -> Value {
                 if (args.size() != 2)
                 {
                     throw InputException(InputExceptionErrors::invalidSize);
@@ -327,9 +327,9 @@ namespace value
             Min
         };
 
-        auto MaxMinIntrinsicFunction(IRFunctionEmitter& fnEmitter, MaxMinIntrinsic intrinsic) -> std::function<Value(std::vector<Value>)>
+        auto MaxMinIntrinsicFunction(MaxMinIntrinsic intrinsic) -> std::function<Value(IRFunctionEmitter&, std::vector<Value>)>
         {
-            return [&fnEmitter, intrinsic](std::vector<Value> args) -> Value {
+            return [intrinsic](IRFunctionEmitter& fnEmitter, std::vector<Value> args) -> Value {
                 if (args.size() == 1)
                 {
                     const auto& value = args[0];
@@ -1186,18 +1186,18 @@ namespace value
 
     Value LLVMContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)
     {
-        static std::unordered_map<FunctionDeclaration, std::function<Value(std::vector<Value>)>> intrinsics =
+        static std::unordered_map<FunctionDeclaration, std::function<Value(IRFunctionEmitter&, std::vector<Value>)>> intrinsics =
             {
-                { AbsFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetAbsFunction) },
-                { CosFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetCosFunction) },
-                { ExpFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetExpFunction) },
-                { LogFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetLogFunction) },
-                { MaxNumFunctionDeclaration, MaxMinIntrinsicFunction(GetFunctionEmitter(), MaxMinIntrinsic::Max) },
-                { MinNumFunctionDeclaration, MaxMinIntrinsicFunction(GetFunctionEmitter(), MaxMinIntrinsic::Min) },
-                { PowFunctionDeclaration, PowFunctionIntrinsic(GetFunctionEmitter()) },
-                { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetSinFunction) },
-                { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetSqrtFunction) },
-                { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic(GetFunctionEmitter(), &IRRuntime::GetTanhFunction) }
+                { AbsFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetAbsFunction) },
+                { CosFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetCosFunction) },
+                { ExpFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetExpFunction) },
+                { LogFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetLogFunction) },
+                { MaxNumFunctionDeclaration, MaxMinIntrinsicFunction(MaxMinIntrinsic::Max) },
+                { MinNumFunctionDeclaration, MaxMinIntrinsicFunction(MaxMinIntrinsic::Min) },
+                { PowFunctionDeclaration, PowFunctionIntrinsic() },
+                { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetSinFunction) },
+                { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetSqrtFunction) },
+                { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetTanhFunction) }
             };
 
         if (std::all_of(args.begin(), args.end(), [](const auto& value) { return value.IsConstant(); }))
@@ -1212,7 +1212,7 @@ namespace value
 
         if (auto it = intrinsics.find(intrinsic); it != intrinsics.end())
         {
-            return it->second(emittableArgs);
+            return it->second(GetFunctionEmitter(), emittableArgs);
         }
 
         throw LogicException(LogicExceptionErrors::notImplemented);
