@@ -50,7 +50,7 @@ namespace emitters
         std::string c_arm64DataLayout = "e-m:e-i64:64-i128:128-n32:64-S128"; // DragonBoard
         std::string c_iosDataLayout = "e-m:o-i64:64-i128:128-n32:64-S128";
 
-        const std::map<std::string, std::function<void(TargetDevice&)>> KnownTargetDeviceMap = {
+        const std::map<std::string, std::function<void(TargetDevice&)>> KnownTargetDeviceNameMap = {
             { "mac", [](TargetDevice& targetDevice) {
                  targetDevice.triple = c_macTriple;
                  targetDevice.dataLayout = c_macDataLayout;
@@ -100,6 +100,22 @@ namespace emitters
              } }
         };
 
+        const std::map<std::string, std::function<void(TargetDevice&)>> KnownTargetDeviceCpuMap = {
+            { "cortex-m0", [](TargetDevice& targetDevice) {
+                 targetDevice.triple = "armv6m-unknown-none-eabi";
+                 targetDevice.features = "+armv6-m,+v6m";
+                 targetDevice.architecture = "thumb";
+             } },
+            { "cortex-m4", [](TargetDevice& targetDevice) {
+                 targetDevice.triple = "arm-none-eabi";
+                 if (targetDevice.features.empty())
+                 {
+                     targetDevice.features = "+armv7e-m,+v7,soft-float";
+                 }
+                 targetDevice.architecture = "arm";
+             } }
+        };
+
         llvm::Triple GetNormalizedTriple(std::string tripleString)
         {
             auto normalizedTriple = llvm::Triple::normalize(tripleString.empty() ? llvm::sys::getDefaultTargetTriple() : tripleString);
@@ -112,6 +128,7 @@ namespace emitters
         void SetTargetPropertiesFromName(TargetDevice& targetDevice);
         void VerifyCustomTargetProperties(TargetDevice& targetDevice);
         void SetTargetPropertiesFromCpu(TargetDevice& targetDevice);
+        void SetTargetDataLayout(TargetDevice& targetDevice);
     } // namespace
 
     bool TargetDevice::IsWindows() const
@@ -150,49 +167,36 @@ namespace emitters
         }
 
         // Set low-level args based on target name (if present)
-        if (deviceName != "")
+        if (deviceName == "host")
         {
-            if (deviceName == "host")
-            {
-                SetHostTargetProperties(targetDevice);
-            }
-            else if (HasKnownDeviceName(targetDevice))
-            {
-                SetTargetPropertiesFromName(targetDevice);
-            }
-            else if (deviceName == "custom")
-            {
-                VerifyCustomTargetProperties(targetDevice);
-            }
-            else
-            {
-                throw EmitterException(EmitterError::targetNotSupported, "Unknown target device name: " + deviceName);
-            }
+            SetHostTargetProperties(targetDevice);
+        }
+        else if (HasKnownDeviceName(targetDevice))
+        {
+            SetTargetPropertiesFromName(targetDevice);
+        }
+        else if (deviceName == "custom")
+        {
+            SetTargetPropertiesFromCpu(targetDevice);
+            SetTargetDataLayout(targetDevice);
+            VerifyCustomTargetProperties(targetDevice);
         }
         else
         {
-            SetTargetPropertiesFromCpu(targetDevice);
+            throw EmitterException(EmitterError::targetNotSupported, "Unknown target device name: " + deviceName);
         }
     }
 
     namespace
     {
-        void SetHostTargetProperties(TargetDevice& targetDevice)
+        void SetTargetDataLayout(TargetDevice& targetDevice)
         {
-            auto hostTripleString = llvm::sys::getProcessTriple();
-            llvm::Triple hostTriple(hostTripleString);
-
-            targetDevice.triple = hostTriple.normalize();
-            targetDevice.architecture = llvm::Triple::getArchTypeName(hostTriple.getArch());
-            targetDevice.cpu = llvm::sys::getHostCPUName();
-
             std::string error;
             const llvm::Target* target = llvm::TargetRegistry::lookupTarget(targetDevice.triple, error);
             if (target == nullptr)
             {
                 throw EmitterException(EmitterError::targetNotSupported, "Couldn't create target " + error);
             }
-
             const OutputRelocationModel relocModel = OutputRelocationModel::Static;
             const llvm::CodeModel::Model codeModel = llvm::CodeModel::Small;
             const llvm::TargetOptions options;
@@ -206,24 +210,36 @@ namespace emitters
 
             if (!targetMachine)
             {
-                throw EmitterException(EmitterError::targetNotSupported, "Unable to allocate host target machine");
+                throw EmitterException(EmitterError::targetNotSupported, "Unable to allocate target machine");
             }
 
             llvm::DataLayout dataLayout(targetMachine->createDataLayout());
             targetDevice.dataLayout = dataLayout.getStringRepresentation();
         }
 
+        void SetHostTargetProperties(TargetDevice& targetDevice)
+        {
+            auto hostTripleString = llvm::sys::getProcessTriple();
+            llvm::Triple hostTriple(hostTripleString);
+
+            targetDevice.triple = hostTriple.normalize();
+            targetDevice.architecture = llvm::Triple::getArchTypeName(hostTriple.getArch());
+            targetDevice.cpu = llvm::sys::getHostCPUName();
+
+            SetTargetDataLayout(targetDevice);
+        }
+
         bool HasKnownDeviceName(TargetDevice& targetDevice)
         {
             auto deviceName = targetDevice.deviceName;
-            return (KnownTargetDeviceMap.find(deviceName) != KnownTargetDeviceMap.end());
+            return (KnownTargetDeviceNameMap.find(deviceName) != KnownTargetDeviceNameMap.end());
         }
 
         void SetTargetPropertiesFromName(TargetDevice& targetDevice)
         {
             auto deviceName = targetDevice.deviceName;
-            auto it = KnownTargetDeviceMap.find(deviceName);
-            if (it != KnownTargetDeviceMap.end())
+            auto it = KnownTargetDeviceNameMap.find(deviceName);
+            if (it != KnownTargetDeviceNameMap.end())
             {
                 (it->second)(targetDevice);
             }
@@ -243,16 +259,11 @@ namespace emitters
 
         void SetTargetPropertiesFromCpu(TargetDevice& targetDevice)
         {
-            if (targetDevice.cpu == "cortex-m0")
+            auto cpu = targetDevice.cpu;
+            auto it = KnownTargetDeviceCpuMap.find(cpu);
+            if (it != KnownTargetDeviceCpuMap.end())
             {
-                targetDevice.triple = "armv6m-unknown-none-eabi";
-                targetDevice.features = "+armv6-m,+v6m";
-                targetDevice.architecture = "thumb";
-            }
-            else if (targetDevice.cpu == "cortex-m4")
-            {
-                targetDevice.triple = "arm-none-eabi";
-                targetDevice.features = "+armv7e-m,+v7,soft-float";
+                (it->second)(targetDevice);
             }
         }
     } // namespace
