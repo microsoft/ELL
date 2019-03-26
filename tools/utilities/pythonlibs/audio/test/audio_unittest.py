@@ -128,18 +128,18 @@ class AudioUnitTest(unittest.TestCase):
 
         try:
             import pyaudio  # noqa: F401
-            import test_audio  # noqa: F401
+            import run_classifier  # noqa: F401
         except:
             _log.info("---------------- skipping test_keyword_spotter because you don't have pyaudio module.")
             return 0
 
-        result = test_audio.test_keyword_spotter("test/compiled_featurizer/mfcc",
-                                                 "test/compiled_classifier/model",
-                                                 self.categories_file,
-                                                 self.wav_file,
-                                                 threshold=0.95,
-                                                 sample_rate=self.sample_rate,
-                                                 auto_scale=True)
+        result = run_classifier.test_keyword_spotter("test/compiled_featurizer/mfcc",
+                                                     "test/compiled_classifier/model",
+                                                     self.categories_file,
+                                                     self.wav_file,
+                                                     threshold=0.95,
+                                                     sample_rate=self.sample_rate,
+                                                     auto_scale=True)
         if not result or result[2] != "seven":
             raise Exception("Did not get expected prediction 'seven': {}".format(result))
 
