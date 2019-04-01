@@ -93,7 +93,7 @@ conda create -n py36 numpy python=3.6
 Next, activate the environment you just created by typing
 
 ```shell
-source activate py36
+conda activate py36
 ```
 
 You need to repeat this activation command each time you open a new terminal and intend to use ELL from Python. Also, make sure to activate the `py36` environment before building ELL, to ensure that Python interfaces are created.
