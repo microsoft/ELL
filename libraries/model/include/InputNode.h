@@ -90,14 +90,23 @@ namespace model
         OutputPort<ValueType> _output;
     };
 
+    /// <summary> Convenience function for adding a 1-dimensional InputNode to a model. </summary>
+    ///
+    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
+    /// <param name="size"> The input node's size. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType, typename ModelLikeType, typename IntType, utilities::IsNonBooleanIntegral<IntType> concept = true>
+    const OutputPort<ValueType>& Input(ModelLikeType& model, IntType size);
+
     /// <summary> Convenience function for adding an InputNode to a model. </summary>
     ///
     /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
-    /// <param name="layout"> The input node's output memory layout </param>
+    /// <param name="layout"> The input node's output memory layout. </param>
     ///
     /// <returns> The output of the new node. </returns>
-    template <typename ModelLikeType, typename ValueType>
-    const OutputPort<ValueType>& AppendInput(ModelLikeType& model, const PortMemoryLayout& layout);
+    template <typename ValueType, typename ModelLikeType>
+    const OutputPort<ValueType>& Input(ModelLikeType& model, const PortMemoryLayout& layout);
 } // namespace model
 } // namespace ell
 
@@ -207,8 +216,24 @@ namespace model
         }
     }
 
-    template <typename ModelLikeType, typename ValueType>
-    const OutputPort<ValueType>& AppendInput(ModelLikeType& model, const PortMemoryLayout& layout)
+    template <typename ValueType, typename ModelLikeType, typename IntType, utilities::IsNonBooleanIntegral<IntType> concept>
+    const OutputPort<ValueType>& Input(ModelLikeType& model, IntType size)
+    {
+        static_assert(utilities::IsOneOf<ModelLikeType, model::Model, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
+        if constexpr (std::is_signed_v<IntType>)
+        {
+            if (size < 0)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidSize);
+            }
+        }
+
+        auto node = model.template AddNode<InputNode<ValueType>>(static_cast<size_t>(size));
+        return node->output;
+    }
+
+    template <typename ValueType, typename ModelLikeType>
+    const OutputPort<ValueType>& Input(ModelLikeType& model, const PortMemoryLayout& layout)
     {
         static_assert(utilities::IsOneOf<ModelLikeType, model::Model, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
         auto node = model.template AddNode<InputNode<ValueType>>(layout);

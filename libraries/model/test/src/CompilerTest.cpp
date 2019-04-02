@@ -7,11 +7,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "CompilerTest.h"
-#include "ModelMaker.h"
 
 #include <model_testing/include/ModelTestUtilities.h>
 
 #include <model/include/CompilableNode.h>
+#include <model/include/InputNode.h>
 #include <model/include/IRCompiledMap.h>
 #include <model/include/IRMapCompiler.h>
 #include <model/include/Map.h>
@@ -76,9 +76,9 @@ model::Map MakeSimpleMap()
     // make a model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto sumNode = model.AddNode<nodes::SumNode<double>>(inputNode->output);
+    const auto& sum = nodes::Sum(inputNode->output);
 
-    return model::Map{ model, { { "input", inputNode } }, { { "output", sumNode->output } } };
+    return model::Map{ model, { { "input", inputNode } }, { { "output", sum } } };
 }
 
 model::Map MakeForestMap()
@@ -348,14 +348,14 @@ void TestBinaryVector(bool expanded, bool runJit)
     std::vector<double> data2 = { 4, 4, 4, 4 };
     const int c_InputSize = data.size();
     const std::string modelFunctionName = "TestBinaryVector";
-    ModelMaker mb;
+    model::Model model;
 
-    auto input1 = mb.Inputs<double>(c_InputSize);
-    auto c1 = mb.Constant<double>(data);
-    auto c2 = mb.Constant<double>(data2);
+    auto inputNode1 = model.AddNode<model::InputNode<double>>(c_InputSize);
+    const auto& c1 = nodes::Constant(model, data);
+    const auto& c2 = nodes::Constant(model, data2);
 
-    auto bop = mb.Add(c1->output, input1->output);
-    auto multiplyNode = mb.Multiply(bop->output, c2->output);
+    const auto& sum = nodes::Add(c1, inputNode1->output);
+    const auto& product = nodes::Multiply(sum, c2);
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = expanded;
@@ -363,7 +363,7 @@ void TestBinaryVector(bool expanded, bool runJit)
     model::ModelOptimizerOptions optimizerOptions;
     model::IRMapCompiler compiler(settings, optimizerOptions);
 
-    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", multiplyNode->output } } };
+    model::Map map{ model, { { "input", inputNode1 } }, { { "output", product } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
 
     std::vector<double> testInput = { 1, 1, 1, 1 };
@@ -396,17 +396,16 @@ void TestBinaryScalar()
 {
     std::vector<double> data = { 5 };
 
-    ModelMaker mb;
-    auto input1 = mb.Inputs<double>(1);
-    auto c1 = mb.Constant<double>(data);
-
-    auto addNode = mb.Add(c1->output, input1->output);
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(1);
+    const auto& c1 = nodes::Constant(model, data);
+    const auto& sum = nodes::Add(c1, inputNode->output);
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.optimize = true;
     model::ModelOptimizerOptions optimizerOptions;
     model::IRMapCompiler compiler(settings, optimizerOptions);
-    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", addNode->output } } };
+    model::Map map{ model, { { "input", inputNode } }, { { "output", sum } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
@@ -415,15 +414,14 @@ void TestDotProduct(model::MapCompilerOptions& settings)
 {
     std::vector<double> data = { 5, 10, 15, 20 };
 
-    ModelMaker mb;
-    auto c1 = mb.Constant<double>(data);
-    auto input1 = mb.Inputs<double>(4);
-    auto dotProduct = mb.DotProduct(c1->output, input1->output);
-    auto outputNode = mb.Outputs<double>(dotProduct->output);
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(4);
+    const auto& c1 = nodes::Constant(model, data);
+    const auto& dotProduct = nodes::DotProduct(c1, inputNode->output);
 
     model::ModelOptimizerOptions optimizerOptions;
     model::IRMapCompiler compiler(settings, optimizerOptions);
-    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ model, { { "input", inputNode } }, { { "output", dotProduct } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
@@ -449,9 +447,9 @@ void TestSimpleSum(bool expanded, bool optimized)
 {
     std::vector<double> data = { 5, 10, 15, 20 };
 
-    ModelMaker mb;
-    auto input1 = mb.Inputs<double>(4);
-    auto sumNode = mb.Sum<double>(input1->output);
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(4);
+    const auto& sum = nodes::Sum(inputNode->output);
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = expanded;
@@ -459,7 +457,7 @@ void TestSimpleSum(bool expanded, bool optimized)
     model::ModelOptimizerOptions optimizerOptions;
     model::IRMapCompiler compiler(settings, optimizerOptions);
 
-    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", sumNode->output } } };
+    model::Map map{ model, { { "input", inputNode } }, { { "output", sum } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
     PrintDiagnostics(compiledMap.GetModule().GetDiagnosticHandler());
@@ -469,18 +467,18 @@ void TestSum(bool expanded, bool optimized)
 {
     std::vector<double> data = { 5, 10, 15, 20 };
 
-    ModelMaker mb;
-    auto c1 = mb.Constant<double>(data);
-    auto input1 = mb.Inputs<double>(4);
-    auto product = mb.Multiply<double>(c1->output, input1->output);
-    auto sumNode = mb.Sum<double>(product->output);
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(4);
+    const auto& c1 = nodes::Constant(model, data);
+    const auto& product = nodes::Multiply(c1, inputNode->output);
+    const auto& sum = nodes::Sum(product);
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = expanded;
     settings.compilerSettings.optimize = optimized;
     model::ModelOptimizerOptions optimizerOptions;
     model::IRMapCompiler compiler(settings, optimizerOptions);
-    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", sumNode->output } } };
+    model::Map map{ model, { { "input", inputNode } }, { { "output", sum } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 
@@ -492,44 +490,41 @@ void TestAccumulator(bool expanded)
 {
     std::vector<double> data = { 5, 10, 15, 20 };
 
-    ModelMaker mb;
-    auto c1 = mb.Constant<double>(data);
-    auto input1 = mb.Inputs<double>(4);
-    auto product = mb.Multiply<double>(c1->output, input1->output);
-    auto accumulate = mb.Accumulate<double>(product->output);
-    auto outputNode = mb.Outputs<double>(accumulate->output);
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(4);
+    const auto& c1 = nodes::Constant(model, data);
+    const auto& product = nodes::Multiply(c1, inputNode->output);
+    const auto& accumulate = nodes::Accumulate(product);
 
     model::MapCompilerOptions settings;
     settings.compilerSettings.unrollLoops = expanded;
     model::ModelOptimizerOptions optimizerOptions;
     model::IRMapCompiler compiler(settings, optimizerOptions);
-    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ model, { { "input", inputNode } }, { { "output", accumulate } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
 
 void TestDelay()
 {
-    ModelMaker mb;
-    auto input1 = mb.Inputs<double>(4);
-    auto delay = mb.Delay<double>(input1->output, 3);
-    auto outputNode = mb.Outputs<double>(delay->output);
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(4);
+    const auto& delay = nodes::Delay(inputNode->output, 3);
 
     model::IRMapCompiler compiler;
-    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ model, { { "input", inputNode } }, { { "output", delay } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
 
 void TestSqrt()
 {
-    ModelMaker mb;
-    auto input1 = mb.Inputs<double>(1);
-    auto sqrt = mb.Sqrt<double>(input1->output);
-    auto outputNode = mb.Outputs<double>(sqrt->output);
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(1);
+    const auto& sqrt = nodes::Sqrt(inputNode->output);
 
     model::IRMapCompiler compiler;
-    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ model, { { "input", inputNode } }, { { "output", sqrt } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
@@ -538,50 +533,47 @@ void TestBinaryPredicate(bool expanded)
 {
     std::vector<double> data = { 5 };
 
-    ModelMaker mb;
-    auto input1 = mb.Inputs<double>(data.size());
-    auto c1 = mb.Constant<double>(data);
-    auto eq = mb.Equals(input1->output, c1->output);
-    auto outputNode = mb.Outputs<bool>(eq->output);
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(data.size());
+    const auto& c1 = nodes::Constant(model, data);
+    const auto& eq = nodes::Equal(inputNode->output, c1);
 
     model::IRMapCompiler compiler;
-    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ model, { { "input", inputNode } }, { { "output", eq } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
 
 void TestMultiplexer()
 {
-    ModelMaker mb;
-
     std::vector<double> data = { 5, 10 };
-    auto c1 = mb.Constant<bool>(true);
-    auto input1 = mb.Inputs<double>(data.size());
-    auto selector = mb.Select<double, bool>(input1->output, c1->output);
-    auto outputNode = mb.Outputs<double>(selector->output);
+
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(data.size());
+    const auto& c1 = nodes::Constant(model, true);
+    const auto& selectedOutput = nodes::Multiplexer(inputNode->output, c1);
 
     model::IRMapCompiler compiler;
-    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ model, { { "input", inputNode } }, { { "output", selectedOutput } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
     PrintIR(compiledMap);
 }
 
 void TestSlidingAverage()
 {
-    ModelMaker mb;
-    auto dim = mb.Constant<double>(4);
-    auto input1 = mb.Inputs<double>(4);
-    auto delay = mb.Delay<double>(input1->output, 2);
-    auto sum = mb.Sum<double>(delay->output);
-    auto avg = mb.Divide<double>(sum->output, dim->output);
-    auto outputNode = mb.Outputs<double>(avg->output);
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(4);
+    const auto& dim = nodes::Constant(model, (double)4.0);
+    const auto& delay = nodes::Delay(inputNode->output, 2);
+    const auto& sum = nodes::Sum(delay);
+    const auto& avg = nodes::Divide(sum, dim);
 
     model::MapCompilerOptions settings;
     settings.mapFunctionName = "TestSlidingAverage";
     model::ModelOptimizerOptions optimizerOptions;
     model::IRMapCompiler compiler(settings, optimizerOptions);
 
-    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ model, { { "input", inputNode } }, { { "output", avg } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
 
     auto& module = compiledMap.GetModule();
@@ -602,7 +594,6 @@ void TestSlidingAverage()
     module.EndFunction();
 
     PrintIR(module);
-    module.WriteToFile(OutputPath("avg.ll"));
 }
 
 void TestDotProductOutput()
@@ -612,15 +603,14 @@ void TestDotProductOutput()
     settings.mapFunctionName = "TestDotProduct";
     std::vector<double> data = { 5, 10, 15, 20 };
 
-    ModelMaker mb;
-    auto c1 = mb.Constant<double>(data);
-    auto input1 = mb.Inputs<double>(4);
-    auto dotProduct = mb.DotProduct(c1->output, input1->output);
-    auto outputNode = mb.Outputs<double>(dotProduct->output);
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(4);
+    const auto& c1 = nodes::Constant(model, data);
+    const auto& dotProduct = nodes::DotProduct(c1, inputNode->output);
 
     model::ModelOptimizerOptions optimizerOptions;
     model::IRMapCompiler compiler(settings, optimizerOptions);
-    model::Map map{ mb.Model, { { "input", input1 } }, { { "output", outputNode->output } } };
+    model::Map map{ model, { { "input", inputNode } }, { { "output", dotProduct } } };
     model::IRCompiledMap compiledMap = compiler.Compile(map);
 
     auto mainFunction = compiledMap.GetModule().BeginMainDebugFunction();
@@ -635,7 +625,6 @@ void TestDotProductOutput()
     compiledMap.GetModule().EndFunction();
 
     PrintIR(compiledMap);
-    compiledMap.GetModule().WriteToFile(OutputPath("dot.ll"));
 }
 
 void TestForest()

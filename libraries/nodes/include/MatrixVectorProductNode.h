@@ -47,8 +47,8 @@ namespace nodes
 
         /// <summary> Constructor </summary>
         ///
-        /// <param name="input"> The signal to predict from </param>
-        /// <param name="predictor"> The projection matrix </param>
+        /// <param name="input"> The vector to multiply with the matrix </param>
+        /// <param name="w"> The matrix </param>
         MatrixVectorProductNode(const model::OutputPort<ValueType>& input, const math::Matrix<ValueType, layout>& w);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -82,6 +82,15 @@ namespace nodes
         // Projection matrix
         math::Matrix<ValueType, layout> _w;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The vector to multiply with the matrix </param>
+    /// <param name="w"> The matrix </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType, math::MatrixLayout layout>
+    const model::OutputPort<ValueType>& MatrixVectorProduct(const model::OutputPort<ValueType>& input, math::ConstMatrixReference<ValueType, layout> w);
 
     /// <summary> Adds a Matrix vector product node to a model transformer. </summary>
     ///
@@ -179,9 +188,9 @@ namespace nodes
         {
             throw utilities::InputException(utilities::InputExceptionErrors::badData, "Matrix has an invalid stride");
         }
-        const auto& projectionMatrixOutput = AppendConstant(transformer, projectionMatrix.ToArray());
-        auto matrixMultiplyNode = transformer.AddNode<MatrixVectorMultiplyNode<ValueType>>(projectionMatrixOutput, m, n, matrixStride, newInput);
-        transformer.MapNodeOutput(output, matrixMultiplyNode->output);
+        const auto& projectionMatrixOutput = Constant(transformer, projectionMatrix.ToArray());
+        const auto& result = MatrixVectorMultiply(projectionMatrixOutput, m, n, matrixStride, newInput);
+        transformer.MapNodeOutput(output, result);
         return true;
     }
 
@@ -200,6 +209,19 @@ namespace nodes
         math::MultiplyScaleAddUpdate(static_cast<ValueType>(1), _w, input, static_cast<ValueType>(0), result);
 
         _output.SetOutput(result.ToArray());
+    }
+
+    template <typename ValueType, math::MatrixLayout layout>
+    const model::OutputPort<ValueType>& MatrixVectorProduct(const model::OutputPort<ValueType>& input, math::ConstMatrixReference<ValueType, layout> w)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+
+        auto node = model->AddNode<MatrixVectorProductNode<ValueType, layout>>(input, w);
+        return node->output;
     }
 
     template <typename ValueType, math::MatrixLayout layout>

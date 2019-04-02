@@ -72,6 +72,9 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
     };
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& L2NormSquared(const model::OutputPort<ValueType>& input);
 } // namespace nodes
 } // namespace ell
 
@@ -121,8 +124,8 @@ namespace nodes
     bool L2NormSquaredNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        const auto& squaredInput = AppendUnaryOperation(newPortElements, UnaryOperationType::square);
-        const auto& sum = AppendSum(squaredInput);
+        const auto& squaredInput = Square(newPortElements);
+        const auto& sum = Sum(squaredInput);
 
         transformer.MapNodeOutput(output, sum);
         return true;
@@ -140,6 +143,18 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& L2NormSquared(const model::OutputPort<ValueType>& input)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<L2NormSquaredNode<ValueType>>(input);
+        return node->output;
     }
 } // namespace nodes
 } // namespace ell

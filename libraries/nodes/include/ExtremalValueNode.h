@@ -88,6 +88,13 @@ namespace nodes
         model::OutputPort<int> _argVal;
     };
 
+    template <typename ValueType>
+    struct ExtremalValNodeOutput
+    {
+        const model::OutputPort<ValueType>& val;
+        const model::OutputPort<int>& argVal;
+    };
+
     /// <summary> ArgMin node subclass </summary>
     template <typename ValueType>
     class ArgMinNode : public ExtremalValueNode<ValueType, false>
@@ -117,6 +124,14 @@ namespace nodes
         void Copy(model::ModelTransformer& transformer) const override;
     };
 
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The node to get the input data from </param>
+    ///
+    /// <returns> The minimum value and index of the minimum value of the input. </returns>
+    template <typename ValueType>
+    ExtremalValNodeOutput<ValueType> ArgMin(const model::OutputPort<ValueType>& input);
+
     /// <summary> ArgMax node subclass </summary>
     template <typename ValueType>
     class ArgMaxNode : public ExtremalValueNode<ValueType, true>
@@ -145,6 +160,14 @@ namespace nodes
     private:
         void Copy(model::ModelTransformer& transformer) const override;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The node to get the input data from </param>
+    ///
+    /// <returns> The maximum value and index of the maximum value of the input. </returns>
+    template <typename ValueType>
+    ExtremalValNodeOutput<ValueType> ArgMax(const model::OutputPort<ValueType>& input);
 } // namespace nodes
 } // namespace ell
 
@@ -325,6 +348,30 @@ namespace nodes
         auto newNode = transformer.AddNode<ArgMaxNode<ValueType>>(newPortElements);
         transformer.MapNodeOutput(this->val, newNode->val);
         transformer.MapNodeOutput(this->argVal, newNode->argVal);
+    }
+
+    template <typename ValueType>
+    ExtremalValNodeOutput<ValueType> ArgMin(const model::OutputPort<ValueType>& input)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<ArgMinNode<ValueType>>(input);
+        return { node->val, node->argVal };
+    }
+
+    template <typename ValueType>
+    ExtremalValNodeOutput<ValueType> ArgMax(const model::OutputPort<ValueType>& input)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<ArgMaxNode<ValueType>>(input);
+        return { node->val, node->argVal };
     }
 } // namespace nodes
 } // namespace ell

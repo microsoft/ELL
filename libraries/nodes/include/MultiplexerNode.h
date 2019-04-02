@@ -79,6 +79,16 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="elements"> The input aray of values. </param>
+    /// <param name="selector"> The index of the chosen element </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType, typename SelectorType>
+    const model::OutputPort<ValueType>& Multiplexer(const model::OutputPort<ValueType>& elements, const model::OutputPort<SelectorType>& selector);
+
 } // namespace nodes
 } // namespace ell
 
@@ -212,6 +222,23 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver["elements"] >> _elements;
         archiver["selector"] >> _selector;
+    }
+
+    template <typename ValueType, typename SelectorType>
+    const model::OutputPort<ValueType>& Multiplexer(const model::OutputPort<ValueType>& elements, const model::OutputPort<SelectorType>& selector)
+    {
+        model::Model* model = elements.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        if (*model != *(selector.GetNode()->GetModel()))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Inputs not part of the same model");
+        }
+
+        auto node = model->AddNode<MultiplexerNode<ValueType, SelectorType>>(elements, selector);
+        return node->output;
     }
 } // namespace nodes
 } // namespace ell

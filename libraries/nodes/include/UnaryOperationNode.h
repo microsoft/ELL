@@ -96,9 +96,47 @@ namespace nodes
     ///
     /// <returns> The output of the new node. </returns>
     template <typename ValueType>
-    const model::OutputPort<ValueType>& AppendUnaryOperation(const model::OutputPort<ValueType>& input, UnaryOperationType operation);
+    const model::OutputPort<ValueType>& UnaryOperation(const model::OutputPort<ValueType>& input, UnaryOperationType operation);
 
-    inline namespace operations
+    /// @{
+    /// <summary> Convenience functions for adding a node to a model. </summary>
+    /// <param name="input"> The port to get the input data from </param>
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& Abs(const model::OutputPort<ValueType>& input);
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& Cos(const model::OutputPort<ValueType>& input);
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& Exp(const model::OutputPort<ValueType>& input);
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& HardSigmoid(const model::OutputPort<ValueType>& input);
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& Log(const model::OutputPort<ValueType>& input);
+
+    template <typename ValueType, utilities::IsBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& LogicalNot(const model::OutputPort<ValueType>& input);
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& Sigmoid(const model::OutputPort<ValueType>& input);
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& Sin(const model::OutputPort<ValueType>& input);
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& Sqrt(const model::OutputPort<ValueType>& input);
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& Square(const model::OutputPort<ValueType>& input);
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& Tanh(const model::OutputPort<ValueType>& input);
+    /// @}
+
+    inline namespace UnaryOperations
     {
         template <typename ValueType>
         ValueType Abs(ValueType a);
@@ -154,7 +192,7 @@ namespace nodes
         template <>
         inline bool HardSigmoid(bool x);
 
-    } // namespace operations
+    } // namespace UnaryOperations
 } // namespace nodes
 } // namespace ell
 
@@ -164,7 +202,7 @@ namespace ell
 {
 namespace nodes
 {
-    inline namespace operations
+    inline namespace UnaryOperations
     {
         template <typename ValueType>
         ValueType Abs(ValueType a)
@@ -287,10 +325,10 @@ namespace nodes
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch, "Error: taking hard sigmoid of a boolean value");
         }
-    } // namespace operations
+    } // namespace UnaryOperations
 
     template <typename ValueType>
-    const model::OutputPort<ValueType>& AppendUnaryOperation(const model::OutputPort<ValueType>& input, UnaryOperationType operation)
+    const model::OutputPort<ValueType>& UnaryOperation(const model::OutputPort<ValueType>& input, UnaryOperationType operation)
     {
         model::Model* model = input.GetNode()->GetModel();
         if (model == nullptr)
@@ -299,6 +337,72 @@ namespace nodes
         }
         auto node = model->AddNode<UnaryOperationNode<ValueType>>(input, operation);
         return node->output;
+    }
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType>>
+    const model::OutputPort<ValueType>& Abs(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::abs);
+    }
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType>>
+    const model::OutputPort<ValueType>& Cos(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::cos);
+    }
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType>>
+    const model::OutputPort<ValueType>& Exp(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::exp);
+    }
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType>>
+    const model::OutputPort<ValueType>& HardSigmoid(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::hardSigmoid);
+    }
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType>>
+    const model::OutputPort<ValueType>& Log(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::log);
+    }
+
+    template <typename ValueType, utilities::IsBoolean<ValueType>>
+    const model::OutputPort<ValueType>& LogicalNot(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::logicalNot);
+    }
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType>>
+    const model::OutputPort<ValueType>& Sigmoid(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::sigmoid);
+    }
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType>>
+    const model::OutputPort<ValueType>& Sin(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::sin);
+    }
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType>>
+    const model::OutputPort<ValueType>& Sqrt(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::sqrt);
+    }
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType>>
+    const model::OutputPort<ValueType>& Square(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::square);
+    }
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType>>
+    const model::OutputPort<ValueType>& Tanh(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::tanh);
     }
 } // namespace nodes
 } // namespace ell

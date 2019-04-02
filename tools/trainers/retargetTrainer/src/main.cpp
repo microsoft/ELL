@@ -31,9 +31,9 @@
 #include <model/include/Map.h>
 #include <model/include/OutputNode.h>
 
+#include <nodes/include/ActivationFunctions.h>
 #include <nodes/include/BinaryOperationNode.h>
 #include <nodes/include/BroadcastFunctionNode.h>
-#include <nodes/include/ActivationFunctions.h>
 #include <nodes/include/ConstantNode.h>
 #include <nodes/include/LinearPredictorNode.h>
 #include <nodes/include/MatrixVectorProductNode.h>
@@ -51,28 +51,17 @@ using namespace ell;
 using PredictorType = predictors::LinearPredictor<double>;
 
 template <typename ElementType>
-nodes::SinkNode<ElementType>* AppendSinkNodeToMap(model::Map& map, const model::OutputPort<ElementType>& sinkOutput)
-{
-    model::Model& model = map.GetModel();
-    auto condition = model.AddNode<nodes::ConstantNode<bool>>(true);
-    return model.AddNode<nodes::SinkNode<ElementType>>(sinkOutput, condition->output, "OutputCallback");
-}
-
-template <typename ElementType>
 model::Map AppendTrainedLinearPredictorToMap(const PredictorType& trainedPredictor, model::Map& map, size_t dimension)
 {
     predictors::LinearPredictor<ElementType> predictor(trainedPredictor);
     predictor.Resize(dimension);
 
     model::Model& model = map.GetModel();
-    auto mapOutput = map.GetOutputElements<ElementType>(0);
-    auto predictorNode = model.AddNode<nodes::LinearPredictorNode<ElementType>>(mapOutput, predictor);
-    auto sinkNode = AppendSinkNodeToMap<ElementType>(map, predictorNode->output);
-    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sinkNode->output);
-
-    auto& output = outputNode->output;
+    const auto& mapOutput = model.SimplifyOutputs(map.GetOutputElements<ElementType>(0));
+    const auto& predictorOutput = nodes::LinearPredictor(mapOutput, predictor);
+    const auto& sink = nodes::Sink(predictorOutput);
+    const auto& output = model::Output(sink);
     auto outputMap = model::Map(map.GetModel(), { { "input", map.GetInput() } }, { { "output", output } });
-
     return outputMap;
 }
 
@@ -88,9 +77,9 @@ bool RedirectNeuralNetworkOutputByLayer(model::Map& map, size_t numLayersFromEnd
         model::Model model;
         model::MemoryShape inputShape(predictor.GetInputShape());
         auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputShape);
-        auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, predictor);
+        const auto& neuralNetwork = nodes::NeuralNetwork(inputNode->output, predictor);
 
-        map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+        map = model::Map(model, { { "input", inputNode } }, { { "output", neuralNetwork } });
         found = true;
     }
 
@@ -306,22 +295,16 @@ model::Map GetMultiClassMapFromBinaryPredictors(std::vector<PredictorType>& bina
     }
 
     model::Model& model = map.GetModel();
-    auto mapOutput = map.GetOutputElements<ElementType>(0);
-    auto concatenationNode = model.AddNode<model::OutputNode<ElementType>>(mapOutput);
-    auto matrixMultiplyNode = model.AddNode<nodes::MatrixVectorProductNode<ElementType, math::MatrixLayout::rowMajor>>(concatenationNode->output, weights);
-    auto biasNode = model.AddNode<nodes::ConstantNode<ElementType>>(bias.ToArray());
-    auto addNode = model.AddNode<nodes::BinaryOperationNode<ElementType>>(matrixMultiplyNode->output, biasNode->output, nodes::BinaryOperationType::add);
+    const auto& mapOutput = model.SimplifyOutputs(map.GetOutputElements<ElementType>(0));
+    const auto& predictorOutput = nodes::MatrixVectorProduct(mapOutput, weights);
+    const auto& biasValues = nodes::Constant(model, bias.ToArray());
+    const auto& biasedOutput = nodes::Add(predictorOutput, biasValues);
 
     // Apply a sigmoid function so that output can be treated as a probability or
     // confidence score.
-    auto sigmoidNode = model.AddNode<nodes::BroadcastUnaryFunctionNode<ElementType, nodes::SigmoidActivationFunction<ElementType>>>(
-        addNode->output,
-        model::PortMemoryLayout({ static_cast<int>(addNode->output.Size()), 1, 1 }),
-        model::PortMemoryLayout({ static_cast<int>(addNode->output.Size()), 1, 1 }));
-    auto sinkNode = AppendSinkNodeToMap<ElementType>(map, sigmoidNode->output);
-    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(sinkNode->output);
-
-    auto& output = outputNode->output;
+    const auto& sigmoid = nodes::BroadcastUnaryFunction<nodes::SigmoidActivationFunction<ElementType>>(biasedOutput);
+    const auto& sink = nodes::Sink(sigmoid);
+    auto& output = model::Output(sink);
     auto outputMap = model::Map(model, { { "input", map.GetInput() } }, { { "output", output } });
 
     return outputMap;

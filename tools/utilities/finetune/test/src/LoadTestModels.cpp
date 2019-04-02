@@ -44,18 +44,6 @@ math::TensorShape ToTensorShape(const utilities::MemoryShape& shape)
     return math::TensorShape(tensorShape[0], tensorShape[1], tensorShape[2]);
 }
 
-const OutputPort<float>& AppendInputNode(Model& model, const utilities::MemoryShape& shape)
-{
-    auto node = model.AddNode<InputNode<float>>(shape);
-    return node->output;
-}
-
-const OutputPort<float>& AppendOutputNode(Model& model, const model::OutputPort<float>& input)
-{
-    auto node = model.AddNode<OutputNode<float>>(input);
-    return node->output;
-}
-
 predictors::neural::FullyConnectedLayer<float> CreateFullyConnectedLayer(int inputSize, int outputSize)
 {
     typename predictors::neural::Layer<float>::TensorType inputTensorPlaceholder(math::TensorShape{ static_cast<size_t>(inputSize), 1, 1 });
@@ -191,9 +179,9 @@ Model GetNodeFindingTestModel()
     const int filterSize = 3;
     const int numFilters = 4;
 
-    const auto& in = AppendInputNode(model, inputShape);
+    const auto& in = model::Input<float>(model, inputShape);
     const auto& conv = AppendConvolutionalNode(model, in, filterSize, numFilters);
     const auto& fc = AppendFullyConnectedNode(model, conv, outputSize);
-    [[maybe_unused]] const auto& out = AppendOutputNode(model, fc);
+    model::Output(fc);
     return model;
 }

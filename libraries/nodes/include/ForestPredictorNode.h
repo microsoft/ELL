@@ -94,7 +94,18 @@ namespace nodes
     };
 
     /// <summary> Defines an alias representing a simple forest node, which holds a forest with a SingleElementThresholdPredictor as the split rule and ConstantPredictors on the edges. </summary>
-    typedef ForestPredictorNode<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor> SimpleForestPredictorNode;
+    using SimpleForestPredictorNode = ForestPredictorNode<predictors::SingleElementThresholdPredictor, predictors::ConstantPredictor>;
+
+    /// <summary> Convenience function to add a forest predictor node. </summary>
+    ///
+    /// <param name="input"> The predictor's input. </param>
+    /// <param name="forest"> The forest predictor. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename SplitRuleType, typename EdgePredictorType>
+    const model::OutputPort<double>& ForestPredictor(const model::OutputPort<double>& input,
+                                                     const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest);
+
 } // namespace nodes
 } // namespace ell
 
@@ -180,7 +191,7 @@ namespace nodes
                 {
                     model::PortElements<double> elements = interiorNodeSubModels[edges[j].GetTargetNodeIndex()];
 
-                    const auto& edgeSum = AppendBinaryOperation(edgePredictorNode->output, transformer.SimplifyOutputs(elements), BinaryOperationType::add);
+                    const auto& edgeSum = Add(edgePredictorNode->output, transformer.SimplifyOutputs(elements));
                     edgeOutputs.Append(edgeSum);
                 }
                 else // target node is a leaf
@@ -199,7 +210,7 @@ namespace nodes
         }
 
         // Now compute the edge indicator vector
-        const auto& trueValue = AppendConstant(transformer, true); // the constant 'true'
+        const auto& trueValue = Constant(transformer, true); // the constant 'true'
         std::vector<model::PortElements<bool>> edgeIndicatorSubModels(_forest.NumEdges());
 
         // Vector with index of the incoming edge for each internal node (with sentinel value of -1 for tree roots)
@@ -245,11 +256,11 @@ namespace nodes
 
         // Make a copy and add the bias term
         auto treesPlusBias = treeSubModels;
-        const auto& bias = AppendConstant(transformer, _forest.GetBias());
+        const auto& bias = Constant(transformer, _forest.GetBias());
         treesPlusBias.Append(bias);
 
         // Sum all of the trees
-        const auto& treeSum = AppendSum(transformer.SimplifyOutputs(treesPlusBias));
+        const auto& treeSum = Sum(transformer.SimplifyOutputs(treesPlusBias));
 
         // Map all the outputs from the original node to the refined model outputs
         transformer.MapNodeOutput(output, treeSum);
@@ -276,6 +287,20 @@ namespace nodes
         // path indicator
         auto edgeIndicator = _forest.GetEdgeIndicatorVector(inputDataVector);
         _edgeIndicatorVector.SetOutput(std::move(edgeIndicator));
+    }
+
+    template <typename SplitRuleType, typename EdgePredictorType>
+    const model::OutputPort<double>& ForestPredictor(const model::OutputPort<double>& input,
+                                                     const predictors::ForestPredictor<SplitRuleType, EdgePredictorType>& forest)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+
+        auto node = model->AddNode<ForestPredictorNode<SplitRuleType, EdgePredictorType>>(input, forest);
+        return node->output;
     }
 } // namespace nodes
 } // namespace ell

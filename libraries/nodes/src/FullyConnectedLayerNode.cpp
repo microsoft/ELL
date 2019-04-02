@@ -63,12 +63,12 @@ namespace nodes
         auto n = weights.NumColumns();
         auto lda = weights.GetIncrement();
         auto weightsValues = weights.ToArray();
-        const auto& weightsOut = AppendConstant(transformer, weightsValues);
-        auto matrixMultiplyNode = transformer.AddNode<MatrixVectorMultiplyNode<ValueType>>(weightsOut, m, n, lda, newInput);
+        const auto& weightsOut = Constant(transformer, weightsValues);
+        const auto& result = MatrixVectorMultiply(weightsOut, m, n, lda, newInput);
 
         // TODO: add a reorder node here that adds padding to the output, if necessary
 
-        transformer.MapNodeOutput(this->output, matrixMultiplyNode->output);
+        transformer.MapNodeOutput(this->output, result);
         return true;
     }
 

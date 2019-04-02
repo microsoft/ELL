@@ -62,27 +62,27 @@ namespace nodes
         switch (operation)
         {
         case UnaryOperationType::abs:
-            return ComputeLoop<ValueType>(input, Abs<ValueType>);
+            return ComputeLoop<ValueType>(input, UnaryOperations::Abs<ValueType>);
         case UnaryOperationType::sqrt:
-            return ComputeLoop<ValueType>(input, Sqrt<ValueType>);
+            return ComputeLoop<ValueType>(input, UnaryOperations::Sqrt<ValueType>);
         case UnaryOperationType::logicalNot:
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Cannot perform logicalNot operation on numeric inputs");
         case UnaryOperationType::exp:
-            return ComputeLoop<ValueType>(input, Exp<ValueType>);
+            return ComputeLoop<ValueType>(input, UnaryOperations::Exp<ValueType>);
         case UnaryOperationType::sin:
-            return ComputeLoop<ValueType>(input, Sin<ValueType>);
+            return ComputeLoop<ValueType>(input, UnaryOperations::Sin<ValueType>);
         case UnaryOperationType::cos:
-            return ComputeLoop<ValueType>(input, Cos<ValueType>);
+            return ComputeLoop<ValueType>(input, UnaryOperations::Cos<ValueType>);
         case UnaryOperationType::tanh:
-            return ComputeLoop<ValueType>(input, Tanh<ValueType>);
+            return ComputeLoop<ValueType>(input, UnaryOperations::Tanh<ValueType>);
         case UnaryOperationType::square:
-            return ComputeLoop<ValueType>(input, Square<ValueType>);
+            return ComputeLoop<ValueType>(input, UnaryOperations::Square<ValueType>);
         case UnaryOperationType::log:
-            return ComputeLoop<ValueType>(input, Log<ValueType>);
+            return ComputeLoop<ValueType>(input, UnaryOperations::Log<ValueType>);
         case UnaryOperationType::sigmoid:
-            return ComputeLoop<ValueType>(input, Sigmoid<ValueType>);
+            return ComputeLoop<ValueType>(input, UnaryOperations::Sigmoid<ValueType>);
         case UnaryOperationType::hardSigmoid:
-            return ComputeLoop<ValueType>(input, HardSigmoid<ValueType>);
+            return ComputeLoop<ValueType>(input, UnaryOperations::HardSigmoid<ValueType>);
         default:
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
         }

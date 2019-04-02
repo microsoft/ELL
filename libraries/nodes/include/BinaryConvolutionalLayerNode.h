@@ -77,7 +77,7 @@ namespace nodes
         std::vector<int> GetInputPaddingMaskSums() const;
 
         template <typename PackedBitsType>
-        model::PortElements<ValueType> AddRefinedNodes(model::ModelTransformer& transformer, const model::OutputPort<ValueType>& input) const;
+        const model::OutputPort<ValueType>& AddRefinedNodes(model::ModelTransformer& transformer, const model::OutputPort<ValueType>& input) const;
     };
 
     //

@@ -203,7 +203,7 @@ namespace nodes
         const auto& weightsMatrix = _filterWeights.ReferenceAsMatrix();
         const auto weightsValues = weightsMatrix.ToArray();
         const int filterSize = _filterWeights.NumColumns();
-        const auto& weights = AppendConstant(transformer, weightsValues);
+        const auto& weights = Constant(transformer, weightsValues);
         auto convNode = transformer.AddNode<SimpleConvolutionComputeNode<ValueType>>(newInput, weights, _inputMemoryLayout, GetOutputMemoryLayout(), filterSize, _stride, _isDepthwiseSeparable);
         convNode->GetMetadata() = GetMetadata();
         transformer.MapNodeOutput(this->output, convNode->output);

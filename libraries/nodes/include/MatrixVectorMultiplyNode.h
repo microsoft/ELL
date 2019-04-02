@@ -50,6 +50,9 @@ namespace nodes
         /// <summary> Constructor. </summary>
         ///
         /// <param name="inputMatrix"> The left-hand input of the matrix multiplication. </param>
+        /// <param name="m"> The number of rows in the matrix. </param>
+        /// <param name="n"> The number of columns in the matrix. </param>
+        /// <param name="matrixStride"> The stride of the matrix (the number of elements between adjacent rows). </param>
         /// <param name="inputVector"> The right-hand input of the matrix multiplication. </param>
         MatrixVectorMultiplyNode(const model::OutputPort<ValueType>& inputMatrix, size_t m, size_t n, size_t matrixStride, const model::OutputPort<ValueType>& inputVector);
 
@@ -85,5 +88,17 @@ namespace nodes
         size_t _m, _n;
         size_t _lda, _incx;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="inputMatrix"> The left-hand input of the matrix multiplication. </param>
+    /// <param name="m"> The number of rows in the matrix. </param>
+    /// <param name="n"> The number of columns in the matrix. </param>
+    /// <param name="matrixStride"> The stride of the matrix (the number of elements between adjacent rows). </param>
+    /// <param name="inputVector"> The right-hand input of the matrix multiplication. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& MatrixVectorMultiply(const model::OutputPort<ValueType>& inputMatrix, size_t m, size_t n, size_t matrixStride, const model::OutputPort<ValueType>& inputVector);
 } // namespace nodes
 } // namespace ell

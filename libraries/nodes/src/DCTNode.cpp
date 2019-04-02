@@ -55,8 +55,8 @@ namespace nodes
     bool DCTNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<MatrixVectorProductNode<ValueType, math::MatrixLayout::rowMajor>>(newPortElements, _dctCoeffs);
-        transformer.MapNodeOutput(output, newNode->output);
+        const auto& result = MatrixVectorProduct(newPortElements, _dctCoeffs);
+        transformer.MapNodeOutput(output, result);
         return true;
     }
 

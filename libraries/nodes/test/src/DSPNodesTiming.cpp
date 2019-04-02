@@ -184,27 +184,27 @@ static void TimeConvolutionNode(ImageShape inputShape, FiltersShape filterShape,
     auto outputMemoryLayout = CalculateMemoryLayout(outputRows, outputColumns, numFilters, outputPadding);
     auto filterWeights = Tensor(numFilters * filterSize, filterSize, numFilterChannels, filter);
 
-    model::Node* outputNode = nullptr;
+    const model::OutputPort<ValueType>* output = nullptr;
     switch (convolutionMethod)
     {
     case dsp::ConvolutionMethodOption::automatic:
         std::cout << "Testing 'automatic' method --- using 'simple' instead" << std::endl;
     // fallthrough
     case dsp::ConvolutionMethodOption::simple:
-        outputNode = model.AddNode<nodes::SimpleConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        output = &nodes::SimpleConvolution(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
         break;
     case dsp::ConvolutionMethodOption::diagonal:
-        outputNode = model.AddNode<nodes::DiagonalConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        output = &nodes::DiagonalConvolution(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
         break;
     case dsp::ConvolutionMethodOption::unrolled:
-        outputNode = model.AddNode<nodes::UnrolledConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        output = &nodes::UnrolledConvolution(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
         break;
     case dsp::ConvolutionMethodOption::winograd:
-        outputNode = model.AddNode<nodes::WinogradConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride, options.winogradOptions.tileSize, options.winogradOptions.filterOrder);
+        output = &nodes::WinogradConvolution(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride, options.winogradOptions.tileSize, options.winogradOptions.filterOrder);
         break;
     }
 
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", model::PortElementsBase(*(outputNode->GetOutputPort(0))) } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", *output } });
 
     auto rawDataTensor = Tensor(inputRows, inputColumns, numChannels, data);
     auto paddedDataTensor = Tensor(inputRows + 2, inputColumns + 2, numChannels);

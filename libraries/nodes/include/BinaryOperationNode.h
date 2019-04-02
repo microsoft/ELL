@@ -164,9 +164,39 @@ namespace nodes
     /// <returns> The output of the new node. </returns>
     /// Note: the output will use the same memory layout as input1
     template <typename ValueType>
-    const model::OutputPort<ValueType>& AppendBinaryOperation(const model::OutputPort<ValueType>& input1,
-                                                              const model::OutputPort<ValueType>& input2,
-                                                              BinaryOperationType operation);
+    const model::OutputPort<ValueType>& BinaryOperation(const model::OutputPort<ValueType>& input1,
+                                                        const model::OutputPort<ValueType>& input2,
+                                                        BinaryOperationType operation);
+
+    /// @{
+    /// <summary> Convenience functions for adding a node to a model. </summary>
+    ///
+    /// <param name="input1"> The left-hand input of the arithmetic expression. </param>
+    /// <param name="input2"> The right-hand input of the arithmetic expression. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    /// Note: the output will use the same memory layout as input1
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Add(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Subtract(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Multiply(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Divide(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& LogicalAnd(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& LogicalOr(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& LogicalXor(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+    /// @}
 
     inline namespace BinaryOperations
     {
@@ -384,25 +414,25 @@ namespace nodes
         switch (_operation)
         {
         case BinaryOperationType::add:
-            output = ComputeOutput(Add<ValueType>);
+            output = ComputeOutput(BinaryOperations::Add<ValueType>);
             break;
         case BinaryOperationType::subtract:
-            output = ComputeOutput(Subtract<ValueType>);
+            output = ComputeOutput(BinaryOperations::Subtract<ValueType>);
             break;
         case BinaryOperationType::multiply:
-            output = ComputeOutput(Multiply<ValueType>);
+            output = ComputeOutput(BinaryOperations::Multiply<ValueType>);
             break;
         case BinaryOperationType::divide:
-            output = ComputeOutput(Divide<ValueType>);
+            output = ComputeOutput(BinaryOperations::Divide<ValueType>);
             break;
         case BinaryOperationType::logicalAnd:
-            output = ComputeOutput(LogicalAnd<ValueType>);
+            output = ComputeOutput(BinaryOperations::LogicalAnd<ValueType>);
             break;
         case BinaryOperationType::logicalOr:
-            output = ComputeOutput(LogicalOr<ValueType>);
+            output = ComputeOutput(BinaryOperations::LogicalOr<ValueType>);
             break;
         case BinaryOperationType::logicalXor:
-            output = ComputeOutput(LogicalXor<ValueType>);
+            output = ComputeOutput(BinaryOperations::LogicalXor<ValueType>);
             break;
         default:
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
@@ -666,9 +696,9 @@ namespace nodes
     }
 
     template <typename ValueType>
-    const model::OutputPort<ValueType>& AppendBinaryOperation(const model::OutputPort<ValueType>& input1,
-                                                              const model::OutputPort<ValueType>& input2,
-                                                              BinaryOperationType operation)
+    const model::OutputPort<ValueType>& BinaryOperation(const model::OutputPort<ValueType>& input1,
+                                                        const model::OutputPort<ValueType>& input2,
+                                                        BinaryOperationType operation)
     {
         model::Model* model = input1.GetNode()->GetModel();
         if (model == nullptr)
@@ -682,6 +712,48 @@ namespace nodes
 
         auto node = model->AddNode<BinaryOperationNode<ValueType>>(input1, input2, operation);
         return node->output;
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Add(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryOperation(input1, input2, BinaryOperationType::add);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Subtract(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryOperation(input1, input2, BinaryOperationType::subtract);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Multiply(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryOperation(input1, input2, BinaryOperationType::multiply);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Divide(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryOperation(input1, input2, BinaryOperationType::divide);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& LogicalAnd(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryOperation(input1, input2, BinaryOperationType::logicalAnd);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& LogicalOr(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryOperation(input1, input2, BinaryOperationType::logicalOr);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& LogicalXor(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryOperation(input1, input2, BinaryOperationType::logicalXor);
     }
 } // namespace nodes
 } // namespace ell

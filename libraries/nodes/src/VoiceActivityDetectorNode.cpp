@@ -73,5 +73,25 @@ namespace nodes
         archiver[defaultInputPortName] >> _input;
         archiver["vad"] >> _vad;
     }
+
+    const model::OutputPortBase& VoiceActivityDetector(const model::OutputPortBase& input,
+                                                       double sampleRate,
+                                                       double frameDuration,
+                                                       double tauUp,
+                                                       double tauDown,
+                                                       double largeInput,
+                                                       double gainAtt,
+                                                       double thresholdUp,
+                                                       double thresholdDown,
+                                                       double levelThreshold)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<VoiceActivityDetectorNode>(input, sampleRate, frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold);
+        return node->output;
+    }
 } // namespace nodes
 } // namespace ell

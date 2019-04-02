@@ -129,6 +129,10 @@ namespace nodes
         // Pointer to the predictor
         PredictorType _predictor;
     };
+
+    template <typename ElementType>
+    const model::OutputPort<ElementType>& NeuralNetwork(const model::OutputPort<ElementType>& input,
+                                                        const predictors::NeuralNetworkPredictor<ElementType>& predictor);
 } // namespace nodes
 } // namespace ell
 
@@ -222,6 +226,21 @@ namespace nodes
         auto name = layer.GetRuntimeTypeName();
         throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Unknown layer type in refine: " + name);
     }
+
+    template <typename ElementType>
+    const model::OutputPort<ElementType>& NeuralNetwork(const model::OutputPort<ElementType>& input,
+                                                        const predictors::NeuralNetworkPredictor<ElementType>& predictor)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+
+        auto node = model->AddNode<NeuralNetworkPredictorNode<ElementType>>(input, predictor);
+        return node->output;
+    }
+
 } // namespace nodes
 } // namespace ell
 

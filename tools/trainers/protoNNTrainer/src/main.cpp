@@ -59,8 +59,8 @@ void CreateMap(predictors::ProtoNNPredictor& predictor, ell::model::Map& map)
     auto predictorNode = model.AddNode<nodes::ProtoNNPredictorNode>(inputElements, predictor);
 
     // add an output node taking input from the predictor node.
-    auto outputNode = model.AddNode<model::OutputNode<double>>(predictorNode->output);
-    model::PortElements<double> outputElements(outputNode->output);
+    const auto& output = model::Output(predictorNode->output);
+    model::PortElements<double> outputElements(output);
 
     // name the inputs and outputs to the map.
     map.AddInput("input", inputNode);

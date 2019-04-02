@@ -127,7 +127,7 @@ namespace nodes
 
         auto paf = dynamic_cast<const predictors::neural::ParametricReLUActivation<ValueType>*>(this->_layer.GetActivationFunction().GetImpl());
         auto alphaValues = paf->GetAlpha().ToArray();
-        const auto& alphaValuesOut = AppendConstant(transformer, alphaValues);
+        const auto& alphaValuesOut = Constant(transformer, alphaValues);
 
         // PReLU is a coordinate-wise operation
         auto computeNode = transformer.AddNode<BinaryFunctionNode<ValueType, ActivationFunction>>(

@@ -60,12 +60,12 @@ namespace nodes
     // Base class for unary function types
     //
     template <typename ValueType>
-    class BroadcastUnaryFunction
+    class BroadcastUnaryFunctionType
     {
     public:
-        BroadcastUnaryFunction() = default;
-        BroadcastUnaryFunction(const BroadcastUnaryFunction&) = default;
-        virtual ~BroadcastUnaryFunction() = default;
+        BroadcastUnaryFunctionType() = default;
+        BroadcastUnaryFunctionType(const BroadcastUnaryFunctionType&) = default;
+        virtual ~BroadcastUnaryFunctionType() = default;
 
         /// <summary> Computes a value (on the host machine) </summary>
         ///
@@ -101,12 +101,12 @@ namespace nodes
     // Base class for binary function types
     //
     template <typename ValueType>
-    class BroadcastBinaryFunction
+    class BroadcastBinaryFunctionType
     {
     public:
-        BroadcastBinaryFunction() = default;
-        BroadcastBinaryFunction(const BroadcastBinaryFunction&) = default;
-        virtual ~BroadcastBinaryFunction() = default;
+        BroadcastBinaryFunctionType() = default;
+        BroadcastBinaryFunctionType(const BroadcastBinaryFunctionType&) = default;
+        virtual ~BroadcastBinaryFunctionType() = default;
 
         /// <summary> Computes a value (on the host machine) </summary>
         ///
@@ -144,12 +144,12 @@ namespace nodes
     // Base class for ternary function types
     //
     template <typename ValueType>
-    class BroadcastTernaryFunction
+    class BroadcastTernaryFunctionType
     {
     public:
-        BroadcastTernaryFunction() = default;
-        BroadcastTernaryFunction(const BroadcastTernaryFunction&) = default;
-        virtual ~BroadcastTernaryFunction() = default;
+        BroadcastTernaryFunctionType() = default;
+        BroadcastTernaryFunctionType(const BroadcastTernaryFunctionType&) = default;
+        virtual ~BroadcastTernaryFunctionType() = default;
 
         /// <summary> Computes a value (on the host machine) </summary>
         ///
@@ -189,11 +189,11 @@ namespace nodes
     // Special type of ternary function: the linear function  y = x*a + b
     //
     template <typename ValueType>
-    class BroadcastLinearFunction : public BroadcastTernaryFunction<ValueType>
+    class BroadcastLinearFunctionType : public BroadcastTernaryFunctionType<ValueType>
     {
     public:
-        BroadcastLinearFunction() = default;
-        BroadcastLinearFunction(const BroadcastLinearFunction&) = default;
+        BroadcastLinearFunctionType() = default;
+        BroadcastLinearFunctionType(const BroadcastLinearFunctionType&) = default;
 
         /// <summary> Computes a linear function (on the host machine) </summary>
         ///
@@ -202,7 +202,7 @@ namespace nodes
         /// <param name="b"> The second secondary value </param>
         /// <returns> The value the function f(x,a,b) = ax + b </returns>
         ValueType Compute(ValueType x, ValueType a, ValueType b) const override;
-        using BroadcastTernaryFunction<ValueType>::Compute;
+        using BroadcastTernaryFunctionType<ValueType>::Compute;
 
         /// <summary> Emits IR to compute a value </summary>
         ///
@@ -211,7 +211,7 @@ namespace nodes
         /// <param name="b"> The second secondary value </param>
         /// <returns> The value the function f(x,a,b) = ax + b </returns>
         emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, emitters::LLVMValue a, emitters::LLVMValue b) const override;
-        using BroadcastTernaryFunction<ValueType>::Compile;
+        using BroadcastTernaryFunctionType<ValueType>::Compile;
 
         /// <summary> Indicates if the function can operate on vector types </summary>
         bool CanUseVectorTypes() const { return true; }
@@ -514,13 +514,13 @@ namespace nodes
     // Special case of BroadcastTernaryFunctionNode, using a linear function
     //
     template <typename ValueType>
-    class BroadcastLinearFunctionNode : public BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>
+    class BroadcastLinearFunctionNode : public BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunctionType<ValueType>>
     {
     public:
-        using BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>::primaryInput;
-        using BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>::secondaryInput1;
-        using BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>::secondaryInput2;
-        using BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>::output;
+        using BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunctionType<ValueType>>::primaryInput;
+        using BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunctionType<ValueType>>::secondaryInput1;
+        using BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunctionType<ValueType>>::secondaryInput2;
+        using BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunctionType<ValueType>>::output;
 
         /// <summary></summary>
         BroadcastLinearFunctionNode();
@@ -552,6 +552,24 @@ namespace nodes
     private:
         void Copy(model::ModelTransformer& transformer) const override;
     };
+
+    // Factory functions
+    template <typename FunctionType, typename ValueType>
+    const model::OutputPort<ValueType>& BroadcastUnaryFunction(const model::OutputPort<ValueType>& input,
+                                                               ValueType padding = 0);
+    template <typename FunctionType, typename ValueType>
+    const model::OutputPort<ValueType>& BroadcastUnaryFunction(const model::OutputPort<ValueType>& input,
+                                                               FunctionType function,
+                                                               ValueType padding = 0);
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& BroadcastLinearFunction(const model::OutputPort<ValueType>& primaryInput,
+                                                                const model::PortMemoryLayout& inputLayout,
+                                                                const model::OutputPort<ValueType>& scaleInput,
+                                                                const model::OutputPort<ValueType>& biasInput,
+                                                                size_t secondaryInputDimension,
+                                                                const model::PortMemoryLayout& outputLayout,
+                                                                ValueType padding = 0);
 } // namespace nodes
 } // namespace ell
 
@@ -562,67 +580,67 @@ namespace ell
 namespace nodes
 {
     //
-    // BroadcastUnaryFunction
+    // BroadcastUnaryFunctionType
     //
     template <typename ValueType>
-    ValueType BroadcastUnaryFunction<ValueType>::Compute(ValueType x, const std::vector<ValueType>& secondaryArgs) const
+    ValueType BroadcastUnaryFunctionType<ValueType>::Compute(ValueType x, const std::vector<ValueType>& secondaryArgs) const
     {
         assert(secondaryArgs.size() == 0);
         return Compute(x);
     }
 
     template <typename ValueType>
-    emitters::LLVMValue BroadcastUnaryFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, const std::vector<emitters::LLVMValue>& secondaryArgs) const
+    emitters::LLVMValue BroadcastUnaryFunctionType<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, const std::vector<emitters::LLVMValue>& secondaryArgs) const
     {
         assert(secondaryArgs.size() == 0);
         return this->Compile(function, x);
     }
 
     //
-    // BroadcastBinaryFunction
+    // BroadcastBinaryFunctionType
     //
     template <typename ValueType>
-    ValueType BroadcastBinaryFunction<ValueType>::Compute(ValueType x, const std::vector<ValueType>& secondaryArgs) const
+    ValueType BroadcastBinaryFunctionType<ValueType>::Compute(ValueType x, const std::vector<ValueType>& secondaryArgs) const
     {
         assert(secondaryArgs.size() == 1);
         return Compute(x, secondaryArgs[0]);
     }
 
     template <typename ValueType>
-    emitters::LLVMValue BroadcastBinaryFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, const std::vector<emitters::LLVMValue>& secondaryArgs) const
+    emitters::LLVMValue BroadcastBinaryFunctionType<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, const std::vector<emitters::LLVMValue>& secondaryArgs) const
     {
         assert(secondaryArgs.size() == 1);
         return this->Compile(function, x, secondaryArgs[0]);
     }
 
     //
-    // BroadcastTernaryFunction
+    // BroadcastTernaryFunctionType
     //
     template <typename ValueType>
-    ValueType BroadcastTernaryFunction<ValueType>::Compute(ValueType x, const std::vector<ValueType>& secondaryArgs) const
+    ValueType BroadcastTernaryFunctionType<ValueType>::Compute(ValueType x, const std::vector<ValueType>& secondaryArgs) const
     {
         assert(secondaryArgs.size() == 2);
         return Compute(x, secondaryArgs[0], secondaryArgs[1]);
     }
 
     template <typename ValueType>
-    emitters::LLVMValue BroadcastTernaryFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, const std::vector<emitters::LLVMValue>& secondaryArgs) const
+    emitters::LLVMValue BroadcastTernaryFunctionType<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, const std::vector<emitters::LLVMValue>& secondaryArgs) const
     {
         assert(secondaryArgs.size() == 2);
         return this->Compile(function, x, secondaryArgs[0], secondaryArgs[1]);
     }
 
     //
-    // BroadcastLinearFunction
+    // BroadcastLinearFunctionType
     //
     template <typename ValueType>
-    ValueType BroadcastLinearFunction<ValueType>::Compute(ValueType x, ValueType scale, ValueType bias) const
+    ValueType BroadcastLinearFunctionType<ValueType>::Compute(ValueType x, ValueType scale, ValueType bias) const
     {
         return scale * x + bias;
     }
 
     template <typename ValueType>
-    emitters::LLVMValue BroadcastLinearFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, emitters::LLVMValue scale, emitters::LLVMValue bias) const
+    emitters::LLVMValue BroadcastLinearFunctionType<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x, emitters::LLVMValue scale, emitters::LLVMValue bias) const
     {
         if (scale == nullptr) // bias only
         {
@@ -737,7 +755,7 @@ namespace nodes
                     else
                     {
                         // Dubious hack to deal with linear function nodes missing a coefficient
-                        if (std::is_same<FunctionType, BroadcastLinearFunction<ValueType>>::value && index == 0) // "scale" value, which should be 1 if not specified
+                        if (std::is_same<FunctionType, BroadcastLinearFunctionType<ValueType>>::value && index == 0) // "scale" value, which should be 1 if not specified
                         {
                             secondaryValues[index] = static_cast<ValueType>(1.0);
                         }
@@ -1298,13 +1316,13 @@ namespace nodes
     //
     template <typename ValueType>
     BroadcastLinearFunctionNode<ValueType>::BroadcastLinearFunctionNode() :
-        BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>()
+        BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunctionType<ValueType>>()
     {
     }
 
     template <typename ValueType>
     BroadcastLinearFunctionNode<ValueType>::BroadcastLinearFunctionNode(const model::OutputPort<ValueType>& primaryInput, const model::PortMemoryLayout& inputLayout, const model::OutputPort<ValueType>& scaleInput, const model::OutputPort<ValueType>& biasInput, size_t dimension, const model::PortMemoryLayout& outputLayout, ValueType paddingValue) :
-        BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunction<ValueType>>(primaryInput, inputLayout, scaleInput, biasInput, dimension, outputLayout, paddingValue)
+        BroadcastTernaryFunctionNode<ValueType, BroadcastLinearFunctionType<ValueType>>(primaryInput, inputLayout, scaleInput, biasInput, dimension, outputLayout, paddingValue)
     {
     }
 
@@ -1321,6 +1339,58 @@ namespace nodes
                                                                                    this->GetBroadcastDimension(),
                                                                                    this->GetOutputMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
+    }
+
+    // Factory functions
+    template <typename FunctionType, typename ValueType>
+    const model::OutputPort<ValueType>& BroadcastUnaryFunction(const model::OutputPort<ValueType>& input,
+                                                               ValueType padding)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+
+        auto node = model->AddNode<BroadcastUnaryFunctionNode<ValueType, FunctionType>>(input, input.GetMemoryLayout(), input.GetMemoryLayout(), padding);
+        return node->output;
+    }
+
+    template <typename FunctionType, typename ValueType>
+    const model::OutputPort<ValueType>& BroadcastUnaryFunction(const model::OutputPort<ValueType>& input,
+                                                               FunctionType function,
+                                                               ValueType padding)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+
+        auto node = model->AddNode<BroadcastUnaryFunctionNode<ValueType, FunctionType>>(input, input.GetMemoryLayout(), input.GetMemoryLayout(), function, padding);
+        return node->output;
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& BroadcastLinearFunction(const model::OutputPort<ValueType>& primaryInput,
+                                                                const model::PortMemoryLayout& inputLayout,
+                                                                const model::OutputPort<ValueType>& scaleInput,
+                                                                const model::OutputPort<ValueType>& biasInput,
+                                                                size_t secondaryInputDimension,
+                                                                const model::PortMemoryLayout& outputLayout,
+                                                                ValueType padding)
+    {
+        model::Model* model = primaryInput.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        if ((*model != *(scaleInput.GetNode()->GetModel())) || (*model != *(biasInput.GetNode()->GetModel())))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Inputs not part of the same model");
+        }
+        auto node = model->AddNode<BroadcastLinearFunctionNode<ValueType>>(primaryInput, inputLayout, scaleInput, biasInput, secondaryInputDimension, outputLayout, padding);
+        return node->output;
     }
 
 } // namespace nodes

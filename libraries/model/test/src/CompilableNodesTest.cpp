@@ -794,13 +794,13 @@ void TestReinterpretLayoutNode()
 
     // create two inputs that are deliberately different shapes (but same # elements).
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(model::MemoryShape{ 1, 1, size });
-    auto constantNode = model.AddNode<ConstantNode<ElementType>>(constants, model::MemoryShape{ size, 1, 1 });
+    const auto& constantOutput = Constant(model, constants, model::MemoryShape{ size, 1, 1 });
 
     // now re-interpret the contantNode so its shape matches the input node.
-    auto reinterpret = model.AddNode<ReinterpretLayoutNode<ElementType>>(constantNode->output, model::MemoryShape{ 1, 1, size });
+    const auto& reinterpret = ReinterpretLayout(constantOutput, model::MemoryShape{ 1, 1, size });
 
     // And do a binary operation on the input (binary operation would complain if the shapes don't match).
-    auto addition = model.AddNode<BinaryOperationNode<ElementType>>(inputNode->output, reinterpret->output, BinaryOperationType::add);
+    auto addition = model.AddNode<BinaryOperationNode<ElementType>>(inputNode->output, reinterpret, BinaryOperationType::add);
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", addition->output } });
     std::string name = "TestReinterpretLayoutNode";
@@ -880,8 +880,8 @@ void TestReorderDataNode1()
 
     size_t inputSize = inputLayout.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
-    auto testNode = model.AddNode<ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout);
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    const auto& testOutput = ReorderData(inputNode->output, inputLayout, outputLayout);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testOutput } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -921,8 +921,8 @@ void TestReorderDataNode2()
 
     size_t inputSize = inputLayout.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
-    auto testNode = model.AddNode<ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout, std::vector<int>{ 2, 0, 1 });
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    const auto& testOutput = ReorderData(inputNode->output, inputLayout, outputLayout, std::vector<int>{ 2, 0, 1 });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testOutput } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -961,8 +961,8 @@ void TestReorderDataNode3()
 
     size_t inputSize = inputLayout.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
-    auto testNode = model.AddNode<ReorderDataNode<ElementType>>(inputNode->output, inputLayout, outputLayout);
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
+    const auto& testOutput = ReorderData(inputNode->output, inputLayout, outputLayout);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testOutput } });
     model::IRMapCompiler compiler;
     auto compiledMap = compiler.Compile(map);
 
@@ -1414,16 +1414,16 @@ void TestOrderedMatrixMatrixMultiplyNode(int m, int n, int k, bool transposeA, b
 
     model::Model model;
     auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(model::MemoryShape{ m, k });
-    auto reorderedInputMatrixNode = model.AddNode<ReorderDataNode<ValueType>>(inputMatrixNode->output, orderA);
+    const auto& reorderedInputMatrix = ReorderData(inputMatrixNode->output, orderA);
 
     std::vector<ValueType> matrixBVals(k * n);
     FillVector(matrixBVals);
-    auto matrixBNode = model.AddNode<ConstantNode<ValueType>>(matrixBVals, model::MemoryShape{ k, n });
-    auto reorderedMatrixBNode = model.AddNode<ReorderDataNode<ValueType>>(matrixBNode->output, orderB);
+    const auto& matrixB = Constant(model, matrixBVals, model::MemoryShape{ k, n });
+    const auto& reorderedMatrixB = ReorderData(matrixB, orderB);
 
-    auto matMatMultNode = model.AddNode<MatrixMatrixMultiplyNode<ValueType>>(reorderedInputMatrixNode->output, reorderedMatrixBNode->output, outputLayout);
+    const auto& matMatMultResult = MatrixMatrixMultiply(reorderedInputMatrix, reorderedMatrixB, outputLayout);
 
-    auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
+    auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultResult } });
 
     // compare output
     std::vector<ValueType> matrixAVals(m * k);

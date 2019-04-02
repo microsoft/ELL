@@ -113,8 +113,32 @@ namespace nodes
         archiver["incx"] >> _incx;
     }
 
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& MatrixVectorMultiply(const model::OutputPort<ValueType>& inputMatrix, size_t m, size_t n, size_t matrixStride, const model::OutputPort<ValueType>& inputVector)
+    {
+        model::Model* model = inputMatrix.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        if (*model != *(inputVector.GetNode()->GetModel()))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Inputs not part of the same model");
+        }
+
+        auto node = model->AddNode<MatrixVectorMultiplyNode<ValueType>>(inputMatrix, m, n, matrixStride, inputVector);
+        return node->output;
+    }
+
     // Explicitly instantiate versions
     template class MatrixVectorMultiplyNode<float>;
     template class MatrixVectorMultiplyNode<double>;
+
+    template
+    const model::OutputPort<float>& MatrixVectorMultiply(const model::OutputPort<float>& inputMatrix, size_t m, size_t n, size_t matrixStride, const model::OutputPort<float>& inputVector);
+
+    template
+    const model::OutputPort<double>& MatrixVectorMultiply(const model::OutputPort<double>& inputMatrix, size_t m, size_t n, size_t matrixStride, const model::OutputPort<double>& inputVector);
+
 } // namespace nodes
 } // namespace ell

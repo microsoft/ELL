@@ -235,27 +235,27 @@ namespace nodes
 
         assert(outputDataPadding == 0 && "Convolutional node output padding not supported yet");
 
-        model::PortElements<ValueType> xnorOutput;
+        const model::OutputPort<ValueType>* xnorOutput;
         if (numPackedBits == 32)
         {
-            xnorOutput = AddRefinedNodes<int32_t>(transformer, newInput);
+            xnorOutput = &AddRefinedNodes<int32_t>(transformer, newInput);
         }
         else
         {
-            xnorOutput = AddRefinedNodes<int64_t>(transformer, newInput);
+            xnorOutput = &AddRefinedNodes<int64_t>(transformer, newInput);
         }
 
         // Output of xnor is in (f x h x w) order, need to transpose to the canonical (h x w x f) order
         model::PortMemoryLayout outputShape(model::MemoryShape{ numFilters, outputImageHeight, outputImageWidth }, model::DimensionOrder{ 2, 0, 1 }); // Note: memory layout constructor takes the sizes in physical dimension order
         model::PortMemoryLayout transposedOutputShape(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputDataPadding, outputDataPadding, 0 }, model::DimensionOrder{ 0, 1, 2 });
-        auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(xnorOutput, outputShape, transposedOutputShape);
-        transformer.MapNodeOutput(this->output, reorderOutputNode->output);
+        const auto& reorderedOutput = ReorderData(*xnorOutput, outputShape, transposedOutputShape);
+        transformer.MapNodeOutput(this->output, reorderedOutput);
         return true;
     }
 
     template <typename ValueType>
     template <typename PackedBitsType>
-    model::PortElements<ValueType> BinaryConvolutionalLayerNode<ValueType>::AddRefinedNodes(model::ModelTransformer& transformer, const model::OutputPort<ValueType>& input) const
+    const model::OutputPort<ValueType>& BinaryConvolutionalLayerNode<ValueType>::AddRefinedNodes(model::ModelTransformer& transformer, const model::OutputPort<ValueType>& input) const
     {
         auto&& inputLayout = this->GetInputMemoryLayout();
         auto&& outputLayout = this->GetOutputMemoryLayout();
@@ -271,10 +271,10 @@ namespace nodes
                                                                                                           convParams,
                                                                                                           inputLayout,
                                                                                                           outputLayout);
-        const auto& paddingMasksOut = AppendConstant(transformer, compressedPaddingMasks);
-        const auto& paddingMaskSumsOut = AppendConstant(transformer, paddingMaskSums);
-        const auto& filterWeightsOut = AppendConstant(transformer, compressedFilterWeights);
-        const auto& filterMeansOut = AppendConstant(transformer, filterMeans);
+        const auto& paddingMasksOut = Constant(transformer, compressedPaddingMasks);
+        const auto& paddingMaskSumsOut = Constant(transformer, paddingMaskSums);
+        const auto& filterWeightsOut = Constant(transformer, compressedFilterWeights);
+        const auto& filterMeansOut = Constant(transformer, filterMeans);
         auto xnorNode = transformer.AddNode<BinaryXnorNode<ValueType, PackedBitsType>>(reshapeNode->output,
                                                                                        paddingMasksOut,
                                                                                        paddingMaskSumsOut,
@@ -285,7 +285,7 @@ namespace nodes
                                                                                        inputLayout,
                                                                                        outputLayout);
 
-        return { xnorNode->output };
+        return xnorNode->output;
     }
 
     template <typename ValueType>

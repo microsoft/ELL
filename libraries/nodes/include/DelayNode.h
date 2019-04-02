@@ -81,6 +81,16 @@ namespace nodes
         mutable std::vector<std::vector<ValueType>> _samples;
         size_t _windowSize;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The port to get the input data from </param>
+    /// <param name="windowSize"> The number of samples of delay to apply to the input data. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ElementType>
+    const model::OutputPort<ElementType>& Delay(const model::OutputPort<ElementType>& input,
+                                                size_t windowSize);
 } // namespace nodes
 } // namespace ell
 
@@ -177,6 +187,20 @@ namespace nodes
             _samples.push_back(std::vector<ValueType>(dimension));
         }
         _output.SetSize(dimension);
+    }
+
+    template <typename ElementType>
+    const model::OutputPort<ElementType>& Delay(const model::OutputPort<ElementType>& input,
+                                                size_t windowSize)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+
+        auto node = model->AddNode<DelayNode<ElementType>>(input, windowSize);
+        return node->output;
     }
 } // namespace nodes
 } // namespace ell

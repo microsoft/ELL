@@ -76,26 +76,26 @@ namespace nodes
 
         // Projection
         auto projectionMatrix = _predictor.GetProjectionMatrix();
-        auto projecedInputNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(newPortElements, projectionMatrix);
+        const auto& projecedInput = MatrixVectorProduct(newPortElements, projectionMatrix);
 
         auto prototypes = _predictor.GetPrototypes();
         auto m = _predictor.GetNumPrototypes();
 
         std::vector<double> multiplier(m, _predictor.GetGamma() * _predictor.GetGamma() * -1);
-        const auto& gamma = AppendConstant(transformer, multiplier);
+        const auto& gamma = Constant(transformer, multiplier);
 
         // Distance to each prototype
         math::RowMatrixReference<double> prototypesMatrix = prototypes.Transpose();
-        auto squareDistanceNode = transformer.AddNode<SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(projecedInputNode->output, prototypesMatrix);
+        auto squareDistanceNode = transformer.AddNode<SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(projecedInput, prototypesMatrix);
 
         // Similarity to each prototype
-        const auto& scaledDistance = AppendBinaryOperation(squareDistanceNode->output, gamma, BinaryOperationType::multiply);
-        const auto& expDistance = AppendUnaryOperation(scaledDistance, UnaryOperationType::exp);
+        const auto& scaledDistance = Multiply(squareDistanceNode->output, gamma);
+        const auto& expDistance = Exp(scaledDistance);
 
         // Get the prediction label
-        auto labelScoresNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::columnMajor>>(expDistance, _predictor.GetLabelEmbeddings());
+        const auto& labelScores = MatrixVectorProduct(expDistance, _predictor.GetLabelEmbeddings());
 
-        transformer.MapNodeOutput(output, labelScoresNode->output);
+        transformer.MapNodeOutput(output, labelScores);
 
         return true;
     }

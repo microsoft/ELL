@@ -26,7 +26,7 @@ namespace nodes
         const auto& newInput = transformer.GetCorrespondingInputs(this->input);
         auto scaleValues = this->_layer.GetScale().ToArray();
         auto biasValuesNode = transformer.AddNode<ConstantNode<ValueType>>(); // nothing
-        const auto& scaleValuesOut = AppendConstant(transformer, scaleValues);
+        const auto& scaleValuesOut = Constant(transformer, scaleValues);
         const auto& biasValuesOut = biasValuesNode->output;
 
         const size_t channelDimension = 2;

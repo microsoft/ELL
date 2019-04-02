@@ -235,12 +235,12 @@ bool TryCombineLinearFunctionNodes(const model::Node& node, model::ModelTransfor
 
     auto newCoeffs = GetCombinedLinearCoeffs(*prevNode, *thisNode);
     const auto& prevPrimaryInputElements = prevNode->primaryInput.GetReferencedPort();
-    auto scaleValuesNode = transformer.AddNode<nodes::ConstantNode<ValueType>>(newCoeffs.scale);
-    auto biasValuesNode = transformer.AddNode<nodes::ConstantNode<ValueType>>(newCoeffs.bias);
+    const auto& scaleValues = nodes::Constant(transformer, newCoeffs.scale);
+    const auto& biasValues = nodes::Constant(transformer, newCoeffs.bias);
     auto newNode = transformer.AddNode<nodes::BroadcastLinearFunctionNode<ValueType>>(prevPrimaryInputElements,
                                                                                       thisNode->GetInputMemoryLayout(),
-                                                                                      scaleValuesNode->output,
-                                                                                      biasValuesNode->output,
+                                                                                      scaleValues,
+                                                                                      biasValues,
                                                                                       thisNode->GetBroadcastDimension(),
                                                                                       thisNode->GetOutputMemoryLayout());
     transformer.MapNodeOutput(thisNode->output, newNode->output);

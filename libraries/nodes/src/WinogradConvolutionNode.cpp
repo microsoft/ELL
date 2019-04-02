@@ -1180,16 +1180,16 @@ namespace nodes
             throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "WinogradConvolutionNode: illegal value for _order");
         }
 
-        const auto& weights = AppendConstant(transformer, weightsValues, weightsShape);
+        const auto& weights = Constant(transformer, weightsValues, weightsShape);
         const auto numFilterChannels = _order == FilterOrder::tilesFirst ? _filterWeights.NumChannels() : _filterWeights.NumColumns();
         auto convInputLayout = _inputMemoryLayout;
         if (numFilterChannels == 1 && _order == FilterOrder::filtersFirst)
         {
             // add a ReorderDataNode to convert to channel-major, which is more efficient in this case
             auto orderArr = utilities::ChannelMajorTensorOrder;
-            auto reorderNode = transformer.AddNode<ReorderDataNode<ValueType>>(*newInput, convInputLayout, convInputLayout, utilities::DimensionOrder{ orderArr });
-            newInput = &reorderNode->output;
-            convInputLayout = reorderNode->GetOutputMemoryLayout();
+            const auto& reorderedData = ReorderData(*newInput, convInputLayout, convInputLayout, utilities::DimensionOrder{ orderArr });
+            newInput = &reorderedData;
+            convInputLayout = reorderedData.GetMemoryLayout();
         }
 
         auto convNode = transformer.AddNode<WinogradConvolutionComputeNode<ValueType>>(*newInput, weights, convInputLayout, GetOutputMemoryLayout(), _stride, _tileSize, _filterSize, _order, static_cast<int>(numFilterChannels));

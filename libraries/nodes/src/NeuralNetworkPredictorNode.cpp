@@ -122,8 +122,8 @@ namespace nodes
             // If the input layer wants padding on its output, add a ReorderDataNode to add padding
             model::PortMemoryLayout inputNodeLayout(model::MemoryShape{ (int)inputShape.NumRows(), (int)inputShape.NumColumns(), (int)inputShape.NumChannels() });
             model::PortMemoryLayout paddedInputNodeLayout(model::MemoryShape{ (int)inputShape.NumRows(), (int)inputShape.NumColumns(), (int)inputShape.NumChannels() }, model::MemoryShape{ (int)padding, (int)padding, 0 });
-            auto paddedInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(*newInputElements, inputNodeLayout, paddedInputNodeLayout, predictors::neural::GetPaddingValue<ValueType>(outputPadding.paddingScheme));
-            newInputElements = &paddedInputNode->output;
+            const auto& paddedInput = ReorderData(*newInputElements, inputNodeLayout, paddedInputNodeLayout, predictors::neural::GetPaddingValue<ValueType>(outputPadding.paddingScheme));
+            newInputElements = &paddedInput;
         }
 
         auto newInput = static_cast<const model::OutputPort<ValueType>*>(newInputElements);

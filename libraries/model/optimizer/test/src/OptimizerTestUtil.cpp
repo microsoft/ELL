@@ -33,7 +33,7 @@ auto Transform(const Container& container, Function fn)
 }
 
 template <typename T>
-const OutputPort<T>& AddInput(Model& model, int size)
+const OutputPort<T>& Input(Model& model, int size)
 {
     auto inputNode = model.AddNode<InputNode<T>>(size);
     return inputNode->output;
@@ -77,7 +77,7 @@ bool SubmodelsAreSameSize(const Submodel& a, const Submodel& b)
 Submodel GetSimpleSubmodel()
 {
     Model m;
-    const auto& in = AddInput<float>(m, 4);
+    const auto& in = Input<float>(m, 4);
     const auto& out1 = AddOutput(m, in);
     const auto& out2 = AddOutput(m, out1);
     return Submodel(m, { &GetInputPort(out1) }, { &out2 });
@@ -94,7 +94,7 @@ Submodel GetSimpleSubmodel()
 Submodel GetCombineNodesTestSubmodel()
 {
     Model m;
-    const auto& in = AddInput<float>(m, 4);
+    const auto& in = Input<float>(m, 4);
     const auto& out1 = AddOutput(m, in, "a");
     const auto& out2 = AddOutput(m, out1, "a");
     const auto& out3 = AddOutput(m, out2);

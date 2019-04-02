@@ -14,6 +14,7 @@
 #include <nodes/include/DiagonalConvolutionNode.h>
 #include <nodes/include/ForestPredictorNode.h>
 #include <nodes/include/NeuralNetworkPredictorNode.h>
+#include <nodes/include/ReinterpretLayoutNode.h>
 #include <nodes/include/SimpleConvolutionNode.h>
 #include <nodes/include/UnrolledConvolutionNode.h>
 #include <nodes/include/WinogradConvolutionNode.h>
@@ -141,8 +142,8 @@ model::Map GenerateTreeModel(size_t numSplits)
     auto forest = CreateForest(numSplits);
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    auto computeNode = model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+    const auto& forestOutput = nodes::ForestPredictor(inputNode->output, forest);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", forestOutput } });
     return map;
 }
 
@@ -190,8 +191,8 @@ model::Map GenerateBinaryConvolutionModel(size_t imageRows, size_t imageColumns,
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
-    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    const auto& predictor = nodes::NeuralNetwork(inputNode->output, neuralNetwork);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictor } });
     return map;
 }
 
@@ -239,8 +240,8 @@ model::Map GenerateBinaryConvolutionPlusDenseModel(size_t imageRows, size_t imag
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
-    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    const auto& predictor = nodes::NeuralNetwork(inputNode->output, neuralNetwork);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictor } });
     return map;
 }
 
@@ -542,8 +543,8 @@ model::Map GenerateBinaryDarknetLikeModel(bool lastLayerReal)
     // Create model
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(GetShapeSize(neuralNetwork.GetInputShape()));
-    auto predictorNode = model.AddNode<nodes::NeuralNetworkPredictorNode<ElementType>>(inputNode->output, neuralNetwork);
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictorNode->output } });
+    const auto& predictor = nodes::NeuralNetwork(inputNode->output, neuralNetwork);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", predictor } });
     return map;
 }
 
@@ -566,7 +567,6 @@ model::Map GenerateConvolutionModel(int inputRows, int inputColumns, int numChan
     auto inputMemoryLayout = CalculateMemoryLayout(inputRows, inputColumns, numChannels, inputPadding);
     auto outputMemoryLayout = CalculateMemoryLayout(outputRows, outputColumns, numFilters, outputPadding);
     auto filterWeights = Tensor(numFilters * filterSize, filterSize, numChannels, filter);
-
     auto inputSize = inputMemoryLayout.GetMemorySize();
 
     // Create compiler for models
@@ -576,26 +576,28 @@ model::Map GenerateConvolutionModel(int inputRows, int inputColumns, int numChan
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ValueType>>(inputSize);
-    model::Node* outputNode = nullptr;
+    const auto& reshapedInput = nodes::ReinterpretLayout(inputNode->output, inputMemoryLayout);
+    const model::OutputPort<ValueType>* output = nullptr;
+
     switch (convolutionMethod)
     {
     case dsp::ConvolutionMethodOption::automatic:
         std::cout << "Testing 'automatic' method --- using 'simple' instead" << std::endl;
     // fallthrough
     case dsp::ConvolutionMethodOption::simple:
-        outputNode = model.AddNode<nodes::SimpleConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        output = &nodes::SimpleConvolution(reshapedInput, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
         break;
     case dsp::ConvolutionMethodOption::diagonal:
-        outputNode = model.AddNode<nodes::DiagonalConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        output = &nodes::DiagonalConvolution(reshapedInput, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
         break;
     case dsp::ConvolutionMethodOption::unrolled:
-        outputNode = model.AddNode<nodes::UnrolledConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        output = &nodes::UnrolledConvolution(reshapedInput, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
         break;
     case dsp::ConvolutionMethodOption::winograd:
-        outputNode = model.AddNode<nodes::WinogradConvolutionNode<ValueType>>(inputNode->output, inputMemoryLayout, outputMemoryLayout, filterWeights, stride, winogradTileSize, winogradFilterOrder);
+        output = &nodes::WinogradConvolution(reshapedInput, inputMemoryLayout, outputMemoryLayout, filterWeights, stride, winogradTileSize, winogradFilterOrder);
         break;
     }
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", model::PortElementsBase(*(outputNode->GetOutputPort(0))) } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", *output } });
     return map;
 }
 

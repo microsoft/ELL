@@ -158,7 +158,6 @@ set(compiler_test_src
     test/src/CompilerTest.cpp
     test/src/model_compiler_test_main.cpp
     test/src/ModelHeaderOutputTest.cpp
-    test/src/ModelMaker.cpp
     test/src/PerformanceCountersTest.cpp
 )
 
@@ -167,7 +166,6 @@ set(compiler_test_include
     test/include/CompilableNodesTest.h
     test/include/CompilerTest.h
     test/include/ModelHeaderOutputTest.h
-    test/include/ModelMaker.h
     test/include/PerformanceCountersTest.h
 )
 

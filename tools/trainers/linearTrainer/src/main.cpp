@@ -49,11 +49,9 @@ model::Map AppendTrainedLinearPredictorToMap(const predictors::LinearPredictor<E
     predictor.Resize(dimension);
 
     model::Model& model = map.GetModel();
-    auto mapOutput = map.GetOutputElements<ElementType>(0);
-    auto predictorNode = model.AddNode<nodes::LinearPredictorNode<ElementType>>(mapOutput, predictor);
-    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(predictorNode->output);
-
-    auto& output = outputNode->output;
+    const auto& mapOutput = model.SimplifyOutputs(map.GetOutputElements<ElementType>(0));
+    const auto& predictorOutput = nodes::LinearPredictor(mapOutput, predictor);
+    const auto& output = model::Output(predictorOutput);
     auto outputMap = model::Map(map.GetModel(), { { "input", map.GetInput() } }, { { "output", output } });
 
     return outputMap;
@@ -107,8 +105,8 @@ int main(int argc, char* argv[])
         {
             model::Model model;
             auto input = model.AddNode<model::InputNode<float>>(dataLoadArguments.parsedDataDimension);
-            auto output = model.AddNode<model::OutputNode<float>>(input->output);
-            map = model::Map(model, { { "input", input } }, { { "output", output->output } });
+            const auto& output = model::Output(input->output);
+            map = model::Map(model, { { "input", input } }, { { "output", output } });
         }
 
         // load dataset

@@ -118,5 +118,24 @@ namespace nodes
         int _lda = 0, _ldb = 0, _ldc = 0;
         bool _transpose1 = false, _transpose2 = false, _transposeOutput = false;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input1"> The left-hand input of the matrix multiplication, a row-major matrix of size m x k.  </param>
+    /// <param name="input2"> The right-hand input of the matrix multiplication, a row-major matrix of size k x n. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& MatrixMatrixMultiply(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input1"> The left-hand input of the matrix multiplication, a row-major matrix of size m x k.  </param>
+    /// <param name="input2"> The right-hand input of the matrix multiplication, a row-major matrix of size k x n. </param>
+    /// <param name="outputMemoryLayout"> The output memory layout to use. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& MatrixMatrixMultiply(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, const model::PortMemoryLayout& outputMemoryLayout);
 } // namespace nodes
 } // namespace ell

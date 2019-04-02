@@ -16,6 +16,7 @@
 #include <model/include/ModelTransformer.h>
 #include <model/include/OutputNode.h>
 #include <model/include/OutputPort.h>
+#include <model/include/SpliceNode.h>
 
 #include <nodes/include/ExtremalValueNode.h>
 #include <nodes/include/MovingAverageNode.h>
@@ -85,37 +86,37 @@ void PrintModel(const model::Model& model, const model::OutputPortBase* output)
 model::Model GetSimpleModel()
 {
     model::Model g;
-    auto in = g.AddNode<model::InputNode<double>>(3);
-    auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
-    auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
-    auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 2);
-    auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 2);
-    g.AddNode<model::OutputNode<double>>(model::PortElements<double>({ meanMin->output, meanMax->output }));
+    const auto& in = model::Input<double>(g, 3);
+    const auto& min = nodes::ArgMin(in).val;
+    const auto& max = nodes::ArgMax(in).val;
+    const auto& meanMin = nodes::MovingAverage(min, 2);
+    const auto& meanMax = nodes::MovingAverage(max, 2);
+    model::Output(model::Splice(meanMin, meanMax));
     return g;
 }
 
 model::Model GetComplexModel()
 {
     model::Model g;
-    auto in = g.AddNode<model::InputNode<double>>(3);
-    auto in2 = g.AddNode<model::InputNode<bool>>(3);
-    auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
-    auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
-    auto meanMin = g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 2);
-    auto meanMax = g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 2);
-    g.AddNode<model::OutputNode<double>>(model::PortElements<double>({ meanMin->output, meanMax->output }));
-    g.AddNode<model::OutputNode<bool>>(model::PortElements<bool>({ in2->output }));
+    const auto& in = model::Input<double>(g, 3);
+    const auto& in2 = model::Input<bool>(g, 3);
+    const auto& min = nodes::ArgMin(in).val;
+    const auto& max = nodes::ArgMax(in).val;
+    const auto& meanMin = nodes::MovingAverage(min, 2);
+    const auto& meanMax = nodes::MovingAverage(max, 2);
+    model::Output(model::Splice(meanMin, meanMax));
+    model::Output(in2);
     return g;
 }
 
 model::Model GetTwoOutputModel()
 {
     model::Model g;
-    auto in = g.AddNode<model::InputNode<double>>(3);
-    auto minAndArgMin = g.AddNode<nodes::ArgMinNode<double>>(in->output);
-    auto maxAndArgMax = g.AddNode<nodes::ArgMaxNode<double>>(in->output);
-    g.AddNode<nodes::MovingAverageNode<double>>(minAndArgMin->val, 8);
-    g.AddNode<nodes::MovingAverageNode<double>>(maxAndArgMax->val, 8);
+    const auto& in = model::Input<double>(g, 3);
+    const auto& min = nodes::ArgMin(in).val;
+    const auto& max = nodes::ArgMax(in).val;
+    [[maybe_unused]] const auto& minAvg = nodes::MovingAverage(min, 8);
+    [[maybe_unused]] const auto& maxAvg = nodes::MovingAverage(max, 8);
     return g;
 }
 
@@ -124,8 +125,8 @@ model::Model GetLinearDebugNodeModel(int numDebugNodes)
     // in -> node1 -> node2 -> ... -> nodeN
     using DebugNode = DebugNode<double, int>;
     model::Model g;
-    auto in = g.AddNode<model::InputNode<double>>(3);
-    const model::OutputPort<double>* lastOutput = &(in->output);
+    const auto& in = model::Input<double>(g, 3);
+    const model::OutputPort<double>* lastOutput = &in;
     for (int i = 0; i < numDebugNodes; ++i)
     {
         auto node = g.AddNode<DebugNode>(*lastOutput, i + 1);

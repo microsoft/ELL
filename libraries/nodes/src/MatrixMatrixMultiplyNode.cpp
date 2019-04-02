@@ -297,8 +297,52 @@ namespace nodes
         archiver.OptionalProperty("transposeOutput", false) >> _transposeOutput;
     }
 
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& MatrixMatrixMultiply(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        model::Model* model = input1.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        if (*model != *(input2.GetNode()->GetModel()))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Inputs not part of the same model");
+        }
+
+        auto node = model->AddNode<MatrixMatrixMultiplyNode<ValueType>>(input1, input2);
+        return node->output;
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& MatrixMatrixMultiply(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2, const model::PortMemoryLayout& outputMemoryLayout)
+    {
+        model::Model* model = input1.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        if (*model != *(input2.GetNode()->GetModel()))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Inputs not part of the same model");
+        }
+
+        auto node = model->AddNode<MatrixMatrixMultiplyNode<ValueType>>(input1, input2, outputMemoryLayout);
+        return node->output;
+    }
+
     // Explicitly instantiate versions
     template class MatrixMatrixMultiplyNode<float>;
+    template 
+    const model::OutputPort<float>& MatrixMatrixMultiply(const model::OutputPort<float>& input1, const model::OutputPort<float>& input2);
+    template 
+    const model::OutputPort<float>& MatrixMatrixMultiply(const model::OutputPort<float>& input1, const model::OutputPort<float>& input2, const model::PortMemoryLayout& outputMemoryLayout);
+
     template class MatrixMatrixMultiplyNode<double>;
+    template 
+    const model::OutputPort<double>& MatrixMatrixMultiply(const model::OutputPort<double>& input1, const model::OutputPort<double>& input2);
+    template 
+    const model::OutputPort<double>& MatrixMatrixMultiply(const model::OutputPort<double>& input1, const model::OutputPort<double>& input2, const model::PortMemoryLayout& outputMemoryLayout);
+
 } // namespace nodes
 } // namespace ell

@@ -17,6 +17,7 @@
 
 #include <utilities/include/Exception.h>
 #include <utilities/include/TypeName.h>
+#include <utilities/include/TypeTraits.h>
 
 #include <memory>
 #include <string>
@@ -72,6 +73,16 @@ namespace model
         std::vector<std::unique_ptr<InputPort<ValueType>>> _inputPorts;
         OutputPort<ValueType> _output;
     };
+
+    /// <summary> Convenience function for adding a SpliceNode to a model. </summary>
+    ///
+    /// <param name="input1"> The first port to splice together </param>
+    /// <param name="rest..."> The rest of the ports to splice together </param>
+    /// Note: the PortType for all the ports must be the same
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType, typename... ValueTypes>
+    const OutputPort<ValueType>& Splice(const OutputPort<ValueType>& input1, const OutputPort<ValueType>& input2, const OutputPort<ValueTypes>&... rest);
 } // namespace model
 } // namespace ell
 
@@ -220,6 +231,19 @@ namespace model
         }
 
         _output.SetMemoryLayout(ComputeOutputLayout(referencedPorts));
+    }
+
+    template <typename ValueType, typename... ValueTypes>
+    const OutputPort<ValueType>& Splice(const OutputPort<ValueType>& input1, const OutputPort<ValueType>& input2, const OutputPort<ValueTypes>&... rest)
+    {
+        static_assert(utilities::AllSame<ValueType, ValueTypes...>);
+        model::Model* model = input1.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<SpliceNode<ValueType>>(std::vector<const OutputPortBase*>{ &input1, &input2, (&rest)... });
+        return node->output;
     }
 } // namespace model
 } // namespace ell

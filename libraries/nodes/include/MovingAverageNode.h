@@ -80,6 +80,15 @@ namespace nodes
         mutable std::vector<ValueType> _runningSum;
         size_t _windowSize;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The port to get the input data from </param>
+    /// <param name="windowSize"> The number of samples of history to use in computing the mean </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& MovingAverage(const model::OutputPort<ValueType>& input, size_t windowSize);
 } // namespace nodes
 } // namespace ell
 
@@ -141,13 +150,13 @@ namespace nodes
     template <typename ValueType>
     bool MovingAverageNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto delayNode = transformer.AddNode<DelayNode<ValueType>>(newPortElements, _windowSize);
-        const auto& difference = AppendBinaryOperation(newPortElements, delayNode->output, BinaryOperationType::subtract);
-        auto accumNode = transformer.AddNode<AccumulatorNode<ValueType>>(difference);
-        std::vector<ValueType> literalN(newPortElements.Size(), (ValueType)_windowSize);
-        const auto& denominator = AppendConstant(transformer, literalN);
-        const auto& quotient = AppendBinaryOperation(accumNode->output, denominator, BinaryOperationType::divide);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        std::vector<ValueType> literalN(newInputs.Size(), (ValueType)_windowSize);
+        const auto& delay = Delay(newInputs, _windowSize);
+        const auto& difference = Subtract(newInputs, delay);
+        const auto& accum = Accumulate(difference);
+        const auto& denominator = Constant(transformer, literalN);
+        const auto& quotient = Divide(accum, denominator);
         transformer.MapNodeOutput(output, quotient);
         return true;
     }
@@ -176,6 +185,18 @@ namespace nodes
         }
         _runningSum = std::vector<ValueType>(dimension);
         _output.SetSize(dimension);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& MovingAverage(const model::OutputPort<ValueType>& input, size_t windowSize)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<MovingAverageNode<ValueType>>(input, windowSize);
+        return node->output;
     }
 } // namespace nodes
 } // namespace ell

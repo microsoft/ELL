@@ -11,6 +11,6 @@
 void TestAppendNodes();
 
 void TestAppenBinaryOperation();
-void TestAppendConstant();
-void TestAppendSum();
+void TestConstant();
+void TestSum();
 void TestAppenUnaryOperation();

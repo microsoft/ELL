@@ -63,7 +63,7 @@ namespace nodes
         auto weightsTranspose = weightsMatrix.Transpose();
         auto weightsValues = weightsTranspose.ToArray();
         int filterSize = _filterWeights.NumColumns();
-        const auto& weights = AppendConstant(transformer, weightsValues);
+        const auto& weights = Constant(transformer, weightsValues);
         auto convNode = transformer.AddNode<DiagonalConvolutionComputeNode<ValueType>>(newInput, weights, _inputMemoryLayout, GetOutputMemoryLayout(), filterSize, _stride);
         convNode->GetMetadata() = GetMetadata();
         transformer.MapNodeOutput(this->output, convNode->output);

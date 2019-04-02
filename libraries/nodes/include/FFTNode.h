@@ -105,7 +105,7 @@ namespace nodes
     };
 
     template <typename ValueType>
-    const model::OutputPort<ValueType>& AppendFFT(const model::OutputPort<ValueType>& input, size_t fftSize)
+    const model::OutputPort<ValueType>& FFT(const model::OutputPort<ValueType>& input, size_t fftSize)
     {
         model::Model* model = input.GetNode()->GetModel();
         if (model == nullptr)

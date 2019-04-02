@@ -75,12 +75,20 @@ namespace model
 
     /// <summary> Convenience function for adding an OutputNode to a model. </summary>
     ///
-    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
     /// <param name="input"> The port to get the input data from </param>
     ///
     /// <returns> The output of the new node. </returns>
-    template <typename ModelLikeType, typename ValueType>
-    const OutputPort<ValueType>& AppendOutput(ModelLikeType& model, const OutputPort<ValueType>& input);
+    template <typename ValueType>
+    const OutputPort<ValueType>& Output(const OutputPort<ValueType>& input);
+
+    /// <summary> Convenience function for adding an OutputNode to a model. </summary>
+    ///
+    /// <param name="input"> The port to get the input data from </param>
+    /// <param name="shape"> The shape of the output data </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const OutputPort<ValueType>& Output(const OutputPort<ValueType>& input, const MemoryShape& shape);
 } // namespace model
 } // namespace ell
 
@@ -161,11 +169,27 @@ namespace model
         }
     }
 
-    template <typename ModelLikeType, typename ValueType>
-    const OutputPort<ValueType>& AppendOutput(ModelLikeType& model, const OutputPort<ValueType>& input)
+    template <typename ValueType>
+    const OutputPort<ValueType>& Output(const OutputPort<ValueType>& input)
     {
-        static_assert(utilities::IsOneOf<ModelLikeType, model::Model, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
-        auto node = model.template AddNode<OutputNode<ValueType>>(input);
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<OutputNode<ValueType>>(input);
+        return node->output;
+    }
+
+    template <typename ValueType>
+    const OutputPort<ValueType>& Output(const OutputPort<ValueType>& input, const MemoryShape& shape)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<OutputNode<ValueType>>(input, shape);
         return node->output;
     }
 } // namespace model

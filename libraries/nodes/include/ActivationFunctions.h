@@ -25,7 +25,7 @@ namespace nodes
     // Activation functions with Compile method
     //
     template <typename ValueType>
-    class ActivationFunction : public BroadcastUnaryFunction<ValueType>
+    class ActivationFunction : public BroadcastUnaryFunctionType<ValueType>
     {
     };
 
@@ -38,7 +38,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         /// <returns> The value of the function ReLU(x) </returns>
         ValueType Compute(ValueType x) const override;
-        using BroadcastUnaryFunction<ValueType>::Compute;
+        using BroadcastUnaryFunctionType<ValueType>::Compute;
 
         /// <summary> Emits IR to compute the ReLU activation function </summary>
         ///
@@ -47,7 +47,7 @@ namespace nodes
         ///
         /// <returns> The value of the function ReLU(x) </returns>
         emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
-        using BroadcastUnaryFunction<ValueType>::Compile;
+        using BroadcastUnaryFunctionType<ValueType>::Compile;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -77,7 +77,7 @@ namespace nodes
         /// <param name="x"> The value </param>
         /// <returns> The value of the function LeakyReLU(x) </returns>
         ValueType Compute(ValueType x) const override;
-        using BroadcastUnaryFunction<ValueType>::Compute;
+        using BroadcastUnaryFunctionType<ValueType>::Compute;
 
         /// <summary> Emits IR to compute the leaky ReLU activation function </summary>
         ///
@@ -86,7 +86,7 @@ namespace nodes
         ///
         /// <returns> The value of the function LeakyReLU(x) </returns>
         emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
-        using BroadcastUnaryFunction<ValueType>::Compile;
+        using BroadcastUnaryFunctionType<ValueType>::Compile;
 
         /// <summary> Gets the leaky factor </summary>
         ///
@@ -118,7 +118,7 @@ namespace nodes
         ///
         /// <returns> The value of the function Sigmoid(x) </returns>
         ValueType Compute(ValueType x) const override;
-        using BroadcastUnaryFunction<ValueType>::Compute;
+        using BroadcastUnaryFunctionType<ValueType>::Compute;
 
         /// <summary> Emits IR to compute the sigmoid activation function </summary>
         ///
@@ -126,7 +126,7 @@ namespace nodes
         /// <returns> The value of the function Sigmoid(x) </returns>
         ///
         emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
-        using BroadcastUnaryFunction<ValueType>::Compile;
+        using BroadcastUnaryFunctionType<ValueType>::Compile;
 
         /// <summary> Emits IR to compute the sigmoid activation function </summary>
         ///
@@ -157,7 +157,7 @@ namespace nodes
         ///
         /// <returns> The value of the hard sigmoid function) </returns>
         ValueType Compute(ValueType x) const override;
-        using BroadcastUnaryFunction<ValueType>::Compute;
+        using BroadcastUnaryFunctionType<ValueType>::Compute;
 
         /// <summary> Emits IR to compute the hard sigmoid activation function </summary>
         ///
@@ -165,7 +165,7 @@ namespace nodes
         ///
         /// <returns> The value of the function Sigmoid(x) </returns>
         emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
-        using BroadcastUnaryFunction<ValueType>::Compile;
+        using BroadcastUnaryFunctionType<ValueType>::Compile;
 
         /// <summary> Emits IR to compute the hard sigmoid activation function </summary>
         ///
@@ -195,7 +195,7 @@ namespace nodes
         ///
         /// <returns> The value of the function tanh(x) </returns>
         ValueType Compute(ValueType x) const override;
-        using BroadcastUnaryFunction<ValueType>::Compute;
+        using BroadcastUnaryFunctionType<ValueType>::Compute;
 
         /// <summary> Emits IR to compute the tanh activation function </summary>
         ///
@@ -203,7 +203,7 @@ namespace nodes
         ///
         /// <returns> The value of the function tanh(x) </returns>
         emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
-        using BroadcastUnaryFunction<ValueType>::Compile;
+        using BroadcastUnaryFunctionType<ValueType>::Compile;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///

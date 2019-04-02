@@ -170,7 +170,7 @@ namespace nodes
         // -2 * P * V => row-wise vector
         auto vectorsAsMatrix = _vectorsAsMatrix;
         vectorsAsMatrix.Transform([](double d) { return -2.0 * d; });
-        auto productNode = transformer.AddNode<MatrixVectorProductNode<double, math::MatrixLayout::rowMajor>>(inputPortElements, vectorsAsMatrix);
+        const auto& product = MatrixVectorProduct(inputPortElements, vectorsAsMatrix);
 
         // Will hold the scalar value of P^2 for each row in the matrix
         model::PortElements<ValueType> inputNorm2SquaredNodeOutputs;
@@ -181,7 +181,7 @@ namespace nodes
             inputNorm2SquaredNodeOutputs.Append(inputNorm2SquaredNode->output);
 
             auto matrixRow = _vectorsAsMatrix.GetRow(index);
-            const auto& rowNorm2Squared = AppendConstant(transformer, static_cast<ValueType>(matrixRow.Norm2Squared()));
+            const auto& rowNorm2Squared = Constant(transformer, static_cast<ValueType>(matrixRow.Norm2Squared()));
             vectorNorm2SquaredConstantNodeOutputs.Append(rowNorm2Squared);
         }
 
@@ -192,9 +192,8 @@ namespace nodes
         // and map it to output node
         auto& A = transformer.SimplifyOutputs(inputNorm2SquaredNodeOutputs);
         auto& B = transformer.SimplifyOutputs(vectorNorm2SquaredConstantNodeOutputs);
-        auto& C = productNode->output;
-        const auto& aPlusB = AppendBinaryOperation(A, B, BinaryOperationType::add);
-        const auto& aPlusBPlusC = AppendBinaryOperation(aPlusB, C, BinaryOperationType::add);
+        const auto& C = product;
+        const auto& aPlusBPlusC = Add(Add(A, B), C);
         transformer.MapNodeOutput(output, aPlusBPlusC);
 
         return true;

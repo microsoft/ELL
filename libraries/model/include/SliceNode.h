@@ -73,6 +73,17 @@ namespace model
         int _largestDimensionStart = 0;
         int _largestDimensionCount = 0;
     };
+
+    /// <summary> Convenience function for adding a SliceNode to a model. </summary>
+    ///
+    /// <param name="port"> The port to take input values from. </param>
+    /// <param name="start"> The start index for the first (largest) physical dimension of the active area. </param>
+    /// <param name="count"> The size of the first (largest) physical dimension of the output to return. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const OutputPort<ValueType>& Slice(const OutputPort<ValueType>& input, int start, int count);
+
 } // namespace model
 } // namespace ell
 
@@ -163,6 +174,18 @@ namespace model
         PortMemoryLayout layout;
         archiver["layout"] >> layout;
         _output.SetMemoryLayout(layout);
+    }
+
+    template <typename ValueType>
+    const OutputPort<ValueType>& Slice(const OutputPort<ValueType>& input, int start, int count)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<SliceNode<ValueType>>(input, start, count);
+        return node->output;
     }
 } // namespace model
 } // namespace ell

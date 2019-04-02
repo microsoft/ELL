@@ -117,12 +117,11 @@ namespace nodes
 
     /// <summary> Convenience function for adding a node to a model. </summary>
     ///
-    /// <param name="model"> The Model or ModelTransformer to add the node to. </param>
     /// <param name="onto"> The output port to use as the input for the new node. </param>
     ///
     /// <returns> The output of the new node. </returns>
-    template <typename ModelLikeType, typename ValueType>
-    const model::OutputPort<ValueType>& AppendSink(ModelLikeType& model, const model::OutputPort<ValueType>& onto);
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Sink(const model::OutputPort<ValueType>& onto);
 } // namespace nodes
 } // namespace ell
 
@@ -307,11 +306,15 @@ namespace nodes
         }
     }
 
-    template <typename ModelLikeType, typename ValueType>
-    const model::OutputPort<ValueType>& AppendSink(ModelLikeType& model, const model::OutputPort<ValueType>& output)
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Sink(const model::OutputPort<ValueType>& input)
     {
-        static_assert(utilities::IsOneOf<ModelLikeType, model::Model, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
-        auto sinkNode = model.template AddNode<SinkNode<ValueType>>(output, AppendConstant(model, true), "OutputCallback");
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto sinkNode = model->AddNode<SinkNode<ValueType>>(input, Constant(*model, true), "OutputCallback");
         return sinkNode->output;
     }
 } // namespace nodes

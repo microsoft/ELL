@@ -60,7 +60,6 @@ namespace nodes
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
     protected:
-
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
 
@@ -68,7 +67,7 @@ namespace nodes
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
-        bool HasState() const override { return true; } 
+        bool HasState() const override { return true; }
 
     private:
         void Copy(model::ModelTransformer& transformer) const override;
@@ -78,8 +77,16 @@ namespace nodes
 
         // Output
         model::OutputPort<ValueType> _output;
-
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The input to reinterpret. </param>
+    /// <param name="outputMemoryLayout"> The memory layout of the output.  </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& ReinterpretLayout(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout);
 } // namespace nodes
 } // namespace ell
 
@@ -110,7 +117,7 @@ namespace nodes
     //
     template <typename ValueType>
     ReinterpretLayoutNode<ValueType>::ReinterpretLayoutNode(const model::OutputPort<ValueType>& input,
-                                                const model::PortMemoryLayout& outputMemoryLayout) :
+                                                            const model::PortMemoryLayout& outputMemoryLayout) :
         CompilableNode({ &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, outputMemoryLayout)
@@ -128,7 +135,7 @@ namespace nodes
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
         auto newNode = transformer.AddNode<ReinterpretLayoutNode>(newPortElements,
-                                                            _output.GetMemoryLayout());
+                                                                  _output.GetMemoryLayout());
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
@@ -178,9 +185,20 @@ namespace nodes
         archiver[defaultInputPortName] >> _input;
         model::PortMemoryLayout outputMemoryLayout;
         archiver["outputLayout"] >> outputMemoryLayout;
-        _output.SetMemoryLayout(outputMemoryLayout);        
+        _output.SetMemoryLayout(outputMemoryLayout);
     }
 
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& ReinterpretLayout(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<ReinterpretLayoutNode<ValueType>>(input, outputMemoryLayout);
+        return node->output;
+    }
 } // namespace nodes
 } // namespace ell
 

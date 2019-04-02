@@ -114,12 +114,12 @@ namespace passes
                     // otherwise, create a new reorder node and use the input to the chain and map its output to the
                     // final output of the chain
                     const auto& newInput = transformer.GetCorrespondingInputs(node.input);
-                    auto newNode = transformer.AddNode<nodes::ReorderDataNode<ValueType>>(newInput, inputLayout, outputLayout, node.GetPaddingValue());
-                    transformer.MapNodeOutput(*finalOutputPort, newNode->output);
+                    const auto& reorderedInput = nodes::ReorderData(newInput, inputLayout, outputLayout, node.GetPaddingValue());
+                    transformer.MapNodeOutput(*finalOutputPort, reorderedInput);
 
                     Log() << "ReorderDataNode chain's input and output memory layout are different. Entire chain is being "
                              "replaced by a new node [id = "
-                          << newNode->GetId() << "]" << EOL;
+                          << reorderedInput.GetNode()->GetId() << "]" << EOL;
                 }
 
                 return true;

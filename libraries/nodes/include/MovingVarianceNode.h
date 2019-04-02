@@ -73,6 +73,9 @@ namespace nodes
         mutable std::vector<ValueType> _runningSquaredSum;
         size_t _windowSize;
     };
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& MovingVariance(const model::OutputPort<ValueType>& input, size_t windowSize);
 } // namespace nodes
 } // namespace ell
 
@@ -157,6 +160,18 @@ namespace nodes
         _runningSum = std::vector<ValueType>(dimension);
         _runningSquaredSum = std::vector<ValueType>(dimension);
         _output.SetSize(dimension);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& MovingVariance(const model::OutputPort<ValueType>& input, size_t windowSize)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<MovingVarianceNode<ValueType>>(input, windowSize);
+        return node->output;
     }
 } // namespace nodes
 } // namespace ell

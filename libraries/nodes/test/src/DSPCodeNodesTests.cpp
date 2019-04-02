@@ -76,9 +76,9 @@ static void TestVoiceActivityDetectorNode(const std::string& path)
     model::Model model;
 
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(FrameSize);
-    auto outputNode = model.AddNode<nodes::VoiceActivityDetectorNode>(inputNode->output, SampleRate, FrameDuration, TauUp, TauDown, LargeInput, GainAtt, ThresholdUp, ThresholdDown, LevelThreshold);
+    const auto& output = nodes::VoiceActivityDetector(inputNode->output, SampleRate, FrameDuration, TauUp, TauDown, LargeInput, GainAtt, ThresholdUp, ThresholdDown, LevelThreshold);
 
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", output } });
 
     // Dump the module so we can debug it
     // compiledMap.GetModule().DebugDump();
@@ -138,26 +138,26 @@ void TestGRUNodeWithVADReset(const std::string& path)
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(FrameSize);
-    auto vadNode = model.AddNode<nodes::VoiceActivityDetectorNode>(inputNode->output, SampleRate, FrameDuration, TauUp, TauDown, LargeInput, GainAtt, ThresholdUp, ThresholdDown, LevelThreshold);
+    const auto& vadOutput = nodes::VoiceActivityDetector(inputNode->output, SampleRate, FrameDuration, TauUp, TauDown, LargeInput, GainAtt, ThresholdUp, ThresholdDown, LevelThreshold);
 
     size_t inputSize = FrameSize;
     size_t hiddenUnits = 10;
     size_t stackSize = 3; // GRU stacks the 3 weights for input, reset, hidden into one matrix.
     size_t numRows = hiddenUnits * stackSize;
     size_t numCols = inputSize;
-    VectorType inputWeights(std::vector<ElementType>(numRows * numCols, static_cast<ElementType>(0.01)));
+    VectorType inputWeightsVector(std::vector<ElementType>(numRows * numCols, static_cast<ElementType>(0.01)));
     numCols = hiddenUnits;
-    VectorType hiddenWeights(std::vector<ElementType>(numRows * numCols, static_cast<ElementType>(0.02)));
+    VectorType hiddenWeightsVector(std::vector<ElementType>(numRows * numCols, static_cast<ElementType>(0.02)));
 
-    VectorType inputBias(std::vector<ElementType>(numRows, static_cast<ElementType>(0.01)));
-    VectorType hiddenBias(std::vector<ElementType>(numRows, static_cast<ElementType>(0.02)));
+    VectorType inputBiasVector(std::vector<ElementType>(numRows, static_cast<ElementType>(0.01)));
+    VectorType hiddenBiasVector(std::vector<ElementType>(numRows, static_cast<ElementType>(0.02)));
 
-    auto inputWeightsNode = model.AddNode<nodes::ConstantNode<ElementType>>(inputWeights.ToArray());
-    auto hiddenWeightsNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenWeights.ToArray());
-    auto inputBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(inputBias.ToArray());
-    auto hiddenBiasNode = model.AddNode<nodes::ConstantNode<ElementType>>(hiddenBias.ToArray());
+    const auto& inputWeights = nodes::Constant(model, inputWeightsVector.ToArray());
+    const auto& hiddenWeights = nodes::Constant(model, hiddenWeightsVector.ToArray());
+    const auto& inputBias = nodes::Constant(model, inputBiasVector.ToArray());
+    const auto& hiddenBias = nodes::Constant(model, hiddenBiasVector.ToArray());
 
-    auto gruNode = model.AddNode<nodes::GRUNode<ElementType>>(inputNode->output, vadNode->output, hiddenUnits, inputWeightsNode->output, hiddenWeightsNode->output, inputBiasNode->output, hiddenBiasNode->output, ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::TanhActivation<ElementType>()), ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::SigmoidActivation<ElementType>()));
+    auto gruNode = model.AddNode<nodes::GRUNode<ElementType>>(inputNode->output, vadOutput, hiddenUnits, inputWeights, hiddenWeights, inputBias, hiddenBias, ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::TanhActivation<ElementType>()), ell::predictors::neural::Activation<ElementType>(new ell::predictors::neural::SigmoidActivation<ElementType>()));
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", gruNode->output } });
 

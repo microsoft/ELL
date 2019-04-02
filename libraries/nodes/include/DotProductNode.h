@@ -84,6 +84,10 @@ namespace nodes
         // Output
         model::OutputPort<ValueType> _output;
     };
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& DotProduct(const model::OutputPort<ValueType>& input1,
+                                                   const model::OutputPort<ValueType>& input2);
 } // namespace nodes
 } // namespace ell
 
@@ -137,8 +141,8 @@ namespace nodes
         // Maybe... in reality, dot product will likely want to be computed as in Compute() above
         const auto& newInput1 = transformer.GetCorrespondingInputs(_input1);
         const auto& newInput2 = transformer.GetCorrespondingInputs(_input2);
-        const auto& product = AppendBinaryOperation(newInput1, newInput2, nodes::BinaryOperationType::multiply);
-        const auto& sum = AppendSum(product);
+        const auto& product = Multiply(newInput1, newInput2);
+        const auto& sum = Sum(product);
 
         transformer.MapNodeOutput(output, sum);
         return true;
@@ -204,6 +208,24 @@ namespace nodes
         Node::ReadFromArchive(archiver);
         archiver[defaultInput1PortName] >> _input1;
         archiver[defaultInput2PortName] >> _input2;
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& DotProduct(const model::OutputPort<ValueType>& input1,
+                                                   const model::OutputPort<ValueType>& input2)
+    {
+        model::Model* model = input1.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        if (*model != *(input2.GetNode()->GetModel()))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Inputs not part of the same model");
+        }
+
+        auto node = model->AddNode<DotProductNode<ValueType>>(input1, input2);
+        return node->output;
     }
 } // namespace nodes
 } // namespace ell

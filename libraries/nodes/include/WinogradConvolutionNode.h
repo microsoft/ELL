@@ -137,6 +137,43 @@ namespace nodes
         FilterOrder _order = FilterOrder::tilesFirst;
     };
 
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The ports to get input data from. </param>
+    /// <param name="inputMemoryLayout"> The layout of the input data. </param>
+    /// <param name="outputMemoryLayout"> The layout of the output data. </param>
+    /// <param name="filterWeights"> The weights for the convolutional filters. Stored
+    ///  as a 3D tensor of dimensions (nf*fw) x fw x d, where nf == # filters, fw == filter width, and d == input depth. </param>
+    /// <param name="stride"> The output stride. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& WinogradConvolution(const model::OutputPort<ValueType>& input,
+                                                            const model::PortMemoryLayout& inputMemoryLayout,
+                                                            const model::PortMemoryLayout& outputMemoryLayout,
+                                                            const typename WinogradConvolutionNode<ValueType>::ConstTensorReferenceType& filterWeights,
+                                                            size_t stride);
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The ports to get input data from. </param>
+    /// <param name="inputMemoryLayout"> The layout of the input data. </param>
+    /// <param name="outputMemoryLayout"> The layout of the output data. </param>
+    /// <param name="filterWeights"> The weights for the convolutional filters. Stored
+    ///  as a 3D tensor of dimensions (nf*fw) x fw x d, where nf == # filters, fw == filter width, and d == input depth. </param>
+    /// <param name="stride"> The output stride. </param>
+    /// <param name="tileSize"> The size of the output tiles --- the number of output values to produce at a time. </param>
+    /// <param name="order"> The order to process filter data during convolution. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& WinogradConvolution(const model::OutputPort<ValueType>& input,
+                                                            const model::PortMemoryLayout& inputMemoryLayout,
+                                                            const model::PortMemoryLayout& outputMemoryLayout,
+                                                            const typename WinogradConvolutionNode<ValueType>::ConstTensorReferenceType& filterWeights,
+                                                            size_t stride,
+                                                            int tileSize,
+                                                            const typename WinogradConvolutionNode<ValueType>::FilterOrder order);
     //
     // WinogradConvolutionComputeNode
     //
@@ -247,3 +284,47 @@ namespace nodes
     };
 } // namespace nodes
 } // namespace ell
+
+#pragma region implementation
+
+namespace ell
+{
+namespace nodes
+{
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& WinogradConvolution(const model::OutputPort<ValueType>& input,
+                                                            const model::PortMemoryLayout& inputMemoryLayout,
+                                                            const model::PortMemoryLayout& outputMemoryLayout,
+                                                            const typename WinogradConvolutionNode<ValueType>::ConstTensorReferenceType& filterWeights,
+                                                            size_t stride)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<WinogradConvolutionNode<ValueType>>(input, inputMemoryLayout, outputMemoryLayout, filterWeights, stride);
+        return node->output;
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& WinogradConvolution(const model::OutputPort<ValueType>& input,
+                                                            const model::PortMemoryLayout& inputMemoryLayout,
+                                                            const model::PortMemoryLayout& outputMemoryLayout,
+                                                            const typename WinogradConvolutionNode<ValueType>::ConstTensorReferenceType& filterWeights,
+                                                            size_t stride,
+                                                            int tileSize,
+                                                            const typename WinogradConvolutionNode<ValueType>::FilterOrder order)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<WinogradConvolutionNode<ValueType>>(input, inputMemoryLayout, outputMemoryLayout, filterWeights, stride, tileSize, order);
+        return node->output;
+    }
+} // namespace nodes
+} // namespace ell
+
+#pragma endregion

@@ -84,7 +84,7 @@ namespace nodes
     ///
     /// <returns> The output of the new node. </returns>
     template <typename ValueType>
-    const model::OutputPort<ValueType>& AppendSum(const model::OutputPort<ValueType>& input);
+    const model::OutputPort<ValueType>& Sum(const model::OutputPort<ValueType>& input);
 } // namespace nodes
 } // namespace ell
 
@@ -270,7 +270,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    const model::OutputPort<ValueType>& AppendSum(const model::OutputPort<ValueType>& input)
+    const model::OutputPort<ValueType>& Sum(const model::OutputPort<ValueType>& input)
     {
         model::Model* model = input.GetNode()->GetModel();
         if (model == nullptr)

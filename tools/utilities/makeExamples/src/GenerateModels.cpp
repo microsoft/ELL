@@ -12,6 +12,8 @@
 #include <model/include/Model.h>
 #include <model/include/OutputNode.h>
 #include <model/include/RefineTransformation.h>
+#include <model/include/SliceNode.h>
+#include <model/include/SpliceNode.h>
 
 #include <nodes/include/ActivationLayerNode.h>
 #include <nodes/include/BiasLayerNode.h>
@@ -50,18 +52,18 @@ using namespace predictors::neural;
 model::Model GenerateIdentityModel(size_t dimension)
 {
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
-    model.AddNode<model::OutputNode<double>>(inputNode->output);
+    const auto& input = model::Input<double>(model, dimension);
+    model::Output(input);
     return model;
 }
 
 model::Model GenerateTimesTwoModel(size_t dimension)
 {
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
-    auto constantTwoNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 2.0));
-    auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTwoNode->output, nodes::BinaryOperationType::multiply);
-    model.AddNode<model::OutputNode<double>>(timesNode->output);
+    const auto& input = model::Input<double>(model, dimension);
+    const auto& constantTwo = nodes::Constant(model, std::vector<double>(dimension, 2.0));
+    const auto& product = nodes::Multiply(input, constantTwo);
+    model::Output(product);
     return model;
 }
 
@@ -69,43 +71,43 @@ template <typename ElementType>
 model::Model GenerateBroadcastTimesTwoModel(size_t dimension)
 {
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<ElementType>>(dimension);
-    auto constantTwoNode = model.AddNode<nodes::ConstantNode<ElementType>>(std::vector<ElementType>(1, 2.0));
-    auto nullNode = model.AddNode<nodes::ConstantNode<ElementType>>();
+    const auto& input = model::Input<ElementType>(model, dimension);
+    const auto& constantTwo = nodes::Constant(model, std::vector<ElementType>(1, 2.0));
+    const auto& null = nodes::Constant(model, std::vector<ElementType>{});
     model::PortMemoryLayout layout({ static_cast<int>(dimension), 1 });
-    auto timesNode = model.AddNode<nodes::BroadcastLinearFunctionNode<ElementType>>(inputNode->output, layout, constantTwoNode->output, nullNode->output, 1, layout);
-    model.AddNode<model::OutputNode<ElementType>>(timesNode->output);
+    const auto& product = nodes::BroadcastLinearFunction(input, layout, constantTwo, null, 1, layout);
+    model::Output(product);
     return model;
 }
 
 model::Model GenerateIsEqualModel()
 {
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(2);
-    auto predicateNode = model.AddNode<nodes::BinaryPredicateNode<double>>(model::PortElements<double>{ inputNode->output, 0 }, model::PortElements<double>{ inputNode->output, 1 }, nodes::BinaryPredicateType::equal);
-    model.AddNode<model::OutputNode<bool>>(predicateNode->output);
+    const auto& input = model::Input<double>(model, 2);
+    const auto& elem0 = model::Slice(input, 0, 1);
+    const auto& elem1 = model::Slice(input, 1, 1);
+    const auto& predicate = nodes::Equal(elem0, elem1);
+    model::Output(predicate);
     return model;
 }
 
 model::Model GenerateArgMaxModel(size_t dimension)
 {
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
-    auto argMaxNode = model.AddNode<nodes::ArgMaxNode<double>>(inputNode->output);
-    model.AddNode<model::OutputNode<int>>(argMaxNode->argVal);
+    const auto& input = model::Input<double>(model, dimension);
+    model::Output(nodes::ArgMax(input).argVal);
     return model;
 }
 
 model::Model GenerateMultiOutModel(size_t dimension)
 {
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
-    auto constantTwoNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 2.0));
-    auto constantTenNode = model.AddNode<nodes::ConstantNode<double>>(std::vector<double>(dimension, 10.0));
-    auto timesNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTwoNode->output, nodes::BinaryOperationType::multiply);
-    auto plusNode = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, constantTenNode->output, nodes::BinaryOperationType::add);
-
-    model.AddNode<model::OutputNode<double>>(model::PortElements<double>{ { timesNode->output }, { plusNode->output } });
+    const auto& input = model::Input<double>(model, dimension);
+    const auto& constantTwo = nodes::Constant(model, std::vector<double>(dimension, 2.0));
+    const auto& constantTen = nodes::Constant(model, std::vector<double>(dimension, 10.0));
+    const auto& product = nodes::Multiply(input, constantTwo);
+    const auto& sum = nodes::Add(input, constantTen);
+    model::Output(model::Splice(product, sum));
     return model;
 }
 
@@ -114,21 +116,21 @@ model::Model GenerateModel1()
     // For now, just create a model and return it
     const int dimension = 3;
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
-    auto mean8 = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 8);
-    auto var8 = model.AddNode<nodes::MovingVarianceNode<double>>(inputNode->output, 8);
-    auto mean16 = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 16);
-    auto var16 = model.AddNode<nodes::MovingVarianceNode<double>>(inputNode->output, 16);
+    const auto& input = model::Input<double>(model, dimension);
+    const auto& mean8 = nodes::MovingAverage(input, 8);
+    const auto& var8 = nodes::MovingVariance(input, 8);
+    const auto& mean16 = nodes::MovingAverage(input, 16);
+    const auto& var16 = nodes::MovingVariance(input, 16);
 
     // classifier
-    auto inputs = model::Concat(model::MakePortElements(mean8->output), model::MakePortElements(var8->output), model::MakePortElements(mean16->output), model::MakePortElements(var16->output));
+    const auto& inputs = model::Splice(mean8, var8, mean16, var16);
     predictors::LinearPredictor<double> predictor(inputs.Size());
     // Set some values into the predictor's vector
     for (size_t index = 0; index < inputs.Size(); ++index)
     {
         predictor.GetWeights()[index] = (double)(index % 5);
     }
-    model.AddNode<nodes::LinearPredictorNode<double>>(inputs, predictor);
+    [[maybe_unused]] const auto& predictorOutput = nodes::LinearPredictor(inputs, predictor);
     return model;
 }
 
@@ -136,18 +138,16 @@ model::Model GenerateModel2()
 {
     const int dimension = 3;
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
+    const auto& input = model::Input<double>(model, dimension);
 
     // one "leg"
-    auto mean1 = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 8);
-    auto mag1 = model.AddNode<nodes::L2NormSquaredNode<double>>(mean1->output);
+    const auto& mag1 = nodes::L2NormSquared(nodes::MovingAverage(input, 8));
 
     // other "leg"
-    auto mag2 = model.AddNode<nodes::L2NormSquaredNode<double>>(inputNode->output);
-    auto mean2 = model.AddNode<nodes::MovingAverageNode<double>>(mag2->output, 8);
+    const auto& mean2 = nodes::MovingAverage(nodes::L2NormSquared(input), 8);
 
     // combine them
-    model.AddNode<nodes::BinaryOperationNode<double>>(mag1->output, mean2->output, nodes::BinaryOperationType::subtract);
+    [[maybe_unused]] const auto& combination = nodes::Subtract(mag1, mean2);
     return model;
 }
 
@@ -155,17 +155,14 @@ model::Model GenerateModel3()
 {
     const int dimension = 3;
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(dimension);
-    auto lowpass = model.AddNode<nodes::MovingAverageNode<double>>(inputNode->output, 16);
-    auto highpass = model.AddNode<nodes::BinaryOperationNode<double>>(inputNode->output, lowpass->output, nodes::BinaryOperationType::subtract);
+    const auto& input = model::Input<double>(model, dimension);
+    const auto& lowpass = nodes::MovingAverage(input, 16);
+    const auto& highpass = nodes::Subtract(input, lowpass);
 
-    auto delay1 = model.AddNode<nodes::DelayNode<double>>(highpass->output, 4);
-    auto delay2 = model.AddNode<nodes::DelayNode<double>>(highpass->output, 8);
+    const auto& dot1 = nodes::DotProduct(highpass, nodes::Delay(highpass, 4));
+    const auto& dot2 = nodes::DotProduct(highpass, nodes::Delay(highpass, 8));
 
-    auto dot1 = model.AddNode<nodes::DotProductNode<double>>(highpass->output, delay1->output);
-    auto dot2 = model.AddNode<nodes::DotProductNode<double>>(highpass->output, delay2->output);
-
-    model.AddNode<nodes::BinaryOperationNode<double>>(dot1->output, dot2->output, nodes::BinaryOperationType::subtract);
+    [[maybe_unused]] const auto& result = nodes::Subtract(dot1, dot2);
     return model;
 }
 
@@ -198,8 +195,8 @@ model::Model GenerateTreeModel(size_t numSplits)
 {
     auto forest = CreateForest(numSplits);
     model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    model.AddNode<nodes::SimpleForestPredictorNode>(inputNode->output, forest);
+    const auto& input = model::Input<double>(model, 3);
+    [[maybe_unused]] const auto& predictorOutput = nodes::ForestPredictor(input, forest);
     return model;
 }
 

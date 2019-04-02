@@ -114,7 +114,7 @@ namespace nodes
 
         // Add the weights as matrix inside a ConstantNode in (row, column), channel order:
         auto weightsValues = _filterWeights.ToArray();
-        const auto& weights = AppendConstant(transformer, weightsValues);
+        const auto& weights = Constant(transformer, weightsValues);
 
         const auto inputLayout = this->GetInputMemoryLayout();
         const auto outputLayout = this->GetOutputMemoryLayout();
@@ -162,8 +162,8 @@ namespace nodes
                 // Add padding
                 model::PortMemoryLayout outputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters });
                 model::PortMemoryLayout paddedOutputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 });
-                auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputLayout, paddedOutputLayout);
-                transformer.MapNodeOutput(this->output, reorderOutputNode->output);
+                const auto& reorderedOutput = ReorderData(matrixMultNode->output, outputLayout, paddedOutputLayout);
+                transformer.MapNodeOutput(this->output, reorderedOutput);
             }
             else
             {
@@ -177,9 +177,9 @@ namespace nodes
             // Remove padding and transpose to channel-major order
             model::PortMemoryLayout inputLayout(model::MemoryShape{ inputHeight, inputWidth, inputDepth }, model::MemoryShape{ inputPadding, inputPadding, 0 });
             model::PortMemoryLayout transposedInputLayout(model::MemoryShape{ inputDepth, inputHeight, inputWidth }, model::DimensionOrder{ 2, 0, 1 }); // Note: memory layout constructor takes the sizes in physical dimension order
-            auto reorderInputNode = transformer.AddNode<ReorderDataNode<ValueType>>(newInput, inputLayout, transposedInputLayout);
+            const auto& reorderedInput = ReorderData(newInput, inputLayout, transposedInputLayout);
 
-            auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(reorderInputNode->output, reorderInputNode->GetOutputMemoryLayout(), _filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
+            auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(reorderedInput, reorderedInput.GetMemoryLayout(), _filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
             auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weights, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);
 
             if (outputPadding != 0)
@@ -187,8 +187,8 @@ namespace nodes
                 // Add padding
                 model::PortMemoryLayout outputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters });
                 model::PortMemoryLayout paddedOutputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 });
-                auto reorderOutputNode = transformer.AddNode<ReorderDataNode<ValueType>>(matrixMultNode->output, outputLayout, paddedOutputLayout);
-                transformer.MapNodeOutput(this->output, reorderOutputNode->output);
+                const auto& reorderedOutput = ReorderData(matrixMultNode->output, outputLayout, paddedOutputLayout);
+                transformer.MapNodeOutput(this->output, reorderedOutput);
             }
             else
             {

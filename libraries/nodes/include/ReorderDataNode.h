@@ -46,14 +46,16 @@ namespace nodes
         /// <summary> Constructor with no reordering </summary>
         ///
         /// <param name="input"> The input to reorder. </param>
-        /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out. </param>
+        /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out according to the padding value. </param>
+        /// <param name="paddingValue"> The value to fill the inactive area with. </param>
         ReorderDataNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue = 0);
 
         /// <summary> Constructor with no reordering </summary>
         ///
         /// <param name="input"> The input to reorder. </param>
         /// <param name="inputMemoryLayout"> The memory layout of the input. Only data in the "active" area will be copied. </param>
-        /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out. </param>
+        /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out according to the padding value. </param>
+        /// <param name="paddingValue"> The value to fill the inactive area with. </param>
         ReorderDataNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue = 0);
 
         /// <summary> Constructor with reordering </summary>
@@ -67,22 +69,22 @@ namespace nodes
         /// <summary> Constructor with reordering </summary>
         ///
         /// <param name="input"> The input to reorder. </param>
-        /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out. </param>
+        /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out according to the padding value. </param>
         /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done.
         ///    For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
         ///    set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
-        /// <param name="paddingValue"> The value to use for output padding, if output shape is larger than input shape. </param>
+        /// <param name="paddingValue"> The value to fill the inactive area with. </param>
         ReorderDataNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue = 0);
 
         /// <summary> Constructor with reordering </summary>
         ///
         /// <param name="input"> The input to reorder. </param>
         /// <param name="inputMemoryLayout"> The memory layout of the input. Only data in the "active" area is guaranteed to be copied. </param>
-        /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out. </param>
+        /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out according to the padding value. </param>
         /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done.
         ///   For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
         ///   set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
-        /// <param name="paddingValue"> The value to use for output padding, if output shape is larger than input shape. </param>
+        /// <param name="paddingValue"> The value to fill the inactive area with. </param>
         ReorderDataNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue = 0);
 
         /// <summary> Gets information about the input memory layout </summary>
@@ -143,6 +145,65 @@ namespace nodes
 
         ValueType _paddingValue;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The input to reorder. </param>
+    /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out according to the padding value. </param>
+    /// <param name="paddingValue"> The value to fill the inactive area with. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& ReorderData(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue = 0);
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The input to reorder. </param>
+    /// <param name="inputMemoryLayout"> The memory layout of the input. Only data in the "active" area will be copied. </param>
+    /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out according to the padding value. </param>
+    /// <param name="paddingValue"> The value to fill the inactive area with. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& ReorderData(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue = 0);
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The input to reorder. </param>
+    /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out according to the padding value. </param>
+    /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done.
+    ///    For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
+    ///    set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
+    /// <param name="paddingValue"> The value to fill the inactive area with. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& ReorderData(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue = 0);
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The input to reorder. </param>
+    /// <param name="inputMemoryLayout"> The memory layout of the input. Only data in the "active" area will be copied. </param>
+    /// <param name="outputMemoryLayout"> The memory layout of the output. Data will be copied into the "active" area, and the rest will be zeroed out according to the padding value. </param>
+    /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done.
+    ///    For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
+    ///    set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
+    /// <param name="paddingValue"> The value to fill the inactive area with. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& ReorderData(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue = 0);
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The input to reorder. </param>
+    /// <param name="order"> The permutation vector to apply to the dimensions when copying. Input dimension `i` will get copied to output dimension `order[i]`. If left empty, no reordering is done.
+    ///    For instance, to reorder the normal interleaved image order into a planar order, the `order` parameter would be
+    ///    set to {2, 0, 1} --- reordering {row, column, channel} to {channel, row, column} </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& ReorderData(const model::OutputPort<ValueType>& input, const model::DimensionOrder& order);
 } // namespace nodes
 } // namespace ell
 
@@ -515,6 +576,65 @@ namespace nodes
         archiver["paddingValue"] >> _paddingValue;
     }
 
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& ReorderData(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<ReorderDataNode<ValueType>>(input, outputMemoryLayout, paddingValue);
+        return node->output;
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& ReorderData(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, ValueType paddingValue)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<ReorderDataNode<ValueType>>(input, inputMemoryLayout, outputMemoryLayout, paddingValue);
+        return node->output;
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& ReorderData(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<ReorderDataNode<ValueType>>(input, outputMemoryLayout, order, paddingValue);
+        return node->output;
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& ReorderData(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& inputMemoryLayout, const model::PortMemoryLayout& outputMemoryLayout, const model::DimensionOrder& order, ValueType paddingValue)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<ReorderDataNode<ValueType>>(input, inputMemoryLayout, outputMemoryLayout, order, paddingValue);
+        return node->output;
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& ReorderData(const model::OutputPort<ValueType>& input, const model::DimensionOrder& order)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<ReorderDataNode<ValueType>>(input, order);
+        return node->output;
+    }
 } // namespace nodes
 } // namespace ell
 

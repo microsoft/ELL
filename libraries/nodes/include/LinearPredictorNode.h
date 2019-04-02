@@ -86,6 +86,18 @@ namespace nodes
         LinearPredictorType _predictor;
     };
 
+
+    /// <summary> Convenience function to add a linear predictor node. </summary>
+    ///
+    /// <typeparam name="ElementType"> The fundamental type used by this predictor. </typeparam>
+    /// <param name="input"> The input to the predictor. </param>
+    /// <param name="predictor"> The linear predictor. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ElementType>
+    const model::OutputPort<ElementType>& LinearPredictor(const model::OutputPort<ElementType>& input,
+                                                          const predictors::LinearPredictor<ElementType>& predictor);
+
     /// <summary> Adds a linear predictor node to a model transformer. </summary>
     ///
     /// <typeparam name="ElementType"> The fundamental type used by this predictor. </typeparam>
@@ -160,11 +172,11 @@ namespace nodes
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
 
-        const auto& weights = AppendConstant(transformer, _predictor.GetWeights().ToArray());
-        const auto& scaledInput = AppendBinaryOperation(weights, newPortElements, BinaryOperationType::multiply);
-        auto dotProductNode = transformer.AddNode<DotProductNode<ElementType>>(weights, newPortElements);
-        const auto& bias = AppendConstant(transformer, _predictor.GetBias());
-        const auto& sum = AppendBinaryOperation(dotProductNode->output, bias, BinaryOperationType::add);
+        const auto& weights = Constant(transformer, _predictor.GetWeights().ToArray());
+        const auto& scaledInput = Multiply(weights, newPortElements);
+        const auto& dotProduct = DotProduct(weights, newPortElements);
+        const auto& bias = Constant(transformer, _predictor.GetBias());
+        const auto& sum = Add(dotProduct, bias);
 
         transformer.MapNodeOutput(output, sum);
         transformer.MapNodeOutput(weightedElements, scaledInput);
@@ -195,6 +207,20 @@ namespace nodes
         }
     }
 
+    template <typename ElementType>
+    const model::OutputPort<ElementType>& LinearPredictor(const model::OutputPort<ElementType>& input,
+                                                          const predictors::LinearPredictor<ElementType>& predictor)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+
+        auto node = model->AddNode<LinearPredictorNode<ElementType>>(input, predictor);
+        return node->output;
+    }
+    
     template <typename ElementType>
     LinearPredictorNode<ElementType>* AddNodeToModelTransformer(const model::PortElements<ElementType>& input, const predictors::LinearPredictor<ElementType>& predictor, model::ModelTransformer& transformer)
     {

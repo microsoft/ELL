@@ -94,6 +94,46 @@ namespace nodes
         // Operation
         BinaryPredicateType _predicate;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input1"> The left-hand input of the comparison. </param>
+    /// <param name="input2"> The right-hand input of the comparison. </param>
+    /// <param name="predicate"> The predicate to use for the comparison. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    /// Note: the output will use the same memory layout as input1
+    template <typename ValueType>
+    const model::OutputPort<bool>& BinaryPredicate(const model::OutputPort<ValueType>& input1,
+                                                   const model::OutputPort<ValueType>& input2,
+                                                   BinaryPredicateType predicate);
+
+    /// @{
+    /// <summary> Convenience functions for adding a node to a model. </summary>
+    ///
+    /// <param name="input1"> The left-hand input of the comparison. </param>
+    /// <param name="input2"> The right-hand input of the comparison. </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    /// Note: the output will use the same memory layout as input1
+    template <typename ValueType>
+    const model::OutputPort<bool>& Equal(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<bool>& Less(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<bool>& Greater(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<bool>& NotEqual(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<bool>& LessOrEqual(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<bool>& GreaterOrEqual(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+    /// @}
 } // namespace nodes
 } // namespace ell
 
@@ -283,6 +323,62 @@ namespace nodes
         _predicate = FromString<BinaryPredicateType>(predicate);
         _output.SetSize(_input1.Size());
     }
+
+    template <typename ValueType>
+    const model::OutputPort<bool>& BinaryPredicate(const model::OutputPort<ValueType>& input1,
+                                                   const model::OutputPort<ValueType>& input2,
+                                                   BinaryPredicateType predicate)
+    {
+        model::Model* model = input1.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        if (*model != *(input2.GetNode()->GetModel()))
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Inputs not part of the same model");
+        }
+
+        auto node = model->AddNode<BinaryPredicateNode<ValueType>>(input1, input2, predicate);
+        return node->output;
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<bool>& Equal(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryPredicate(input1, input2, BinaryPredicateType::equal);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<bool>& Less(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryPredicate(input1, input2, BinaryPredicateType::less);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<bool>& Greater(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryPredicate(input1, input2, BinaryPredicateType::greater);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<bool>& NotEqual(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryPredicate(input1, input2, BinaryPredicateType::notEqual);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<bool>& LessOrEqual(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryPredicate(input1, input2, BinaryPredicateType::lessOrEqual);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<bool>& GreaterOrEqual(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryPredicate(input1, input2, BinaryPredicateType::greaterOrEqual);
+    }
+
 } // namespace nodes
 } // namespace ell
 

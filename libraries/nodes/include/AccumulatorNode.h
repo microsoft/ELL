@@ -78,6 +78,14 @@ namespace nodes
         // Buffer
         mutable std::vector<ValueType> _accumulator;
     };
+
+    /// <summary> Convenience function for adding a node to a model. </summary>
+    ///
+    /// <param name="input"> The port to get the input data from </param>
+    ///
+    /// <returns> The output of the new node. </returns>
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Accumulate(const model::OutputPort<ValueType>& input);
 } // namespace nodes
 } // namespace ell
 
@@ -185,6 +193,18 @@ namespace nodes
         auto dimension = _input.Size();
         _accumulator = std::vector<ValueType>(dimension);
         _output.SetSize(dimension);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Accumulate(const model::OutputPort<ValueType>& input)
+    {
+        model::Model* model = input.GetNode()->GetModel();
+        if (model == nullptr)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Input not part of a model");
+        }
+        auto node = model->AddNode<AccumulatorNode<ValueType>>(input);
+        return node->output;
     }
 } // namespace nodes
 } // namespace ell

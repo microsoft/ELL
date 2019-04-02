@@ -47,8 +47,8 @@ namespace
         }
 
         auto shape = thisNode->GetShape();
-        auto newNode = transformer.AddNode<model::InputNode<ValueType>>(shape);
-        transformer.MapNodeOutput(thisNode->output, newNode->output);
+        const auto& newOutput = model::Input<ValueType>(transformer, shape);
+        transformer.MapNodeOutput(thisNode->output, newOutput);
 
         return true;
     }
@@ -62,11 +62,10 @@ namespace
             return false;
         }
 
-        auto shape = thisNode->GetShape();
         const auto& newInput = transformer.GetCorrespondingInputs(thisNode->input);
-        auto newNode = transformer.AddNode<model::OutputNode<ValueType>>(newInput, shape);
+        const auto& newOutput = model::Output(newInput);
 
-        transformer.MapNodeOutput(thisNode->output, newNode->output);
+        transformer.MapNodeOutput(thisNode->output, newOutput);
         return true;
     }
 
