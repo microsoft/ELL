@@ -53,6 +53,8 @@
 #include <predictors/neural/include/BiasLayer.h>
 #include <predictors/neural/include/InputLayer.h>
 
+#include <value/include/ComputeContext.h>
+
 #include <testing/include/testing.h>
 
 #include <utilities/include/RandomEngines.h>
@@ -401,6 +403,8 @@ static void TestSquaredEuclideanDistanceNodeCompute()
 
 static void TestL2NormSquaredNodeRefine()
 {
+    value::ComputeContext context("TestL2NormSquaredNodeRefine");
+    value::ContextGuard<> guard(context);
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
 
     model::Model model;
@@ -495,6 +499,9 @@ static void TestSimpleForestPredictorNodeRefine()
 
 static void TestSquaredEuclideanDistanceNodeRefine()
 {
+    value::ComputeContext context("TestSquaredEuclideanDistanceNodeRefine");
+    value::ContextGuard<> guard(context);
+
     math::RowMatrix<double> m{
         { 1.0, 0.2, 0.3 },
         { 0.3, 0.7, 0.5 }
@@ -614,6 +621,9 @@ static void TestMatrixVectorProductRefine()
 
 static void TestEuclideanDistanceNodeRefine()
 {
+    value::ComputeContext context("TestEuclideanDistanceNodeRefine");
+    value::ContextGuard<> guard(context);
+
     math::RowMatrix<double> v(2, 3);
     v(0, 0) = 1.0;
     v(0, 1) = 0.2;
@@ -646,6 +656,9 @@ static void TestEuclideanDistanceNodeRefine()
 
 static void TestProtoNNPredictorNode()
 {
+    value::ComputeContext context("TestProtoNNPredictorNode");
+    value::ContextGuard<> guard(context);
+
     size_t dim = 5, projectedDim = 4, numPrototypes = 3, numLabels = 2;
     double gamma = 0.3;
     predictors::ProtoNNPredictor protonnPredictor(dim, projectedDim, numPrototypes, numLabels, gamma);

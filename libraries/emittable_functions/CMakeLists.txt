@@ -7,12 +7,14 @@ set(library_name emittable_functions)
 set(src
     src/Convolutions.cpp
     src/IIRFilter.cpp
+    src/LogisticFunctions.cpp
     src/VoiceActivityDetector.cpp
 )
 
 set(include
     include/Convolutions.h
     include/IIRFilter.h
+    include/LogisticFunctions.h
     include/VoiceActivityDetector.h
 )
 
@@ -45,6 +47,7 @@ set(test_src
     test/src/Convolutions_test.cpp
     test/src/Emittable_functions_util.cpp
     test/src/IIRFilter_test.cpp
+    test/src/LogisticFunctionsTest.cpp
     test/src/VoiceActivityDetectorTest.cpp
 )
 
@@ -52,6 +55,7 @@ set(test_include
     test/include/Convolutions_test.h
     test/include/Emittable_functions_util.h
     test/include/IIRFilter_test.h
+    test/include/LogisticFunctionsTest.h
     test/include/VoiceActivityDetectorTest.h
 )
 

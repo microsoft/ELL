@@ -41,6 +41,7 @@ class UnaryOperationType:
     sin = UnaryOperationType_sin
     sqrt = UnaryOperationType_sqrt
     square = UnaryOperationType_square
+    softmax = UnaryOperationType_softmax
     tanh = UnaryOperationType_tanh
 
 # Remove flat defines so callers only see the class above
@@ -55,6 +56,7 @@ del UnaryOperationType_sigmoid
 del UnaryOperationType_sin
 del UnaryOperationType_sqrt
 del UnaryOperationType_square
+del UnaryOperationType_softmax
 del UnaryOperationType_tanh
 
 # Python friendly class for BinaryOperationType enum

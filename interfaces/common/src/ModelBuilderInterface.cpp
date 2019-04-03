@@ -27,6 +27,7 @@
 #include <nodes/include/BufferNode.h>
 #include <nodes/include/ClockNode.h>
 #include <nodes/include/ConcatenationNode.h>
+#include <nodes/include/DotProductNode.h>
 #include <nodes/include/DCTNode.h>
 #include <nodes/include/DTWDistanceNode.h>
 #include <nodes/include/FFTNode.h>
@@ -35,6 +36,7 @@
 #include <nodes/include/HammingWindowNode.h>
 #include <nodes/include/IIRFilterNode.h>
 #include <nodes/include/LSTMNode.h>
+#include <nodes/include/MatrixVectorMultiplyNode.h>
 #include <nodes/include/NeuralNetworkPredictorNode.h>
 #include <nodes/include/NodeOperations.h>
 #include <nodes/include/ReinterpretLayoutNode.h>
@@ -569,7 +571,34 @@ Node ModelBuilder::AddConstantNode(Model model, std::vector<double> values, cons
         newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<float>>(CastVector<float>(values), shape);
         break;
     case PortType::bigInt:
-        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<int64_t>>(CastVector<int64_t>(values));
+        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<int64_t>>(CastVector<int64_t>(values), shape);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create ConstantNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddConstantNode(Model model, std::vector<double> values, PortMemoryLayout outputMemoryLayout, PortType type)
+{
+    auto outputLayout = outputMemoryLayout.Get();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<bool>>(CastVector<bool>(values), outputLayout);
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<int>>(CastVector<int>(values), outputLayout);
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<double>>(values, outputLayout);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<float>>(CastVector<float>(values), outputLayout);
+        break;
+    case PortType::bigInt:
+        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<int64_t>>(CastVector<int64_t>(values), outputLayout);
         break;
     default:
         throw std::invalid_argument("Error: could not create ConstantNode of the requested type");
@@ -814,6 +843,101 @@ Node ModelBuilder::AddDCTNode(Model model, PortElements input, int numFilters)
     default:
         throw std::invalid_argument("Error: could not create DCTNode of the requested type");
     }
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddMatrixMultiplyNode(Model model, PortElements input1, PortElements input2)
+{
+    auto type = input1.GetType();
+    auto t2 = input2.GetType();
+    if (type != t2)
+    {
+        throw std::invalid_argument("Error: input1 has different element types from input2");
+    }
+    auto elements1 = input1.GetPortElements();
+    auto elements2 = input2.GetPortElements();
+
+    auto layout1 = elements1.GetMemoryLayout();
+    auto layout2 = elements2.GetMemoryLayout();
+
+    auto s1 = layout1.GetActiveSize().NumElements();
+    auto s2 = layout2.GetActiveSize().NumElements();
+    ell::model::Node* newNode = nullptr;
+
+    if (layout1.NumDimensions() == 1 && layout2.NumDimensions() == 2)
+    {
+        // then this is a MatrixVectorMultiplyNode, but MatrixVectorMultiplyNode requires matrix first so we 
+        // have to transpose input2 in this case.
+        // TODO: fix MatrixVectorMultiplyNode so it exposes the transpose options supported by BLAS GEMV functions.
+        // In the meantime we can handle the constant case.
+        throw std::invalid_argument("Error: input sizes not yet supported");
+    }
+    else if (layout1.NumDimensions() == 2 && layout2.NumDimensions() == 1)
+    {
+        auto m = layout1.GetActiveSize()[0];
+        auto n = layout1.GetActiveSize()[1];
+
+        // then this is a MatrixVectorMultiplyNode
+        switch (type)
+        {
+        case PortType::real:
+            newNode = model.GetModel().AddNode<ell::nodes::MatrixVectorMultiplyNode<double>>(ell::model::PortElements<double>(elements1), m, n, n, ell::model::PortElements<double>(elements2));
+            break;
+        case PortType::smallReal:
+            newNode = model.GetModel().AddNode<ell::nodes::MatrixVectorMultiplyNode<float>>(ell::model::PortElements<float>(elements1), m, n, n, ell::model::PortElements<float>(elements2));
+            break;
+        default:
+            throw std::invalid_argument("Error: could not create MatrixVectorMultiplyNode of the requested type");
+        }
+    }
+    else if (layout1.NumDimensions() == 1 && layout2.NumDimensions() == 1)
+    {
+        if (s1 != s2)
+        {
+            throw std::invalid_argument("Error: cannot multiply vectors of different sizes");
+        }
+        else
+        {
+            return AddDotProductNode(model, input1, input2);
+        }
+    }
+    else
+    {
+        // todo: figure out numpy rules here,  https://docs.scipy.org/doc/numpy/reference/generated/numpy.dot.html
+        // e.g. if layout 1 is 2-D and layout 2 is 1-D then turn this into a MatrixVectorMultiplyNode
+        // if both are 2D then use MatrixMatrixMultiplyNode.
+        // if both are 1D then use DotProductNode.
+        // etc.
+        throw std::invalid_argument("Error: input sizes not yet supported");
+    }
+    
+    return Node(newNode);
+}
+
+Node ModelBuilder::AddDotProductNode(Model model, PortElements input1, PortElements input2)
+{
+    ell::model::Node* newNode = nullptr;
+    auto type = input1.GetType();
+    auto t2 = input2.GetType();
+    if (type != t2)
+    {
+        throw std::invalid_argument("Error: input1 has different element types from input2");
+    }
+    auto elements1 = input1.GetPortElements();
+    auto elements2 = input2.GetPortElements();
+
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::nodes::DotProductNode<double>>(ell::model::PortElements<double>(elements1), ell::model::PortElements<double>(elements2));
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::nodes::DotProductNode<float>>(ell::model::PortElements<float>(elements1), ell::model::PortElements<float>(elements2));
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create DotProductNode of the requested type");
+    }
+
     return Node(newNode);
 }
 

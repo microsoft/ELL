@@ -11,8 +11,8 @@
 import argparse
 
 # helper classes
-import classifier
 import featurizer
+import classifier
 import microphone
 import speaker
 import wav_reader
@@ -87,5 +87,6 @@ if __name__ == "__main__":
                         action='store_true')
 
     args = parser.parse_args()
+
     test_keyword_spotter(args.featurizer, args.classifier, args.categories, args.wav_file, args.threshold,
                          args.sample_rate, args.speaker, args.auto_scale)

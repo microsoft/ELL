@@ -12,7 +12,6 @@
 #include "FFTTest.h"
 #include "FilterTest.h"
 #include "MelTest.h"
-#include "VoiceActivityDetectorTest.h"
 #include "WindowTest.h"
 
 #include <dsp/include/Convolution.h>
@@ -37,11 +36,7 @@ void DspTest(const std::string& path)
     //
     // Testing
     //
-
-    // Voice Activity Detection
-    TestVoiceActivityDetector<float>(path);
-    TestVoiceActivityDetector<double>(path);
-
+    
     // 1D Convolution
     TestConv1D<float>(ConvolutionMethodOption::simple);
     TestConv1D<float>(ConvolutionMethodOption::winograd);

@@ -311,6 +311,10 @@ namespace nodes
         _output(this, defaultOutputPortName, fftSize / 2),
         _fftSize(fftSize)
     {
+        if (fftSize == 0)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "fftSize must be greater than zero");
+        }
         double power = std::log2(fftSize);
         if (std::floor(power) != power)
         {
@@ -727,10 +731,7 @@ namespace nodes
     {
         Node::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
-        if (_fftSize != _input.Size())
-        {
-            archiver["fftSize"] << _fftSize;
-        }
+        archiver["fftSize"] << _fftSize;
     }
 
     template <typename ValueType>

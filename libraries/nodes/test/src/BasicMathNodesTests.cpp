@@ -82,6 +82,9 @@ void TestBasicMathNodes()
 
 void TestUnaryOperationNodeCompute(UnaryOperationType op, double (*expectedTransform)(double))
 {
+    value::ComputeContext context("TestUnaryOperationNodeCompute");
+    value::ContextGuard<> guard(context);
+
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
 
     model::Model model;
@@ -106,6 +109,9 @@ void TestUnaryOperationNodeCompute(UnaryOperationType op, double (*expectedTrans
 
 void TestUnaryOperationNodeCompute(UnaryOperationType op, bool (*expectedTransform)(bool))
 {
+    value::ComputeContext context("TestUnaryOperationNodeCompute<bool>");
+    value::ContextGuard<> guard(context);
+
     std::vector<std::vector<bool>> data = { { true }, { false } };
 
     model::Model model;

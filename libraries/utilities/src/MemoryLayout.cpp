@@ -529,8 +529,11 @@ namespace utilities
         }
         else
         {
-            archiver["stride"] >> temp;
-            _extent = { temp };
+            archiver.OptionalProperty("stride") >> temp;
+            if (!temp.empty())
+            {
+                _extent = { temp };
+            }
         }
 
         archiver["offset"] >> temp;

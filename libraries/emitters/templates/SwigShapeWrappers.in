@@ -1,14 +1,23 @@
-u8R"(%include "shape.i";
+u8R"(
 %inline %{
-  ell::api::math::TensorShape get_default_input_shape() {
+  TensorShape get_default_input_shape() {
     TensorShape  s;
     @@MODULE@@_GetInputShape(0, &s);
-    return ell::api::math::TensorShape{ s.rows, s.columns, s.channels };
+    return s;
   }
-  ell::api::math::TensorShape get_default_output_shape() {
+  TensorShape get_default_output_shape() {
     TensorShape  s;
     @@MODULE@@_GetOutputShape(0, &s);
-    return ell::api::math::TensorShape{ s.rows, s.columns, s.channels };
+    return s;
   }
+%}
+
+%pythoncode %{
+  
+def TensorShape_Size(self):
+    return self.rows * self.columns * self.channels
+
+TensorShape.Size = TensorShape_Size
+
 %}
 )"

@@ -260,7 +260,6 @@ namespace emitters
             }
 
             {
-                DeclareIfDefGuard swig(os, "SWIG", DeclareIfDefGuard::Type::Negative);
                 // First write out type definitions
                 os << "//\n// Types\n//\n\n";
 

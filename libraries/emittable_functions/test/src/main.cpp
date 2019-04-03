@@ -9,6 +9,7 @@
 #include "Convolutions_test.h"
 #include "Emittable_functions_util.h"
 #include "IIRFilter_test.h"
+#include "LogisticFunctionsTest.h"
 #include "VoiceActivityDetectorTest.h"
 
 #include <utilities/include/Exception.h>
@@ -36,6 +37,10 @@ int main(int argc, char* argv[])
         for (const auto& context : GetContexts())
         {
             value::ContextGuard<> guard(*context);
+
+            TestSoftmax();
+            TestSigmoid();
+            TestHardSigmoid();
 
             TestVoiceActivityDetector<float>(path);
             TestVoiceActivityDetector<double>(path);

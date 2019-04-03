@@ -131,7 +131,6 @@ int main(int argc, char* argv[])
 
             size_t test_index = 0;
             // print evaluation
-            std::cout << "Training accuracy\n";
             {
                 auto accuracy = 0.0;
                 auto truePositive = 0.0;
@@ -159,8 +158,8 @@ int main(int argc, char* argv[])
                     test_index++;
                 }
 
-                accuracy = truePositive / mappedDataset.NumExamples();
-                std::cout << "\nAccuracy: " << accuracy << std::endl;
+                accuracy = 100 * (truePositive / mappedDataset.NumExamples());
+                std::cout << "Training Accuracy: " << accuracy << " %" << std::endl;
             }
 
             std::cout << std::endl;

@@ -9,13 +9,21 @@
 #include "UnaryOperationNode.h"
 #include "NodeOperations.h"
 
-#include <emitters/include/IRMath.h>
+#include <value/include/EmitterContext.h>
+#include <value/include/Value.h>
+#include <value/include/ValueOperations.h>
+#include <value/include/Scalar.h>
+#include <value/include/ScalarOperations.h>
 
+#include <emittable_functions/include/LogisticFunctions.h>
+
+#include <utilities/include/Boolean.h>
 #include <utilities/include/TypeTraits.h>
 
 #include <cmath>
 
 using namespace ell;
+using namespace ell::emittable_functions;
 
 namespace ell
 {
@@ -23,7 +31,7 @@ namespace nodes
 {
     template <typename ValueType>
     UnaryOperationNode<ValueType>::UnaryOperationNode() :
-        CompilableNode({ &_input }, { &_output }),
+        CompilableCodeNode("UnaryOperationNode", { &_input }, { &_output }),
         _input(this, {}, defaultInputPortName),
         _output(this, defaultOutputPortName, 0),
         _operation(UnaryOperationType::none)
@@ -32,7 +40,7 @@ namespace nodes
 
     template <typename ValueType>
     UnaryOperationNode<ValueType>::UnaryOperationNode(const model::OutputPort<ValueType>& input, UnaryOperationType operation) :
-        CompilableNode({ &_input }, { &_output }),
+        CompilableCodeNode("UnaryOperationNode", { &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, _input.Size()),
         _operation(operation)
@@ -47,199 +55,84 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    template <typename ValueType, typename Operation>
-    std::vector<ValueType> ComputeLoop(std::vector<ValueType> input, Operation&& operation)
+    void DoUnaryOp(value::Vector& data, value::Vector& result, UnaryOperationType op)
     {
-        auto length = input.size();
-        auto output = std::vector<ValueType>(length);
-        std::transform(input.begin(), input.end(), output.begin(), [&](ValueType x) { return operation(x); });
-        return output;
-    }
-
-    template <typename ValueType, utilities::IsFloatingPoint<ValueType> = true>
-    std::vector<ValueType> ComputeOutput(std::vector<ValueType> input, UnaryOperationType operation)
-    {
-        switch (operation)
+        if (op == UnaryOperationType::softmax)
         {
-        case UnaryOperationType::abs:
-            return ComputeLoop<ValueType>(input, UnaryOperations::Abs<ValueType>);
-        case UnaryOperationType::sqrt:
-            return ComputeLoop<ValueType>(input, UnaryOperations::Sqrt<ValueType>);
-        case UnaryOperationType::logicalNot:
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Cannot perform logicalNot operation on numeric inputs");
-        case UnaryOperationType::exp:
-            return ComputeLoop<ValueType>(input, UnaryOperations::Exp<ValueType>);
-        case UnaryOperationType::sin:
-            return ComputeLoop<ValueType>(input, UnaryOperations::Sin<ValueType>);
-        case UnaryOperationType::cos:
-            return ComputeLoop<ValueType>(input, UnaryOperations::Cos<ValueType>);
-        case UnaryOperationType::tanh:
-            return ComputeLoop<ValueType>(input, UnaryOperations::Tanh<ValueType>);
-        case UnaryOperationType::square:
-            return ComputeLoop<ValueType>(input, UnaryOperations::Square<ValueType>);
-        case UnaryOperationType::log:
-            return ComputeLoop<ValueType>(input, UnaryOperations::Log<ValueType>);
-        case UnaryOperationType::sigmoid:
-            return ComputeLoop<ValueType>(input, UnaryOperations::Sigmoid<ValueType>);
-        case UnaryOperationType::hardSigmoid:
-            return ComputeLoop<ValueType>(input, UnaryOperations::HardSigmoid<ValueType>);
-        default:
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
-        }
-    }
-
-    template <typename ValueType, utilities::IsIntegral<ValueType> = true, utilities::IsNotBoolean<ValueType> = true>
-    std::vector<ValueType> ComputeOutput(std::vector<ValueType> input, UnaryOperationType operation)
-    {
-        // math functions require floating point, so do it in float, then cast result back to int.
-        std::vector<float> temp(input.size());
-        std::transform(input.begin(), input.end(), temp.begin(), [&](ValueType x) { return static_cast<float>(x); });
-        std::vector<float> floatResult = ComputeOutput<float>(temp, operation);
-        std::vector<ValueType> result(input.size());
-        std::transform(floatResult.begin(), floatResult.end(), result.begin(), [&](float x) { return static_cast<ValueType>(x); });
-        return result;
-    }
-
-    template <typename ValueType, utilities::IsBoolean<ValueType> = true>
-    std::vector<ValueType> ComputeOutput(std::vector<ValueType> input, UnaryOperationType operation)
-    {
-        switch (operation)
-        {
-        case UnaryOperationType::logicalNot:
-        {
-            auto length = input.size();
-            auto output = std::vector<ValueType>(length);
-            for (size_t index = 0; index < length; index++)
-            {
-                bool x = input[index];
-                output[index] = !x;
-            }
-            return output;
-        }
-        default:
-            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Cannot perform numeric operation on boolean inputs");
-        }
-    }
-
-    template <typename ValueType>
-    void UnaryOperationNode<ValueType>::Compute() const
-    {
-        std::vector<ValueType> output = ComputeOutput<ValueType>(_input.GetValue(), _operation);
-        _output.SetOutput(output);
-    };
-
-    template <typename ValueType, utilities::IsFloatingPoint<ValueType> = true>
-    emitters::IRLocalScalar CompileOperator(emitters::IRLocalScalar value, UnaryOperationType operation)
-    {
-        emitters::IRFunctionEmitter& function = value.function;
-        emitters::LLVMValue result;
-        switch (operation)
-        {
-        case UnaryOperationType::abs:
-            result = emitters::Abs(value);
-            break;
-        case UnaryOperationType::sqrt:
-            result = emitters::Sqrt(value);
-            break;
-        case UnaryOperationType::exp:
-            result = emitters::Exp(value);
-            break;
-        case UnaryOperationType::log:
-            result = emitters::Log(value);
-            break;
-        case UnaryOperationType::logicalNot:
-            result = function.LogicalNot(value);
-            break;
-        case UnaryOperationType::square:
-            result = function.Operator(emitters::GetMultiplyForValueType<ValueType>(), value, value);
-            break;
-        case UnaryOperationType::sin:
-            result = emitters::Sin(value);
-            break;
-        case UnaryOperationType::cos:
-            result = emitters::Cos(value);
-            break;
-        case UnaryOperationType::tanh:
-            result = emitters::Tanh<ValueType>(value);
-            break;
-        case UnaryOperationType::sigmoid:
-        {
-            SigmoidActivationFunction<ValueType> sigmoid;
-            return sigmoid.Compile(value);
-        }
-
-        case UnaryOperationType::hardSigmoid:
-        {
-            HardSigmoidActivationFunction<ValueType> hardSigmoid;
-            return hardSigmoid.Compile(value);
-        }
-        case UnaryOperationType::none:
-        default:
-            throw emitters::EmitterException(emitters::EmitterError::unaryOperationNotSupported);
-        }
-        return { function, result };
-    }
-
-    template <typename ValueType, utilities::IsIntegral<ValueType> = true, utilities::IsNotBoolean<ValueType> = true>
-    emitters::IRLocalScalar CompileOperator(emitters::IRLocalScalar value, UnaryOperationType operation)
-    {
-        emitters::LLVMValue x = value.value;
-        auto function = value.function;
-        emitters::LLVMValue xf = function.CastValue<float>(x);
-        emitters::IRLocalScalar y = CompileOperator<float>({ function, xf }, operation);
-        emitters::LLVMValue yi = function.CastValue<ValueType>(y.value);
-        return { function, yi };
-    }
-
-    template <typename ValueType, utilities::IsBoolean<ValueType> = true>
-    emitters::IRLocalScalar CompileOperator(emitters::IRLocalScalar value, UnaryOperationType operation)
-    {
-        if (operation == UnaryOperationType::logicalNot)
-        {
-            return { value.function, value.function.LogicalNot(value) };
-        }
-        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Cannot perform numeric operation on boolean inputs");
-    }
-
-    template <typename ValueType>
-    void UnaryOperationNode<ValueType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
-    {
-        if (!function.GetCompilerOptions().unrollLoops)
-        {
-            CompileLoop(compiler, function);
+            Softmax(data, result);
         }
         else
         {
-            CompileExpanded(compiler, function);
+            For(data, [&](value::Scalar index) {
+                value::Scalar v = data(index);
+                value::Scalar r;
+                switch (op)
+                {
+                case UnaryOperationType::none:
+                    // this is a no-op on purpose
+                    r = v;
+                    break;
+                case UnaryOperationType::abs:
+                    r = Abs(v);
+                    break;
+                case UnaryOperationType::sqrt:
+                    r = Sqrt(v);
+                    break;
+                case UnaryOperationType::logicalNot:
+                    if (v.GetType() == value::ValueType::Boolean)
+                    {
+                        ell::utilities::Boolean t(true);
+                        r = (v != t);
+                    }
+                    else
+                    {
+                        If(v == Cast(0, v.GetType()), [&]
+                        {
+                            r = Cast(1, v.GetType());
+                        }).Else([&]
+                        {
+                            r = Cast(0, v.GetType());
+                        });
+                    }
+                    break;
+                case UnaryOperationType::exp:
+                    r = Exp(v);
+                    break;
+                case UnaryOperationType::sin:
+                    r = Sin(v);
+                    break;
+                case UnaryOperationType::cos:
+                    r = Cos(v);
+                    break;
+                case UnaryOperationType::tanh:
+                    r = Tanh(v);
+                    break;
+                case UnaryOperationType::square:
+                    r = v * v;
+                    break;
+                case UnaryOperationType::log:
+                    r = Log(v);
+                    break;
+                case UnaryOperationType::sigmoid:
+                    r = emittable_functions::Sigmoid(v);
+                    break;
+                case UnaryOperationType::hardSigmoid:
+                    r = emittable_functions::HardSigmoid(v);
+                    break;
+                default:
+                    throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown unary operation type");
+                }
+                result(index) = r;
+            });
         }
     }
 
     template <typename ValueType>
-    void UnaryOperationNode<ValueType>::CompileLoop(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    void UnaryOperationNode<ValueType>::Define(value::FunctionDeclaration& fn)
     {
-        // Loop version broken
-        auto count = input.Size();
-        emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
-        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
-
-        function.For(count, [pInput, pResult, this](emitters::IRFunctionEmitter& function, emitters::LLVMValue i) {
-            emitters::LLVMValue inputValue = function.ValueAt(pInput, i);
-            emitters::IRLocalScalar pOpResult = CompileOperator<ValueType>({ function, inputValue }, _operation);
-            function.SetValueAt(pResult, i, pOpResult.value);
+        (void)fn.Define([this](value::Vector data, value::Vector result) {
+            DoUnaryOp(data, result, _operation);
         });
-    }
-
-    template <typename ValueType>
-    void UnaryOperationNode<ValueType>::CompileExpanded(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
-    {
-        emitters::LLVMValue pResult = compiler.EnsurePortEmitted(output);
-
-        for (size_t i = 0; i < input.Size(); ++i)
-        {
-            emitters::LLVMValue inputValue = compiler.LoadPortElementVariable(input.GetInputElement(i));
-            emitters::IRLocalScalar pOpResult = CompileOperator<ValueType>({ function, inputValue }, _operation);
-            function.SetValueAt(pResult, function.Literal((int)i), pOpResult.value);
-        }
     }
 
     template <typename ValueType>

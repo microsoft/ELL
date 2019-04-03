@@ -231,6 +231,9 @@ namespace nodes
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+        /// <summary> Get the type of binary operation this node will perform </summary>
+        OperationType GetOperation() const { return _operation; }
+
     protected:
         using BroadcastOperationNode<ValueType, FunctionType>::GetOutput;
         using BroadcastOperationNode<ValueType, FunctionType>::GetFunction;

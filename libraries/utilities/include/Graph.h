@@ -38,8 +38,9 @@ namespace utilities
         /// <summary> This method is how you add links to the graph. </summary>
         /// <param name="source"> The node on the source end the link. </param>
         /// <param name="target"> The node on the target end the link. </param>
+        /// <param name="label"> An optional link label. </param>
         /// <param name="category"> An optional category. </param>
-        GraphLink& GetOrCreateLink(GraphNode& source, GraphNode& target, const std::string& category);
+        GraphLink& GetOrCreateLink(GraphNode& source, GraphNode& target, const std::string& label, const std::string& category);
 
         /// <summary> This method is how you find a node by it's id. </summary>
         /// <returns> The node with given id or nullptr if node is not defined in this graph. </returns>
@@ -119,7 +120,7 @@ namespace utilities
     private:
         friend class Graph;
         /// <summary> Create a new GraphLink - see Graph::GetOrCreateLink</summary>
-        GraphLink(GraphNode& source, GraphNode& target, std::string category);
+        GraphLink(GraphNode& source, GraphNode& target, std::string label, std::string category);
 
     public:
         GraphLink();
@@ -133,10 +134,13 @@ namespace utilities
         GraphNode& GetTarget() { return _target; }
         /// <summary> Get the optional Category defined on this link</summary>
         std::string GetCategory() { return _category; }
+        /// <summary> Get the optional Label defined on this link</summary>
+        std::string GetLabel() { return _label; }
 
     private:
         GraphNode _source;
         GraphNode _target;
+        std::string _label;
         std::string _category;
     };
 

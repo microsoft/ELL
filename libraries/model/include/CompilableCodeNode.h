@@ -31,13 +31,19 @@ namespace model
     protected:
         CompilableCodeNode(std::string name, const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
+        /// <summary> This is where you implement your code node function </summary>
         virtual void Define(value::FunctionDeclaration& fn) = 0;
 
+        /// <summary> You can optionally also define a function that will be called to reset any node state.
+        /// For example this method could clear the value of one or more StaticAllocated variables defined by the
+        /// Define method above. </summary>
         virtual void DefineReset(value::FunctionDeclaration& fn) {}
 
-    private:
-        std::string GetRuntimeTypeName() const final;
+        /// <summary> Return a name to be used in serialized model.  You shouldn't need to override this method
+        /// unless you want to return a name that is backwards compatible with old node names </summary>
+        std::string GetRuntimeTypeName() const override;
 
+    private:
         std::string GetCompiledFunctionName() const final;
 
         void Reset() final;

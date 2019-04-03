@@ -47,23 +47,106 @@ GraphNode& Graph::GetOrCreateNode(const std::string& id, const std::string& labe
     }
     return _nodes[id];
 }
-GraphLink& Graph::GetOrCreateLink(GraphNode& source, GraphNode& target, const std::string& category)
+GraphLink& Graph::GetOrCreateLink(GraphNode& source, GraphNode& target, const std::string& label, const std::string& category)
 {
     std::string key = source.GetId() + "->" + target.GetId();
     if (_links.find(key) == _links.end())
     {
-        GraphLink link{ source, target, category };
+        GraphLink link{ source, target, label, category };
         _links[key] = link;
     }
     return _links[key];
 }
+
+bool ValidEntity(std::string e)
+{
+    size_t s = e.size();
+    if (s == 0)
+    {
+        return false;
+    }
+    if (e[0] == '#')
+    {
+        // numeric entity
+        if (s == 1)
+        {
+            return false;
+        }
+        else if (e[1] == 'x')
+        {
+            // hex entity
+            for (size_t i = 2; i < s; i++)
+            {
+                char c = e[i];
+                if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' || c <= 'f')))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        else
+        {
+            // remainder must be digits
+            for (size_t i = 1; i < s; i++)
+            {
+                char c = e[i];
+                if (c < '0' || c > '9')
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+    else
+    {
+        // named entity
+        return true;
+    }
+}
+
 std::string Graph::EscapeAttribute(const std::string& value)
 {
-    std::string result(value);
-    ReplaceAll(result, "&", "&amp;");
-    ReplaceAll(result, "<", "&lt;");
-    ReplaceAll(result, ">", "&gt;");
-    ReplaceAll(result, "'", "&apos;");
+    std::string result;
+    for (size_t i = 0, n = value.size(); i < n; ++i)
+    {
+        char c = value[i];
+        switch (c)
+        {
+        case '&':
+            for (size_t j = i + 1; j < n; j++)
+            {
+                char d = value[j];
+                if (d == ';' || d == '&' || d == ' ' || d == '\t' || d == '\n' || d == '\r')
+                {
+                    // see if this is a valid "entity" already.
+                    if (ValidEntity(value.substr(i + 1, j - i - 1)))
+                    {
+                        result.push_back(c);
+                    }
+                    else
+                    {
+                        result += "&amp;";
+                    }
+                    break;
+                }
+            }
+            break;
+        case '<':
+            result += "&lt;";
+            break;
+        case '>':
+            result += "&gt;";
+            break;
+        case '\'':
+            result += "&apos;";
+            break;
+        default:
+            result.push_back(c);
+            break;
+        }
+    }
     return result;
 }
 
@@ -100,7 +183,12 @@ void Graph::SaveDot(std::ostream& fout)
     for (auto ptr = _links.begin(), end = _links.end(); ptr != end; ptr++)
     {
         GraphLink link = ptr->second;
-        fout << ValidDotIdentifier(link.GetSource().GetId()) << " -> " << ValidDotIdentifier(link.GetTarget().GetId()) << ";\n";
+        fout << ValidDotIdentifier(link.GetSource().GetId()) << " -> " << ValidDotIdentifier(link.GetTarget().GetId());
+        if (!link.GetLabel().empty())
+        {
+            fout << " [ label=\"" << EscapeAttribute(link.GetLabel()) << "\" ]";
+        }
+        fout << ";\n";
     }
 
     fout << "}";
@@ -132,7 +220,11 @@ void Graph::SaveDgml(std::ostream& fout)
     {
         GraphLink& link = ptr->second;
         fout << "    <Link Source='" << EscapeAttribute(link.GetSource().GetId()) << "' Target='" << EscapeAttribute(link.GetTarget().GetId()) << "'";
-        if (link.GetCategory().size() > 0)
+        if (!link.GetLabel().empty())
+        {
+            fout << " Label='" << EscapeAttribute(link.GetLabel()) << "'";
+        }
+        if (!link.GetCategory().empty())
         {
             fout << " Category='" << EscapeAttribute(link.GetCategory()) << "'";
         }
@@ -248,9 +340,10 @@ GraphProperty::GraphProperty(std::string id, std::string label, std::string desc
     _dataType = dataType;
 }
 
-GraphLink::GraphLink(GraphNode& source, GraphNode& target, std::string category) :
+GraphLink::GraphLink(GraphNode& source, GraphNode& target, std::string label, std::string category) :
     _source(source),
     _target(target),
+    _label(label),
     _category(category)
 {
 }
@@ -258,6 +351,7 @@ GraphLink::GraphLink(GraphNode& source, GraphNode& target, std::string category)
 GraphLink::GraphLink(const GraphLink& other) :
     _source(other._source),
     _target(other._target),
+    _label(other._label),
     _category(other._category)
 {
 }
@@ -266,6 +360,7 @@ GraphLink& GraphLink::operator=(GraphLink& other)
 {
     this->_source = other.GetSource();
     this->_target = other.GetTarget();
+    this->_label = other.GetLabel();
     this->_category = other.GetCategory();
     return *this;
 }

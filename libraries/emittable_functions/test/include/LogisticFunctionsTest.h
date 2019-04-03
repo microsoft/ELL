@@ -1,14 +1,23 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     VoiceActivityDetectorTest.h (dsp)
-//  Authors:  Chris Lovett
+//  File:     LogisticFunctionsTest.h (emittable_functions)
+//  Authors:  Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
-#include <string>
+#include <value/include/EmitterContext.h>
 
-template <typename ValueType>
-void TestVoiceActivityDetector(const std::string& path);
+#include <memory>
+#include <vector>
+
+namespace ell
+{
+
+void TestSoftmax();
+void TestSigmoid();
+void TestHardSigmoid();
+
+} // namespace ell

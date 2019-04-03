@@ -30,6 +30,7 @@ namespace nodes
             logicalNot, // bool only
             sigmoid, // real only
             sin, // real only
+            softmax, // real only
             sqrt, // real only
             square, // real only
             tanh // real only
@@ -176,15 +177,16 @@ namespace nodes
             {
                 ADD_TO_STRING_ENTRY(UnaryOperationType, none);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, abs);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, cos);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, exp);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, hardSigmoid);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, log);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, logicalNot);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, sigmoid);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, sin);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, softmax);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, sqrt);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, square);
-                ADD_TO_STRING_ENTRY(UnaryOperationType, sin);
-                ADD_TO_STRING_ENTRY(UnaryOperationType, cos);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, tanh);
 
             default:
@@ -198,18 +200,19 @@ namespace nodes
             BEGIN_FROM_STRING;
             ADD_FROM_STRING_ENTRY(UnaryOperationType, none);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, abs);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, cos);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, exp);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, hardSigmoid);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, log);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, logicalNot);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, sigmoid);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, sin);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, softmax);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, sqrt);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, square);
-            ADD_FROM_STRING_ENTRY(UnaryOperationType, sin);
-            ADD_FROM_STRING_ENTRY(UnaryOperationType, cos);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, tanh);
 
-            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation");
+            throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown unary operation: '" + name + "'");
         }
 
         inline emitters::UnaryOperatorType ToEmitterType(UnaryOperationType t)

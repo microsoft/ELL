@@ -384,44 +384,67 @@ std::vector<std::vector<double>> GetExpectedUnaryOperationOutput(std::vector<std
     for (auto v : signal)
     {
         std::vector<double> r;
-        for (double d : v)
+        if (op == UnaryOperationType::softmax)
         {
-            switch (op)
+            size_t len = v.size();
+            r.resize(len);
+            double max = *std::max_element(v.begin(), v.end());
+            double sum = 0;
+            for (size_t i = 0; i < len; i++)
             {
-            case UnaryOperationType::abs:
-                d = std::abs(d);
-                break;
-            case UnaryOperationType::exp:
-                d = std::exp(d);
-                break;
-            case UnaryOperationType::hardSigmoid:
-                d = hardSigmoid.Compute(d);
-                break;
-            case UnaryOperationType::log:
-                d = std::log(d);
-                break;
-            case UnaryOperationType::sin:
-                d = std::sin(d);
-                break;
-            case UnaryOperationType::sigmoid:
-                d = sigmoid.Compute(d);
-                break;
-            case UnaryOperationType::square:
-                d *= d;
-                break;
-            case UnaryOperationType::cos:
-                d = std::cos(d);
-                break;
-            case UnaryOperationType::sqrt:
-                d = std::sqrt(d);
-                break;
-            case UnaryOperationType::tanh:
-                d = std::tanh(d);
-                break;
-            default:
-                break;
+                auto e = std::exp(v[i] - max);
+                r[i] = e;
+                sum += e;
             }
-            r.push_back(d);
+            for (size_t i = 0; i < len; i++)
+            {
+                r[i] /= sum;
+            }
+        }
+        else
+        {
+            for (double d : v)
+            {
+                switch (op)
+                {
+                case UnaryOperationType::abs:
+                    d = std::abs(d);
+                    break;
+                case UnaryOperationType::exp:
+                    d = std::exp(d);
+                    break;
+                case UnaryOperationType::hardSigmoid:
+                    d = hardSigmoid.Compute(d);
+                    break;
+                case UnaryOperationType::log:
+                    d = std::log(d);
+                    break;
+                case UnaryOperationType::logicalNot:
+                    d = (d == 0) ? 1 : 0;
+                    break;
+                case UnaryOperationType::sin:
+                    d = std::sin(d);
+                    break;
+                case UnaryOperationType::sigmoid:
+                    d = sigmoid.Compute(d);
+                    break;
+                case UnaryOperationType::square:
+                    d *= d;
+                    break;
+                case UnaryOperationType::cos:
+                    d = std::cos(d);
+                    break;
+                case UnaryOperationType::sqrt:
+                    d = std::sqrt(d);
+                    break;
+                case UnaryOperationType::tanh:
+                    d = std::tanh(d);
+                    break;
+                default:
+                    break;
+                }
+                r.push_back(d);
+            }
         }
         result.push_back(r);
     }
@@ -430,45 +453,45 @@ std::vector<std::vector<double>> GetExpectedUnaryOperationOutput(std::vector<std
 
 void TestCompilableUnaryOperationNode()
 {
-    std::string opnames[] = {
-        "none",
-        "abs",
-        "exp",
-        "hardSigmoid",
-        "log",
-        "logicalNot",
-        "sin",
-        "sigmoid",
-        "square",
-        "cos",
-        "sqrt",
-        "tanh",
+    using namespace std::string_literals;
+
+#define MAP_OP(op) {#op ## s, UnaryOperationType::op}
+
+    std::map<std::string, UnaryOperationType> ops{
+        MAP_OP(abs),
+        MAP_OP(exp),
+        MAP_OP(hardSigmoid),
+        MAP_OP(log),
+        MAP_OP(logicalNot),
+        MAP_OP(sin),
+        MAP_OP(sigmoid),
+        MAP_OP(softmax),
+        MAP_OP(square),
+        MAP_OP(cos),
+        MAP_OP(sqrt),
+        MAP_OP(tanh),
     };
+
+#undef MAP_OP
+
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    std::vector<UnaryOperationType> ops = { UnaryOperationType::abs,
-                                            UnaryOperationType::cos,
-                                            UnaryOperationType::exp,
-                                            UnaryOperationType::hardSigmoid,
-                                            UnaryOperationType::log,
-                                            UnaryOperationType::sigmoid,
-                                            UnaryOperationType::sin,
-                                            UnaryOperationType::sqrt,
-                                            UnaryOperationType::square,
-                                            UnaryOperationType::tanh };
-    for (auto op : ops)
+
+    for (auto& op : ops)
     {
-        auto testNode = model.AddNode<UnaryOperationNode<double>>(inputNode->output, op);
+        auto& opName = op.first;
+        auto opValue = op.second;
+        auto testNode = model.AddNode<UnaryOperationNode<double>>(inputNode->output, opValue);
         auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
 
-        std::string name = "UnaryOperationNode_" + opnames[static_cast<int>(op)];
+        std::string name = "UnaryOperationNode_" + opName;
         TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
             model::IRMapCompiler compiler;
             auto compiledMap = compiler.Compile(map);
 
             // compare output
             std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-            std::vector<std::vector<double>> expected = GetExpectedUnaryOperationOutput(signal, op);
+            std::vector<std::vector<double>> expected = GetExpectedUnaryOperationOutput(signal, opValue);
             VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
         });
     }

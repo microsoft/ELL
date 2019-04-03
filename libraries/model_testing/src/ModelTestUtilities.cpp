@@ -178,6 +178,12 @@ void PrintIR(model::IRCompiledMap& compiledMap)
     {
         compiledMap.WriteCode(std::cout, emitters::ModuleOutputFormat::ir);
     }
+    else
+    {
+        // test that we can serialize code.
+        std::ostringstream buffer;
+        compiledMap.WriteCode(buffer, emitters::ModuleOutputFormat::ir);
+    }
 }
 
 void PrintDiagnostics(emitters::IRDiagnosticHandler& handler)

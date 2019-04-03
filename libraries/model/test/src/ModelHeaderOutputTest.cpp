@@ -180,9 +180,9 @@ void TestSwigCallbackInterfaces()
     testing::ProcessTest("Testing generated python code 1", testing::IsTrue(std::string::npos != result.find("%pythoncode %{")));
     testing::ProcessTest("Testing generated python code 3", testing::IsTrue(std::string::npos != result.find("def predict(inputData")));
 
-    testing::ProcessTest("Testing shape wrappers 1", testing::IsTrue(std::string::npos != result.find("ell::api::math::TensorShape get_default_input_shape() {")));
+    testing::ProcessTest("Testing shape wrappers 1", testing::IsTrue(std::string::npos != result.find("TensorShape get_default_input_shape() {")));
     testing::ProcessTest("Testing shape wrappers 2", testing::IsTrue(std::string::npos != result.find("TestModuleWithCallbacks_GetInputShape(0, &s);")));
-    testing::ProcessTest("Testing shape wrappers 3", testing::IsTrue(std::string::npos != result.find("ell::api::math::TensorShape get_default_output_shape() {")));
+    testing::ProcessTest("Testing shape wrappers 3", testing::IsTrue(std::string::npos != result.find("TensorShape get_default_output_shape() {")));
     testing::ProcessTest("Testing shape wrappers 4", testing::IsTrue(std::string::npos != result.find("TestModuleWithCallbacks_GetOutputShape(0, &s);")));
 
     testing::ProcessTest("Checking that all delimiters are processed", testing::IsTrue(std::string::npos == result.find("@@")));

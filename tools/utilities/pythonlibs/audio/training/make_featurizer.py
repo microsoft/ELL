@@ -13,7 +13,6 @@
 Utility for creating ELL featurizer models
 """
 import argparse
-import math
 import os
 
 import find_ell_root  # noqa: F401
@@ -70,12 +69,11 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
     if nfft:
         last_node = builder.AddFFTNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")), nfft)
     else:
-        inputSize = last_node.GetOutputPort("output").Size()
-        nfft = int(math.pow(2, math.ceil(math.log2(inputSize))))
         last_node = builder.AddFFTNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")))
 
     if not filterbank_nfft:
-        filterbank_nfft = nfft
+        # default is to just use the output size of the fft node.
+        filterbank_nfft = last_node.GetOutputPort("output").Size()
 
     if power_spec:
         fft_size = last_node.GetOutputPort("output").Size()
@@ -175,6 +173,8 @@ higher speed classifier that might be better at spotting word boundaries, at the
     arg_parser.add_argument("--filterbank_type", "-t", help="Type of filterbank (mel, linear, none)", default="mel")
     arg_parser.add_argument("--filterbank_size", "-fs", help="Number of filters to use in filterbank", type=int,
                             default=40)
+    arg_parser.add_argument("--filterbank_nfft", "-fn", help="nfft number for filterbank to use", type=int,
+                            default=None)
     arg_parser.add_argument("--nfft", type=int, help="The size of the fft (defaults to input size)", default=None)
     arg_parser.add_argument("--iir", help="Include IIR prefilter", action="store_true")
     arg_parser.add_argument("--log", help="Include a LOG node on the output", action="store_true")
@@ -187,4 +187,4 @@ higher speed classifier that might be better at spotting word boundaries, at the
 
     make_featurizer(args.output_filename, args.sample_rate, args.window_size, args.input_buffer_size,
                     args.filterbank_type, args.filterbank_size, args.nfft, args.iir, args.log, args.dct,
-                    args.power_spec, args.log_delta)
+                    args.power_spec, args.log_delta, args.filterbank_nfft)

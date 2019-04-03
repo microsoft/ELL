@@ -43,10 +43,11 @@ enum class UnaryOperationType
     logicalNot = (int)ell::nodes::UnaryOperationType::logicalNot,
     sin = (int)ell::nodes::UnaryOperationType::sin,
     sigmoid = (int)ell::nodes::UnaryOperationType::sigmoid,
+    softmax = (int)ell::nodes::UnaryOperationType::softmax,
     square = (int)ell::nodes::UnaryOperationType::square,
     cos = (int)ell::nodes::UnaryOperationType::cos,
     sqrt = (int)ell::nodes::UnaryOperationType::sqrt,
-    tanh = (int)ell::nodes::UnaryOperationType::tanh
+    tanh = (int)ell::nodes::UnaryOperationType::tanh,
 };
 
 //
@@ -57,7 +58,7 @@ enum class BinaryOperationType
     none = (int)ell::nodes::BinaryOperationType::none,
     add = (int)ell::nodes::BinaryOperationType::add,
     subtract = (int)ell::nodes::BinaryOperationType::subtract,
-    multiply = (int)ell::nodes::BinaryOperationType::multiply,
+    multiply = (int)ell::nodes::BinaryOperationType::multiply, // elementwise only
     divide = (int)ell::nodes::BinaryOperationType::divide,
     logicalAnd = (int)ell::nodes::BinaryOperationType::logicalAnd,
     logicalOr = (int)ell::nodes::BinaryOperationType::logicalOr,
@@ -83,7 +84,10 @@ public:
     Node AddConcatenationNode(Model model, const ell::api::math::TensorShape& outputShape, const std::vector<PortElements*>& inputs);
     Node AddConstantNode(Model model, std::vector<double> values, PortType type);
     Node AddConstantNode(Model model, std::vector<double> values, const ell::api::math::TensorShape& outputShape, PortType type);
+    Node AddConstantNode(Model model, std::vector<double> values, PortMemoryLayout outputMemoryLayout, PortType type);
     Node AddDCTNode(Model model, PortElements input, int numFilters);
+    Node AddMatrixMultiplyNode(Model model, PortElements input1, PortElements input2);
+    Node AddDotProductNode(Model model, PortElements input1, PortElements input2);
     Node AddNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor predictor);
     Node AddFFTNode(Model model, PortElements input, int nfft = 0);
     Node AddHammingWindowNode(Model model, PortElements input);

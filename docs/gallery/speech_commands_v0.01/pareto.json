@@ -1,7 +1,7 @@
 [
   {
-    "accuracy_test": 0.8678,
-    "accuracy_val": 0.8882665094339622,
+    "accuracy_test": 0.8936,
+    "accuracy_val": 0.8960336538461539,
     "architecture": "GRU",
     "filename": "GRU60KeywordSpotter.ell",
     "friendly_name": "Cinnamon",
@@ -10,29 +10,13 @@
     "input_size": 512,
     "num_filters": 80,
     "num_layers": 2,
-    "predict_time": 0.143698,
+    "predict_time": 0.142551,
     "reset": false,
     "sample_rate": 16000,
     "vad": true
   },
   {
-    "accuracy_test": 0.8832,
-    "accuracy_val": 0.9038915094339622,
-    "architecture": "GRU",
-    "filename": "GRU70KeywordSpotter.ell",
-    "friendly_name": "Pear",
-    "hard_sigmoid": true,
-    "hidden_size": 70,
-    "input_size": 512,
-    "num_filters": 80,
-    "num_layers": 2,
-    "predict_time": 0.167813,
-    "reset": false,
-    "sample_rate": 16000,
-    "vad": true
-  },
-  {
-    "accuracy_test": 0.8942,
+    "accuracy_test": 0.9002,
     "accuracy_val": 0.9027122641509434,
     "architecture": "GRU",
     "filename": "GRU80KeywordSpotter.ell",
@@ -90,7 +74,7 @@
     "input_size": 512,
     "num_filters": 80,
     "num_layers": 2,
-    "predict_time": 0.296821,
+    "predict_time": 0.426821,
     "reset": false,
     "sample_rate": 16000,
     "vad": true

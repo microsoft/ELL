@@ -54,34 +54,50 @@ namespace emittable_functions
 
         void Reset()
         {
-            _lastLevel = 0.1;
-            _lastTime = 0.0;
+            _lastLevel = Cast(0.1, _lastLevel.GetType());
+            _lastTime = Cast(0, _lastLevel.GetType());
             _signal = 0;
         }
 
         /// <summary> compute the next signal state given input time and power levels </summary>
         Scalar Classify(Scalar time, Scalar inputLevel)
         {
-            _lastLevel = StaticAllocate("lastLevel", 0.1);
-            _lastTime = StaticAllocate("lastTime", 0.0);
+            auto dataType = inputLevel.GetType();
+            if (dataType == ValueType::Double)
+            {
+                _lastLevel = StaticAllocate("lastLevel", 0.1);
+                _lastTime = StaticAllocate("lastTime", 0.0);
+            }
+            else
+            {
+                _lastLevel = StaticAllocate("lastLevel", 0.1f);
+                _lastTime = StaticAllocate("lastTime", 0.0f);
+            }
             _signal = StaticAllocate("signal", 0);
 
-            Scalar level = Cast<double>(inputLevel);
+            Scalar level = inputLevel;
             Scalar timeDelta = time - _lastTime;
             Scalar levelDelta = level - _lastLevel;
+            Scalar tauDown = Cast(_tauDown, dataType);
+            Scalar tauUp = Cast(_tauUp, dataType);
+            Scalar gainAtt = Cast(_gainAtt, dataType);
+            Scalar thresholdUp = Cast(_thresholdUp, dataType);
+            Scalar levelThreshold = Cast(_levelThreshold, dataType);
+            Scalar thresholdDown = Cast(_thresholdDown, dataType);
+            Scalar largeInput = Cast(_largeInput, dataType);
 
             If(level < _lastLevel,
                [&] {
-                   _lastLevel = _lastLevel + timeDelta / _tauDown * levelDelta;
+                   _lastLevel = _lastLevel + timeDelta / tauDown * levelDelta;
 
                    If(_lastLevel < level,
                       [&] {
                           _lastLevel = level;
                       });
                })
-                .ElseIf(level > _largeInput * _lastLevel,
+                .ElseIf(level > largeInput * _lastLevel,
                         [&] {
-                            _lastLevel = _lastLevel + _gainAtt * timeDelta / _tauUp * levelDelta;
+                            _lastLevel = _lastLevel + gainAtt * timeDelta / tauUp * levelDelta;
 
                             If(_lastLevel > level,
                                [&] {
@@ -89,7 +105,7 @@ namespace emittable_functions
                                });
                         })
                 .Else([&] {
-                    _lastLevel = _lastLevel + timeDelta / _tauUp * levelDelta;
+                    _lastLevel = _lastLevel + timeDelta / tauUp * levelDelta;
 
                     If(_lastLevel > level,
                        [&] {
@@ -97,15 +113,15 @@ namespace emittable_functions
                        });
                 });
 
-            // bugblug: need && operator
-            If(level > (_thresholdUp * _lastLevel),
+            // bugbug: need && operator
+            If(level > (thresholdUp * _lastLevel),
                [&] {
-                   If(level > _levelThreshold, [&] {
+                   If(level > levelThreshold, [&] {
                        _signal = 1;
                    });
                });
 
-            If(level < (_thresholdDown * _lastLevel),
+            If(level < (thresholdDown * _lastLevel),
                [&] {
                    _signal = 0;
                });
@@ -289,16 +305,16 @@ namespace emittable_functions
 
         _impl->_time = StaticAllocate("time", int64_t{ 0 });
 
-        Vector weights = GetWeights();
-        Scalar windowSize = _impl->_windowSize;
-        Scalar frameDuration = _impl->_frameDuration;
-
         auto dataType = data.GetType();
+        Vector weights = GetWeights();
+        Scalar windowSize = Cast(_impl->_windowSize, dataType);
+        Scalar frameDuration = Cast(_impl->_frameDuration, dataType);
+
         auto level = Dot(data, Cast(weights, dataType));
 
-        level /= Cast(windowSize, dataType);
+        level /= windowSize;
 
-        Scalar castedTime = Cast(_impl->_time, frameDuration.GetType());
+        Scalar castedTime = Cast(_impl->_time, dataType);
         Scalar t = castedTime * frameDuration;
         ++_impl->_time;
 

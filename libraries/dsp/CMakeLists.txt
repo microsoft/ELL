@@ -12,8 +12,7 @@ set(src
   src/Convolution.cpp
   src/FilterBank.cpp
   src/SimpleConvolution.cpp
-  src/UnrolledConvolution.cpp
-  src/VoiceActivityDetector.cpp
+  src/UnrolledConvolution.cpp  
   src/WinogradConvolution.cpp
 )
 
@@ -23,7 +22,6 @@ set(include
   include/FilterBank.h
   include/IIRFilter.h
   include/SimpleConvolution.h
-  include/VoiceActivityDetector.h
   include/UnrolledConvolution.h
   include/WindowFunctions.h
   include/WinogradConvolution.h
@@ -61,7 +59,6 @@ set(test_src
   test/src/FFTTest.cpp
   test/src/FilterTest.cpp
   test/src/MelTest.cpp
-  test/src/VoiceActivityDetectorTest.cpp
   test/src/WindowTest.cpp
 )
 
@@ -75,7 +72,6 @@ set(test_include
   test/include/FFTTest.h
   test/include/FilterTest.h
   test/include/MelTest.h
-  test/include/VoiceActivityDetectorTest.h
   test/include/WindowTest.h
 )
 

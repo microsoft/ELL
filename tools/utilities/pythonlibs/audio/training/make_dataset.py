@@ -149,7 +149,7 @@ def _get_dataset(entry_map, categories, transform, sample_rate, window_size, shi
 
 
 def make_dataset(list_file, categories_path, featurizer_path, sample_rate, window_size, shift, auto_scale=True,
-                 use_cache=True, noise_path=None, max_noise_ratio=0.1, noise_selection=0.1):
+                 noise_path=None, max_noise_ratio=0.1, noise_selection=0.1, use_cache=False):
 
     """
     Create a dataset given the input list file, a featurizer, the desired .wav sample rate,
@@ -159,7 +159,7 @@ def make_dataset(list_file, categories_path, featurizer_path, sample_rate, windo
     dataset_name = os.path.basename(list_file)
     dataset_path = os.path.splitext(dataset_name)[0] + ".npz"
     if use_cache and os.path.isfile(dataset_path):
-        return
+      return
 
     transform = featurizer.AudioTransform(featurizer_path, 0)
 
@@ -195,15 +195,15 @@ if __name__ == "__main__":
     arg_parser.add_argument("--auto_scale", help="Whether to scale audio input to range [-1, 1] (default: false)",
                             action="store_true")
     arg_parser.add_argument("--noise_path", help="Path to noise folder, if provided noise from this folder will be "
-                            "mixed with some of the audio files in list_file", default="GRU")
+                            "mixed with some of the audio files in list_file", default=None)
     arg_parser.add_argument("--max_noise_ratio", type=float, default=0.1,
                             help="Specifies the ratio of noise to audio (default 0.1)")
     arg_parser.add_argument("--noise_selection", type=float, default=0.1,
                             help="Ratio of audio files to mix with noise (default 0.1)")
     args = arg_parser.parse_args()
 
-    if args.noise and not os.path.isdir(args.noise):
-        print("Noise dir '{}' not found".format(args.noise))
+    if args.noise_path and not os.path.isdir(args.noise_path):
+        print("Noise dir '{}' not found".format(args.noise_path))
         sys.exit(1)
 
     make_dataset(args.list_file, args.categories, args.featurizer, args.sample_rate, args.window_size, args.shift,

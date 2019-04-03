@@ -244,17 +244,17 @@ void TestProtoNNPredictorMap()
 
         inputNode->SetInput(input);
         auto computeOutput = model.ComputeOutput(outputNode->output);
-        testing::ProcessTest("one hot indices are incorrect for computed and actual label",
+        testing::ProcessTest("ProtoNN: one hot indices are incorrect for computed and actual label",
                              IsEqual(std::max_element(label.begin(), label.end()) - label.begin(),
                                      std::max_element(computeOutput.begin(), computeOutput.end()) - computeOutput.begin()));
 
         map.SetInputValue(0, input);
         auto refinedOutput = map.ComputeOutput<double>(0);
-        testing::ProcessTest("computed and refined output vectors don't match", IsEqual(computeOutput, refinedOutput, 1e-5));
+        testing::ProcessTest("ProtoNN: computed and refined output vectors don't match", IsEqual(computeOutput, refinedOutput, 1e-5));
 
         compiledMap.SetInputValue(0, input);
         auto compiledOutput = compiledMap.ComputeOutput<double>(0);
-        testing::ProcessTest("refined and compiled output vectors don't match", IsEqual(refinedOutput, compiledOutput, 1e-5));
+        testing::ProcessTest("ProtoNN: refined and compiled output vectors don't match", IsEqual(refinedOutput, compiledOutput, 1e-5));
     }
 }
 

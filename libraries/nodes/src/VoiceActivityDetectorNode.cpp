@@ -20,7 +20,7 @@ namespace nodes
     VoiceActivityDetectorNode::VoiceActivityDetectorNode() :
         CompilableCodeNode("VoiceActivityDetector", { &_input }, { &_output }),
         _input(this, {}, defaultInputPortName),
-        _output(this, defaultOutputPortName, ell::model::Port::PortType::integer, utilities::ScalarLayout)
+        _output(this, defaultOutputPortName, ell::model::Port::PortType::integer, 1)
     {
     }
 
@@ -36,15 +36,15 @@ namespace nodes
                                                          double levelThreshold) :
         CompilableCodeNode("VoiceActivityDetector", { &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
-        _output(this, defaultOutputPortName, ell::model::Port::PortType::integer, utilities::ScalarLayout),
+        _output(this, defaultOutputPortName, ell::model::Port::PortType::integer, 1),
         _vad(sampleRate, input.Size(), frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold)
     {
     }
 
     void VoiceActivityDetectorNode::Define(value::FunctionDeclaration& fn)
     {
-        (void)fn.Define([this](value::Vector data, value::Scalar result) {
-            result = _vad.Process(data);
+        (void)fn.Define([this](value::Vector data, value::Vector output) {
+            output[0] = _vad.Process(data);
         });
     }
 
