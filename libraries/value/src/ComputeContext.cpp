@@ -672,6 +672,34 @@ namespace value
         } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
     }
 
+    void ComputeContext::ForImpl(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn)
+    {
+        if (!(start.GetValue().IsConstant() && stop.GetValue().IsConstant() && step.GetValue().IsConstant()))
+        {
+            throw InputException(InputExceptionErrors::invalidArgument, "start/stop/step values must be constant for ComputeContext");
+        }
+
+        std::visit(
+            [&](auto&& data) {
+                using Type = std::remove_pointer_t<std::decay_t<decltype(data)>>;
+                if constexpr (IsOneOf<Type, Undefined, Emittable, Boolean>)
+                {
+                    // no op
+                }
+                else
+                {
+                    auto startNum = start.Get<Type>();
+                    auto stopNum = stop.Get<Type>();
+                    auto stepNum = step.Get<Type>();
+                    for (; startNum < stopNum; startNum += stepNum)
+                    {
+                        fn(startNum);
+                    }
+                }
+            },
+            start.GetValue().GetUnderlyingData());
+    }
+
     Value ComputeContext::UnaryOperationImpl(ValueUnaryOperation op, Value destination)
     {
         throw LogicException(LogicExceptionErrors::notImplemented);
@@ -698,78 +726,80 @@ namespace value
             throw InputException(InputExceptionErrors::sizeMismatch);
         }
 
-        std::visit(VariantVisitor{ [](Undefined) {},
-                                   [](Emittable) {},
-                                   [](Boolean*) {},
-                                   [&destination, &source, op](auto&& destinationData) {
-                                       using DestinationDataType =
-                                           std::remove_pointer_t<std::decay_t<decltype(destinationData)>>;
+        std::visit(
+            VariantVisitor{
+                [](Undefined) {},
+                [](Emittable) {},
+                [](Boolean*) {},
+                [&destination, &source, op](auto&& destinationData) {
+                    using DestinationDataType =
+                        std::remove_pointer_t<std::decay_t<decltype(destinationData)>>;
 
-                                       std::function<DestinationDataType(DestinationDataType, DestinationDataType)>
-                                           opFn;
-                                       switch (op)
-                                       {
-                                       case ValueBinaryOperation::add:
-                                           opFn = [](auto dst, auto src) { return dst + src; };
-                                           break;
-                                       case ValueBinaryOperation::subtract:
-                                           opFn = [](auto dst, auto src) { return dst - src; };
-                                           break;
-                                       case ValueBinaryOperation::multiply:
-                                           opFn = [](auto dst, auto src) { return dst * src; };
-                                           break;
-                                       case ValueBinaryOperation::divide:
-                                           opFn = [](auto dst, auto src) { return dst / src; };
-                                           break;
+                    std::function<DestinationDataType(DestinationDataType, DestinationDataType)>
+                        opFn;
+                    switch (op)
+                    {
+                    case ValueBinaryOperation::add:
+                        opFn = [](auto dst, auto src) { return dst + src; };
+                        break;
+                    case ValueBinaryOperation::subtract:
+                        opFn = [](auto dst, auto src) { return dst - src; };
+                        break;
+                    case ValueBinaryOperation::multiply:
+                        opFn = [](auto dst, auto src) { return dst * src; };
+                        break;
+                    case ValueBinaryOperation::divide:
+                        opFn = [](auto dst, auto src) { return dst / src; };
+                        break;
 
-                                       default:
-                                           if constexpr (std::is_integral_v<DestinationDataType>)
-                                           {
-                                               switch (op)
-                                               {
-                                               case ValueBinaryOperation::modulus:
-                                                   opFn = [](auto dst, auto src) { return dst % src; };
-                                                   break;
-                                               default:
-                                                   throw LogicException(LogicExceptionErrors::illegalState);
-                                               }
-                                           }
-                                           else
-                                           {
-                                               throw LogicException(LogicExceptionErrors::illegalState);
-                                           }
-                                       }
+                    default:
+                        if constexpr (std::is_integral_v<DestinationDataType>)
+                        {
+                            switch (op)
+                            {
+                            case ValueBinaryOperation::modulus:
+                                opFn = [](auto dst, auto src) { return dst % src; };
+                                break;
+                            default:
+                                throw LogicException(LogicExceptionErrors::illegalState);
+                            }
+                        }
+                        else
+                        {
+                            throw LogicException(LogicExceptionErrors::illegalState);
+                        }
+                    }
 
-                                       auto& sourceData = std::get<DestinationDataType*>(source.GetUnderlyingData());
-                                       if (source.GetLayout().IsContiguous() && destination.GetLayout().IsContiguous())
-                                       {
-                                           auto numElements = destination.GetLayout().NumElements();
-                                           std::transform(destinationData,
-                                                          destinationData + numElements,
-                                                          sourceData,
-                                                          destinationData,
-                                                          opFn);
-                                       }
-                                       else
-                                       {
-                                           auto& sourceLayout = source.GetLayout();
-                                           auto maxCoordinate = sourceLayout.GetActiveSize().ToVector();
-                                           decltype(maxCoordinate) coordinate(maxCoordinate.size());
+                    auto& sourceData = std::get<DestinationDataType*>(source.GetUnderlyingData());
+                    if (source.GetLayout().IsContiguous() && destination.GetLayout().IsContiguous())
+                    {
+                        auto numElements = destination.GetLayout().NumElements();
+                        std::transform(destinationData,
+                                       destinationData + numElements,
+                                       sourceData,
+                                       destinationData,
+                                       opFn);
+                    }
+                    else
+                    {
+                        auto& sourceLayout = source.GetLayout();
+                        auto maxCoordinate = sourceLayout.GetActiveSize().ToVector();
+                        decltype(maxCoordinate) coordinate(maxCoordinate.size());
 
-                                           do
-                                           {
-                                               auto logicalCoordinates = sourceLayout.GetLogicalCoordinates(coordinate);
-                                               auto sourceOffset =
-                                                   sourceLayout.GetLogicalEntryOffset(logicalCoordinates);
-                                               auto destinationOffset =
-                                                   destination.GetLayout().GetLogicalEntryOffset(logicalCoordinates);
-                                               *(destinationData + destinationOffset) =
-                                                   opFn(*(destinationData + destinationOffset),
-                                                        *(sourceData + sourceOffset));
-                                           } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
-                                       }
-                                   } },
-                   destination.GetUnderlyingData());
+                        do
+                        {
+                            auto logicalCoordinates = sourceLayout.GetLogicalCoordinates(coordinate);
+                            auto sourceOffset =
+                                sourceLayout.GetLogicalEntryOffset(logicalCoordinates);
+                            auto destinationOffset =
+                                destination.GetLayout().GetLogicalEntryOffset(logicalCoordinates);
+                            *(destinationData + destinationOffset) =
+                                opFn(*(destinationData + destinationOffset),
+                                     *(sourceData + sourceOffset));
+                        } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+                    }
+                } },
+            destination.GetUnderlyingData());
 
         return destination;
     }
@@ -782,73 +812,75 @@ namespace value
         }
 
         Value returnValue =
-            std::visit(VariantVisitor{ [](Undefined) -> Boolean {
-                                          throw LogicException(LogicExceptionErrors::illegalState);
-                                      },
-                                       [](Emittable) -> Boolean {
-                                           throw LogicException(LogicExceptionErrors::illegalState);
-                                       },
-                                       [op,
-                                        &source2Data = source2.GetUnderlyingData(),
-                                        &source1Layout = source1.GetLayout(),
-                                        &source2Layout = source2.GetLayout()](auto&& source1) -> Boolean {
-                                           using Type = std::remove_pointer_t<std::decay_t<decltype(source1)>>;
+            std::visit(
+                VariantVisitor{
+                    [](Undefined) -> Boolean {
+                        throw LogicException(LogicExceptionErrors::illegalState);
+                    },
+                    [](Emittable) -> Boolean {
+                        throw LogicException(LogicExceptionErrors::illegalState);
+                    },
+                    [op,
+                     &source2Data = source2.GetUnderlyingData(),
+                     &source1Layout = source1.GetLayout(),
+                     &source2Layout = source2.GetLayout()](auto&& source1) -> Boolean {
+                        using Type = std::remove_pointer_t<std::decay_t<decltype(source1)>>;
 
-                                           std::function<bool(Type, Type)> opFn;
-                                           switch (op)
-                                           {
-                                           case ValueLogicalOperation::equality:
-                                               opFn = std::equal_to<Type>{};
-                                               break;
-                                           case ValueLogicalOperation::inequality:
-                                               opFn = std::not_equal_to<Type>{};
-                                               break;
-                                           default:
-                                               if constexpr (std::is_same_v<Boolean, Type>)
-                                               {
-                                                   throw LogicException(LogicExceptionErrors::illegalState);
-                                               }
-                                               else
-                                               {
-                                                   switch (op)
-                                                   {
-                                                   case ValueLogicalOperation::greaterthan:
-                                                       opFn = std::greater<Type>{};
-                                                       break;
-                                                   case ValueLogicalOperation::greaterthanorequal:
-                                                       opFn = std::greater_equal<Type>{};
-                                                       break;
-                                                   case ValueLogicalOperation::lessthan:
-                                                       opFn = std::less<Type>{};
-                                                       break;
-                                                   case ValueLogicalOperation::lessthanorequal:
-                                                       opFn = std::less_equal<Type>{};
-                                                       break;
-                                                   default:
-                                                       throw LogicException(LogicExceptionErrors::illegalState);
-                                                   }
-                                               }
-                                           }
+                        std::function<bool(Type, Type)> opFn;
+                        switch (op)
+                        {
+                        case ValueLogicalOperation::equality:
+                            opFn = std::equal_to<Type>{};
+                            break;
+                        case ValueLogicalOperation::inequality:
+                            opFn = std::not_equal_to<Type>{};
+                            break;
+                        default:
+                            if constexpr (std::is_same_v<Boolean, Type>)
+                            {
+                                throw LogicException(LogicExceptionErrors::illegalState);
+                            }
+                            else
+                            {
+                                switch (op)
+                                {
+                                case ValueLogicalOperation::greaterthan:
+                                    opFn = std::greater<Type>{};
+                                    break;
+                                case ValueLogicalOperation::greaterthanorequal:
+                                    opFn = std::greater_equal<Type>{};
+                                    break;
+                                case ValueLogicalOperation::lessthan:
+                                    opFn = std::less<Type>{};
+                                    break;
+                                case ValueLogicalOperation::lessthanorequal:
+                                    opFn = std::less_equal<Type>{};
+                                    break;
+                                default:
+                                    throw LogicException(LogicExceptionErrors::illegalState);
+                                }
+                            }
+                        }
 
-                                           auto maxCoordinate = source1Layout.GetActiveSize().ToVector();
-                                           decltype(maxCoordinate) coordinate(maxCoordinate.size());
+                        auto maxCoordinate = source1Layout.GetActiveSize().ToVector();
+                        decltype(maxCoordinate) coordinate(maxCoordinate.size());
 
-                                           bool b = true;
-                                           auto source2 = std::get<Type*>(source2Data);
-                                           do
-                                           {
-                                               auto logicalCoordinates =
-                                                   source1Layout.GetLogicalCoordinates(coordinate);
-                                               auto source1Offset =
-                                                   source1Layout.GetLogicalEntryOffset(logicalCoordinates);
-                                               auto source2Offset =
-                                                   source2Layout.GetLogicalEntryOffset(logicalCoordinates);
-                                               b &= opFn(source1[source1Offset], source2[source2Offset]);
-                                           } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+                        bool b = true;
+                        auto source2 = std::get<Type*>(source2Data);
+                        do
+                        {
+                            auto logicalCoordinates =
+                                source1Layout.GetLogicalCoordinates(coordinate);
+                            auto source1Offset =
+                                source1Layout.GetLogicalEntryOffset(logicalCoordinates);
+                            auto source2Offset =
+                                source2Layout.GetLogicalEntryOffset(logicalCoordinates);
+                            b &= opFn(source1[source1Offset], source2[source2Offset]);
+                        } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
 
-                                           return b;
-                                       } },
-                       source1.GetUnderlyingData());
+                        return b;
+                    } },
+                source1.GetUnderlyingData());
 
         return returnValue;
     }
@@ -862,43 +894,45 @@ namespace value
 
         ConstantData castedData;
 
-        std::visit(VariantVisitor{ [](Undefined) {},
-                                   [](Emittable) {},
-                                   [&castedData, destType, &value](auto&& data) {
-                                       auto ptrBegin = data;
-                                       auto ptrEnd = data + value.GetLayout().GetMemorySize();
+        std::visit(
+            VariantVisitor{
+                [](Undefined) {},
+                [](Emittable) {},
+                [&castedData, destType, &value](auto&& data) {
+                    auto ptrBegin = data;
+                    auto ptrEnd = data + value.GetLayout().GetMemorySize();
 
-                                       switch (destType)
-                                       {
-                                       case ValueType::Boolean:
-                                           castedData = std::vector<Boolean>(ptrBegin, ptrEnd);
-                                           break;
-                                       case ValueType::Char8:
-                                           castedData = std::vector<char>(ptrBegin, ptrEnd);
-                                           break;
-                                       case ValueType::Byte:
-                                           castedData = std::vector<uint8_t>(ptrBegin, ptrEnd);
-                                           break;
-                                       case ValueType::Int16:
-                                           castedData = std::vector<int16_t>(ptrBegin, ptrEnd);
-                                           break;
-                                       case ValueType::Int32:
-                                           castedData = std::vector<int32_t>(ptrBegin, ptrEnd);
-                                           break;
-                                       case ValueType::Int64:
-                                           castedData = std::vector<int64_t>(ptrBegin, ptrEnd);
-                                           break;
-                                       case ValueType::Float:
-                                           castedData = std::vector<float>(ptrBegin, ptrEnd);
-                                           break;
-                                       case ValueType::Double:
-                                           castedData = std::vector<double>(ptrBegin, ptrEnd);
-                                           break;
-                                       default:
-                                           throw LogicException(LogicExceptionErrors::notImplemented);
-                                       }
-                                   } },
-                   value.GetUnderlyingData());
+                    switch (destType)
+                    {
+                    case ValueType::Boolean:
+                        castedData = std::vector<Boolean>(ptrBegin, ptrEnd);
+                        break;
+                    case ValueType::Char8:
+                        castedData = std::vector<char>(ptrBegin, ptrEnd);
+                        break;
+                    case ValueType::Byte:
+                        castedData = std::vector<uint8_t>(ptrBegin, ptrEnd);
+                        break;
+                    case ValueType::Int16:
+                        castedData = std::vector<int16_t>(ptrBegin, ptrEnd);
+                        break;
+                    case ValueType::Int32:
+                        castedData = std::vector<int32_t>(ptrBegin, ptrEnd);
+                        break;
+                    case ValueType::Int64:
+                        castedData = std::vector<int64_t>(ptrBegin, ptrEnd);
+                        break;
+                    case ValueType::Float:
+                        castedData = std::vector<float>(ptrBegin, ptrEnd);
+                        break;
+                    case ValueType::Double:
+                        castedData = std::vector<double>(ptrBegin, ptrEnd);
+                        break;
+                    default:
+                        throw LogicException(LogicExceptionErrors::notImplemented);
+                    }
+                } },
+            value.GetUnderlyingData());
 
         Value castedValue = StoreConstantData(std::move(castedData));
         castedValue.SetLayout(value.GetLayout());
@@ -977,26 +1011,26 @@ namespace value
 
     void ComputeContext::DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const
     {
-        std::visit([&tag, &stream, &value](auto&& data)
-        {
-            using Type = std::decay_t<decltype(data)>;
-            if constexpr (utilities::IsOneOf<Type, Emittable, Undefined>)
-            {
-                return;
-            }
-            else
-            {
-                using DataTypeTemp = std::remove_pointer_t<Type>;
-                using DataType = std::conditional_t<std::is_same_v<DataTypeTemp, utilities::Boolean>, bool, DataTypeTemp>;
-                stream << utilities::TypeName<DataType>::GetName() << " (" << value.GetLayout() << ")";
-                if (!tag.empty())
+        std::visit(
+            [&tag, &stream, &value](auto&& data) {
+                using Type = std::decay_t<decltype(data)>;
+                if constexpr (utilities::IsOneOf<Type, Emittable, Undefined>)
                 {
-                    stream << " [tag = " << tag << "]";
+                    return;
                 }
-                stream << "\n";
-            }
-
-        }, value.GetUnderlyingData());
+                else
+                {
+                    using DataTypeTemp = std::remove_pointer_t<Type>;
+                    using DataType = std::conditional_t<std::is_same_v<DataTypeTemp, utilities::Boolean>, bool, DataTypeTemp>;
+                    stream << utilities::TypeName<DataType>::GetName() << " (" << value.GetLayout() << ")";
+                    if (!tag.empty())
+                    {
+                        stream << " [tag = " << tag << "]";
+                    }
+                    stream << "\n";
+                }
+            },
+            value.GetUnderlyingData());
     }
 
     Value ComputeContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)

@@ -35,23 +35,23 @@ namespace emittable_functions
                                             Tensor filter,
                                             Scalar rowStride,
                                             Scalar columnStride,
-                                            value::Tensor output)
+                                            Tensor output)
     {
         // Change to For once we have emittable For for 0 to Value
-        For(signal.Slice(0, 0, Slice::All), [&](auto depth) {
+        ForRange(static_cast<int>(signal.Channels()), [&](auto depth) {
             auto slicedInputMatrix = signal.Slice(Slice::All, Slice::All, depth);
             auto slicedOutputMatrix = output.Slice(Slice::All, Slice::All, depth);
             auto slicedFilterMatrix = filter.Slice(Slice::All, Slice::All, depth);
 
-            For(output.Slice(Slice::All, 0, 0), [&](auto outRow) {
-                For(output.Slice(0, Slice::All, 0), [&](auto outColumn) {
+            ForRange(static_cast<int>(output.Rows()), [&](auto outRow) {
+                ForRange(static_cast<int>(output.Columns()), [&](auto outColumn) {
                     const auto inputRow = outRow * rowStride;
                     const auto inputColumn = outColumn * columnStride;
 
                     // Set the initial value to 0
                     slicedOutputMatrix(outRow, outColumn) = Cast(0, output.Type());
                     // Accumulate along values
-                    For(filter.Slice(Slice::All, 0, 0), [&](auto filterRow) {
+                    ForRange(static_cast<int>(filter.Rows()), [&](auto filterRow) {
                         auto filterVec = slicedFilterMatrix.Row(filterRow);
                         auto inputVec = slicedInputMatrix.Row(inputRow + filterRow).SubVector(inputColumn, filter.Columns());
 

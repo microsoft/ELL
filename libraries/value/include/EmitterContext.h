@@ -189,6 +189,13 @@ namespace value
         /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>
         void For(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn);
 
+        /// <summary> Creates a for loop beggining at `start`, ending at `stop`, and incrementing by `step` </summary>
+        /// <param name="start"> The value used to initialize the loop counter </param>
+        /// <param name="stop"> The terminal value of the loop </param>
+        /// <param name="step"> The value by which the loop counter is incremented </param>
+        /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>
+        void For(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn);
+
         /// <summary> Moves the data from one location to another </summary>
         /// <param name="source"> The source of the memory to be moved </param>
         /// <param name="destination"> The destination of the memory to be moved </param>
@@ -255,6 +262,7 @@ namespace value
         virtual Value StoreConstantDataImpl(ConstantData data) = 0;
 
         virtual void ForImpl(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn) = 0;
+        virtual void ForImpl(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn) = 0;
 
         virtual void MoveDataImpl(Value& source, Value& destination) = 0;
 
@@ -434,6 +442,10 @@ namespace value
     }
 
     EmitterContext::IfContext If(Scalar test, std::function<void()> fn);
+
+    void ForRange(Scalar end, std::function<void(Scalar)> fn);
+    void ForRange(Scalar start, Scalar end, std::function<void(Scalar)> fn);
+    void ForRange(Scalar start, Scalar end, Scalar step, std::function<void(Scalar)> fn);
 
     extern FunctionDeclaration AbsFunctionDeclaration;
     extern FunctionDeclaration CosFunctionDeclaration;

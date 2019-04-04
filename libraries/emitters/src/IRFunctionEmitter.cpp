@@ -727,6 +727,12 @@ namespace emitters
         return GetEmitter().StackAllocate(type);
     }
 
+    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type)
+    {
+        EntryBlockScope scope(*this);
+        return GetEmitter().StackAllocate(type);
+    }
+
     llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, const std::string& namePrefix)
     {
         EntryBlockScope scope(*this);

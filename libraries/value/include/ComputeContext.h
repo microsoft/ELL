@@ -49,6 +49,7 @@ namespace value
         Value StoreConstantDataImpl(ConstantData data) override;
 
         void ForImpl(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn) override;
+        void ForImpl(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn) override;
 
         void MoveDataImpl(Value& source, Value& destination) override;
 

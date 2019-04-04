@@ -30,18 +30,26 @@ namespace value
     {
         Scalar CalculateOffset(const MemoryLayout& layout, std::vector<Scalar> coordinates)
         {
-            const auto& offset = layout.GetOffset();
-            const auto& increment = layout.GetCumulativeIncrement();
-            const auto& order = layout.GetLogicalDimensionOrder();
-            const auto numDimensions = layout.NumDimensions();
-
-            Scalar result;
-            for (int index = 0; index < numDimensions; ++index)
+            if (layout == ScalarLayout)
             {
-                result += increment[index] * (coordinates[order[index]] + offset[index]);
+                assert(coordinates.empty());
+                return { 0 };
             }
+            else
+            {
+                const auto& offset = layout.GetOffset();
+                const auto& increment = layout.GetCumulativeIncrement();
+                const auto& order = layout.GetLogicalDimensionOrder();
+                const auto numDimensions = layout.NumDimensions();
 
-            return result;
+                Scalar result;
+                for (int index = 0; index < numDimensions; ++index)
+                {
+                    result += increment[index] * (coordinates[order[index]] + offset[index]);
+                }
+
+                return result;
+            }
         }
 
     } // namespace detail
@@ -128,6 +136,21 @@ namespace value
         }
 
         return ForImpl(layout, fn);
+    }
+
+    void EmitterContext::For(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn)
+    {
+        if (!(start.GetType() == stop.GetType() && start.GetType() == step.GetType()))
+        {
+            throw InputException(InputExceptionErrors::typeMismatch, "start/stop/step types must match");
+        }
+
+        if (start.GetType() == ValueType::Boolean)
+        {
+            throw InputException(InputExceptionErrors::invalidArgument, "start/stop/step must not be boolean");
+        }
+
+        return ForImpl(start, stop, step, fn);
     }
 
     void EmitterContext::MoveData(Value& source, Value& destination) { return MoveDataImpl(source, destination); }
@@ -259,12 +282,32 @@ namespace value
 
     Value Allocate(ValueType type, MemoryLayout layout) { return GetContext().Allocate(type, layout); }
 
+    Value StaticAllocate(std::string name, ValueType type, utilities::MemoryLayout layout)
+    {
+        return GetContext().StaticAllocate(name, type, layout);
+    }
+
     Value GlobalAllocate(std::string name, ValueType type, utilities::MemoryLayout layout)
     {
         return GetContext().GlobalAllocate(name, type, layout);
     }
 
     EmitterContext::IfContext If(Scalar test, std::function<void()> fn) { return GetContext().If(test, fn); }
+
+    void ForRange(Scalar end, std::function<void(Scalar)> fn)
+    {
+        ForRange(0, end, fn);
+    }
+
+    void ForRange(Scalar start, Scalar end, std::function<void(Scalar)> fn)
+    {
+        ForRange(start, end, 1, fn);
+    }
+
+    void ForRange(Scalar start, Scalar end, Scalar step, std::function<void(Scalar)> fn)
+    {
+        GetContext().For(start, end, step, fn);
+    }
 
     void DebugDump(Value value, std::string tag, std::ostream* stream)
     {

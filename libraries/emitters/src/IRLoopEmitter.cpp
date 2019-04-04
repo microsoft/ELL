@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     IRLoopEmitter.cpp (emitters)
-//  Authors:  Umesh Madan
+//  Authors:  Umesh Madan, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -47,19 +47,15 @@ namespace emitters
 
     llvm::BasicBlock* IRForLoopEmitter::Begin(int iStartAt, int iMaxValue, int stepSize)
     {
-        CreateBlocks();
-        EmitIterationVariable(VariableType::Int32, _functionEmitter.Literal(iStartAt));
-        EmitCondition(TypedComparison::lessThan, _functionEmitter.Literal(iMaxValue));
-        EmitIncrement(VariableType::Int32, _functionEmitter.Literal(stepSize));
-        return PrepareBody();
+        return Begin(_functionEmitter.Literal(iStartAt), _functionEmitter.Literal(iMaxValue), _functionEmitter.Literal(stepSize));
     }
 
     llvm::BasicBlock* IRForLoopEmitter::Begin(LLVMValue iStartAt, LLVMValue iMaxValue, LLVMValue stepSize)
     {
         CreateBlocks();
-        EmitIterationVariable(VariableType::Int32, iStartAt);
-        EmitCondition(TypedComparison::lessThan, iMaxValue);
-        EmitIncrement(VariableType::Int32, stepSize);
+        EmitIterationVariable(iStartAt);
+        EmitCondition(GetComparison(iMaxValue->getType(), BinaryPredicateType::less), iMaxValue);
+        EmitIncrement(stepSize);
         return PrepareBody();
     }
 
@@ -70,11 +66,7 @@ namespace emitters
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Repeat count must not be null");
         }
 
-        CreateBlocks();
-        EmitIterationVariable(VariableType::Int32, _functionEmitter.Literal(0));
-        EmitCondition(TypedComparison::lessThan, pRepeatCount);
-        EmitIncrement(VariableType::Int32, _functionEmitter.Literal(1));
-        return PrepareBody();
+        return Begin(_functionEmitter.Literal(0), pRepeatCount, _functionEmitter.Literal(1));
     }
 
     LLVMValue IRForLoopEmitter::LoadIterationVariable()
@@ -82,12 +74,12 @@ namespace emitters
         return _functionEmitter.Load(_pIterationVariable);
     }
 
-    void IRForLoopEmitter::EmitIterationVariable(VariableType type, LLVMValue pStartValue)
+    void IRForLoopEmitter::EmitIterationVariable(LLVMValue pStartValue)
     {
         _functionEmitter.Branch(_pInitializationBlock);
         _functionEmitter.SetCurrentBlock(_pInitializationBlock);
         {
-            _pIterationVariable = _functionEmitter.Variable(type);
+            _pIterationVariable = _functionEmitter.Variable(pStartValue->getType());
             _functionEmitter.Store(_pIterationVariable, pStartValue);
         }
     }
@@ -101,11 +93,12 @@ namespace emitters
         }
     }
 
-    void IRForLoopEmitter::EmitIncrement(VariableType type, LLVMValue pIncrementValue)
+    void IRForLoopEmitter::EmitIncrement(LLVMValue pIncrementValue)
     {
+        auto isFp = pIncrementValue->getType()->isFloatingPointTy();
         _functionEmitter.SetCurrentBlock(_pIncrementBlock);
         _functionEmitter.OperationAndUpdate(_pIterationVariable,
-                                            (type == VariableType::Double) ? TypedOperator::addFloat : TypedOperator::add,
+                                            isFp ? TypedOperator::addFloat : TypedOperator::add,
                                             pIncrementValue);
         _functionEmitter.Branch(_pConditionBlock);
     }

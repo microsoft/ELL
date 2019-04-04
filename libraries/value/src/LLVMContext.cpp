@@ -15,6 +15,8 @@
 
 #include <utilities/include/StringUtil.h>
 
+#include <numeric>
+
 #include <llvm/Support/raw_os_ostream.h>
 
 using namespace std::string_literals;
@@ -449,6 +451,24 @@ namespace value
             };
         }
 
+        void ConstantForLoop(const MemoryLayout& layout, std::function<void(const MemoryCoordinates&)> fn)
+        {
+            auto maxCoordinate = layout.GetActiveSize().ToVector();
+            decltype(maxCoordinate) coordinate(maxCoordinate.size());
+
+            do
+            {
+                fn(layout.GetLogicalCoordinates(coordinate));
+            } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+        }
+
+        void ConstantForLoop(const MemoryLayout& layout, std::function<void(int)> fn)
+        {
+            ConstantForLoop(layout, [&](const MemoryCoordinates& coordinate) {
+                fn(static_cast<int>(layout.GetLogicalEntryOffset(coordinate)));
+            });
+        }
+
     } // namespace
 
     struct LLVMContext::FunctionScope
@@ -668,14 +688,41 @@ namespace value
 
     void LLVMContext::ForImpl(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn)
     {
-        auto maxCoordinate = layout.GetActiveSize().ToVector();
-        decltype(maxCoordinate) coordinate(maxCoordinate.size());
-
-        do
+        std::vector<IRFunctionEmitter::ConstLoopRange> ranges(layout.NumDimensions());
+        for (auto index = 0u; index < ranges.size(); ++index)
         {
-            auto logicalCoordinates = layout.GetLogicalCoordinates(coordinate).ToVector();
-            fn(std::vector<Scalar>(logicalCoordinates.begin(), logicalCoordinates.end()));
-        } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+            ranges[index].begin = 0;
+            ranges[index].end = layout.GetActiveSize(index);
+        }
+
+        auto logicalOrder = layout.GetLogicalDimensionOrder();
+
+        GetFunctionEmitter().For(
+            ranges,
+            [&fn, logicalOrder](emitters::IRFunctionEmitter&, std::vector<emitters::IRLocalScalar> indices) {
+                std::vector<Scalar> logicalIndices(indices.size());
+                for (int index = 0; index < static_cast<int>(indices.size()); ++index)
+                {
+                    logicalIndices[logicalOrder[index]] = Scalar(Value(indices[index].value, ScalarLayout));
+                }
+                fn(logicalIndices);
+            });
+    }
+
+    void LLVMContext::ForImpl(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn)
+    {
+        auto startValue = EnsureEmittable(start.GetValue());
+        auto stopValue = EnsureEmittable(stop.GetValue());
+        auto stepValue = EnsureEmittable(step.GetValue());
+
+        auto& fnEmitter = GetFunctionEmitter();
+        fnEmitter.For(
+            fnEmitter.Load(ToLLVMValue(startValue)),
+            fnEmitter.Load(ToLLVMValue(stopValue)),
+            fnEmitter.Load(ToLLVMValue(stepValue)),
+            [&](IRFunctionEmitter&, IRLocalScalar iterationVariable) {
+                fn(Value{ Emittable{ iterationVariable.value }, ScalarLayout });
+            });
     }
 
     void LLVMContext::MoveDataImpl(Value& source, Value& destination)
@@ -719,18 +766,12 @@ namespace value
                     VariantVisitor{ [](Undefined) {},
                                     [](Emittable) {},
                                     [destValue, &irEmitter, &layout](auto&& data) {
-                                        auto maxCoordinate = layout.GetActiveSize().ToVector();
-                                        decltype(maxCoordinate) coordinate(maxCoordinate.size());
-
-                                        do
-                                        {
-                                            auto srcAtOffset =
-                                                irEmitter.Literal(*(data + layout.GetEntryOffset(coordinate)));
-                                            auto destOffset = irEmitter.Literal(
-                                                static_cast<int>(layout.GetEntryOffset(coordinate)));
+                                        ConstantForLoop(layout, [&](int offset) {
+                                            auto srcAtOffset = irEmitter.Literal(*(data + offset));
+                                            auto destOffset = irEmitter.Literal(offset);
                                             auto destAtOffset = irEmitter.PointerOffset(destValue, destOffset);
                                             (void)irEmitter.Store(destAtOffset, srcAtOffset);
-                                        } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+                                        });
                                     } },
                     source.GetUnderlyingData());
             }
@@ -759,18 +800,11 @@ namespace value
                 }
                 else
                 {
-                    auto maxCoordinate = layout.GetActiveSize().ToVector();
-                    decltype(maxCoordinate) coordinate(maxCoordinate.size());
-
-                    do
-                    {
-                        auto offset = irEmitter.Literal(static_cast<int>(layout.GetEntryOffset(coordinate)));
-                        auto srcAtOffset = irEmitter.PointerOffset(srcValue, offset);
-                        auto destAtOffset = irEmitter.PointerOffset(destValue, offset);
-
-                        [[maybe_unused]] auto storeInst = irEmitter.Store(destAtOffset, irEmitter.Load(srcAtOffset));
-
-                    } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+                    ForImpl(layout, [&](std::vector<Scalar> index) {
+                        auto offsetSource = source.Offset(detail::CalculateOffset(source.GetLayout(), index));
+                        auto offsetDest = destination.Offset(detail::CalculateOffset(destination.GetLayout(), index));
+                        (void)irEmitter.Store(ToLLVMValue(offsetDest), irEmitter.Load(ToLLVMValue(offsetSource)));
+                    });
                 }
             }
         }
@@ -819,7 +853,9 @@ namespace value
             destination = Allocate(source.GetBaseType(), source.GetLayout());
         }
 
-        if (!TypeCompatible(destination, source))
+        if (!TypeCompatible(destination, source) &&
+            (destination.PointerLevel() == source.PointerLevel() ||
+             destination.PointerLevel() == (1 + source.PointerLevel())))
         {
             throw InputException(InputExceptionErrors::typeMismatch);
         }
@@ -831,7 +867,7 @@ namespace value
 
         auto& fn = GetFunctionEmitter();
         std::visit(
-            [destination = EnsureEmittable(destination), op, &fn](auto&& sourceData) {
+            [this, destination = EnsureEmittable(destination), &source, op, &fn](auto&& sourceData) {
                 using SourceDataType = std::decay_t<decltype(sourceData)>;
                 if constexpr (std::is_same_v<SourceDataType, Undefined>)
                 {
@@ -883,41 +919,37 @@ namespace value
                     auto maxCoordinate = layout.GetActiveSize().ToVector();
                     decltype(maxCoordinate) coordinate(maxCoordinate.size());
 
-                    auto destValue = ToLLVMValue(destination);
-
-                    std::conditional_t<std::is_same_v<Emittable, SourceDataType>, LLVMValue, SourceDataType> srcValue =
-                        nullptr;
                     if constexpr (std::is_same_v<Emittable, SourceDataType>)
                     {
-                        srcValue = sourceData.template GetDataAs<LLVMValue>();
+                        // If the pointer levels don't match, it means the source is not a pointer (logically)
+                        // and we just need to do an assignment of the value to the value pointed to by
+                        // destintion
+                        bool scalarLLVMSource = source.PointerLevel() != destination.PointerLevel();
+                        ForImpl(layout, [&](std::vector<Scalar> index) {
+                            LLVMValue srcValue = nullptr;
+                            if (scalarLLVMSource)
+                            {
+                                srcValue = ToLLVMValue(source);
+                            }
+                            else
+                            {
+                                auto offsetSource = source.Offset(detail::CalculateOffset(source.GetLayout(), index));
+                                srcValue = fn.Load(ToLLVMValue(offsetSource));
+                            }
+                            auto offsetDest = destination.Offset(detail::CalculateOffset(destination.GetLayout(), index));
+                            auto destValue = ToLLVMValue(offsetDest);
+                            fn.Store(destValue, opFn(fn.Load(destValue), srcValue));
+                        });
                     }
                     else
                     {
-                        srcValue = sourceData;
+                        auto destValue = ToLLVMValue(destination);
+                        ConstantForLoop(layout, [&](int offset) {
+                            auto offsetLiteral = fn.Literal(offset);
+                            auto opResult = opFn(fn.ValueAt(destValue, offsetLiteral), fn.Literal(*(sourceData + offset)));
+                            fn.SetValueAt(destValue, offsetLiteral, opResult);
+                        });
                     }
-
-                    do
-                    {
-                        LLVMValue opResult = nullptr;
-                        if constexpr (std::is_same_v<Emittable, SourceDataType>)
-                        {
-                            opResult =
-                                opFn(fn.ValueAt(destValue,
-                                                fn.Literal(static_cast<int>(layout.GetEntryOffset(coordinate)))),
-                                     fn.ValueAt(srcValue,
-                                                fn.Literal(static_cast<int>(layout.GetEntryOffset(coordinate)))));
-                        }
-                        else
-                        {
-                            opResult = opFn(fn.ValueAt(destValue,
-                                                       fn.Literal(static_cast<int>(layout.GetEntryOffset(coordinate)))),
-                                            fn.Literal(*(srcValue + layout.GetEntryOffset(coordinate))));
-                        }
-
-                        fn.SetValueAt(destValue,
-                                      fn.Literal(static_cast<int>(layout.GetEntryOffset(coordinate))),
-                                      opResult);
-                    } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
                 }
             },
             source.GetUnderlyingData());
@@ -966,75 +998,54 @@ namespace value
                 [](Undefined) -> Value { throw LogicException(LogicExceptionErrors::illegalState); },
                 [this,
                  comparisonOp,
-                 &source2UnderlyingData = source2.GetUnderlyingData(),
-                 &source1Layout = source1.GetLayout(),
-                 &source2Layout = source2.GetLayout()](Emittable source1Data) -> Value {
+                 &source1,
+                 &source2](Emittable source1Data) -> Value {
                     // source1 is an Emittable type, so source2 can be constant or Emittable
-                    return std::
-                        visit(VariantVisitor{ [](Undefined) -> Value {
-                                                 throw LogicException(LogicExceptionErrors::illegalState);
-                                             },
-                                              [&, this](Emittable source2Data) -> Value {
-                                                  auto maxCoordinate = source1Layout.GetActiveSize().ToVector();
-                                                  decltype(maxCoordinate) coordinate(maxCoordinate.size());
-                                                  auto& fn = this->GetFunctionEmitter();
-                                                  auto result = fn.TrueBit();
-                                                  auto llvmOp1 = source1Data.GetDataAs<LLVMValue>();
-                                                  auto llvmOp2 = source2Data.GetDataAs<LLVMValue>();
-                                                  do
-                                                  {
-                                                      auto logicalCoordinates =
-                                                          source1Layout.GetLogicalCoordinates(coordinate);
-                                                      auto source1Offset =
-                                                          source1Layout.GetLogicalEntryOffset(logicalCoordinates);
-                                                      auto source2Offset =
-                                                          source2Layout.GetLogicalEntryOffset(logicalCoordinates);
+                    return std::visit(
+                        VariantVisitor{
+                            [](Undefined) -> Value {
+                                throw LogicException(LogicExceptionErrors::illegalState);
+                            },
+                            [&, this](Emittable source2Data) -> Value {
+                                auto& fn = this->GetFunctionEmitter();
+                                auto result = fn.TrueBit();
 
-                                                      result = fn.LogicalAnd(result,
-                                                                             fn.Comparison(comparisonOp,
-                                                                                           fn.ValueAt(llvmOp1,
-                                                                                                      source1Offset),
-                                                                                           fn.ValueAt(llvmOp2,
-                                                                                                      source2Offset)));
+                                ForImpl(source1.GetLayout(), [&](std::vector<Scalar> index) {
+                                    auto offsetSource1 = source1.Offset(detail::CalculateOffset(source1.GetLayout(), index));
+                                    auto offsetSource2 = source2.Offset(detail::CalculateOffset(source2.GetLayout(), index));
+                                    result = fn.LogicalAnd(
+                                        result,
+                                        fn.Comparison(
+                                            comparisonOp,
+                                            fn.Load(ToLLVMValue(offsetSource1)),
+                                            fn.Load(ToLLVMValue(offsetSource2))));
+                                });
 
-                                                  } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+                                return { Emittable{ result }, ScalarLayout };
+                            },
+                            [&, this](auto&& source2Data) -> Value {
+                                using Type = std::remove_pointer_t<std::decay_t<decltype(source2Data)>>;
+                                using CastType = std::conditional_t<std::is_same_v<Type, Boolean>, bool, Type>;
+                                auto& fn = this->GetFunctionEmitter();
 
-                                                  return { Emittable{ result }, ScalarLayout };
-                                              },
-                                              [&, this](auto&& source2Data) -> Value {
-                                                  using Type =
-                                                      std::remove_pointer_t<std::decay_t<decltype(source2Data)>>;
-                                                  using CastType =
-                                                      std::conditional_t<std::is_same_v<Type, Boolean>, bool, Type>;
-                                                  auto& fn = this->GetFunctionEmitter();
+                                auto result = fn.TrueBit();
+                                auto llvmOp1 = source1Data.GetDataAs<LLVMValue>();
 
-                                                  auto result = fn.TrueBit();
-                                                  auto llvmOp1 = source1Data.GetDataAs<LLVMValue>();
-                                                  auto maxCoordinate = source1Layout.GetActiveSize().ToVector();
-                                                  decltype(maxCoordinate) coordinate(maxCoordinate.size());
-                                                  do
-                                                  {
-                                                      auto logicalCoordinates =
-                                                          source1Layout.GetLogicalCoordinates(coordinate);
-                                                      auto source1Offset =
-                                                          source1Layout.GetLogicalEntryOffset(logicalCoordinates);
-                                                      auto source2Offset =
-                                                          source2Layout.GetLogicalEntryOffset(logicalCoordinates);
+                                ConstantForLoop(source1.GetLayout(), [&](const MemoryCoordinates& logicalCoordinates) {
+                                    auto source1Offset = source1.GetLayout().GetLogicalEntryOffset(logicalCoordinates);
+                                    auto source2Offset = source2.GetLayout().GetLogicalEntryOffset(logicalCoordinates);
 
-                                                      result =
-                                                          fn.LogicalAnd(result,
-                                                                        fn.Comparison(comparisonOp,
-                                                                                      fn.ValueAt(llvmOp1,
-                                                                                                 source1Offset),
-                                                                                      fn.Literal(static_cast<CastType>(
-                                                                                          source2Data
-                                                                                              [source2Offset]))));
+                                    result = fn.LogicalAnd(
+                                        result,
+                                        fn.Comparison(
+                                            comparisonOp,
+                                            fn.ValueAt(llvmOp1, source1Offset),
+                                            fn.Literal(static_cast<CastType>(source2Data[source2Offset]))));
+                                });
 
-                                                  } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
-
-                                                  return { Emittable{ result }, ScalarLayout };
-                                              } },
-                              source2UnderlyingData);
+                                return { Emittable{ result }, ScalarLayout };
+                            } },
+                        source2.GetUnderlyingData());
                 },
                 [this,
                  comparisonOp,
@@ -1049,21 +1060,17 @@ namespace value
                     auto result = fn.TrueBit();
                     auto llvmOp2 = std::get<Emittable>(source2Data).GetDataAs<LLVMValue>();
 
-                    auto maxCoordinate = source1Layout.GetActiveSize().ToVector();
-                    decltype(maxCoordinate) coordinate(maxCoordinate.size());
-                    do
-                    {
-                        auto logicalCoordinates = source1Layout.GetLogicalCoordinates(coordinate);
+                    ConstantForLoop(source1Layout, [&](const MemoryCoordinates& logicalCoordinates) {
                         auto source1Offset = source1Layout.GetLogicalEntryOffset(logicalCoordinates);
                         auto source2Offset = source2Layout.GetLogicalEntryOffset(logicalCoordinates);
 
-                        result =
-                            fn.LogicalAnd(result,
-                                          fn.Comparison(comparisonOp,
-                                                        fn.Literal(static_cast<CastType>(source1Data[source1Offset])),
-                                                        fn.ValueAt(llvmOp2, source2Offset)));
-
-                    } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+                        result = fn.LogicalAnd(
+                            result,
+                            fn.Comparison(
+                                comparisonOp,
+                                fn.Literal(static_cast<CastType>(source1Data[source1Offset])),
+                                fn.ValueAt(llvmOp2, source2Offset)));
+                    });
 
                     return { Emittable{ result }, ScalarLayout };
                 } },
@@ -1331,7 +1338,10 @@ namespace value
         return GetGlobalScopedName(GetFunctionEmitter().GetFunctionName() + "_" + name);
     }
 
-    IRFunctionEmitter& LLVMContext::GetFunctionEmitter() const { return _functionStack.top().get(); }
+    IRFunctionEmitter& LLVMContext::GetFunctionEmitter() const
+    {
+        return _functionStack.top().get();
+    }
 
     Value LLVMContext::PromoteConstantData(Value value)
     {

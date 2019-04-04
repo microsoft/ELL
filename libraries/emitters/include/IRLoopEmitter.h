@@ -85,9 +85,9 @@ namespace emitters
 
     private:
         void CreateBlocks();
-        void EmitIterationVariable(VariableType type, LLVMValue pStartValue);
+        void EmitIterationVariable(LLVMValue pStartValue);
         void EmitCondition(TypedComparison type, LLVMValue pTestValue);
-        void EmitIncrement(VariableType type, LLVMValue pIncrementValue);
+        void EmitIncrement(LLVMValue pIncrementValue);
         llvm::BasicBlock* PrepareBody();
 
         IRFunctionEmitter& _functionEmitter; // Loop written into this function

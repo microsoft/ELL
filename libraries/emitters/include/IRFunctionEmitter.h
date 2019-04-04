@@ -717,6 +717,13 @@ namespace emitters
         /// <returns> Pointer to the resulting variable. </returns>
         llvm::AllocaInst* Variable(VariableType type);
 
+        /// <summary> Emit a stack variable. </summary>
+        ///
+        /// <param name="type"> The variable type. </param>
+        ///
+        /// <returns> Pointer to the resulting variable. </returns>
+        llvm::AllocaInst* Variable(LLVMType type);
+
         /// <summary> Emit a named stack variable. </summary>
         ///
         /// <param name="type"> The variable type. </param>
