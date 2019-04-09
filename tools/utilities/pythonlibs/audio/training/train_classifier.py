@@ -84,6 +84,7 @@ class KeywordSpotter(nn.Module):
         loss_function = nn.NLLLoss()
         optimizer = optim.RMSprop(self.parameters(), lr=learning_rate, weight_decay=weight_decay)
         # optimizer = optim.Adam(model.parameters(), lr=0.0001)
+        log = []
 
         for epoch in range(num_epochs):
             self.train()
@@ -126,9 +127,11 @@ class KeywordSpotter(nn.Module):
             # Find the best prediction in each sequence and return it's accuracy
             passed, total, rate = self.evaluate(validation_data, batch_size, device)
             print("Epoch {}, Loss {}, Validation Accuracy {:.3f}".format(epoch, loss.item(), rate * 100))
+            log += [{'epoch': epoch, 'loss': loss.item(), 'accuracy': rate}]
 
         end = time.time()
         print("Trained in {:.2f} seconds".format(end - start))
+        return log
 
     def evaluate(self, test_data, batch_size, device=None):
         """
@@ -380,6 +383,7 @@ def train(epochs=30, hidden_units=128, learning_rate=1e-3, weight_decay=1e-5, ba
     else:
         print("### CUDA not available!!")
 
+    log = None
     if not evaluate_only:
         print("Loading {}...".format(training_file))
         training_data = AudioDataset(training_file, keywords)
@@ -391,7 +395,7 @@ def train(epochs=30, hidden_units=128, learning_rate=1e-3, weight_decay=1e-5, ba
                              num_layers)
         if device:
             model.cuda()  # move the processing to GPU
-        model.fit(training_data, validation_data, batch_size, epochs, learning_rate, weight_decay, device)
+        log = model.fit(training_data, validation_data, batch_size, epochs, learning_rate, weight_decay, device)
 
         passed, total, rate = model.evaluate(training_data, batch_size, device)
         print("Training accuracy = {:.3f} %".format(rate * 100))
@@ -417,7 +421,7 @@ def train(epochs=30, hidden_units=128, learning_rate=1e-3, weight_decay=1e-5, ba
     name = os.path.splitext(filename)[0] + ".onnx"
     print("saving onnx file: {}".format(name))
     model.export(name, device)
-    return rate
+    return rate, log
 
 
 if __name__ == '__main__':

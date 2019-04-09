@@ -5,6 +5,8 @@
 - Fix bugs in ReinterpretLayoutNode
 - Fix importing of DenseNet models
 - Improvements to FFT and MelFilterBank nodes so that non-power of 2 sized input buffers can be processed.
+- Fix darknet importer
+- Add shuffling of test and validation sets to audio train_classifier
 
 ## 2.4.0 
 - Initial release of the finetune utility

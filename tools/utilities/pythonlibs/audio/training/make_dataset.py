@@ -62,6 +62,7 @@ def sliding_window_frame(source, window_size, shift_amount):
     # Source is a container or generator that returns numpy vectors
     # We buffer them and return arrays of length window_size, shifted by shift_amount
     buffer = None
+    count = 0
     for new_samples in source:
         # if new_samples is a scalar, turn it into a 1-element tuple
         if np.isscalar(new_samples):
@@ -72,11 +73,12 @@ def sliding_window_frame(source, window_size, shift_amount):
             buffer = np.concatenate((buffer, new_samples))
 
         while len(buffer) >= window_size:
+            count += 1
             yield buffer[:window_size]
             buffer = buffer[shift_amount:]
 
     # return the remainder, if any, to ensure we at least return 1 full frame
-    if buffer is not None and len(buffer) < window_size and len(buffer) > window_size / 4:
+    if buffer is not None and len(buffer) < window_size and (len(buffer) > window_size / 4 or count == 0):
         shape = buffer.shape
         if len(shape) == 2:
             new_sample = np.zeros((window_size - len(buffer), shape[1]))
@@ -115,6 +117,9 @@ def get_wav_features(input_filename, transform, sample_rate, window_size, shift,
         features = np.ravel(row)
         rows_generated += 1
         yield features
+
+    if rows_generated == 0:
+        print("### no rows generated for input file: {}".format(input_filename))
 
 
 def _get_dataset(entry_map, categories, transform, sample_rate, window_size, shift, auto_scale, mixer):
