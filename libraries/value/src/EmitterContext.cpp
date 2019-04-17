@@ -9,6 +9,7 @@
 #include "EmitterContext.h"
 #include "FunctionDeclaration.h"
 #include "Scalar.h"
+#include "ScalarOperations.h"
 #include "Value.h"
 #include "Vector.h"
 
@@ -237,6 +238,7 @@ namespace value
     {
         static std::vector intrinsics = {
             std::ref(AbsFunctionDeclaration),
+            std::ref(CopySignFunctionDeclaration),
             std::ref(CosFunctionDeclaration),
             std::ref(ExpFunctionDeclaration),
             std::ref(LogFunctionDeclaration),
@@ -324,6 +326,11 @@ namespace value
         return *GetContext().Call(CosFunctionDeclaration, { s.GetValue() });
     }
 
+    Scalar CopySign(Scalar s1, Scalar s2)
+    {
+        return *GetContext().Call(CopySignFunctionDeclaration, { s1.GetValue(), s2.GetValue() });
+    }
+
     Scalar Exp(Scalar s)
     {
         return *GetContext().Call(ExpFunctionDeclaration, { s.GetValue() });
@@ -362,6 +369,11 @@ namespace value
     Scalar Tanh(Scalar s)
     {
         return *GetContext().Call(TanhFunctionDeclaration, { s.GetValue() });
+    }
+
+    Scalar Sign(Scalar s)
+    {
+        return *GetContext().Call(CopySignFunctionDeclaration, { Cast(1, s.GetType()).GetValue(), s.GetValue() });
     }
 
     Vector Abs(Vector v)

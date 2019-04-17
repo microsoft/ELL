@@ -98,6 +98,9 @@ namespace nodes
                 case UnaryOperationType::exp:
                     r = Exp(v);
                     break;
+                case UnaryOperationType::sign:
+                    r = Sign(v);
+                    break;
                 case UnaryOperationType::sin:
                     r = Sin(v);
                     break;

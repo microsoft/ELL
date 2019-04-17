@@ -10,6 +10,8 @@
 
 #include <utilities/include/Exception.h>
 
+#include <locale>
+
 namespace ell
 {
 namespace data
@@ -44,6 +46,7 @@ namespace data
 
     void GeneralizedSparseParsingIterator::ReadEntry(size_t nextIndex)
     {
+        std::locale loc;
         // check for prefix '+'
         bool firstCharacterIsPlus = false;
         if (_textLine.Peek() == '+')
@@ -95,7 +98,7 @@ namespace data
         }
 
         // case 3: the parsed integer is the value - cast it to double
-        else if (std::isspace(nextChar) != 0 || nextChar == '\0')
+        else if (std::isspace(nextChar, loc) != 0 || nextChar == '\0')
         {
             _currentIndexValue.value = static_cast<double>(integerPart);
             _textLine.AdvancePosition(stepSize);

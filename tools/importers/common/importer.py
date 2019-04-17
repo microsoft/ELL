@@ -73,6 +73,7 @@ operation_map = {
     "Reshape": ConvertReshape,
     "Softmax": ConvertSoftmax,
     "Sigmoid": ConvertSigmoid,
+    "Sign": ConvertSign,
     "Sin": ConvertSin,
     "Splice": ConvertSplice,
     "Square": ConvertSquare,

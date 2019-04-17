@@ -43,6 +43,7 @@ enum class UnaryOperationType
     logicalNot = (int)ell::nodes::UnaryOperationType::logicalNot,
     sin = (int)ell::nodes::UnaryOperationType::sin,
     sigmoid = (int)ell::nodes::UnaryOperationType::sigmoid,
+    sign = (int)ell::nodes::UnaryOperationType::sign,
     softmax = (int)ell::nodes::UnaryOperationType::softmax,
     square = (int)ell::nodes::UnaryOperationType::square,
     cos = (int)ell::nodes::UnaryOperationType::cos,

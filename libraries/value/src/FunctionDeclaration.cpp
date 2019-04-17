@@ -111,6 +111,7 @@ namespace value
 
     /*extern*/ FunctionDeclaration AbsFunctionDeclaration = DeclareFunction("Abs");
     /*extern*/ FunctionDeclaration CosFunctionDeclaration = DeclareFunction("Cos");
+    /*extern*/ FunctionDeclaration CopySignFunctionDeclaration = DeclareFunction("CopySign");
     /*extern*/ FunctionDeclaration ExpFunctionDeclaration = DeclareFunction("Exp");
     /*extern*/ FunctionDeclaration LogFunctionDeclaration = DeclareFunction("Log");
     /*extern*/ FunctionDeclaration MaxNumFunctionDeclaration = DeclareFunction("MaxNum");

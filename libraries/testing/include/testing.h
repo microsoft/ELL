@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <cmath>
 
 namespace ell
 {
@@ -65,9 +66,9 @@ namespace testing
     /// <returns> true if equal, false if not. </returns>
     template <typename T1, typename T2>
     inline std::enable_if_t<!std::is_floating_point<T1>::value && !std::is_floating_point<T2>::value, bool>
-    IsEqual(T1 t1, T2 t2)
+    IsEqual(T1 a, T2 b)
     {
-        return t1 == t2;
+        return a == b;
     }
 
     /// <summary> Checks if two floats are equal, up to a small numerical error. </summary>
@@ -84,6 +85,14 @@ namespace testing
     inline std::enable_if_t<std::is_floating_point<T1>::value && std::is_floating_point<T2>::value, bool>
     IsEqual(T1 a, T2 b, T3 tolerance = std::is_same_v<float, T3> ? 1.0e-6f : 1.0e-8)
     {
+        if (std::isnan(a))
+        {
+            return std::isnan(b);
+        }
+        if (std::isinf(a))
+        {
+            return std::isinf(b);
+        }
         return (a - b < tolerance && b - a < tolerance);
     }
 

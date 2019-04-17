@@ -320,6 +320,44 @@ namespace value
             }
         };
 
+        struct CopySignFunctionIntrinsic
+        {
+            auto operator()(std::vector<Value> args) const -> Value
+            {
+                if (args.size() != 2)
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+
+                        const auto& value1 = args[0];
+                const auto& value2 = args[1];
+                if ((value1.IsConstrained() && value1.GetLayout() != ScalarLayout) ||
+                    (value2.IsConstrained() && value2.GetLayout() != ScalarLayout))
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+                return std::visit(
+                    [](auto&& data1, auto&& data2) -> Value {
+                        using Type1 = std::decay_t<decltype(data1)>;
+                        using Type2 = std::decay_t<decltype(data2)>;
+                        using DataType1 = std::remove_pointer_t<Type1>;
+                        using DataType2 = std::remove_pointer_t<Type2>;
+
+                        if constexpr (IsOneOf<DataType1, Undefined, Emittable, Boolean> ||
+                                      IsOneOf<DataType2, Undefined, Emittable, Boolean>)
+                        {
+                            throw InputException(InputExceptionErrors::invalidArgument);
+                        }
+                        else
+                        {
+                            return Value(std::copysign(*data1, *data2));
+                        }
+                    },
+                    value1.GetUnderlyingData(),
+                    value2.GetUnderlyingData());
+            }
+        };
+
     } // namespace
 
     ComputeContext::ComputeContext(std::string moduleName) :
@@ -1045,7 +1083,8 @@ namespace value
             { PowFunctionDeclaration, PowFunctionIntrinsic{} },
             { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::sin(n); }) },
             { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::sqrt(n); }) },
-            { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::tanh(n); }) }
+            { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::tanh(n); }) },
+            { CopySignFunctionDeclaration, CopySignFunctionIntrinsic{} },
         };
 
         if (auto it = intrinsics.find(intrinsic); it != intrinsics.end())

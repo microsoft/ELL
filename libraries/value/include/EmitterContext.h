@@ -449,6 +449,7 @@ namespace value
 
     extern FunctionDeclaration AbsFunctionDeclaration;
     extern FunctionDeclaration CosFunctionDeclaration;
+    extern FunctionDeclaration CopySignFunctionDeclaration;
     extern FunctionDeclaration ExpFunctionDeclaration;
     extern FunctionDeclaration LogFunctionDeclaration;
     extern FunctionDeclaration MaxNumFunctionDeclaration;
@@ -460,6 +461,7 @@ namespace value
 
     Scalar Abs(Scalar s);
     Scalar Cos(Scalar s);
+    Scalar CopySign(Scalar s1, Scalar s2);
     Scalar Exp(Scalar s);
     Scalar Log(Scalar s);
     Scalar Max(Scalar s1, Scalar s2);
@@ -468,6 +470,7 @@ namespace value
     Scalar Sin(Scalar s);
     Scalar Sqrt(Scalar s);
     Scalar Tanh(Scalar s);
+    Scalar Sign(Scalar s);
 
     Vector Abs(Vector v);
     Vector Cos(Vector v);

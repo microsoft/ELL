@@ -400,12 +400,17 @@ namespace emitters
         return _module.GetIntrinsic(llvm::Intrinsic::sin, { argType });
     }
 
-    LLVMFunction IRRuntime::GetCosFunction(VariableType argType)
+	LLVMFunction IRRuntime::GetCosFunction(VariableType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::cos, { argType });
     }
 
-    LLVMFunction IRRuntime::GetTanhFunction(VariableType argType)
+	LLVMFunction IRRuntime::GetCopySignFunction(VariableType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::copysign, { argType });
+    }
+
+	LLVMFunction IRRuntime::GetTanhFunction(VariableType argType)
     {
         // This assumes a standard C runtime library is linked
         auto& emitter = _module.GetIREmitter();
@@ -467,6 +472,11 @@ namespace emitters
     LLVMFunction IRRuntime::GetCosFunction(LLVMType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::cos, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetCopySignFunction(LLVMType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::copysign, { argType });
     }
 
     LLVMFunction IRRuntime::GetStringCompareFunction()

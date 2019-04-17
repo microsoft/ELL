@@ -401,6 +401,15 @@ class OnnxPassthroughConverter(OnnxNodeConverter):
         self.add_passthrough_tensors()
         return {}
 
+
+class OnnxSkipConverter(OnnxNodeConverter):
+    def __init__(self, converter):
+        super().init(converter, "Skip")
+        
+    def get_weights(self):
+        return {}
+    
+
 class OnnxIdentityConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Passthrough") # Identity is a just a passthrough node
@@ -410,6 +419,54 @@ class OnnxIdentityConverter(OnnxNodeConverter):
     def get_weights(self):
         self.add_passthrough_tensors()    
         return {}
+
+
+class OnnxAtenConverter(OnnxNodeConverter):
+    def __init__(self, converter):
+        # Initially, make this a passthrough node.
+        super().init(converter, "Passthrough")
+
+    def is_equivalent_to_sign_function(self, node: NodeProto):
+        op_is_greater = False
+        operand_is_zero = False
+        arg2_is_one = False
+        arg3_is_minus_one = False
+
+        try:
+            # The sign function is equivalent to the "where" using
+            # the > operator with operand 0, with input tensors of 1 and -1
+            if node.attribute[0].s == b"where":
+                arg1 = self.converter.model.nodes[node.input[0]]
+                arg2 = self.converter.model.nodes[node.input[1]]
+                arg3 = self.converter.model.nodes[node.input[2]]
+                if arg1.onnx_node.op_type == "Greater":
+                    op_is_greater = True
+                    operand = self.converter.model.tensors[arg1.inputs[1]]
+                    if operand[0] == [0]:
+                        operand_is_zero = True
+                if arg2.onnx_node.op_type == "ConstantFill" and arg2.attributes["value"] == 1:
+                    arg2_is_one = True
+                if arg3.onnx_node.op_type == "ConstantFill" and arg3.attributes["value"] == -1:
+                    arg3_is_minus_one = True
+        except Exception as _:
+            return False
+
+        if op_is_greater and operand_is_zero and arg2_is_one and arg3_is_minus_one:
+            return True
+
+        return False
+
+    def convert(self, node: NodeProto):
+        # Check whether this is equivalent to the Sign function
+        if self.is_equivalent_to_sign_function(node):
+            self.op_type = "Sign"
+
+        node = super().convert(node)
+        # Adjust inputs
+        self.node.inputs = [self.node.inputs[0]]
+        self.node.input_shapes = [self.node.input_shapes[0]]
+
+        return node
 
 class OnnxConstantFillConverter(OnnxNodeConverter):
     def __init__(self, converter):
@@ -808,7 +865,6 @@ class OnnxLSTMConverter(OnnxNodeConverter):
         self.remove_input_tensors(node)
 
         return result
-
 
 class OnnxGRUConverter(OnnxNodeConverter):
     def __init__(self, converter):
@@ -1356,8 +1412,12 @@ class OnnxAveragePoolingConverter(ReceptiveFieldConverter):
 
 class OnnxConvolutionConverter(ReceptiveFieldConverter):
     def __init__(self, converter):
-        super(OnnxConvolutionConverter, self).__init__(converter)   
+        super(OnnxConvolutionConverter, self).__init__(converter)
         self.op_type = "Convolution"
+
+    def convert(self, node: NodeProto):
+        node = super().convert(node)
+        return node
 
     def get_weights(self):
         """ 
@@ -1369,10 +1429,12 @@ class OnnxConvolutionConverter(ReceptiveFieldConverter):
         """
         tensor_inputs = self.get_input_tensors()
         result = {}
-        if len(tensor_inputs) > 0:
-            result['weights'] = tensor_inputs[0]
-        if len(tensor_inputs) > 1:
-            result['bias'] = tensor_inputs[1]
+
+        for i in range(len(tensor_inputs)):
+            if len(tensor_inputs[i][1].shape) == 4:
+                result['weights'] = tensor_inputs[i]
+            else:
+                result['bias'] = tensor_inputs[i]
         
         return result
 
@@ -1391,6 +1453,7 @@ class OnnxConvolutionConverter(ReceptiveFieldConverter):
 ONNX_OP_TYPE_TO_CONVERTER_MAP  = {
     "Abs"                     : OnnxAbsConverter,
     "Add"                     : OnnxPlusConverter,
+    "ATen"                    : OnnxAtenConverter,
     "AveragePool"             : OnnxAveragePoolingConverter,
     "BatchNormalization"      : OnnxBatchNormalizationConverter,
     "Bias"                    : OnnxBiasConverter,
@@ -1406,6 +1469,7 @@ ONNX_OP_TYPE_TO_CONVERTER_MAP  = {
     "Gather"                  : OnnxGatherConverter,
     "Gemm"                    : OnnxGemmConverter, 
     "GlobalAveragePool"       : OnnxMaxPoolingConverter, 
+    "Greater"                 : OnnxPassthroughConverter,
     "GRU"                     : OnnxGRUConverter, 
     "HardSigmoid"             : OnnxHardSigmoidConverter, 
     "Identity"                : OnnxIdentityConverter, 

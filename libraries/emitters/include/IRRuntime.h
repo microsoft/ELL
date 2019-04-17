@@ -76,6 +76,12 @@ namespace emitters
         template <typename ValueType>
         LLVMFunction GetCosFunction();
 
+        /// <summary> Get the copysign function </summary>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
+        template <typename ValueType>
+        LLVMFunction GetCopySignFunction();
+
         /// <summary> Get the tanh function </summary>
         ///
         /// <returns> An LLVM function pointer to the function. </returns>
@@ -91,6 +97,7 @@ namespace emitters
         LLVMFunction GetTanhFunction(VariableType argType);
         LLVMFunction GetSinFunction(VariableType argType);
         LLVMFunction GetCosFunction(VariableType argType);
+        LLVMFunction GetCopySignFunction(VariableType argType);
 
         // llvm types
         LLVMFunction GetSqrtFunction(LLVMType argType);
@@ -101,6 +108,7 @@ namespace emitters
         LLVMFunction GetTanhFunction(LLVMType argType);
         LLVMFunction GetSinFunction(LLVMType argType);
         LLVMFunction GetCosFunction(LLVMType argType);
+        LLVMFunction GetCopySignFunction(LLVMType argType);
 
         //
         // Dot product
@@ -241,6 +249,12 @@ namespace emitters
     LLVMFunction IRRuntime::GetCosFunction()
     {
         return GetCosFunction(GetVariableType<ValueType>());
+    }
+
+    template <typename ValueType>
+    LLVMFunction IRRuntime::GetCopySignFunction()
+    {
+        return GetCopySignFunction(GetVariableType<ValueType>());
     }
 
     template <typename ValueType>

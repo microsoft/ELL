@@ -1495,6 +1495,12 @@ class ConvertSigmoid(ConvertUnaryOperation):
     def __init__(self, node: ImporterNode):
         super().__init__(node, ell.nodes.UnaryOperationType.sigmoid)
 
+class ConvertSign(ConvertUnaryOperation):
+    """
+    Converter for Sign operation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.UnaryOperationType.sign)
 
 class ConvertHardSigmoid(ConvertUnaryOperation):
     """

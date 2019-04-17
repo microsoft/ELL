@@ -38,6 +38,7 @@ class UnaryOperationType:
     log = UnaryOperationType_log
     logicalNot = UnaryOperationType_logicalNot
     sigmoid = UnaryOperationType_sigmoid
+    sign = UnaryOperationType_sign
     sin = UnaryOperationType_sin
     sqrt = UnaryOperationType_sqrt
     square = UnaryOperationType_square
@@ -53,6 +54,7 @@ del UnaryOperationType_hardSigmoid
 del UnaryOperationType_log
 del UnaryOperationType_logicalNot
 del UnaryOperationType_sigmoid
+del UnaryOperationType_sign
 del UnaryOperationType_sin
 del UnaryOperationType_sqrt
 del UnaryOperationType_square

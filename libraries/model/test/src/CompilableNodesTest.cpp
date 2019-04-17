@@ -422,6 +422,9 @@ std::vector<std::vector<double>> GetExpectedUnaryOperationOutput(std::vector<std
                 case UnaryOperationType::logicalNot:
                     d = (d == 0) ? 1 : 0;
                     break;
+                case UnaryOperationType::sign:
+                    d = (d > 0) ? 1 : -1;
+                    break;
                 case UnaryOperationType::sin:
                     d = std::sin(d);
                     break;
@@ -463,8 +466,10 @@ void TestCompilableUnaryOperationNode()
         MAP_OP(hardSigmoid),
         MAP_OP(log),
         MAP_OP(logicalNot),
+        MAP_OP(sign),
         MAP_OP(sin),
         MAP_OP(sigmoid),
+        MAP_OP(sign),
         MAP_OP(softmax),
         MAP_OP(square),
         MAP_OP(cos),
@@ -490,7 +495,15 @@ void TestCompilableUnaryOperationNode()
             auto compiledMap = compiler.Compile(map);
 
             // compare output
-            std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+            std::vector<std::vector<double>> signal = { { 1, -2, 3 }, { 4, -5, 6 }, { 7, 8, -9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+            if (opValue == UnaryOperationType::sqrt || opValue == UnaryOperationType::log)
+            {
+                std::transform(signal.begin(), signal.end(), signal.begin(), [](auto vec) 
+				{ 
+					std::transform(vec.begin(), vec.end(), vec.begin(), [](double value) { return std::abs(value); });
+                    return vec;
+				});
+            }
             std::vector<std::vector<double>> expected = GetExpectedUnaryOperationOutput(signal, opValue);
             VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
         });

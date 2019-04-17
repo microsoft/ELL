@@ -109,6 +109,9 @@ namespace nodes
     const model::OutputPort<ValueType>& Sigmoid(const model::OutputPort<ValueType>& input);
 
     template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& Sign(const model::OutputPort<ValueType>& input);
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
     const model::OutputPort<ValueType>& Sin(const model::OutputPort<ValueType>& input);
 
     template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
@@ -182,6 +185,12 @@ namespace nodes
     const model::OutputPort<ValueType>& Sigmoid(const model::OutputPort<ValueType>& input)
     {
         return UnaryOperation(input, UnaryOperationType::sigmoid);
+    }
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType>>
+    const model::OutputPort<ValueType>& Sign(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::sign);
     }
 
     template <typename ValueType, utilities::IsNotBoolean<ValueType>>

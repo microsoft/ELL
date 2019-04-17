@@ -6,6 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "DetectLowPrecisionConvolutionTransformation.h"
 #include "StandardTransformations.h"
 #include "FuseLinearOperationsTransformation.h"
 #include "OptimizeReorderDataNodesTransformation.h"
@@ -32,6 +33,7 @@ namespace passes
         static bool done = false;
         if (!done)
         {
+            registry.AddTransformation<DetectLowPrecisionConvolutionTransformation>();
             registry.AddTransformation<SetConvolutionMethodTransformation>();
             registry.AddTransformation<model::RefineTransformation>();
             registry.AddTransformation<FuseLinearOperationsTransformation>();

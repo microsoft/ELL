@@ -323,6 +323,53 @@ namespace value
             };
         }
 
+        auto CopySignFunctionIntrinsic() -> std::function<Value(IRFunctionEmitter&, std::vector<Value>)>
+        {
+            return [](IRFunctionEmitter& fnEmitter, std::vector<Value> args) -> Value {
+                if (args.size() != 2)
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+
+                const auto& value1 = args[0];
+                const auto& value2 = args[1];
+                if (value1.GetBaseType() != value2.GetBaseType())
+                {
+                    throw InputException(InputExceptionErrors::typeMismatch);
+                }
+
+                if (value1.GetBaseType() == ValueType::Boolean)
+                {
+                    throw InputException(InputExceptionErrors::typeMismatch);
+                }
+
+                if ((value1.IsConstrained() && value1.GetLayout() != ScalarLayout) ||
+                    (value2.IsConstrained() && value2.GetLayout() != ScalarLayout))
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+
+                Value result = value::Allocate(value1.GetBaseType(), ScalarLayout);
+
+                auto llvmValue1 = fnEmitter.ValueAt(ToLLVMValue(value1), 0);
+                auto llvmValue2 = fnEmitter.ValueAt(ToLLVMValue(value2), 0);
+                auto variableType = [type = value1.GetBaseType()] {
+                    switch (type)
+                    {
+                    case ValueType::Float:
+                        return VariableType::Float;
+                    default:
+                        return VariableType::Double;
+                    }
+                }();
+
+                auto llvmFunc = fnEmitter.GetModule().GetRuntime().GetCopySignFunction(variableType);
+                auto resultValue = ToLLVMValue(result);
+                fnEmitter.SetValueAt(resultValue, 0, fnEmitter.Call(llvmFunc, { llvmValue1, llvmValue2 }));
+                return result;
+            };
+        }
+
         enum class MaxMinIntrinsic
         {
             Max,
@@ -1204,7 +1251,8 @@ namespace value
                 { PowFunctionDeclaration, PowFunctionIntrinsic() },
                 { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetSinFunction) },
                 { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetSqrtFunction) },
-                { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetTanhFunction) }
+                { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetTanhFunction) },
+                { CopySignFunctionDeclaration, CopySignFunctionIntrinsic() },
             };
 
         if (std::all_of(args.begin(), args.end(), [](const auto& value) { return value.IsConstant(); }))

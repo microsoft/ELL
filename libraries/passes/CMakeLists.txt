@@ -5,6 +5,7 @@
 set(library_name passes)
 
 set(src
+    src/DetectLowPrecisionConvolutionTransformation.cpp
     src/FuseLinearOperationsTransformation.cpp
     src/OptimizeReorderDataNodesTransformation.cpp
     src/SetConvolutionMethodTransformation.cpp
@@ -12,6 +13,7 @@ set(src
 )
 
 set(include
+    include/DetectLowPrecisionConvolutionTransformation.h
     include/FuseLinearOperationsTransformation.h
     include/OptimizeReorderDataNodesTransformation.h
     include/SetConvolutionMethodTransformation.h
