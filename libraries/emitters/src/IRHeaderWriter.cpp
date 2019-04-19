@@ -243,8 +243,13 @@ namespace emitters
 
         // Header comment
         std::string moduleName = pModule->getName();
+        std::string fileName = moduleEmitter.GetCompilerOptions().modelFile;
         os << "//\n";
         os << "// ELL header for module " << moduleName << "\n";
+        if (!fileName.empty())
+        {
+            os << "// Compiled from input model " << fileName << "\n";
+        }
         os << "//\n\n";
         os << "#pragma once\n\n";
         os << "#include <stdint.h>\n\n";

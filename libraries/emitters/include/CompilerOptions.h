@@ -89,6 +89,9 @@ namespace emitters
         /// <summary> Emit debug code. </summary>
         bool debug = false;
 
+        /// <summary> The name of the file being compiled. </summary>
+        std::string modelFile;
+
     private:
         void AddOptions(const utilities::PropertyBag& properties);
     };

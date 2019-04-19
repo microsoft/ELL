@@ -112,6 +112,7 @@ void ProduceMapOutput(ParsedCompileArguments& compileArguments, common::ParsedMa
     }
 
     model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions(baseFilename);
+    settings.compilerSettings.modelFile = ell::utilities::GetFileName(inputFilename);
 
     // Add model/node-specific parameters to metadata
     if (mapCompilerArguments.HasOptionsMetadata())
