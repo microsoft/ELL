@@ -105,9 +105,6 @@ namespace nodes
         class SigmoidFunction;
 
         template <typename ValueType>
-        class SignFunction;
-
-        template <typename ValueType>
         class HardSigmoidFunction;
 
         template <typename ValueType>
