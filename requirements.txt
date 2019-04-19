@@ -12,6 +12,7 @@ paramiko
 parse
 psutil
 pyaudio
+python_speech_features
 requests
 serial
 # optional (very large):

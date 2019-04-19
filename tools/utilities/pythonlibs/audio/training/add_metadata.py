@@ -17,16 +17,17 @@ import model_editor
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Add a metadata key/value pair to the input node of the given model")
     parser.add_argument("model", help="The *.ell model to edit)")
-    parser.add_argument("--name", "-n", help="The metadata key", default=None)
-    parser.add_argument("--value", "-v", help="The metadata value", default=None)
+    parser.add_argument("--names", "-n", help="One or more metadata keys", nargs="+")
+    parser.add_argument("--values", "-v", help="The same number of metadata values", nargs="+")
 
     args = parser.parse_args()
     filename = args.model
-    print("Adding metadata {}={}".format(args.name, args.value))
     editor = model_editor.ModelEditor(filename)
     node = editor.get_input_node()
     if node is not None:
-        node.SetMetadataValue(args.name, args.value)
+        for i in range(len(args.names)):
+            print("Adding metadata {}={}".format(args.names[i], args.values[i]))
+            node.SetMetadataValue(args.names[i], args.values[i])
         editor.save(filename)
     else:
         print("No InputNode found in model")

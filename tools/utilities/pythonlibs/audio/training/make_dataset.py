@@ -153,7 +153,7 @@ def _get_dataset(entry_map, categories, transform, sample_rate, window_size, shi
     return Dataset(features, label_names, categories, parameters)
 
 
-def make_dataset(list_file, categories_path, featurizer_path, sample_rate, window_size, shift, auto_scale=True,
+def make_dataset(list_file, outdir, categories_path, featurizer_path, sample_rate, window_size, shift, auto_scale=True,
                  noise_path=None, max_noise_ratio=0.1, noise_selection=0.1, use_cache=False):
 
     """
@@ -163,6 +163,7 @@ def make_dataset(list_file, categories_path, featurizer_path, sample_rate, windo
     """
     dataset_name = os.path.basename(list_file)
     dataset_path = os.path.splitext(dataset_name)[0] + ".npz"
+    dataset_path = os.path.join(outdir, dataset_path)
     if use_cache and os.path.isfile(dataset_path):
       return
 
@@ -191,6 +192,8 @@ if __name__ == "__main__":
 
     # options
     arg_parser.add_argument("--list_file", "-l", help="The path to the list file to process")
+    arg_parser.add_argument("--outdir", "-o", help="The path where you want the *.npz files saved",
+                            default=os.getcwd())
     arg_parser.add_argument("--categories", "-c",
                             help="The full list of labels (a given list file might only see a subset of these)")
     arg_parser.add_argument("--featurizer", "-f", help="Compiled featurizer module to use", default="featurizer/mfcc")
@@ -211,5 +214,5 @@ if __name__ == "__main__":
         print("Noise dir '{}' not found".format(args.noise_path))
         sys.exit(1)
 
-    make_dataset(args.list_file, args.categories, args.featurizer, args.sample_rate, args.window_size, args.shift,
-                 args.auto_scale, args.noise_path, args.max_noise_ratio, args.noise_selection)
+    make_dataset(args.list_file, args.outdir, args.categories, args.featurizer, args.sample_rate, args.window_size,
+                 args.shift, args.auto_scale, args.noise_path, args.max_noise_ratio, args.noise_selection)

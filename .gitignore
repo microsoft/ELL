@@ -267,3 +267,5 @@ Gemfile.lock
 
 # ctags tag file
 tags
+.amlignore
+aml_config/
