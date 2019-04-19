@@ -43,7 +43,7 @@ namespace nodes
 
     void VoiceActivityDetectorNode::Define(value::FunctionDeclaration& fn)
     {
-        (void)fn.Define([this](value::Vector data, value::Vector output) {
+        (void)fn.Define([this](const value::Vector data, value::Vector output) {
             output[0] = _vad.Process(data);
         });
     }

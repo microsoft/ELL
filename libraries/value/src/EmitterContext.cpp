@@ -426,5 +426,27 @@ namespace value
         return *GetContext().Call(TanhFunctionDeclaration, { v.GetValue() });
     }
 
+    Scalar LogicalNot(const Scalar v)
+    {
+        Scalar r;
+        if (v.GetType() == ValueType::Boolean)
+        {
+            ell::utilities::Boolean t(true);
+            r = (v != t);
+        }
+        else
+        {
+            If(v == Cast(0, v.GetType()), [&]
+            {
+                r = Cast(1, v.GetType());
+            }).Else([&]
+            {
+                r = Cast(0, v.GetType());
+            });
+        }
+        return r;
+    }
+
+
 } // namespace value
 } // namespace ell

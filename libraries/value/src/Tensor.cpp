@@ -63,6 +63,14 @@ namespace value
         return indexedValue;
     }
 
+    Scalar Tensor::operator()(Scalar rowIndex, Scalar columnIndex, Scalar channelIndex) const
+    {
+        Value indexedValue = GetContext().Offset(_value, { rowIndex, columnIndex, channelIndex });
+        indexedValue.SetLayout(ScalarLayout);
+
+        return Scalar(indexedValue).Copy();
+    }
+
     Value Tensor::GetValue() const { return _value; }
 
     Tensor Tensor::SubTensor(Scalar row, Scalar column, Scalar channel, int numRows, int numColumns, int numChannels) const

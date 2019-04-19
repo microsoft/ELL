@@ -43,6 +43,10 @@ namespace value
         /// <returns> The Scalar value wrapping the value that is at the specified index within the tensor </return>
         Scalar operator()(Scalar rowIndex, Scalar columnIndex, Scalar channelIndex);
 
+        /// <summary> Tensor element access operator. </summary>
+        /// <returns> A copy of the Scalar value that is at the specified index within the tensor </return>
+        Scalar operator()(Scalar rowIndex, Scalar columnIndex, Scalar channelIndex) const;
+
         /// <summary> Gets the underlying wrapped Value instance </summary>
         Value GetValue() const;
 

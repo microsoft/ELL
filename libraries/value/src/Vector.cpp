@@ -59,6 +59,18 @@ namespace value
         return indexedValue;
     }
 
+    Scalar Vector::operator[](Scalar index) const { return (*this)(index); }
+
+    Scalar Vector::operator()(Scalar index) const
+    {
+        Value indexedValue = GetContext().Offset(_value, { index });
+        indexedValue.SetLayout(ScalarLayout);
+        // since this Vector is const, we should make a copy of the Scalar value
+        // so caller is not tempted to try and modify that value and change this vector.
+        return Scalar(indexedValue).Copy();
+    }
+
+
     Value Vector::GetValue() const { return _value; }
 
     Vector Vector::SubVector(Scalar offset, int size) const

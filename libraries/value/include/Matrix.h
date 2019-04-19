@@ -47,6 +47,10 @@ namespace value
         /// <returns> The Scalar value wrapping the value that is at the specified index within the matrix </return>
         Scalar operator()(Scalar rowIndex, Scalar columnIndex);
 
+        /// <summary> Matrix element access operator. </summary>
+        /// <returns> A copy of the Scalar value that is at the specified index within the matrix </return>
+        Scalar operator()(Scalar rowIndex, Scalar columnIndex) const;
+
         /// <summary> Gets the underlying wrapped Value instance </summary>
         Value GetValue() const;
 

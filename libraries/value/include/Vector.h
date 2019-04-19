@@ -64,6 +64,16 @@ namespace value
         /// <returns> The Scalar value wrapping the value that is at the specified index within the vector </return>
         Scalar operator()(Scalar index);
 
+        /// <summary> Returns a copy of the Scalar value that represents the data at the specified index within the vector </summary>
+        /// <param name="index"> The value by which to offset into the vector and return the specified value </param>
+        /// <returns> The Scalar value copy of the value that is at the specified index within the vector </return>
+        Scalar operator[](Scalar index) const;
+
+        /// <summary> Returns a copy of the Scalar value that represents the data at the specified index within the vector </summary>
+        /// <param name="index"> The value by which to offset into the vector and return the specified value </param>
+        /// <returns> The Scalar value copy of the value that is at the specified index within the vector </return>
+        Scalar operator()(Scalar index) const;
+
         /// <summary> Gets the underlying wrapped Value instance </summary>
         Value GetValue() const;
 

@@ -55,86 +55,67 @@ namespace nodes
         transformer.MapNodeOutput(output, newNode->output);
     }
 
-    void DoUnaryOp(value::Vector& data, value::Vector& result, UnaryOperationType op)
-    {
-        if (op == UnaryOperationType::softmax)
-        {
-            Softmax(data, result);
-        }
-        else
-        {
-            For(data, [&](value::Scalar index) {
-                value::Scalar v = data(index);
-                value::Scalar r;
-                switch (op)
-                {
-                case UnaryOperationType::none:
-                    // this is a no-op on purpose
-                    r = v;
-                    break;
-                case UnaryOperationType::abs:
-                    r = Abs(v);
-                    break;
-                case UnaryOperationType::sqrt:
-                    r = Sqrt(v);
-                    break;
-                case UnaryOperationType::logicalNot:
-                    if (v.GetType() == value::ValueType::Boolean)
-                    {
-                        ell::utilities::Boolean t(true);
-                        r = (v != t);
-                    }
-                    else
-                    {
-                        If(v == Cast(0, v.GetType()), [&]
-                        {
-                            r = Cast(1, v.GetType());
-                        }).Else([&]
-                        {
-                            r = Cast(0, v.GetType());
-                        });
-                    }
-                    break;
-                case UnaryOperationType::exp:
-                    r = Exp(v);
-                    break;
-                case UnaryOperationType::sign:
-                    r = Sign(v);
-                    break;
-                case UnaryOperationType::sin:
-                    r = Sin(v);
-                    break;
-                case UnaryOperationType::cos:
-                    r = Cos(v);
-                    break;
-                case UnaryOperationType::tanh:
-                    r = Tanh(v);
-                    break;
-                case UnaryOperationType::square:
-                    r = v * v;
-                    break;
-                case UnaryOperationType::log:
-                    r = Log(v);
-                    break;
-                case UnaryOperationType::sigmoid:
-                    r = emittable_functions::Sigmoid(v);
-                    break;
-                case UnaryOperationType::hardSigmoid:
-                    r = emittable_functions::HardSigmoid(v);
-                    break;
-                default:
-                    throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown unary operation type");
-                }
-                result(index) = r;
-            });
-        }
-    }
-
     template <typename ValueType>
     void UnaryOperationNode<ValueType>::Define(value::FunctionDeclaration& fn)
     {
-        (void)fn.Define([this](value::Vector data, value::Vector result) {
-            DoUnaryOp(data, result, _operation);
+        (void)fn.Define([this](const value::Vector data, value::Vector result) {
+
+            auto op = _operation;
+            if (op == UnaryOperationType::softmax)
+            {
+                Softmax(data, result);
+            }
+            else
+            {
+                For(data, [&](value::Scalar index) {
+                    auto v = data(index);
+                    switch (op)
+                    {
+                    case UnaryOperationType::none:
+                        // this is a no-op on purpose
+                        break;
+                    case UnaryOperationType::abs:
+                        v = Abs(v);
+                        break;
+                    case UnaryOperationType::sqrt:
+                        v = Sqrt(v);
+                        break;
+                    case UnaryOperationType::logicalNot:
+                        v = LogicalNot(v);
+                        break;
+                    case UnaryOperationType::exp:
+                        v = Exp(v);
+                        break;
+                    case UnaryOperationType::sin:
+                        v = Sin(v);
+                        break;
+                    case UnaryOperationType::cos:
+                        v = Cos(v);
+                        break;
+                    case UnaryOperationType::tanh:
+                        v = Tanh(v);
+                        break;
+                    case UnaryOperationType::sign:
+                        v = Sign(v);
+                        break;
+                    case UnaryOperationType::square:
+                        v = v * v;
+                        break;
+                    case UnaryOperationType::log:
+                        v = Log(v);
+                        break;
+                    case UnaryOperationType::sigmoid:
+                        v = emittable_functions::Sigmoid(v);
+                        break;
+                    case UnaryOperationType::hardSigmoid:
+                        v = emittable_functions::HardSigmoid(v);
+                        break;
+                    default:
+                        throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown unary operation type");
+                    }
+                    result(index) = v;
+                });
+            }
         });
     }
 

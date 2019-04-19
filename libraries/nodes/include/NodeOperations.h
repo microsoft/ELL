@@ -22,19 +22,19 @@ namespace nodes
         enum class UnaryOperationType
         {
             none,
-            abs, // real only
-            cos, // real only
-            exp, // real only
-            hardSigmoid, // real only
-            log, // real only
-            logicalNot, // bool only
-            sigmoid, // real only
+            abs,
+            cos,
+            exp,
+            hardSigmoid,
+            log,
+            logicalNot,
+            sigmoid,
 			sign,
-            sin, // real only
-            softmax, // real only
-            sqrt, // real only
-            square, // real only
-            tanh // real only
+            sin,
+            softmax,
+            sqrt,
+            square,
+            tanh
         };
 
         template <typename OperationType>

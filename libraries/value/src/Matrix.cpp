@@ -63,6 +63,14 @@ namespace value
         return indexedValue;
     }
 
+    Scalar Matrix::operator()(Scalar rowIndex, Scalar columnIndex) const
+    {
+        Value indexedValue = GetContext().Offset(_value, { rowIndex, columnIndex });
+        indexedValue.SetLayout(ScalarLayout);
+
+        return Scalar(indexedValue).Copy();
+    }
+
     Value Matrix::GetValue() const { return _value; }
 
     Matrix Matrix::SubMatrix(Scalar row, Scalar column, int numRows, int numColumns) const

@@ -295,7 +295,7 @@ namespace emittable_functions
 
     double VoiceActivityDetector::GetLevelThreshold() const { return _impl->_tracker._levelThreshold; }
 
-    Scalar VoiceActivityDetector::Process(Vector data)
+    Scalar VoiceActivityDetector::Process(const Vector data)
     {
         if (data.Size() != static_cast<size_t>(_impl->_windowSize))
         {

@@ -471,6 +471,7 @@ namespace value
     Scalar Sqrt(Scalar s);
     Scalar Tanh(Scalar s);
     Scalar Sign(Scalar s);
+    Scalar LogicalNot(Scalar v);
 
     Vector Abs(Vector v);
     Vector Cos(Vector v);
