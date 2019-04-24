@@ -721,68 +721,110 @@ namespace emitters
         }
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, Variable::VariableFlags flags)
     {
         EntryBlockScope scope(*this);
-        return GetEmitter().StackAllocate(type);
+        auto alloca = GetEmitter().StackAllocate(type);
+        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
+        {
+            StoreZero(alloca, 1);
+        }
+        return alloca;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, Variable::VariableFlags flags)
     {
         EntryBlockScope scope(*this);
-        return GetEmitter().StackAllocate(type);
+        auto alloca = GetEmitter().StackAllocate(type);
+        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
+        {
+            StoreZero(alloca, 1);
+        }
+        return alloca;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, const std::string& namePrefix)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, const std::string& namePrefix, Variable::VariableFlags flags)
     {
         EntryBlockScope scope(*this);
 
         // don't do this for emitted variables!
         auto name = _locals.GetUniqueName(namePrefix);
         auto result = GetEmitter().StackAllocate(type, name);
+        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
+        {
+            StoreZero(result, 1);
+        }
         _locals.Add(name, result);
         return result;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, const std::string& namePrefix)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, const std::string& namePrefix, Variable::VariableFlags flags)
     {
         EntryBlockScope scope(*this);
         auto name = _locals.GetUniqueName(namePrefix);
         auto result = GetEmitter().StackAllocate(type, name);
+        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
+        {
+            StoreZero(result, 1);
+        }
         _locals.Add(name, result);
         return result;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::EmittedVariable(VariableType type, const std::string& name)
+    llvm::AllocaInst* IRFunctionEmitter::EmittedVariable(VariableType type, const std::string& name, Variable::VariableFlags flags)
     {
         EntryBlockScope scope(*this);
         auto result = GetEmitter().StackAllocate(type, name);
+        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
+        {
+            StoreZero(result, 1);
+        }
         _locals.Add(name, result);
         return result;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, int size)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, int size, Variable::VariableFlags flags)
     {
         EntryBlockScope scope(*this);
-        return GetEmitter().StackAllocate(type, size);
+        auto alloca = GetEmitter().StackAllocate(type, size);
+        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
+        {
+            StoreZero(alloca, size);
+        }
+        return alloca;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, int rows, int columns)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, int rows, int columns, Variable::VariableFlags flags)
     {
         EntryBlockScope scope(*this);
-        return GetEmitter().StackAllocate(type, rows, columns);
+        auto alloca = GetEmitter().StackAllocate(type, rows, columns);
+        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
+        {
+            StoreZero(alloca, rows * columns);
+        }
+        return alloca;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, int size)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, int size, Variable::VariableFlags flags)
     {
         EntryBlockScope scope(*this);
-        return GetEmitter().StackAllocate(type, size);
+        auto alloca = GetEmitter().StackAllocate(type, size);
+        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
+        {
+            StoreZero(alloca, size);
+        }
+        return alloca;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, int rows, int columns)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, int rows, int columns, Variable::VariableFlags flags)
     {
         EntryBlockScope scope(*this);
-        return GetEmitter().StackAllocate(type, rows, columns);
+        auto alloca = GetEmitter().StackAllocate(type, rows, columns);
+        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
+        {
+            StoreZero(alloca, rows * columns);
+        }
+        return alloca;
     }
 
     LLVMValue IRFunctionEmitter::Load(LLVMValue pPointer)
@@ -821,30 +863,14 @@ namespace emitters
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "StoreZero can't handle llvm::GlobalVariables");
         }
 
-        LLVMValue returnValue = nullptr;
         auto type = llvm::cast<llvm::PointerType>(pPointer->getType())->getElementType();
-        const int loopThresh = 16;
-        if (numElements < loopThresh)
-        {
-            auto zero = llvm::Constant::getNullValue(type);
-            for (int index = 0; index < numElements; ++index)
-            {
-                // We use SetValueAtA directly because SetValueAt tries to see if the variable
-                // is a global variable first, which is not handled by this function.
-                returnValue = SetValueAtA(pPointer, index, zero);
-            }
-        }
-        else
-        {
-            auto typeSize = type->getPrimitiveSizeInBits() / 8;
-            auto byteCount = static_cast<int>(typeSize * numElements);
-            auto int8Type = llvm::Type::getInt8Ty(GetLLVMContext());
-            auto bytePointer = CastPointer(pPointer, int8Type->getPointerTo());
-            auto zero = llvm::ConstantInt::get(int8Type, 0);
-            returnValue = GetEmitter().MemorySet(bytePointer, zero, Literal(byteCount));
-        }
 
-        return returnValue;
+        auto int8Type = llvm::Type::getInt8Ty(GetLLVMContext());
+        auto& irEmitter = GetEmitter();
+        irEmitter.MemorySet(pPointer, irEmitter.Zero(int8Type),
+            irEmitter.Literal(static_cast<int64_t>(numElements * irEmitter.SizeOf(type))));
+
+        return pPointer;
     }
 
     LLVMValue IRFunctionEmitter::OperationAndUpdate(LLVMValue pPointer, TypedOperator operation, LLVMValue pValue)

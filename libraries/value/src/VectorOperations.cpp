@@ -45,8 +45,10 @@ namespace value
         }
 
         auto defaultImpl = [](Vector v1, Vector v2) {
-            Scalar result;
-            For(v1, [&](auto index) { result += v1[index] * v2[index]; });
+            Scalar result = Allocate(v1.GetType(), ScalarLayout);
+            For(v1, [&](auto index) {
+                result += v1[index] * v2[index];
+            });
 
             return result;
         };

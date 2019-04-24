@@ -521,7 +521,7 @@ namespace emitters
         auto int8PtrType = llvm::Type::getInt8PtrTy(context);
         auto int8PtrPtrType = int8PtrType->getPointerTo();
 
-        auto numTasks = taskArgs.size();
+        auto numTasks = static_cast<int>(taskArgs.size());
 
         // Get pointers into struct fields
         auto taskFunctionPtr = GetTaskFunctionPointer(function);
@@ -553,7 +553,7 @@ namespace emitters
         SetTaskArgsStructSize(function, function.Literal<int>(argStructSize));
 
         // copy args to taskData struct
-        for (size_t taskIndex = 0; taskIndex < numTasks; ++taskIndex)
+        for (int taskIndex = 0; taskIndex < numTasks; ++taskIndex)
         {
             auto taskData = function.PointerOffset(taskArgStorage, taskIndex);
             function.FillStruct(taskData, taskArgs[taskIndex]);
