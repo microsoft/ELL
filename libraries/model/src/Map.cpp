@@ -32,7 +32,7 @@ namespace model
         constexpr utilities::ArchiveVersion metadataArchiveVersion = { utilities::ArchiveVersionNumbers::v3_model_metadata };
     } // namespace
 
-    Map::Map(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs)
+    Map::Map(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, const OutputPortBase&>>& outputs)
     {
         TransformContext context;
         ModelTransformer transformer;
@@ -45,10 +45,6 @@ namespace model
 
         for (const auto& output : outputs)
         {
-            if (!output.second.IsFullPortOutput())
-            {
-                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Map constructor requires full output ports (IsFullPortOutput()==true)");
-            }
             AddOutput(output.first, transformer.GetCorrespondingOutputs(output.second));
         }
 
@@ -56,7 +52,7 @@ namespace model
         _model.Verify();
     }
 
-    Map::Map(Model&& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs) :
+    Map::Map(Model&& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, const OutputPortBase&>>& outputs) :
         _model(std::move(model))
     {
         for (const auto& input : inputs)
@@ -66,10 +62,6 @@ namespace model
 
         for (const auto& output : outputs)
         {
-            if (!output.second.IsFullPortOutput())
-            {
-                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Map constructor requires full output ports (IsFullPortOutput()==true)");
-            }
             AddOutput(output.first, output.second);
         }
 
@@ -87,9 +79,9 @@ namespace model
             AddInput(input.first, transformer.GetCorrespondingInputNode(input.second));
         }
 
-        for (const auto& output : other._outputElementsMap)
+        for (const auto& output : other._outputsMap)
         {
-            AddOutput(output.first, transformer.GetCorrespondingOutputs(output.second));
+            AddOutput(output.first, transformer.GetCorrespondingOutputs(*output.second));
         }
 
         _model.Verify();
@@ -221,10 +213,9 @@ namespace model
     {
         // Add concat/splice nodes to ensure output is a single port
         const auto& newOutputPort = _model.SimplifyOutputs(outputElements);
-        PortElementsBase newOutputElements{ newOutputPort };
-        _outputElements.push_back({ newOutputPort });
+        _outputs.push_back(&newOutputPort);
         _outputNames.push_back(outputName);
-        _outputElementsMap.insert({ outputName, newOutputElements });
+        _outputsMap.insert({ outputName, &newOutputPort });
     }
 
     void swap(Map& a, Map& b)
@@ -234,9 +225,9 @@ namespace model
         swap(a._inputNodes, b._inputNodes);
         swap(a._inputNames, b._inputNames);
         swap(a._inputNodeMap, b._inputNodeMap);
-        swap(a._outputElements, b._outputElements);
+        swap(a._outputs, b._outputs);
         swap(a._outputNames, b._outputNames);
-        swap(a._outputElementsMap, b._outputElementsMap);
+        swap(a._outputsMap, b._outputsMap);
         swap(a._computeContext, b._computeContext);
     }
 
@@ -246,10 +237,7 @@ namespace model
         std::unordered_set<const Node*> outputNodes;
         for (const auto& output : GetOutputs())
         {
-            for (const auto& range : output.GetRanges())
-            {
-                outputNodes.insert(range.ReferencedPort()->GetNode());
-            }
+            outputNodes.insert(output->GetNode());
         }
 
         return { outputNodes.begin(), outputNodes.end() };
@@ -309,17 +297,17 @@ namespace model
             inputNode.second = refinedInput;
         }
 
-        for (auto& outputElements : _outputElements)
+        for (auto& outputEntry : _outputs)
         {
-            const auto& refinedOutput = transformer.GetCorrespondingOutputs(outputElements);
-            outputElements = { refinedOutput };
+            const auto& refinedOutput = transformer.GetCorrespondingOutputs(*outputEntry);
+            outputEntry = &refinedOutput;
         }
 
-        for (auto& outputElements : _outputElementsMap)
+        for (auto& outputEntry : _outputsMap)
         {
-            auto output = outputElements.second;
-            const auto& refinedOutput = transformer.GetCorrespondingOutputs(output);
-            outputElements.second = { refinedOutput };
+            auto output = outputEntry.second;
+            const auto& refinedOutput = transformer.GetCorrespondingOutputs(*output);
+            outputEntry.second = &refinedOutput;
         }
     }
 
@@ -351,7 +339,7 @@ namespace model
 
         TransformContext context;
         ModelTransformer transformer;
-        Submodel submodel(_model, {}, outputPorts);
+        Submodel submodel(outputPorts);
         auto minimalModel = transformer.CopySubmodel(submodel, context);
         FixTransformedIO(transformer);
         _model = minimalModel.GetModel().ShallowCopy();
@@ -369,7 +357,7 @@ namespace model
         auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
         if (index < sourceNodes.size())
         {
-            return sourceNodes[index]->GetShape().NumElements();
+            return sourceNodes[index]->GetMemoryLayout().GetMemorySize();
         }
         return GetInputShape(index).NumElements();
     }
@@ -380,10 +368,10 @@ namespace model
         auto sourceNodes = _model.GetNodesByType<SourceNodeBase>();
         if (index < sourceNodes.size())
         {
-            return sourceNodes[index]->GetShape();
+            return sourceNodes[index]->GetMemoryLayout().GetExtent();
         }
         // no source nodes, fallback to first input node's shape
-        return GetInput(index)->GetShape();
+        return GetInput(index)->GetMemoryLayout().GetExtent();
     }
 
     std::vector<const InputNodeBase*> Map::GetInputNodes() const
@@ -399,7 +387,7 @@ namespace model
 
     size_t Map::NumOutputs() const
     {
-        return _outputElements.size();
+        return _outputs.size();
     }
 
     size_t Map::GetOutputSize(size_t index) const
@@ -476,7 +464,7 @@ namespace model
 
     Port::PortType Map::GetOutputType(size_t index) const
     {
-        return GetOutput(index).GetPortType();
+        return GetOutput(index).GetType();
     }
 
     Port::PortType Map::GetSinkOutputType(size_t index) const
@@ -585,7 +573,12 @@ namespace model
 
         // Archive the outputs
         archiver["outputNames"] << _outputNames;
-        archiver["outputElements"] << _outputElements;
+        std::vector<PortElementsBase> outputElements;
+        for (auto port : _outputs)
+        {
+            outputElements.push_back({ *port });
+        }
+        archiver["outputElements"] << outputElements;
 
         if (!_metadata.IsEmpty())
         {
@@ -608,7 +601,12 @@ namespace model
 
         // Unarchive the outputs
         archiver["outputNames"] >> _outputNames;
-        archiver["outputElements"] >> _outputElements;
+        std::vector<PortElementsBase> outputElements;
+        archiver["outputElements"] >> outputElements;
+        for (auto element : outputElements)
+        {
+            _outputs.push_back(element.GetRanges()[0].ReferencedPort());
+        }
 
         if (archiver.HasNextPropertyName("metadata"))
         {
@@ -627,12 +625,12 @@ namespace model
             _inputNodeMap[_inputNames[index]] = static_cast<InputNodeBase*>(node);
         }
 
-        // Reconstruct the output elements map
-        _outputElementsMap.clear();
-        assert(_outputNames.size() == _outputElements.size());
+        // Reconstruct the outputs map
+        _outputsMap.clear();
+        assert(_outputNames.size() == _outputs.size());
         for (size_t index = 0; index < _outputNames.size(); ++index)
         {
-            _outputElementsMap[_outputNames[index]] = _outputElements[index];
+            _outputsMap[_outputNames[index]] = _outputs[index];
         }
 
         archiver.PopContext();
@@ -669,30 +667,30 @@ namespace model
         return _inputNames[index];
     }
 
-    PortElementsBase Map::GetOutput(size_t index) const
+    const OutputPortBase& Map::GetOutput(size_t index) const
     {
-        if (index >= _outputElements.size())
+        if (index >= _outputs.size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
         }
 
-        return _outputElements[index];
+        return *_outputs[index];
     }
 
-    PortElementsBase Map::GetOutput(const std::string& outputName) const
+    const OutputPortBase& Map::GetOutput(const std::string& outputName) const
     {
-        auto iter = _outputElementsMap.find(outputName);
-        if (iter == _outputElementsMap.end())
+        auto iter = _outputsMap.find(outputName);
+        if (iter == _outputsMap.end())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
         }
 
-        return iter->second;
+        return *iter->second;
     }
 
     std::string Map::GetOutputName(size_t index) const
     {
-        if (index >= _outputElements.size())
+        if (index >= _outputNames.size())
         {
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
         }

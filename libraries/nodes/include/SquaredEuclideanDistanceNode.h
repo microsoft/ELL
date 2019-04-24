@@ -20,6 +20,7 @@
 #include <model/include/Model.h>
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
+#include <model/include/PortElements.h>
 
 #include <math/include/Matrix.h>
 #include <math/include/MatrixOperations.h>
@@ -153,8 +154,8 @@ namespace nodes
     template <typename ValueType, math::MatrixLayout layout>
     void SquaredEuclideanDistanceNode<ValueType, layout>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<SquaredEuclideanDistanceNode<ValueType, layout>>(newPortElements, _vectorsAsMatrix);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<SquaredEuclideanDistanceNode<ValueType, layout>>(newInputs, _vectorsAsMatrix);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -162,15 +163,15 @@ namespace nodes
     template <typename ValueType, math::MatrixLayout layout>
     bool SquaredEuclideanDistanceNode<ValueType, layout>::Refine(model::ModelTransformer& transformer) const
     {
-        const auto& inputPortElements = transformer.GetCorrespondingInputs(_input);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
 
         // P^2 => scalar value
-        auto inputNorm2SquaredNode = transformer.AddNode<L2NormSquaredNode<double>>(inputPortElements);
+        auto inputNorm2SquaredNode = transformer.AddNode<L2NormSquaredNode<double>>(newInputs);
 
         // -2 * P * V => row-wise vector
         auto vectorsAsMatrix = _vectorsAsMatrix;
         vectorsAsMatrix.Transform([](double d) { return -2.0 * d; });
-        const auto& product = MatrixVectorProduct(inputPortElements, vectorsAsMatrix);
+        const auto& product = MatrixVectorProduct(newInputs, vectorsAsMatrix);
 
         // Will hold the scalar value of P^2 for each row in the matrix
         model::PortElements<ValueType> inputNorm2SquaredNodeOutputs;

@@ -662,11 +662,7 @@ namespace model
     void Model::ReverseVisit(Visitor&& visitor) const
     {
         auto iter = GetReverseNodeIterator();
-        while (iter.IsValid())
-        {
-            visitor(*iter.Get());
-            iter.Next();
-        }
+        VisitIteratedNodes(iter, visitor);
     }
 } // namespace model
 } // namespace ell

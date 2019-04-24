@@ -14,7 +14,6 @@
 #include <model/include/MapCompiler.h>
 #include <model/include/ModelTransformer.h>
 #include <model/include/OutputPort.h>
-#include <model/include/PortElements.h>
 
 #include <utilities/include/IArchivable.h>
 #include <utilities/include/TypeName.h>
@@ -139,8 +138,8 @@ namespace nodes
     template <typename ValueType>
     void BufferNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<BufferNode<ValueType>>(newPortElements, _windowSize);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<BufferNode<ValueType>>(newInputs, _windowSize);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

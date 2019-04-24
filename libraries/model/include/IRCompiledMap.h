@@ -43,7 +43,6 @@ namespace model
         IRCompiledMap(const IRCompiledMap&) = delete;
         IRCompiledMap(IRCompiledMap&& other);
         IRCompiledMap& operator=(const IRCompiledMap&) = delete;
-        //IRCompiledMap& operator=(IRCompiledMap&& other);
 
         /// <summary> Output the compiled model to the given file </summary>
         ///
@@ -222,13 +221,13 @@ namespace model
         std::string _moduleName;
 
         std::unique_ptr<emitters::IRExecutionEngine> _executionEngine;
-        bool _verifyJittedModule = false;
+        bool _verifyJittedModule = true;
         void* _context = nullptr;
 
         template <typename T>
         using Vector = std::vector<std::conditional_t<std::is_same_v<bool, T>, Boolean, T>>;
 
-        bool _computeFunctionDefined;
+        bool _computeFunctionDefined = false;
         std::variant<ComputeFunction<bool>, ComputeFunction<int>, ComputeFunction<int64_t>, ComputeFunction<float>, ComputeFunction<double>> _computeInputFunction;
         std::variant<Vector<bool>, Vector<int>, Vector<int64_t>, Vector<float>, Vector<double>> _cachedOutput;
     };
@@ -250,7 +249,7 @@ namespace model
             auto outputSize = GetOutput(0).Size();
             auto functionPointer = _executionEngine->ResolveFunctionAddress(_functionName);
             ComputeFunction<InputType> computeFunction;
-            switch (GetOutput(0).GetPortType()) // Switch on output type
+            switch (GetOutput(0).GetType()) // Switch on output type
             {
             case model::Port::PortType::boolean:
             {

@@ -47,6 +47,7 @@
 
 #include <testing/include/testing.h>
 
+#include <algorithm>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -330,7 +331,7 @@ void TestCompiledMapMove()
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-    VerifyCompiledOutput(map, compiledMap1, signal, " moved compiled map");
+    VerifyCompiledOutput(map, compiledMap1, signal, " original compiled map");
 
     auto compiledMap2 = std::move(compiledMap1);
     testing::ProcessTest("Testing IsValid of moved-from map", testing::IsEqual(compiledMap1.IsValid(), false));

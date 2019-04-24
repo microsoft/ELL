@@ -8,19 +8,51 @@
 
 #include "Submodel.h"
 
+#include <utilities/include/Exception.h>
+
 #include <unordered_set>
 
 namespace ell
 {
 namespace model
 {
+    namespace
+    {
+        template <typename PortType>
+        const Model& GetModelOrThrow(const std::vector<PortType>& ports)
+        {
+            if (ports.empty())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't get model from empty output list");
+            }
+            return *(ports[0]->GetNode()->GetModel());
+        }
+
+        template <typename PortType1, typename PortType2>
+        const Model& GetModelOrThrow(const std::vector<PortType1>& inputs, const std::vector<PortType2>& outputs)
+        {
+            if (outputs.empty() && inputs.empty())
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't get model from empty output list");
+            }
+            if (inputs.empty())
+            {
+                return GetModelOrThrow(outputs);
+            }
+            else
+            {
+                return GetModelOrThrow(inputs);
+            }
+        }
+    } // namespace
+
     Submodel::Submodel(const Model& model) :
         Submodel(model, std::vector<const InputPortBase*>{}, std::vector<const OutputPortBase*>{})
     {
     }
 
-    Submodel::Submodel(const Model& model, const std::vector<const OutputPortBase*>& outputs) :
-        Submodel(model, {}, outputs)
+    Submodel::Submodel(const std::vector<const OutputPortBase*>& outputs) :
+        Submodel(GetModelOrThrow(outputs), {}, outputs)
     {
     }
 
@@ -30,6 +62,12 @@ namespace model
         _outputs(outputs.begin(), outputs.end())
     {
         VerifyInputs();
+        VerifyOutputs();
+    }
+
+    Submodel::Submodel(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs) :
+        Submodel(GetModelOrThrow(inputs), inputs, outputs)
+    {
     }
 
     Submodel::Submodel(const Model& model, const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs) :
@@ -38,6 +76,12 @@ namespace model
         _outputs(outputs)
     {
         VerifyInputs();
+        VerifyOutputs();
+    }
+
+    Submodel::Submodel(const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs) :
+        Submodel(GetModelOrThrow(inputs, outputs), inputs, outputs)
+    {
     }
 
     Submodel::Submodel(const Submodel& other) :
@@ -62,6 +106,14 @@ namespace model
 
     void Submodel::VerifyInputs()
     {
+        for (auto input : _inputs)
+        {
+            if (*(input->GetNode()->GetModel()) != _model)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Submodel input isn't from the same model as the submodel");
+            }
+        }
+
         // Verify each of the supplied inputs is necessary
         std::unordered_set<const InputPortBase*> inputs(_inputs.begin(), _inputs.end());
         std::unordered_set<const InputPortBase*> unseenInputs(_inputs.begin(), _inputs.end());
@@ -96,6 +148,17 @@ namespace model
                 {
                     VerifyInputs(&(input->GetReferencedPort()), inputs, unseenInputs, visitedNodes);
                 }
+            }
+        }
+    }
+
+    void Submodel::VerifyOutputs()
+    {
+        for (auto output : _outputs)
+        {
+            if (*(output->GetNode()->GetModel()) != _model)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Submodel output isn't from the same model as the submodel");
             }
         }
     }

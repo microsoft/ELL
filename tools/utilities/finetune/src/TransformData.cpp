@@ -161,7 +161,7 @@ std::unique_ptr<Map> GetMapForModel(Model& model, const OutputPort<ElementType>&
     const auto& newOutput = transformer.GetCorrespondingOutputs(output);
     const auto& newNewOutput = RemoveSourceAndSinkNodes(newModel, newOutput);
 
-    Submodel submodel(newModel, {}, { &newNewOutput });
+    Submodel submodel({ &newNewOutput });
     auto prunedSubmodel = transformer.CopySubmodel(submodel, context);
     const auto& prunedOutput = *prunedSubmodel.GetOutputs()[0];
 

@@ -48,17 +48,17 @@ namespace nodes
 
     void SingleElementThresholdNode::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<SingleElementThresholdNode>(newPortElements, _predictor);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<SingleElementThresholdNode>(newInputs, _predictor);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     bool SingleElementThresholdNode::Refine(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
 
         // get the element used in the split rule
-        model::PortElements<double> element{ newPortElements, _predictor.GetElementIndex() };
+        model::PortElements<double> element{ newInputs, _predictor.GetElementIndex() };
 
         // get the threshold.
         const auto& threshold = Constant(transformer, _predictor.GetThreshold());

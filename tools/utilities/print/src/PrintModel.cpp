@@ -15,7 +15,6 @@
 #include <model/include/InputPort.h>
 #include <model/include/Model.h>
 #include <model/include/Node.h>
-#include <model/include/PortElements.h>
 
 #include <nodes/include/NeuralNetworkPredictorNode.h>
 

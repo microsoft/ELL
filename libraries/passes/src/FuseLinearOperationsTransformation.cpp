@@ -66,11 +66,11 @@ bool HasSimpleConstantSecondaryInputs(const nodes::BroadcastLinearFunctionNode<V
         return false; // sizes incompatible
     }
 
-    const auto& scaleElements = node.secondaryInput1.GetPortElements();
-    const auto& biasElements = node.secondaryInput2.GetPortElements();
+    const auto& scale = node.secondaryInput1.GetReferencedPort();
+    const auto& bias = node.secondaryInput2.GetReferencedPort();
 
-    const nodes::ConstantNode<ValueType>* scaleInputNode = scaleInputSize == 0 ? nullptr : dynamic_cast<const nodes::ConstantNode<ValueType>*>(scaleElements.GetElement(0).ReferencedPort()->GetNode());
-    const nodes::ConstantNode<ValueType>* biasInputNode = biasInputSize == 0 ? nullptr : dynamic_cast<const nodes::ConstantNode<ValueType>*>(biasElements.GetElement(0).ReferencedPort()->GetNode());
+    const nodes::ConstantNode<ValueType>* scaleInputNode = scaleInputSize == 0 ? nullptr : dynamic_cast<const nodes::ConstantNode<ValueType>*>(scale.GetNode());
+    const nodes::ConstantNode<ValueType>* biasInputNode = biasInputSize == 0 ? nullptr : dynamic_cast<const nodes::ConstantNode<ValueType>*>(bias.GetNode());
 
     if (scaleInputNode == nullptr && biasInputNode == nullptr)
     {
@@ -89,8 +89,8 @@ bool CanCombineWithPrimaryInput(const nodes::BroadcastLinearFunctionNode<ValueTy
         return false;
     }
 
-    const auto& primaryElements = node.primaryInput.GetPortElements();
-    const nodes::BroadcastLinearFunctionNode<ValueType>* primaryInputNode = dynamic_cast<const nodes::BroadcastLinearFunctionNode<ValueType>*>(primaryElements.GetElement(0).ReferencedPort()->GetNode());
+    const auto& primaryValues = node.primaryInput.GetReferencedPort();
+    const nodes::BroadcastLinearFunctionNode<ValueType>* primaryInputNode = dynamic_cast<const nodes::BroadcastLinearFunctionNode<ValueType>*>(primaryValues.GetNode());
     if (primaryInputNode == nullptr)
     {
         return false; // primary input must be another linear function
@@ -120,18 +120,18 @@ bool CanCombineWithPrimaryInput(const nodes::BroadcastLinearFunctionNode<ValueTy
 template <typename ValueType>
 LinearCoeffNodes<ValueType> GetConstantSecondaryInputNodes(const nodes::BroadcastLinearFunctionNode<ValueType>& node)
 {
-    const auto& scaleElements = node.secondaryInput1.GetPortElements();
-    const auto& biasElements = node.secondaryInput2.GetPortElements();
+    const auto& scale = node.secondaryInput1.GetReferencedPort();
+    const auto& bias = node.secondaryInput2.GetReferencedPort();
 
-    int scaleInputSize = scaleElements.Size();
-    int biasInputSize = biasElements.Size();
+    int scaleInputSize = scale.Size();
+    int biasInputSize = bias.Size();
     if (scaleInputSize > 0 && biasInputSize > 0 && scaleInputSize != biasInputSize)
     {
         throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Combined linear function coefficients must have same size");
     }
 
-    const nodes::ConstantNode<ValueType>* scaleInputNode = scaleInputSize == 0 ? nullptr : dynamic_cast<const nodes::ConstantNode<ValueType>*>(scaleElements.GetElement(0).ReferencedPort()->GetNode());
-    const nodes::ConstantNode<ValueType>* biasInputNode = biasInputSize == 0 ? nullptr : dynamic_cast<const nodes::ConstantNode<ValueType>*>(biasElements.GetElement(0).ReferencedPort()->GetNode());
+    const nodes::ConstantNode<ValueType>* scaleInputNode = scaleInputSize == 0 ? nullptr : dynamic_cast<const nodes::ConstantNode<ValueType>*>(scale.GetNode());
+    const nodes::ConstantNode<ValueType>* biasInputNode = biasInputSize == 0 ? nullptr : dynamic_cast<const nodes::ConstantNode<ValueType>*>(bias.GetNode());
 
     return { scaleInputNode, biasInputNode };
 }
@@ -289,7 +289,8 @@ namespace passes
         }
 
         auto onto = GetReferencedPorts(submodel.GetInputs());
-        auto result = transformer.TransformSubmodelOnto(submodel, onto, context, [compiler](const Node& node, ModelTransformer& transformer) {
+        auto destModel = submodel.GetModel().ShallowCopy();
+        auto result = transformer.TransformSubmodelOnto(submodel, destModel, onto, context, [compiler](const Node& node, ModelTransformer& transformer) {
             bool canFuseNodes = compiler->GetModelOptimizerOptions(node).GetEntry<bool>("fuseLinearFunctionNodes", true);
 
             if (canFuseNodes)

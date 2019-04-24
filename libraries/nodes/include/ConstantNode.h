@@ -14,6 +14,7 @@
 #include <model/include/MapCompiler.h>
 #include <model/include/ModelTransformer.h>
 #include <model/include/OutputPort.h>
+#include <model/include/PortElements.h>
 
 #include <emitters/include/IRFunctionEmitter.h>
 

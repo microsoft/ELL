@@ -13,7 +13,6 @@
 #include "Node.h"
 #include "OutputPort.h"
 #include "Port.h"
-#include "PortElements.h"
 #include "Submodel.h"
 
 #include <utilities/include/Exception.h>

@@ -15,7 +15,6 @@
 
 #include <model/include/IRMapCompiler.h>
 #include <model/include/ModelTransformer.h>
-#include <model/include/PortElements.h>
 
 #include <predictors/include/RecurrentLayer.h>
 #include <predictors/neural/include/Activation.h>

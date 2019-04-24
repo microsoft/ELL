@@ -38,7 +38,7 @@ namespace common
     model::Model AppendNodeToModel(const model::Map& map, const PredictorType& predictor)
     {
         auto model = map.GetModel().ShallowCopy();
-        const auto& mapOutput = map.GetOutputElements<double>(0);
+        const auto& mapOutput = map.GetOutput<double>(0);
         model.AddNode<PredictorNodeType>(mapOutput, predictor);
         return model;
     }

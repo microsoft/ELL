@@ -38,7 +38,7 @@ int main()
         TestModelSerialization();
         TestInputRouting();
 
-        TestDenseCopyModel();
+        TestDeepCopyModel();
         TestShallowCopyModel();
         TestRefineSplitOutputs();
         TestChangeInputForNode();
@@ -87,6 +87,7 @@ int main()
 
         // ModelTransformer tests
         TestCopySubmodel();
+        TestCopySubmodelOnto();
         TestTransformSubmodelOnto();
         TestTransformSubmodelInPlace();
 

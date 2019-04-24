@@ -335,8 +335,8 @@ namespace nodes
     template <typename ValueType>
     void ArgMinNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
-        auto newNode = transformer.AddNode<ArgMinNode<ValueType>>(newPortElements);
+        const auto& newInputs = transformer.GetCorrespondingInputs(this->_input);
+        auto newNode = transformer.AddNode<ArgMinNode<ValueType>>(newInputs);
         transformer.MapNodeOutput(this->val, newNode->val);
         transformer.MapNodeOutput(this->argVal, newNode->argVal);
     }
@@ -344,8 +344,8 @@ namespace nodes
     template <typename ValueType>
     void ArgMaxNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
-        auto newNode = transformer.AddNode<ArgMaxNode<ValueType>>(newPortElements);
+        const auto& newInputs = transformer.GetCorrespondingInputs(this->_input);
+        auto newNode = transformer.AddNode<ArgMaxNode<ValueType>>(newInputs);
         transformer.MapNodeOutput(this->val, newNode->val);
         transformer.MapNodeOutput(this->argVal, newNode->argVal);
     }

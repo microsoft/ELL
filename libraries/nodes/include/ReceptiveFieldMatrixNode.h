@@ -9,15 +9,19 @@
 #pragma once
 
 #include <model/include/CompilableNode.h>
+#include <model/include/CompilableNodeUtilities.h>
 #include <model/include/IRMapCompiler.h>
 #include <model/include/Model.h>
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
+#include <model/include/OutputNode.h>
 #include <model/include/Port.h>
+
+#include <utilities/include/Exception.h>
 
 #include <algorithm>
 #include <array>
-#include <numeric>
+#include <cassert>
 #include <string>
 #include <vector>
 
@@ -103,16 +107,6 @@ namespace nodes
 } // namespace ell
 
 #pragma region implementation
-
-#include <model/include/CompilableNodeUtilities.h>
-#include <model/include/IRMapCompiler.h>
-#include <model/include/OutputNode.h>
-
-#include <utilities/include/Exception.h>
-
-#include <cassert>
-#include <string>
-#include <vector>
 
 namespace ell
 {
@@ -446,8 +440,8 @@ namespace nodes
     template <typename ValueType>
     void ReceptiveFieldMatrixNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<ReceptiveFieldMatrixNode>(newPortElements, GetInputMemoryLayout(), _filterWidth, _stride, _convolutionPadding, _dataOrder, _outputWidth, _outputHeight);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<ReceptiveFieldMatrixNode>(newInputs, GetInputMemoryLayout(), _filterWidth, _stride, _convolutionPadding, _dataOrder, _outputWidth, _outputHeight);
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 
@@ -480,7 +474,7 @@ namespace nodes
 
         archiver["filterWidth"] << _filterWidth;
         archiver["stride"] << _stride;
-        ;
+
         archiver["convolutionPadding"] << _convolutionPadding;
 
         std::vector<int> dataOrder(_dataOrder.begin(), _dataOrder.end());

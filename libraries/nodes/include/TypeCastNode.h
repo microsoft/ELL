@@ -15,6 +15,7 @@
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
 #include <model/include/OutputPort.h>
+#include <model/include/PortElements.h>
 
 #include <string>
 #include <vector>
@@ -106,8 +107,8 @@ namespace nodes
     template <typename InputValueType, typename OutputValueType>
     void TypeCastNode<InputValueType, OutputValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<TypeCastNode<InputValueType, OutputValueType>>(newPortElements);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<TypeCastNode<InputValueType, OutputValueType>>(newInputs);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

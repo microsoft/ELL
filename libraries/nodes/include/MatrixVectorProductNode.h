@@ -14,6 +14,7 @@
 #include <model/include/Model.h>
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
+#include <model/include/PortElements.h>
 
 #include <math/include/Matrix.h>
 #include <math/include/MatrixOperations.h>
@@ -169,8 +170,8 @@ namespace nodes
     template <typename ValueType, math::MatrixLayout layout>
     void MatrixVectorProductNode<ValueType, layout>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<MatrixVectorProductNode<ValueType, layout>>(newPortElements, _w);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<MatrixVectorProductNode<ValueType, layout>>(newInputs, _w);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

@@ -18,7 +18,6 @@
 #include <model/include/Map.h>
 #include <model/include/Model.h>
 #include <model/include/OutputNode.h>
-#include <model/include/PortElements.h>
 
 #include <nodes/include/ClockNode.h>
 #include <nodes/include/ExtremalValueNode.h>

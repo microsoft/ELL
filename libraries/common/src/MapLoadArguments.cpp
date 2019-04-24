@@ -10,6 +10,7 @@
 
 #include <model/include/Model.h>
 #include <model/include/Node.h>
+#include <model/include/PortElements.h>
 
 #include <utilities/include/Files.h>
 
@@ -83,10 +84,11 @@ namespace common
         return dynamic_cast<model::InputNodeBase*>(inputNode);
     }
 
-    model::PortElementsBase MapLoadArguments::GetOutput(model::Model& model) const
+    const model::OutputPortBase* MapLoadArguments::GetOutput(model::Model& model) const
     {
         auto elementsProxy = model::ParsePortElementsProxy(modelOutputsString);
-        return model::ProxyToPortElements(model, elementsProxy);
+        auto portElements = model::ProxyToPortElements(model, elementsProxy);
+        return &model.SimplifyOutputs(portElements);
     }
 
     //

@@ -55,8 +55,8 @@ namespace nodes
 
     void VoiceActivityDetectorNode::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<VoiceActivityDetectorNode>(newPortElements, _vad.GetSampleRate(), _vad.GetFrameDuration(), _vad.GetTauUp(), _vad.GetTauDown(), _vad.GetLargeInput(), _vad.GetGainAtt(), _vad.GetThresholdUp(), _vad.GetThresholdDown(), _vad.GetLevelThreshold());
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<VoiceActivityDetectorNode>(newInputs, _vad.GetSampleRate(), _vad.GetFrameDuration(), _vad.GetTauUp(), _vad.GetTauDown(), _vad.GetLargeInput(), _vad.GetGainAtt(), _vad.GetThresholdUp(), _vad.GetThresholdDown(), _vad.GetLevelThreshold());
         transformer.MapNodeOutput(output, newNode->output);
     }
 

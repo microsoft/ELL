@@ -68,8 +68,8 @@ namespace nodes
     template <typename ValueType>
     void IIRFilterNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<IIRFilterNode<ValueType>>(newPortElements, _filter.GetFeedforwardCoefficients(), _filter.GetRecursiveCoefficients());
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<IIRFilterNode<ValueType>>(newInputs, _filter.GetFeedforwardCoefficients(), _filter.GetRecursiveCoefficients());
         transformer.MapNodeOutput(output, newNode->output);
     }
 

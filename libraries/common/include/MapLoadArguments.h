@@ -12,7 +12,6 @@
 
 #include <model/include/InputNode.h>
 #include <model/include/Model.h>
-#include <model/include/PortElements.h>
 
 #include <utilities/include/CommandLineParser.h>
 
@@ -60,17 +59,17 @@ namespace common
         /// <returns> The input model or map filename specified by the user. If none are specified, returns the empty string. </returns>
         std::string GetInputFilename() const;
 
-        /// <summary> Get the input node for the loaded model, given the input definition string. </summary>
+        /// <summary> Get the input node for the loaded model (according to the input definition string in the modelInputsString field). </summary>
         ///
         /// <param name="model"> The model as specified by the input model filename </param>
         /// <returns> The specified input node to use for the map. </returns>
         model::InputNodeBase* GetInput(model::Model& model) const;
 
-        /// <summary> Get the output PortElements for the loaded model, given the output definition string. </summary>
+        /// <summary> Get the output for the loaded model (according to the output definition string in the modelOutputsString field). </summary>
         ///
         /// <param name="model"> The model as specified by the input model filename </param>
         /// <returns> The specified output to use for the map. </returns>
-        model::PortElementsBase GetOutput(model::Model& model) const;
+        const model::OutputPortBase* GetOutput(model::Model& model) const;
     };
 
     /// <summary> A version of MapLoadArguments that adds its members to the command line parser. </summary>

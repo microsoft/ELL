@@ -48,8 +48,7 @@ model::Map AppendTrainedLinearPredictorToMap(const predictors::LinearPredictor<E
     predictors::LinearPredictor<ElementType> predictor(trainedPredictor);
     predictor.Resize(dimension);
 
-    model::Model& model = map.GetModel();
-    const auto& mapOutput = model.SimplifyOutputs(map.GetOutputElements<ElementType>(0));
+    const auto& mapOutput = map.GetOutput<ElementType>(0);
     const auto& predictorOutput = nodes::LinearPredictor(mapOutput, predictor);
     const auto& output = model::Output(predictorOutput);
     auto outputMap = model::Map(map.GetModel(), { { "input", map.GetInput() } }, { { "output", output } });

@@ -143,7 +143,8 @@ namespace passes
     model::Submodel OptimizeReorderDataNodesTransformation::Transform(const Submodel& submodel, ModelTransformer& transformer, const TransformContext& context) const
     {
         auto onto = GetReferencedPorts(submodel.GetInputs());
-        auto result = transformer.TransformSubmodelOnto(submodel, onto, context, [this, context](const Node& node, ModelTransformer& transformer) {
+        auto destModel = submodel.GetModel().ShallowCopy();
+        auto result = transformer.TransformSubmodelOnto(submodel, destModel, onto, context, [this, context](const Node& node, ModelTransformer& transformer) {
             const model::MapCompiler* compiler = context.GetCompiler();
             bool canOptimizeNode = true;
             if (compiler)

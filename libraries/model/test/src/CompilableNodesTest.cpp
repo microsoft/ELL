@@ -305,7 +305,7 @@ model::Map GenerateMulticlassDTWClassifier(const std::vector<LabeledPrototype>& 
     auto selectNode = model.AddNode<MultiplexerNode<double, int>>(labelsNode->output, argMinNode->argVal);
     auto combinedNode = model.AddNode<ell::model::SpliceNode<double>>(std::vector<const ell::model::OutputPortBase*>{ &selectNode->output, &argMinNode->val });
 
-    model::Map result(model, { { "input", inputNode } }, { { "output", ell::model::PortElements<double>{ combinedNode->output } } });
+    model::Map result(model, { { "input", inputNode } }, { { "output", combinedNode->output } });
     return result;
 }
 
@@ -458,7 +458,7 @@ void TestCompilableUnaryOperationNode()
 {
     using namespace std::string_literals;
 
-#define MAP_OP(op) {#op ## s, UnaryOperationType::op}
+#define MAP_OP(op) { #op##s, UnaryOperationType::op }
 
     std::map<std::string, UnaryOperationType> ops{
         MAP_OP(abs),

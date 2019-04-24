@@ -65,18 +65,18 @@ namespace nodes
 
     void ProtoNNPredictorNode::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<ProtoNNPredictorNode>(newPortElements, _predictor);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<ProtoNNPredictorNode>(newInputs, _predictor);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     bool ProtoNNPredictorNode::Refine(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
 
         // Projection
         auto projectionMatrix = _predictor.GetProjectionMatrix();
-        const auto& projecedInput = MatrixVectorProduct(newPortElements, projectionMatrix);
+        const auto& projectedInput = MatrixVectorProduct(newInputs, projectionMatrix);
 
         auto prototypes = _predictor.GetPrototypes();
         auto m = _predictor.GetNumPrototypes();
@@ -86,7 +86,7 @@ namespace nodes
 
         // Distance to each prototype
         math::RowMatrixReference<double> prototypesMatrix = prototypes.Transpose();
-        auto squareDistanceNode = transformer.AddNode<SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(projecedInput, prototypesMatrix);
+        auto squareDistanceNode = transformer.AddNode<SquaredEuclideanDistanceNode<double, math::MatrixLayout::rowMajor>>(projectedInput, prototypesMatrix);
 
         // Similarity to each prototype
         const auto& scaledDistance = Multiply(squareDistanceNode->output, gamma);

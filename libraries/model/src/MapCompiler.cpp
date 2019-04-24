@@ -189,12 +189,10 @@ namespace model
         }
 
         // Allocate variables for outputs -- scalar outputs are treated the same as vectors
-        for (auto outputElements : map.GetOutputs())
+        for (auto output : map.GetOutputs())
         {
-            assert(outputElements.NumRanges() == 1);
-
             // TODO: can we use an array type here?
-            auto argVar = AllocatePortFunctionArgument(module, *outputElements.GetRanges()[0].ReferencedPort(), ArgType::output, list);
+            auto argVar = AllocatePortFunctionArgument(module, *output, ArgType::output, list);
             functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
         }
         return functionArguments;

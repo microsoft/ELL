@@ -46,16 +46,16 @@ namespace nodes
     template <typename ValueType>
     void DCTNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<DCTNode<ValueType>>(newPortElements, _dctCoeffs.NumRows());
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<DCTNode<ValueType>>(newInputs, _dctCoeffs.NumRows());
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>
     bool DCTNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        const auto& result = MatrixVectorProduct(newPortElements, _dctCoeffs);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        const auto& result = MatrixVectorProduct(newInputs, _dctCoeffs);
         transformer.MapNodeOutput(output, result);
         return true;
     }

@@ -335,7 +335,7 @@ void TestInputRouting()
 // Placeholder for test function that creates a model using dynamic-creation routines
 //
 
-void TestDenseCopyModel()
+void TestDeepCopyModel()
 {
     // Create a simple computation model
     model::Model model;
@@ -347,9 +347,7 @@ void TestDenseCopyModel()
     model.AddNode<nodes::ValueSelectorNode<int>>(condition->output, maxAndArgMax->argVal, minAndArgMin->argVal);
 
     // Now make a copy
-    model::TransformContext context;
-    model::ModelTransformer transformer;
-    auto copiedModel = transformer.CopyModel(model, context);
+    auto copiedModel = model.DeepCopy();
 
     // make sure they're the same
     auto originalModelIterator = model.GetNodeIterator();
@@ -514,7 +512,7 @@ void TestRefineSplitOutputs()
 
     // Now run data through the models and make sure they agree
     auto newInputNode = transformer.GetCorrespondingInputNode(inputNode);
-    const auto& newOutputs = transformer.GetCorrespondingOutputs(model::PortElements<double>{ outputNode->output });
+    const auto& newOutputs = transformer.GetCorrespondingOutputs(outputNode->output);
 
     std::vector<std::vector<double>> inputValues = { { 1.0, 2.0 }, { 1.0, 0.5 }, { 2.0, 4.0 } };
     for (const auto& inputValue : inputValues)
@@ -566,7 +564,7 @@ void TestChangeInputForNode()
     // Now make a copy
     model::TransformContext context;
     model::ModelTransformer transformer;
-    auto newModel = transformer.CopyModel(model, context);
+    auto newModel = model.DeepCopy();
 
     // Print them both:
     std::cout << "\n\nOld model" << std::endl;

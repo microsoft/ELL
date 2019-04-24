@@ -262,8 +262,8 @@ namespace nodes
     template <typename ValueType>
     void SoftmaxLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
-        auto newNode = transformer.AddNode<SoftmaxLayerNode<ValueType>>(newPortElements, this->_layer);
+        const auto& newInputs = transformer.GetCorrespondingInputs(this->_input);
+        auto newNode = transformer.AddNode<SoftmaxLayerNode<ValueType>>(newInputs, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }
 

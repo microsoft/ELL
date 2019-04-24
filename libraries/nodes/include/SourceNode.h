@@ -255,8 +255,8 @@ namespace nodes
     template <typename ValueType>
     void SourceNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<SourceNode<ValueType>>(newPortElements, _output.GetMemoryLayout(), GetCallbackName(), _source);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<SourceNode<ValueType>>(newInputs, _output.GetMemoryLayout(), GetCallbackName(), _source);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

@@ -14,7 +14,6 @@
 
 #include <model/include/IRMapCompiler.h>
 #include <model/include/ModelTransformer.h>
-#include <model/include/PortElements.h>
 #include <model/include/PortMemoryLayout.h>
 
 #include <predictors/neural/include/PoolingLayer.h>

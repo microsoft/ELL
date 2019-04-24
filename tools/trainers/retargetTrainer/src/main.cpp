@@ -56,8 +56,7 @@ model::Map AppendTrainedLinearPredictorToMap(const PredictorType& trainedPredict
     predictors::LinearPredictor<ElementType> predictor(trainedPredictor);
     predictor.Resize(dimension);
 
-    model::Model& model = map.GetModel();
-    const auto& mapOutput = model.SimplifyOutputs(map.GetOutputElements<ElementType>(0));
+    const auto& mapOutput = map.GetOutput<ElementType>(0);
     const auto& predictorOutput = nodes::LinearPredictor(mapOutput, predictor);
     const auto& sink = nodes::Sink(predictorOutput);
     const auto& output = model::Output(sink);
@@ -101,16 +100,16 @@ bool RedirectModelOutputByPortElements(model::Map& map, const std::string& targe
     {
         // Create a port elements from the target port output
         auto elementsProxy = model::ParsePortElementsProxy(targetPortElements);
-        auto originalPortElement = model::ProxyToPortElements(map.GetModel(), elementsProxy);
+        auto originalPortElements = model::ProxyToPortElements(map.GetModel(), elementsProxy);
 
         // Create a copy of the refined model, setting the
         // input to be the original input node and the output to be from the target
         // port elements.
         model::TransformContext context;
         model::ModelTransformer transformer;
-        auto model = transformer.CopyModel(map.GetModel(), context);
+        auto model = map.GetModel().DeepCopy();
         auto input = transformer.GetCorrespondingInputNode(map.GetInput());
-        const auto& output = transformer.GetCorrespondingOutputs(originalPortElement);
+        const auto& output = transformer.GetCorrespondingOutputs(*originalPortElements.GetRanges()[0].ReferencedPort());
 
         map = model::Map(model, { { "input", input } }, { { "output", output } });
     }
@@ -295,7 +294,7 @@ model::Map GetMultiClassMapFromBinaryPredictors(std::vector<PredictorType>& bina
     }
 
     model::Model& model = map.GetModel();
-    const auto& mapOutput = model.SimplifyOutputs(map.GetOutputElements<ElementType>(0));
+    const auto& mapOutput = map.GetOutput<ElementType>(0);
     const auto& predictorOutput = nodes::MatrixVectorProduct(mapOutput, weights);
     const auto& biasValues = nodes::Constant(model, bias.ToArray());
     const auto& biasedOutput = nodes::Add(predictorOutput, biasValues);
@@ -419,8 +418,7 @@ int main(int argc, char* argv[])
             return 1;
         }
 
-        auto output = map.GetOutput(0);
-        auto node = output.GetElement(0).ReferencedPort()->GetNode();
+        auto node = map.GetOutput(0).GetNode();
         std::cout << "Using output from node of type " << node->GetRuntimeTypeName() << std::endl;
 
         // load dataset and map the output

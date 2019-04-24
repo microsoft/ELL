@@ -44,8 +44,8 @@ namespace nodes
     template <typename ValueType>
     void BatchNormalizationLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
-        auto newNode = transformer.AddNode<BatchNormalizationLayerNode<ValueType>>(newPortElements, this->_layer);
+        const auto& newInputs = transformer.GetCorrespondingInputs(this->_input);
+        auto newNode = transformer.AddNode<BatchNormalizationLayerNode<ValueType>>(newInputs, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }
 

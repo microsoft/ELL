@@ -14,6 +14,9 @@
 
 #include <emitters/include/IRMetadata.h>
 
+#include <utilities/include/Debug.h>
+#include <utilities/include/Exception.h>
+
 #include <functional>
 #include <string>
 #include <vector>
@@ -104,9 +107,6 @@ namespace nodes
 
 #pragma region implementation
 
-#include <utilities/include/Debug.h>
-#include <utilities/include/Exception.h>
-
 namespace ell
 {
 namespace nodes
@@ -175,8 +175,8 @@ namespace nodes
     template <typename ValueType>
     void DebugSinkNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<DebugSinkNode<ValueType>>(newPortElements, _sink, _label, _userData, _sinkFunctionName);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<DebugSinkNode<ValueType>>(newInputs, _sink, _label, _userData, _sinkFunctionName);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

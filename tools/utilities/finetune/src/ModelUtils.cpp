@@ -14,8 +14,8 @@
 #include <model/include/Map.h>
 #include <model/include/OutputNode.h>
 
-#include <nodes/include/ClockNode.h>
 #include <nodes/include/ActivationFunctions.h>
+#include <nodes/include/ClockNode.h>
 #include <nodes/include/ConstantNode.h>
 #include <nodes/include/NeuralNetworkPredictorNode.h>
 #include <nodes/include/SinkNode.h>
@@ -37,7 +37,7 @@ void SaveModel(const Model& model, const OutputPortBase& output, std::string fil
 {
     ModelTransformer transformer;
     TransformContext context;
-    Submodel submodel(model, {}, { &output });
+    Submodel submodel({ &output });
     auto prunedSubmodel = transformer.CopySubmodel(submodel, context);
     common::SaveModel(prunedSubmodel.GetModel(), filename);
 }
@@ -233,13 +233,14 @@ Map MakeNeuralNetworkPredictorMap(const typename nodes::NeuralNetworkPredictorNo
     return Map(model, { { "input", inputNode } }, { { "output", newPredictorNode->output } });
 }
 
-Map GetMapPrefix(const Map& map, const std::string& outputElementsString)
+Map GetMapPrefix(Map& map, const std::string& outputElementsString)
 {
     auto& model = map.GetModel();
     auto parsedOutputElements = ParsePortElementsProxy(outputElementsString);
     auto outputElements = ProxyToPortElements(model, parsedOutputElements);
+    const auto& output = model.SimplifyOutputs(outputElements);
     const auto& input = map.GetInput();
-    return Map(model, { { "input", input } }, { { "output", outputElements } });
+    return Map(model, { { "input", input } }, { { "output", output } });
 }
 
 //
@@ -376,7 +377,7 @@ const model::OutputPortBase& RemoveSourceAndSinkNodes(model::Model& model, const
 {
     TransformContext context;
     ModelTransformer transformer;
-    Submodel submodel(model, {}, { &output });
+    Submodel submodel({ &output });
     auto newSubmodel = transformer.TransformSubmodelOnto(submodel, {}, context, [](const Node& n, ModelTransformer& transformer) {
         if (IsSourceNode(&n))
         {

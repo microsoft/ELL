@@ -88,7 +88,7 @@ model::Map GenerateLinearOpsTestModel(const model::PortMemoryLayout& inputLayout
     model::MemoryShape scaleShape({ 1, 1, numChannels });
     model::MemoryShape biasShape({ 1, 1, numChannels });
 
-    model::PortElements<ValueType> prevOutput = inputNode->output;
+    const model::OutputPort<ValueType>* prevOutput = &inputNode->output;
     int scaleStart = static_cast<ValueType>(1);
     int biasStart = static_cast<ValueType>(2);
     for (auto info : functionInfos)
@@ -116,14 +116,14 @@ model::Map GenerateLinearOpsTestModel(const model::PortMemoryLayout& inputLayout
         {
             biasNode = model.AddNode<nodes::ConstantNode<ValueType>>();
         }
-        auto functionNode = model.AddNode<nodes::BroadcastLinearFunctionNode<ValueType>>(prevOutput, inputLayout, scaleNode->output, biasNode->output, 2, outputLayout);
-        prevOutput = functionNode->output;
+        auto functionNode = model.AddNode<nodes::BroadcastLinearFunctionNode<ValueType>>(*prevOutput, inputLayout, scaleNode->output, biasNode->output, 2, outputLayout);
+        prevOutput = &functionNode->output;
         ++scaleStart;
         ++biasStart;
     }
 
     // Make a map from it
-    model::Map map(model, { { "input", inputNode } }, { { "output", prevOutput } });
+    model::Map map(model, { { "input", inputNode } }, { { "output", *prevOutput } });
     return map;
 }
 

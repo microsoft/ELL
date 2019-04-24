@@ -182,7 +182,7 @@ FineTuningOutput FineTuneNodesInSubmodel(Model& model,
     std::chrono::milliseconds::rep optimizationTime = 0;
     std::vector<FineTuningLayerResult> layerResults;
     int skipCount = args.numNodesToSkip;
-    Submodel submodel(model, {}, { &submodelOutput });
+    Submodel submodel({ &submodelOutput });
     auto resultSubmodel = transformer.TransformSubmodelOnto(submodel, {}, context, [&skipCount, &layerResults, &dataTransformTime, &optimizationTime, &trainingData, &args](const Node& node, ModelTransformer& transformer) {
         if (ShouldConsiderLayer(node, args))
         {

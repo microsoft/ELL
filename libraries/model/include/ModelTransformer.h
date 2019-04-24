@@ -91,7 +91,7 @@ namespace model
         /// If D is specified as the output of the submodel, any of A, B, C, or D would be reasonable inputs.
         ///
         /// When performing an in-place copy, trivial node copies are elided: if a node is to be copied to
-        /// its existing location (that is, the new copy will havethe same inputs as the original node),
+        /// its existing location (that is, the new copy will have the same inputs as the original node),
         /// then no copy is performed. For instance, `ConstantNode`s will always have their copies elided.
         ///
         /// Consider the the following model:
@@ -116,6 +116,19 @@ namespace model
         ///
         /// <returns> A copy of the requested portion of the model. </returns>
         Submodel CopySubmodelOnto(const Submodel& submodel, Model& destModel, const std::vector<const OutputPortBase*>& onto, const TransformContext& context);
+
+        /// <summary>
+        /// Copies part of a source model onto a specified port
+        /// </summary>
+        /// <param name="submodel"> The submodel to copy. There must not be any free input ports in the submodel. </param>
+        /// <param name="onto">
+        ///     The output ports in the destination model to graft the copied submodel's inputs onto.
+        ///     The "onto" ports must be in the same order as the corresponding inputs in the source submodel.
+        ///  </param>
+        /// <param name="context"> The context. </param>
+        ///
+        /// <returns> A copy of the requested portion of the model. </returns>
+        Submodel CopySubmodelOnto(const Submodel& submodel, const std::vector<const OutputPortBase*>& onto, const TransformContext& context);
 
         /// <summary> Transforms the model by applying a transformation function to each node </summary>
         ///
@@ -161,6 +174,17 @@ namespace model
                                        const std::vector<const OutputPortBase*>& onto,
                                        const TransformContext& context,
                                        const NodeTransformFunction& transformFunction);
+
+        /// <summary> Transforms part of a model in-place by applying a transformation function to each node. </summary>
+        ///
+        /// <param name="submodel"> The submodel to transform. </param>
+        /// <param name="context"> The TransformContext to use during the transformation. </param>
+        /// <param name="transformFunction"> The function to apply to each node. </param>
+        ///
+        /// <returns> The resulting (transformed) submodel. </returns>
+        Submodel TransformSubmodel(const Submodel& submodel,
+                                   const TransformContext& context,
+                                   const NodeTransformFunction& transformFunction);
 
         /// <summary> Returns the port from the new model corresponding to the given input port on the input model </summary>
         /// <remarks> Only available after calling CopyModel or TransformModel </remarks>
@@ -312,6 +336,7 @@ namespace model
 
         bool ShouldCopyNode(const Node& node) const;
         bool IsInputMapped(const InputPortBase& input) const;
+        bool HasNontrivialInputMapping(const InputPortBase& input) const;
         bool IsOutputMapped(const OutputPortBase& output) const;
         bool IsInputNode(const Node& node) const;
         static bool ArePortsCompatible(const InputPortBase* source, const OutputPortBase* dest);

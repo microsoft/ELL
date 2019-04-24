@@ -83,6 +83,7 @@ namespace model
     //
     // PortCorrespondences
     //
+    void VerifyOntoModel(const Model& destModel, const std::vector<const OutputPortBase*>& onto);
     void VerifyOntoCorrespondences(const std::vector<const InputPortBase*>& srcInputs, const std::vector<const OutputPortBase*>& onto);
 
     PortCorrespondences::PortCorrespondences(const std::vector<const InputPortBase*>& sources, const std::vector<const OutputPortBase*>& destinations)
@@ -220,9 +221,19 @@ namespace model
         return result;
     }
 
+    Submodel ModelTransformer::CopySubmodelOnto(const Submodel& submodel, const std::vector<const OutputPortBase*>& onto, const TransformContext& context)
+    {
+        if (onto.empty())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Location to transform submodel onto is empty");
+        }
+        auto destModel = onto[0]->GetNode()->GetModel()->ShallowCopy();
+        return CopySubmodelOnto(submodel, destModel, onto, context);
+    }
+
     Submodel ModelTransformer::CopySubmodelOnto(const Submodel& submodel, Model& destModel, const std::vector<const OutputPortBase*>& onto, const TransformContext& context)
     {
-        auto result = TransformSubmodelOnto(submodel, destModel, {}, context, [](const Node& node, ModelTransformer& transformer) {
+        auto result = TransformSubmodelOnto(submodel, destModel, onto, context, [](const Node& node, ModelTransformer& transformer) {
             transformer.CopyNode(node);
         });
 
@@ -258,7 +269,7 @@ namespace model
         const auto& inputs = node.GetInputPorts();
         for (auto in : inputs)
         {
-            if (IsInputMapped(*in))
+            if (HasNontrivialInputMapping(*in))
             {
                 return true;
             }
@@ -275,6 +286,17 @@ namespace model
     bool ModelTransformer::IsInputMapped(const InputPortBase& input) const
     {
         return _elementsMap.IsOutputMapped(input.GetReferencedPort());
+    }
+
+    bool ModelTransformer::HasNontrivialInputMapping(const InputPortBase& input) const
+    {
+        if (!_elementsMap.IsOutputMapped(input.GetReferencedPort()))
+        {
+            return false;
+        }
+
+        const auto& referencedPort = input.GetReferencedPort();
+        return &GetCorrespondingOutputs(referencedPort) != &referencedPort;
     }
 
     bool ModelTransformer::IsOutputMapped(const OutputPortBase& output) const
@@ -317,6 +339,7 @@ namespace model
         return result.GetModel().ShallowCopy();
     }
 
+    // Transforms the submodel by visiting its nodes in execution order (visit all inputs to a node before visiting that node)
     Submodel ModelTransformer::TransformSubmodelOnto(const Submodel& submodel, Model& destModel, const std::vector<const OutputPortBase*>& onto, const TransformContext& context, const NodeTransformFunction& transformFunction)
     {
         _context = context;
@@ -325,10 +348,13 @@ namespace model
         auto previousElementMap = std::move(_elementsMap);
         _elementsMap.Clear();
 
+        VerifyOntoModel(destModel, onto);
         VerifyOntoCorrespondences(submodel.GetInputs(), onto);
 
         std::vector<const InputPortBase*> sourceInputs = submodel.GetInputs();
         MapCorrespondingInputs(sourceInputs, onto);
+
+        // This call to VisitSubmodel does the actual transformation (creating new nodes, etc.)
         submodel.GetModel().VisitSubmodel(sourceInputs, submodel.GetOutputs(), [this, transformFunction](const Node& node) {
             transformFunction(node, *this);
             AssignNodeAncestor(node);
@@ -346,12 +372,14 @@ namespace model
 
         auto newOutputs = GetCorrespondingOutputs(submodel.GetOutputs());
 
+        // This part of the code discovers the corresponding outputs in the transformed submodel for each of the outputs in the original submodel
+
         // Now visit the new outputs until we encounter an input port referencing a port from the "onto" list. That will be one of the new inputs. We should encounter one for each of the "onto" items.
         std::vector<const InputPortBase*> newInputs(submodel.GetInputs().size(), nullptr);
-        std::unordered_map<const OutputPortBase*, int> ontoPortToIndexMap;
+        std::unordered_map<const OutputPortBase*, std::vector<int>> ontoPortToIndexMap;
         for (int i = 0, size = (int)onto.size(); i < size; ++i)
         {
-            ontoPortToIndexMap[onto[i]] = i;
+            ontoPortToIndexMap[onto[i]].push_back(i);
         }
         destModel.VisitSubmodel(newOutputs, [&ontoPortToIndexMap, &newInputs](const Node& node) {
             // check node's input ports -- if one of them references one of the onto ports, set it in the newInputs vector at the corresponding location
@@ -360,21 +388,45 @@ namespace model
                 auto referencedPort = &input->GetReferencedPort();
                 if (ontoPortToIndexMap.find(referencedPort) != ontoPortToIndexMap.end())
                 {
-                    auto index = ontoPortToIndexMap[referencedPort];
-                    newInputs[index] = input;
-                    ontoPortToIndexMap.erase(referencedPort);
+                    for (auto index : ontoPortToIndexMap[referencedPort])
+                    {
+                        newInputs[index] = input;
+                    }
                 }
             }
         });
 
-        return { destModel.ShallowCopy(), newInputs, newOutputs };
+        for (auto input : newInputs)
+        {
+            if (input == nullptr)
+            {
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Found a null input in copied submodel");
+            }
+        }
+
+        if (newInputs.empty() && newOutputs.empty())
+        {
+            return { destModel };
+        }
+        return { newInputs, newOutputs };
+    }
+
+    void VerifyOntoModel(const Model& destModel, const std::vector<const OutputPortBase*>& destinations)
+    {
+        for (auto destination : destinations)
+        {
+            if (*destination->GetNode()->GetModel() != destModel)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Destination model and destination outputs don't match");
+            }
+        }
     }
 
     void VerifyOntoCorrespondences(const std::vector<const InputPortBase*>& sources, const std::vector<const OutputPortBase*>& destinations)
     {
         if (sources.size() != destinations.size())
         {
-            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Trying to graft a submodel onto a destination with a different number of outputs");
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Trying to graft a submodel with " + std::to_string(sources.size()) + " outputs onto a destination with " + std::to_string(destinations.size()) + " outputs");
         }
 
         bool ok = std::equal(sources.begin(), sources.end(), destinations.begin(), [](const InputPortBase* s, const OutputPortBase* d) {
@@ -389,8 +441,17 @@ namespace model
 
     Submodel ModelTransformer::TransformSubmodelOnto(const Submodel& submodel, const std::vector<const OutputPortBase*>& onto, const TransformContext& context, const NodeTransformFunction& transformFunction)
     {
-        auto destModel = submodel.GetModel().ShallowCopy();
+        if (onto.empty())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Location to transform submodel onto is empty");
+        }
+        auto destModel = onto[0]->GetNode()->GetModel()->ShallowCopy();
         return TransformSubmodelOnto(submodel, destModel, onto, context, transformFunction);
+    }
+
+    Submodel ModelTransformer::TransformSubmodel(const Submodel& submodel, const TransformContext& context, const NodeTransformFunction& transformFunction)
+    {
+        return TransformSubmodelOnto(submodel, {}, context, transformFunction);
     }
 
     void ModelTransformer::ResetContext()
@@ -494,7 +555,7 @@ namespace model
             {
                 const auto& port = GetCorrespondingOutputs(*node.GetOutputPort(0));
                 auto newNode = const_cast<Node*>(port.GetNode());
-                if (newNode && newNode != (&node))
+                if (newNode != (&node))
                 {
                     // copy metadata
                     newNode->GetMetadata() = node.GetMetadata();
@@ -505,6 +566,15 @@ namespace model
                 {
                     newNode->GetMetadata()[entry.first] = entry.second;
                 }
+            }
+        }
+        else
+        {
+            // If we don't make a copy of the node, record the self->self mapping
+            // so that subsequent queries will find it
+            for (auto output : node.GetOutputPorts())
+            {
+                MapNodeOutput(*output, *output);
             }
         }
     }

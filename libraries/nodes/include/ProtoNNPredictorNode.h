@@ -11,6 +11,7 @@
 #include <model/include/Model.h>
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
+#include <model/include/PortElements.h>
 
 #include <predictors/include/ProtoNNPredictor.h>
 

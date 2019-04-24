@@ -143,8 +143,8 @@ namespace nodes
     template <typename ValueType>
     void LinearFilterBankNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
-        auto newNode = transformer.AddNode<LinearFilterBankNode<ValueType>>(newPortElements, _linearFilters);
+        const auto& newInputs = transformer.GetCorrespondingInputs(this->_input);
+        auto newNode = transformer.AddNode<LinearFilterBankNode<ValueType>>(newInputs, _linearFilters);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
@@ -183,8 +183,8 @@ namespace nodes
     template <typename ValueType>
     void MelFilterBankNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<MelFilterBankNode<ValueType>>(newPortElements, _melFilters);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<MelFilterBankNode<ValueType>>(newInputs, _melFilters);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

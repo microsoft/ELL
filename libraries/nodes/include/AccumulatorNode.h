@@ -16,6 +16,7 @@
 #include <model/include/Model.h>
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
+#include <model/include/PortElements.h>
 
 #include <utilities/include/Exception.h>
 #include <utilities/include/IArchivable.h>
@@ -126,8 +127,8 @@ namespace nodes
     template <typename ValueType>
     void AccumulatorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newPortElements);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<AccumulatorNode<ValueType>>(newInputs);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

@@ -38,13 +38,13 @@ namespace model
         Submodel(const Model& model);
 
         /// <summary> Constructor </summary>
-        Submodel(const Model& model, const std::vector<const OutputPortBase*>& outputs);
+        Submodel(const std::vector<const OutputPortBase*>& outputs);
 
         /// <summary> Constructor </summary>
-        Submodel(const Model& model, const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
+        Submodel(const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
 
         /// <summary> Constructor </summary>
-        Submodel(const Model& model, const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs);
+        Submodel(const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs);
 
         Submodel(const Submodel& other);
         Submodel(Submodel&& other) = default;
@@ -80,9 +80,12 @@ namespace model
         const std::vector<const OutputPortBase*>& GetOutputs() const { return _outputs; }
 
     private:
+        Submodel(const Model& model, const std::vector<InputPortBase*>& inputs, const std::vector<OutputPortBase*>& outputs);
+        Submodel(const Model& model, const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs);
         friend void swap(Submodel& a, Submodel& b);
         void VerifyInputs();
         void VerifyInputs(const OutputPortBase* output, const std::unordered_set<const InputPortBase*>& inputs, std::unordered_set<const InputPortBase*>& unseenInputs, std::unordered_set<const InputPortBase*>& visitedNodes);
+        void VerifyOutputs();
 
         Model _model;
         std::vector<const InputPortBase*> _inputs;

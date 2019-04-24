@@ -9,6 +9,11 @@
 #pragma once
 
 #include <model/include/CompilableNode.h>
+#include <model/include/CompilableNodeUtilities.h>
+#include <model/include/IRMapCompiler.h>
+#include <model/include/OutputNode.h>
+
+#include <vector>
 
 namespace ell
 {
@@ -46,7 +51,7 @@ namespace nodes
         /// <returns> If the node can accept the input memory layout order, true, else false </returns>
         bool CanAcceptInputLayout(const utilities::DimensionOrder& order) const override
         {
-            return true;;
+            return true;
         }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -92,12 +97,6 @@ namespace nodes
 
 #pragma region implementation
 
-#include <model/include/CompilableNodeUtilities.h>
-#include <model/include/IRMapCompiler.h>
-#include <model/include/OutputNode.h>
-
-#include <vector>
-
 namespace ell
 {
 namespace nodes
@@ -133,9 +132,8 @@ namespace nodes
     template <typename ValueType>
     void ReinterpretLayoutNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<ReinterpretLayoutNode>(newPortElements,
-                                                                  _output.GetMemoryLayout());
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<ReinterpretLayoutNode>(newInputs, _output.GetMemoryLayout());
         transformer.MapNodeOutput(this->output, newNode->output);
     }
 

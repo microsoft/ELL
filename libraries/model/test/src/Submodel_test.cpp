@@ -42,8 +42,8 @@ void TestSubmodelConstructors()
 
     {
         std::vector<const OutputPortBase*> outputs{ &outputNodes[0]->input.GetReferencedPort() };
-        Submodel submodel{ model, outputs };
-        testing::ProcessTest("Testing Submodel(const Model&, const std::vector<const OutputPortBase*>&)", testing::IsEqual(modelSize - 1, submodel.Size()));
+        Submodel submodel{ outputs };
+        testing::ProcessTest("Testing Submodel(const std::vector<const OutputPortBase*>&)", testing::IsEqual(modelSize - 1, submodel.Size()));
     }
 }
 

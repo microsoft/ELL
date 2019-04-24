@@ -15,7 +15,6 @@
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
 #include <model/include/OutputPort.h>
-#include <model/include/PortElements.h>
 
 #include <utilities/include/TypeName.h>
 
@@ -115,16 +114,16 @@ namespace nodes
     template <typename ValueType>
     void L2NormSquaredNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<L2NormSquaredNode<ValueType>>(newPortElements);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<L2NormSquaredNode<ValueType>>(newInputs);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>
     bool L2NormSquaredNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        const auto& squaredInput = Square(newPortElements);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        const auto& squaredInput = Square(newInputs);
         const auto& sum = Sum(squaredInput);
 
         transformer.MapNodeOutput(output, sum);

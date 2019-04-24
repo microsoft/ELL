@@ -158,8 +158,8 @@ namespace nodes
     template <typename SplitRuleType, typename EdgePredictorType>
     void ForestPredictorNode<SplitRuleType, EdgePredictorType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<ForestPredictorNode<SplitRuleType, EdgePredictorType>>(newPortElements, _forest);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<ForestPredictorNode<SplitRuleType, EdgePredictorType>>(newInputs, _forest);
         transformer.MapNodeOutput(output, newNode->output);
         transformer.MapNodeOutput(treeOutputs, newNode->treeOutputs);
         transformer.MapNodeOutput(edgeIndicatorVector, newNode->edgeIndicatorVector);

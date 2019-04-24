@@ -289,7 +289,7 @@ void PrintCompiledOutput(model::Map& map, model::IRCompiledMap& compiledMap, con
 template <typename InputType>
 void PrintCompiledOutput(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name)
 {
-    switch (map.GetOutput(0).GetPortType())
+    switch (map.GetOutput(0).GetType())
     {
     case model::Port::PortType::boolean:
         PrintCompiledOutput<InputType, bool>(map, compiledMap, signal, name);
@@ -363,7 +363,7 @@ std::vector<OutputType> VerifyCompiledOutput(model::Map& map, model::IRCompiledM
 template <typename InputType>
 void VerifyCompiledOutput(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::string& name, const std::string& additionalMessage, double epsilon)
 {
-    switch (map.GetOutput(0).GetPortType())
+    switch (map.GetOutput(0).GetType())
     {
     case model::Port::PortType::boolean:
         VerifyCompiledOutput<InputType, bool>(map, compiledMap, signal, name, additionalMessage, epsilon);

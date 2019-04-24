@@ -235,20 +235,12 @@ namespace nodes
 
         assert(outputDataPadding == 0 && "Convolutional node output padding not supported yet");
 
-        const model::OutputPort<ValueType>* xnorOutput;
-        if (numPackedBits == 32)
-        {
-            xnorOutput = &AddRefinedNodes<int32_t>(transformer, newInput);
-        }
-        else
-        {
-            xnorOutput = &AddRefinedNodes<int64_t>(transformer, newInput);
-        }
+        const auto& xnorOutput = (numPackedBits == 32) ? AddRefinedNodes<int32_t>(transformer, newInput) : AddRefinedNodes<int64_t>(transformer, newInput);
 
         // Output of xnor is in (f x h x w) order, need to transpose to the canonical (h x w x f) order
         model::PortMemoryLayout outputShape(model::MemoryShape{ numFilters, outputImageHeight, outputImageWidth }, model::DimensionOrder{ 2, 0, 1 }); // Note: memory layout constructor takes the sizes in physical dimension order
         model::PortMemoryLayout transposedOutputShape(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputDataPadding, outputDataPadding, 0 }, model::DimensionOrder{ 0, 1, 2 });
-        const auto& reorderedOutput = ReorderData(*xnorOutput, outputShape, transposedOutputShape);
+        const auto& reorderedOutput = ReorderData(xnorOutput, outputShape, transposedOutputShape);
         transformer.MapNodeOutput(this->output, reorderedOutput);
         return true;
     }
@@ -291,8 +283,8 @@ namespace nodes
     template <typename ValueType>
     void BinaryConvolutionalLayerNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(this->_input);
-        auto newNode = transformer.AddNode<BinaryConvolutionalLayerNode<ValueType>>(newPortElements, this->_layer);
+        const auto& newInputs = transformer.GetCorrespondingInputs(this->_input);
+        auto newNode = transformer.AddNode<BinaryConvolutionalLayerNode<ValueType>>(newInputs, this->_layer);
         transformer.MapNodeOutput(this->_output, newNode->output);
     }
 
@@ -325,8 +317,8 @@ namespace nodes
     template <typename ValueType, typename PackedBitsType>
     void BinaryReceptiveFieldMatrixNode<ValueType, PackedBitsType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<BinaryReceptiveFieldMatrixNode>(newPortElements, _convolutionalParameters, _inputMemoryLayout, _outputMemoryLayout);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<BinaryReceptiveFieldMatrixNode>(newInputs, _convolutionalParameters, _inputMemoryLayout, _outputMemoryLayout);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

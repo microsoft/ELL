@@ -33,7 +33,7 @@ namespace model
         /// <summary> Get the name of function this map compiles to </summary>
         ///
         /// <returns> The name of function this map compiles to </returns>
-        std::string GetFunctionName() { return _functionName; }
+        std::string GetFunctionName() const { return _functionName; }
 
         /// <summary> Output the compiled model to the given file </summary>
         ///
@@ -86,7 +86,8 @@ namespace model
 
     protected:
         CompiledMap(Map map, std::string functionName, const MapCompilerOptions& options);
-
+        MapCompilerOptions GetMapCompilerOptions() const { return _compilerOptions; }
+        
         std::string _functionName;
         MapCompilerOptions _compilerOptions;
     };

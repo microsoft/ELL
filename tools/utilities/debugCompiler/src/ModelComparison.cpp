@@ -762,7 +762,7 @@ template <typename ValueType>
 void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, const nodes::NeuralNetworkLayerNodeBase<ValueType>* layerNode)
 {
     std::string sinkFunctionName = "DebugOutput";
-    const auto& newPortElements = transformer.GetCorrespondingOutputs(layerNode->output);
+    const auto& newInputs = transformer.GetCorrespondingOutputs(layerNode->output);
     std::string label = layerNode->GetRuntimeTypeName() + "(" + to_string(layerNode->GetId()) + ")";
 
     size_t size = layerNode->GetOutputSize();
@@ -773,7 +773,7 @@ void ModelComparison::AddDebugOutputNode(model::ModelTransformer& transformer, c
     };
 
     auto sinkNode = transformer.AddNode<ell::nodes::DebugSinkNode<ValueType>>(
-        newPortElements,
+        newInputs,
         sinkFunction,
         label,
         static_cast<void*>(this),

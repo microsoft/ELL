@@ -17,7 +17,6 @@
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
 #include <model/include/OutputPort.h>
-#include <model/include/PortElements.h>
 
 #include <utilities/include/TypeName.h>
 #include <utilities/include/TypeTraits.h>

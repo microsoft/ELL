@@ -178,7 +178,7 @@ namespace model
     template <typename ValueType>
     void InputNode<ValueType>::Copy(ModelTransformer& transformer) const
     {
-        auto newNode = transformer.AddNode<InputNode<ValueType>>(GetShape());
+        auto newNode = transformer.AddNode<InputNode<ValueType>>(GetMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }
 

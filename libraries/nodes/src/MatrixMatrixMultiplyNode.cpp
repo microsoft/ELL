@@ -225,9 +225,9 @@ namespace nodes
     template <typename ValueType>
     void MatrixMatrixMultiplyNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& PortElements1 = transformer.GetCorrespondingInputs(_input1);
-        const auto& PortElements2 = transformer.GetCorrespondingInputs(_input2);
-        auto newNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(PortElements1, _m, _n, _k, _lda, _transpose1, PortElements2, _ldb, _transpose2, _ldc, _transposeOutput);
+        const auto& newInput1 = transformer.GetCorrespondingInputs(_input1);
+        const auto& newInput2 = transformer.GetCorrespondingInputs(_input2);
+        auto newNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(newInput1, _m, _n, _k, _lda, _transpose1, newInput2, _ldb, _transpose2, _ldc, _transposeOutput);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

@@ -141,10 +141,10 @@ namespace nodes
     void ValueSelectorNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         const auto& newCondition = transformer.GetCorrespondingInputs(_condition);
-        const auto& newPortElements1 = transformer.GetCorrespondingInputs(_input1);
-        const auto& newPortElements2 = transformer.GetCorrespondingInputs(_input2);
+        const auto& newInputs1 = transformer.GetCorrespondingInputs(_input1);
+        const auto& newInputs2 = transformer.GetCorrespondingInputs(_input2);
 
-        auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newPortElements1, newPortElements2);
+        auto newNode = transformer.AddNode<ValueSelectorNode<ValueType>>(newCondition, newInputs1, newInputs2);
 
         transformer.MapNodeOutput(output, newNode->output);
     }

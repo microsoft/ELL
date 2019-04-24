@@ -17,7 +17,6 @@
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
 #include <model/include/OutputPort.h>
-#include <model/include/PortElements.h>
 
 #include <utilities/include/TypeName.h>
 
@@ -142,8 +141,8 @@ namespace nodes
     template <typename ValueType>
     void MovingAverageNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<MovingAverageNode<ValueType>>(newPortElements, _windowSize);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<MovingAverageNode<ValueType>>(newInputs, _windowSize);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

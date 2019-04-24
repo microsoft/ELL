@@ -8,5 +8,6 @@
 #pragma once
 
 void TestCopySubmodel();
+void TestCopySubmodelOnto();
 void TestTransformSubmodelOnto();
 void TestTransformSubmodelInPlace();

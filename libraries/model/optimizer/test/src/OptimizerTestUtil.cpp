@@ -80,7 +80,7 @@ Submodel GetSimpleSubmodel()
     const auto& in = Input<float>(m, 4);
     const auto& out1 = AddOutput(m, in);
     const auto& out2 = AddOutput(m, out1);
-    return Submodel(m, { &GetInputPort(out1) }, { &out2 });
+    return Submodel({ &GetInputPort(out1) }, { &out2 });
 }
 
 // Returns a simple submodel to test the CombineNodesTransformation
@@ -105,7 +105,7 @@ Submodel GetCombineNodesTestSubmodel()
     const auto& out8 = AddOutput(m, out7, "a");
     const auto& out9 = AddOutput(m, out8, "a");
 
-    return Submodel(m, { &GetInputPort(out3) }, { &out9 });
+    return Submodel({ &GetInputPort(out3) }, { &out9 });
 }
 
 TransformationTestData GetCombineNodesTestData()

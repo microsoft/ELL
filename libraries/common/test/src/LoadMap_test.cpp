@@ -41,17 +41,10 @@ void TestLoadMapWithPorts(const std::string& examplePath)
     args.modelInputsString = "";
     args.modelOutputsString = "{1031.weightedElements[0:2], 1031.weightedElements[4:6]}";
 
-    bool threw = false;
     std::cout << "Testing map loading, file " << args.inputModelFilename << std::endl;
-    try
-    {
-        auto map = common::LoadMap(args);
-    }
-    catch (const utilities::LogicException&)
-    {
-        threw = true;
-    }
+    auto map = common::LoadMap(args);
+
     // check stuff out
-    testing::ProcessTest("Testing Map constructor does not support multiple output ranges", threw);
+    testing::ProcessTest("Testing Map constructor supports multiple output ranges", map.GetOutput().Size() == 4);
 }
 } // namespace ell

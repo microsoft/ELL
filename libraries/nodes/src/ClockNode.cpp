@@ -144,8 +144,8 @@ namespace nodes
 
     void ClockNode::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<ClockNode>(newPortElements, _interval, _lagThreshold, _lagNotificationFunctionName, _lagNotificationFunction);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<ClockNode>(newInputs, _interval, _lagThreshold, _lagNotificationFunctionName, _lagNotificationFunction);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

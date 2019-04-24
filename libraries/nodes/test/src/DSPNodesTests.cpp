@@ -153,12 +153,12 @@ static void TestFFTNodeCompute(size_t N, size_t nfft)
     for (size_t index = 0; index < computeOutput.size(); ++index)
     {
         auto x = computeOutput[index];
-        if (N >= nfft || index == 0) 
+        if (N >= nfft || index == 0)
         {
             auto expected = (N > nfft) ? nfft : N;
             testing::ProcessTest("Testing real-valued FFT of DC signal", testing::IsEqual(x, static_cast<ValueType>(index == 0 ? expected : 0)));
         }
-        else 
+        else
         {
             // in the zero-padded case the ramp down from N is a bit smoother, it is not just a step function.
             testing::ProcessTest("Testing real-valued FFT of DC signal", testing::IsTrue(x < N));
@@ -504,7 +504,7 @@ static void TestConvolutionNodeCompile(dsp::ConvolutionMethodOption convolutionM
         break;
     }
 
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", model::PortElementsBase(*(outputNode->GetOutputPort(0))) } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", *(outputNode->GetOutputPort(0)) } });
 
     auto rawDataTensor = Tensor(inputRows, inputColumns, numChannels, data);
     auto paddedDataTensor = Tensor(inputRows + 2, inputColumns + 2, numChannels);
@@ -631,7 +631,7 @@ static void TestConvolutionNodeCompileVsReference(ImageShape inputShape, Filters
 
     auto postConvReorderNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(convOutput, convOutputLayout, outputMemoryLayout);
 
-    auto map = model::Map(model, { { "input", inputNode } }, { { "output", model::PortElementsBase(*(postConvReorderNode->GetOutputPort(0))) } });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", postConvReorderNode->output } });
 
     auto rawDataTensor = Tensor(inputRows, inputColumns, numChannels, data);
     auto paddedDataTensor = Tensor(inputRows + 2 * inputPadding, inputColumns + 2 * inputPadding, numChannels);

@@ -25,7 +25,6 @@ using namespace ell::predictors::neural;
 void TestIRCompiler()
 {
     TestReinterpretLayoutNode();
-    TestReinterpretLayoutNodeWithPadding();
     TestBroadcastLinearFunctionNode();
 
     TestNodeMetadata();

@@ -174,7 +174,7 @@ source_group("include" FILES ${compiler_test_include})
 
 add_executable(${compiler_test_name} ${compiler_test_src} ${compiler_test_include})
 target_include_directories(${compiler_test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
-target_link_libraries(${compiler_test_name} common model nodes passes testing model_testing utilities)
+target_link_libraries(${compiler_test_name} PRIVATE common model nodes passes testing model_testing utilities)
 copy_shared_libraries(${compiler_test_name})
 
 set_target_properties(

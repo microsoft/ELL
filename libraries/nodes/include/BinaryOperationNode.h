@@ -16,6 +16,7 @@
 #include <model/include/Model.h>
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
+#include <model/include/PortElements.h>
 #include <model/include/PortMemoryLayout.h>
 
 #include <emitters/include/LLVMUtilities.h>
@@ -443,10 +444,10 @@ namespace nodes
     template <typename ValueType>
     void BinaryOperationNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& PortElements1 = transformer.GetCorrespondingInputs(_input1);
-        const auto& PortElements2 = transformer.GetCorrespondingInputs(_input2);
+        const auto& inputs1 = transformer.GetCorrespondingInputs(_input1);
+        const auto& inputs2 = transformer.GetCorrespondingInputs(_input2);
         auto outputLayout = _output.GetMemoryLayout();
-        auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(PortElements1, _inputLayout1, PortElements2, _inputLayout2, outputLayout, _operation);
+        auto newNode = transformer.AddNode<BinaryOperationNode<ValueType>>(inputs1, _inputLayout1, inputs2, _inputLayout2, outputLayout, _operation);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

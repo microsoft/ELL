@@ -660,8 +660,8 @@ namespace nodes
     template <typename ValueType>
     void FFTNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<FFTNode<ValueType>>(newPortElements, _fftSize);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<FFTNode<ValueType>>(newInputs, _fftSize);
         transformer.MapNodeOutput(output, newNode->output);
     }
 

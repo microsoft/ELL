@@ -9,10 +9,12 @@
 #pragma once
 
 #include <model/include/CompilableNode.h>
+#include <model/include/CompilableNodeUtilities.h>
 #include <model/include/IRMapCompiler.h>
 #include <model/include/Model.h>
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
+#include <model/include/OutputNode.h>
 #include <model/include/Port.h>
 #include <model/include/PortMemoryLayout.h>
 
@@ -209,12 +211,6 @@ namespace nodes
 
 #pragma region implementation
 
-#include <model/include/CompilableNodeUtilities.h>
-#include <model/include/IRMapCompiler.h>
-#include <model/include/OutputNode.h>
-
-#include <vector>
-
 namespace ell
 {
 namespace nodes
@@ -409,8 +405,8 @@ namespace nodes
     template <typename ValueType>
     void ReorderDataNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<ReorderDataNode>(newPortElements,
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<ReorderDataNode>(newInputs,
                                                             _inputMemoryLayout,
                                                             _output.GetMemoryLayout(),
                                                             _paddingValue);

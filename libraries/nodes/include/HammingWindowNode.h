@@ -112,17 +112,17 @@ namespace nodes
     template <typename ValueType>
     void HammingWindowNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<HammingWindowNode<ValueType>>(newPortElements);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        auto newNode = transformer.AddNode<HammingWindowNode<ValueType>>(newInputs);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>
     bool HammingWindowNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
-        const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        const auto& windowValue = Constant(transformer, dsp::HammingWindow<ValueType>(_input.Size()), newPortElements.GetMemoryLayout());
-        const auto& product = Multiply(newPortElements, windowValue);
+        const auto& newInputs = transformer.GetCorrespondingInputs(_input);
+        const auto& windowValue = Constant(transformer, dsp::HammingWindow<ValueType>(_input.Size()), newInputs.GetMemoryLayout());
+        const auto& product = Multiply(newInputs, windowValue);
         transformer.MapNodeOutput(output, product);
         return true;
     }

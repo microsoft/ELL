@@ -176,7 +176,7 @@ namespace model
     {
         FinishJitting();
 
-        if (GetOutput(0).GetPortType() != model::Port::PortType::boolean)
+        if (GetOutput(0).GetType() != model::Port::PortType::boolean)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
@@ -189,7 +189,7 @@ namespace model
     std::vector<int> IRCompiledMap::ComputeIntOutput(const model::PortElementsBase& outputs)
     {
         EnsureExecutionEngine();
-        if (GetOutput(0).GetPortType() != model::Port::PortType::integer)
+        if (GetOutput(0).GetType() != model::Port::PortType::integer)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
@@ -200,7 +200,7 @@ namespace model
     std::vector<int64_t> IRCompiledMap::ComputeInt64Output(const model::PortElementsBase& outputs)
     {
         FinishJitting();
-        if (GetOutput(0).GetPortType() != model::Port::PortType::bigInt)
+        if (GetOutput(0).GetType() != model::Port::PortType::bigInt)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
@@ -211,7 +211,7 @@ namespace model
     std::vector<float> IRCompiledMap::ComputeFloatOutput(const model::PortElementsBase& outputs)
     {
         FinishJitting();
-        if (GetOutput(0).GetPortType() != model::Port::PortType::smallReal)
+        if (GetOutput(0).GetType() != model::Port::PortType::smallReal)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
@@ -222,7 +222,7 @@ namespace model
     std::vector<double> IRCompiledMap::ComputeDoubleOutput(const model::PortElementsBase& outputs)
     {
         FinishJitting();
-        if (GetOutput(0).GetPortType() != model::Port::PortType::real)
+        if (GetOutput(0).GetType() != model::Port::PortType::real)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }

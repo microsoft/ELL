@@ -65,14 +65,10 @@ namespace model
         /// <param name="model"> The model to wrap. A deep copy of this model is stored inside the map. </param>
         /// <param name="inputs"> A vector of name/value pairs for the inputs this map uses </param>
         /// <param name="outputs"> A vector of name/value pairs for the outputs this map generates </param>
-        Map(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs);
-
-        /// <summary> Constructor </summary>
-        ///
-        /// <param name="model"> The model to wrap. </param>
-        /// <param name="inputs"> A vector of name/value pairs for the inputs this map uses </param>
-        /// <param name="outputs"> A vector of name/value pairs for the outputs this map generates </param>
-        Map(Model&& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, PortElementsBase>>& outputs);
+        /// @{
+        Map(const Model& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, const OutputPortBase&>>& outputs);
+        Map(Model&& model, const std::vector<std::pair<std::string, InputNodeBase*>>& inputs, const std::vector<std::pair<std::string, const OutputPortBase&>>& outputs);
+        /// @}
 
         /// <summary> Gets the model wrapped by this map </summary>
         ///
@@ -264,13 +260,13 @@ namespace model
         ///
         /// <param name="index"> The index of the output </param>
         /// <returns> The output </returns>
-        PortElementsBase GetOutput(size_t index = 0) const;
+        const OutputPortBase& GetOutput(size_t index = 0) const;
 
         /// <summary> Returns an output </summary>
         ///
         /// <param name="outputName"> The name of the output </param>
         /// <returns> The output </returns>
-        PortElementsBase GetOutput(const std::string& outputName) const;
+        const OutputPortBase& GetOutput(const std::string& outputName) const;
 
         /// <summary> Returns the name of an output </summary>
         ///
@@ -287,7 +283,7 @@ namespace model
         /// <summary> Returns the outputs </summary>
         ///
         /// <returns> The outputs </returns>
-        const std::vector<PortElementsBase>& GetOutputs() const { return _outputElements; }
+        const std::vector<const OutputPortBase*>& GetOutputs() const { return _outputs; }
 
         //
         // Routines for computing output (processing data)
@@ -353,19 +349,19 @@ namespace model
         template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
         DataVectorType ComputeOutput(const std::string& outputName);
 
-        /// <summary> Returns a `PortElements` object representing the indicated map output </summary>
+        /// <summary> Returns a `OutputPort` for the indicated map output </summary>
         ///
         /// <param name="outputIndex"> The zero-based index of the map output </param>
-        /// <returns> The `PortElements` object representing the indicated outputs </returns>
+        /// <returns> The `OutputPort` for the indicated outputs </returns>
         template <typename ValueType>
-        PortElements<ValueType> GetOutputElements(size_t outputIndex) const;
+        const OutputPort<ValueType>& GetOutput(size_t outputIndex) const;
 
-        /// <summary> Returns a `PortElements` object representing the indicated map output </summary>
+        /// <summary> Returns a `OutputPort` for the indicated map output </summary>
         ///
         /// <param name="outputName"> The name of the map output </param>
-        /// <returns> The `PortElements` object representing the indicated outputs </returns>
+        /// <returns> The `OutputPort` for the indicated outputs </returns>
         template <typename ValueType>
-        PortElements<ValueType> GetOutputElements(std::string outputName) const;
+        const OutputPort<ValueType>& GetOutput(std::string outputName) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -456,12 +452,12 @@ namespace model
         std::vector<std::string> _inputNames;
         std::unordered_map<std::string, InputNodeBase*> _inputNodeMap;
 
-        std::vector<PortElementsBase> _outputElements;
+        std::vector<const OutputPortBase*> _outputs;
         std::vector<std::string> _outputNames;
-        std::unordered_map<std::string, PortElementsBase> _outputElementsMap;
+        std::unordered_map<std::string, const OutputPortBase*> _outputsMap;
         utilities::PropertyBag _metadata;
 
-        value::ComputeContext _computeContext{"map_compute"};
+        value::ComputeContext _computeContext{ "map_compute" };
     };
 
     /// <summary> A serialization context used during Map deserialization. Wraps an existing `ModelSerializationContext` </summary>
@@ -687,15 +683,15 @@ namespace model
     }
 
     template <typename ValueType>
-    PortElements<ValueType> Map::GetOutputElements(size_t outputIndex) const
+    const OutputPort<ValueType>& Map::GetOutput(size_t outputIndex) const
     {
-        return PortElements<ValueType>(GetOutput(outputIndex));
+        return static_cast<const OutputPort<ValueType>&>(GetOutput(outputIndex));
     }
 
     template <typename ValueType>
-    PortElements<ValueType> Map::GetOutputElements(std::string outputName) const
+    const OutputPort<ValueType>& Map::GetOutput(std::string outputName) const
     {
-        return PortElements<ValueType>(GetOutput(outputName));
+        return static_cast<const OutputPort<ValueType>&>(GetOutput(outputName));
     }
 } // namespace model
 } // namespace ell

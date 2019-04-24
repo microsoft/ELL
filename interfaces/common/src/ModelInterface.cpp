@@ -644,13 +644,14 @@ std::string GetVariableName(const ell::model::PortElementsBase& portElements, co
     // a PortElements object can pull output from multiple nodes, so the friendly name should then be
     // the concatenation of friendly names of each of those output nodes.
     std::vector<std::string> parts;
-    for (auto range: portElements.GetRanges())
+    for (auto range : portElements.GetRanges())
     {
         const ell::model::OutputPortBase* outputPort = range.ReferencedPort();
         std::string name = outputPort->GetVariableName(defaultName);
         parts.push_back(name);
     }
-    if (parts.size() == 0) {
+    if (parts.size() == 0)
+    {
         return defaultName;
     }
     return ell::utilities::Join(parts, "_");
@@ -669,14 +670,15 @@ Map::Map(Model model, InputNode inputNode, PortElements output)
 
     const ell::model::PortElementsBase& innerPortElements = output.GetPortElements();
     name = GetVariableName(innerPortElements, "output");
-    auto outputs = std::vector<std::pair<std::string, ell::model::PortElementsBase>>{ { name, innerPortElements } };
-    _map = std::make_shared<ell::model::Map>(model.GetModel(), inputs, outputs);
+    auto& ellModel = model.GetModel();
+    auto outputs = std::vector<std::pair<std::string, const ell::model::OutputPortBase&>>{ { name, ellModel.SimplifyOutputs(innerPortElements) } };
+    _map = std::make_shared<ell::model::Map>(ellModel, inputs, outputs);
 }
 
 Map::Map(Model model, const std::vector<InputNode*> inputNodes, const std::vector<PortElements*> outputs)
 {
     std::vector<std::pair<std::string, ell::model::InputNodeBase*>> mapInputs;
-    for (auto& inputNode: inputNodes)
+    for (auto& inputNode : inputNodes)
     {
         const ell::model::InputNodeBase* innerInputNode = inputNode->GetInputNode();
         auto name = innerInputNode->GetFriendlyName();
@@ -686,13 +688,14 @@ Map::Map(Model model, const std::vector<InputNode*> inputNodes, const std::vecto
         }
         mapInputs.push_back(std::pair<std::string, ell::model::InputNodeBase*>{ name, const_cast<ell::model::InputNodeBase*>(innerInputNode) });
     }
-        
-    std::vector<std::pair<std::string, ell::model::PortElementsBase>> mapOutputs;
+
+    auto& ellModel = model.GetModel();
+    std::vector<std::pair<std::string, const ell::model::OutputPortBase&>> mapOutputs;
     for (auto& output : outputs)
     {
         const ell::model::PortElementsBase& innerPortElements = output->GetPortElements();
         auto name = GetVariableName(innerPortElements, "output");
-        mapOutputs.push_back({ name, innerPortElements });
+        mapOutputs.push_back({ name, ellModel.SimplifyOutputs(innerPortElements) });
     }
     _map = std::make_shared<ell::model::Map>(model.GetModel(), mapInputs, mapOutputs);
 }

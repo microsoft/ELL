@@ -349,7 +349,7 @@ namespace common
         {
             auto model = common::LoadModel(mapLoadArguments.inputModelFilename);
             model::InputNodeBase* inputNode = nullptr;
-            model::PortElementsBase outputElements;
+            const model::OutputPortBase* output;
             if (mapLoadArguments.modelInputsString != "")
             {
                 inputNode = mapLoadArguments.GetInput(model);
@@ -370,7 +370,7 @@ namespace common
 
             if (mapLoadArguments.modelOutputsString != "")
             {
-                outputElements = mapLoadArguments.GetOutput(model);
+                output = mapLoadArguments.GetOutput(model);
             }
             else // look for first output node
             {
@@ -387,10 +387,10 @@ namespace common
                 }
 
                 auto outputPort = outputPorts[0]; // ptr to port base
-                outputElements = model::PortElementsBase(*outputPort);
+                output = outputPort;
             }
 
-            return { model, { { "input", inputNode } }, { { "output", outputElements } } };
+            return { model, { { "input", inputNode } }, { { "output", *output } } };
         }
         else // No model / map file specified -- return an identity map
         {
