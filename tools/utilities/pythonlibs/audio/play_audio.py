@@ -34,8 +34,6 @@ speaker = speaker.Speaker()
 # open the reader asking for size chunks of audio, converted to floating point between -1 and 1.
 reader.open(args.filename, args.buffer_size, speaker)
 
-print("wav file contains sample rate {} and {} channels".format(reader.actual_rate, reader.actual_channels))
-
 code = args.code
 # pump the reader until it returns None.  In a real app you would assign the results of read() to
 # a variable so you can process the audio chunks returned.

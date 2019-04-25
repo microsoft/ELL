@@ -170,6 +170,11 @@ def make_dataset(list_file, outdir, categories_path, featurizer_path, sample_rat
     transform = featurizer.AudioTransform(featurizer_path, 0)
 
     entry_map = parse_list_file(list_file)
+    if not categories_path:
+        categories_path = "categories.txt"
+    if not os.path.isfile(categories_path):
+        raise Exception("{} file not found".format(categories_path))
+
     categories = [x.strip() for x in open(categories_path, 'r').readlines()]
 
     mixer = None

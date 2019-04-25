@@ -44,6 +44,7 @@ class Microphone:
         self.input_stream = None
         self.auto_scale = auto_scale
         self.audio_scale_factor = 1
+        self.tail = None
 
     def open(self, sample_size, sample_rate, num_channels, input_device=None):
         """ Open the microphone so it returns chunks of audio samples of the given sample_size
@@ -72,7 +73,8 @@ class Microphone:
                                             rate=self.mic_rate,
                                             input=True,
                                             frames_per_buffer=buffer_size,
-                                            stream_callback=self._on_recording_callback)
+                                            stream_callback=self._on_recording_callback,
+                                            input_device_index=input_device)
         if self.auto_scale:
             self.audio_scale_factor = 1 / 32768  # since we are using pyaudio.paInt16.
         self.closed = False
@@ -83,9 +85,12 @@ class Microphone:
             self.stdin_thread.start()
 
     def _on_recording_callback(self, data, frame_count, time_info, status):
-        # convert the incoming audio to the desired recording rate
-        result, self.cvstate = audioop.ratecv(data, 2, self.num_channels, self.mic_rate, self.sample_rate,
-                                              self.cvstate)
+        if self.mic_rate != self.sample_rate:
+            # convert the incoming audio to the desired recording rate
+            result, self.cvstate = audioop.ratecv(data, 2, self.num_channels, self.mic_rate, self.sample_rate,
+                                                  self.cvstate)
+        else:
+            result = data
 
         # protect access to the shared state
         self.cv.acquire()
@@ -101,8 +106,16 @@ class Microphone:
     def read(self):
         """ Read the next audio chunk. This method blocks until the audio is available """
         while not self.closed:
-            # block until microphone data is ready...
             result = None
+
+            # deal with any accumulation of tails, if the tail grows to a full
+            # buffer then return it!
+            if self.tail is not None and len(self.tail) >= self.sample_size:
+                data = self.tail[0:self.sample_size]
+                self.tail = self.tail[self.sample_size:]
+                return data
+
+            # block until microphone data is ready...
             self.cv.acquire()
             try:
                 while len(self.read_buffer) == 0:
@@ -118,13 +131,22 @@ class Microphone:
                 # convert int16 data to scaled floats
                 data = np.frombuffer(result, dtype=np.int16)
                 data = data.astype(float)
+
+                if self.tail is not None:
+                    # we have a tail from previous frame, so prepend it
+                    data = np.concatenate((self.tail, data))
+
+                # now the caller needs us to stick to our sample_size contract, but when
+                # rate conversion happens we can't be sure that 'data' is exactly that size.
+                if len(data) > self.sample_size:
+                    # usually one byte extra so add this to our accumulating tail
+                    self.tail = data[self.sample_size:]
+                    data = data[0:self.sample_size]
+
                 if len(data) < self.sample_size:
-                    # pad the last record with zeros so it is valid input also.
-                    bigger = np.zeros((self.sample_size))
-                    bigger[:len(data)] = data
-                    data = bigger
-                elif len(data) > self.sample_size:
-                    data = data[:self.sample_size]  # just truncate it, might be off by 1 due to rounding errors
+                    # might have reached the end of the stream.
+                    zeros = np.zeros(self.sample_size - len(data))
+                    data = np.concatenate((data, zeros))
 
                 return data * self.audio_scale_factor
         return None

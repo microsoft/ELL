@@ -33,6 +33,7 @@ class WavReader:
         self.dtype = None
         self.auto_scale = auto_scale
         self.audio_scale_factor = 1
+        self.tail = None
 
     def open(self, filename, buffer_size, speaker=None):
         """ open a wav file for reading
@@ -82,16 +83,31 @@ class WavReader:
         if len(data) == 0:
             return None
 
-        if self.actual_channels != self.requested_channels:
-            if self.requested_channels == 1:
-                data = audioop.tomono(data, self.sample_width, 1, 1)
-            else:
-                raise Exception("Target number of channels must be 1")
-
         if self.actual_rate != self.requested_rate:
             # convert the audio to the desired recording rate
-            data, self.cvstate = audioop.ratecv(data, self.sample_width, self.requested_channels, self.actual_rate,
+            data, self.cvstate = audioop.ratecv(data, self.sample_width, self.actual_channels, self.actual_rate,
                                                 self.requested_rate, self.cvstate)
+
+        return self.get_requested_channels(data)
+
+    def get_requested_channels(self, data):
+        if self.requested_channels > self.actual_channels:
+            raise Exception("Cannot add channels, actual is {}, requested is {}".format(
+                self.actual_channels, self.requested_channels))
+
+        if self.requested_channels < self.actual_channels:
+            data = np.frombuffer(data, dtype=np.int16)
+            channels = []
+            # split into separate channels
+            for i in range(self.actual_channels):
+                channels += [data[i::self.actual_channels]]
+            # drop the channels we don't want
+            channels = channels[0:self.requested_channels]
+            # zip the resulting channels back up.
+            data = np.array(list(zip(*channels))).flatten()
+            # convert back to packed bytes in PCM 16 format
+            data = bytes(np.array(data, dtype=np.int16))
+
         return data
 
     def read(self):
@@ -100,6 +116,13 @@ class WavReader:
         values possible for the given audio format.
         """
 
+        # deal with any accumulation of tails, if the tail grows to a full
+        # buffer then return it!
+        if self.tail is not None and len(self.tail) >= self.read_size:
+            data = self.tail[0:self.read_size]
+            self.tail = self.tail[self.read_size:]
+            return data
+
         data = self.read_raw()
         if data is None:
             return None
@@ -107,19 +130,22 @@ class WavReader:
         if self.speaker:
             self.speaker.write(data)
 
-        remainder = len(data) % self.sample_width
-        if remainder != 0:
-            data = data[:len(data) - remainder]
         data = np.frombuffer(data, dtype=self.dtype).astype(float)
+        if self.tail is not None:
+            # we have a tail from previous frame, so prepend it
+            data = np.concatenate((self.tail, data))
 
-        # pad the last record with zeros so it is valid output.
-        data_size = len(data)
-        if data_size < self.read_size:
-            bigger = np.zeros((self.read_size))
-            bigger[:data_size] = data
-            data = bigger
-        elif data_size > self.read_size:
-            data = data[:self.read_size]  # truncate
+        # now the caller needs us to stick to our sample_size contract, but when
+        # rate conversion happens we can't be sure that 'data' is exactly that size.
+        if len(data) > self.read_size:
+            # usually one byte extra so add this to our accumulating tail
+            self.tail = data[self.read_size:]
+            data = data[0:self.read_size]
+
+        if len(data) < self.read_size:
+            # might have reached the end of a file, so pad with zeros.
+            zeros = np.zeros(self.read_size - len(data))
+            data = np.concatenate((data, zeros))
 
         return data * self.audio_scale_factor
 

@@ -70,6 +70,9 @@ class AudioTransform:
             self.logfile.write("{}\n".format(",".join([str(x) for x in data])))
         self.frame_count += 1
 
+        if len(data) != self.input_size:
+            raise Exception("Expecting {} bytes, but only have {}".format(self.input_size, len(data)))
+
         start_time = time.time()
         result = self.model.transform(data)
 

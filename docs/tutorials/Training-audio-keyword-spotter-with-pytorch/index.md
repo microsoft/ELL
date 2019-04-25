@@ -23,7 +23,8 @@ Complete the following steps before starting the tutorial.
 ## What you will need
 
 *  Laptop or desktop computer with at least 16 GB of RAM.
-*  Optional NVidia Graphics Card that supports [CUDA](https://developer.nvidia.com/cuda-downloads).
+*  Optional NVidia Graphics Card that supports CUDA.  You will get great results with a [GTX 1080](https://www.nvidia.com/en-us/geforce/products/10series/geforce-gtx-1080/) which is commonly used for training neural networks.
+*  The NVidia CUDA 10.0 SDK from [https://developer.nvidia.com/cuda-downloads](https://developer.nvidia.com/cuda-downloads).
 
 ## Overview
 
@@ -68,17 +69,13 @@ Activate it
 [Windows] activate torch
 ```
 
-Then do the following:
+Then follow the PyTorch setup instructions for Anaconda and your version of CUDA as described on this page:
+[https://pytorch.org/get-started/locally/](https://pytorch.org/get-started/locally/).
 
-```shell
-[Linux, macOS] conda install pytorch cuda90 torchvision -c pytorch
-[Linux, macOS] pip install pyaudio
 
-[Windows] conda install pytorch cuda90 -c pytorch
-[Windows] pip install torchvision
-[Windows] conda install -c defaults intel-openmp -f
-[Windows] pip install pyaudio
-```
+## Helper Python Code
+
+This tutorial uses python scripts located in your ELL git repo under `tools/utilities/pythonlibs/audio` and `tools/utilities/pythonlibs/audio/training`.  When you see a python script referenced below like `make_training_list.py`, just prefix that with the full path to that script your ELL git repo.
 
 ## Downloading the Training Data
 
@@ -180,9 +177,9 @@ popd
 Now you have a compiled featurizer, so you can preprocess all the audio files using this featurizer and create a compressed numpy dataset with the result.  This large dataset will contain one row per audio file, where each row contains all the featurizer output for that file.  The featurizer output is smaller than the raw audio, but it will still end up being a pretty big file, (about 1.2 GB).  Of course it depends how many files you include in the set.  Remember for best training results the more files the better, so  you will use the **training_list.txt** you created earlier which selected 1600 files per keyword.  You need three datasets created from each of the list files in your audio folder using `make_dataset` as follows:
 
 ```shell
-python make_dataset.py --list_file audio/training_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --auto_scale
-python make_dataset.py --list_file audio/validation_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --auto_scale
-python make_dataset.py --list_file audio/testing_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --auto_scale
+python make_dataset.py --list_file audio/training_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --window_size 40 --shift 40 --auto_scale
+python make_dataset.py --list_file audio/validation_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --window_size 40 --shift 40 --auto_scale
+python make_dataset.py --list_file audio/testing_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --window_size 40 --shift 40 --auto_scale
 ```
 
 Where the **audio** folder contains your unpacked .wav files.  If your audio files are in a different location then simply provide the full path to it in the above commands.  
@@ -190,7 +187,7 @@ Where the **audio** folder contains your unpacked .wav files.  If your audio fil
 The reason for the `--sample_rate 16000` argument is that small low powered target devices might not be able to record and process audio at very high rates.
 So while your host PC can probably do 96kHz audio and higher just fine, this tutorial shows you how to down sample the audio to something that will run on a tiny target device.  The main point being that you will get the best results if you train the model on audio that is sampled at the same rate that your target device will be recording.
 
-The `--auto_scale` option converts raw integer audio values to floating point numbers in the range [-1, 1]. 
+The `--auto_scale` option converts raw integer audio values to floating point numbers in the range [-1, 1].  
 
 Creating the datasets will take a while, about 10 minutes or more, so now is a great time to grab a cup of tea.  It will produce three files in your working folder named **training.npz**, **validation.npz** and **testing.npz** which you will use below.
 
@@ -402,16 +399,32 @@ There are many other things you could try.  So long as the trainer still shows a
 As you can see, PyTorch makes it pretty easy to experiment.
 To learn more about PyTorch see their [excellent tutorials](https://pytorch.org/tutorials/).
 
+## Hyper-parameter Tuning
+
+So far your training has used all the defaults provided by `train_classifier`, but an important step in training neural networks is 
+tuning all the training parameters.  These include `learning_rate`, `batch_size`, `weight_decay`, `lr_schedulers` and their associated 
+`lr_min` and `lr_peaks`, and of course the number of `epochs`.  It is good practice to do a set of training runs that test a range
+of different values independently testing all these hyper-parameters.  You can probably get a full 1% increase in training accuracy by finding
+the optimal parameters.
+
+## Cleaning the Data
+
+The speech commands dataset contains many bad training files, either total silence, or bad noise, clipped words and some 
+completely mislabelled words.  Obviously this will impact your training accuracy.  So included in this tutorial is a `bad_list.txt` file.  If you copy that to your speech commands folder (next to your `testing_list.txt` file) then re-run `make_training_list.py` with the additional argument `--bad_list bad_list.txt` then it will create a cleaner test, validation and training list.
+
+Re-run the featurization steps with `make_dataset.py` and retrain your model and you should now see the test accuracy jump
+to about 94%.  So this is a good illustration of the fact that higher quality labelled data can make a big difference in model performance.
+
 ## Next steps
 
-That's it, you just trained your first keyword spotter using PyTorch and you compiled and tested it using ELL, congratulations!  You can now use your new featurizer and classifier in your embedded application, perhaps on a Raspberry Pi, or even on an [Azure IOT Dev Kit](https://microsoft.github.io/azure-iot-developer-kit/).
+That's it, you just trained your first keyword spotter using PyTorch and you compiled and tested it using ELL, congratulations!  You can now use your new featurizer and classifier in your embedded application, perhaps on a Raspberry Pi, or even on an [Azure IOT Dev Kit](https://microsoft.github.io/azure-iot-developer-kit/), as shown in the [DevKitKeywordSpotter](https://github.com/IoTDevEnvExamples/DevKitKeywordSpotter/) example.
 
 There are also lots of things you can experiment with as listed above.  You can also build your own training sets, or customize the speech commands set by simply modifying the the **training_list.txt** file, then recreate the **training_list.npz** dataset using `make_dataset.py`, retrain the model and see how it does.  
 
-Another dimension you can play with is mixing noise with your clean .wav files.  This can give you a much bigger dataset and a model that performs better in noisy locations.  Of course, this depends on what kind of noise you care about.  Crowds of people? Industrial machinery? Just the hum of computers and HVAC systems in an Office environment?  It depends on your application.  You can experiment using the noise files included in the speech_commands dataset.
+Another dimension you can play with is mixing noise with your clean .wav files.  This can give you a much bigger dataset and a model that performs better in noisy locations.  Of course, this depends on what kind of noise you care about.  Crowds of people? Industrial machinery? Just the hum of computers and HVAC systems in an Office environment?  It depends on your application.  You can experiment using the noise files included in the speech_commands dataset.  There are some more advanced options on the `make_dataset.py` script to help with mixing noise in with the audio recordings.
 
 The [github speech commands gallery](https://github.com/Microsoft/ELL-models/tree/master/models/speech_commands_v0.01) contains some other types of models, some based on LSTM nodes, for example.  The GRU architecture does well on smaller sized models, but LSTM hits the highest score
-when it maximizes the hidden state size.  You can also see on the gallery that the 8kHz audio is faster, but it loses accuracy.
+when it maximizes the hidden state size.
 
 ## Troubleshooting
 

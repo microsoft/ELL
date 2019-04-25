@@ -1,4 +1,5 @@
 ## 2.4.1*
+- Improvements to audio python library and updates to audio training tutorial
 - Add support for non-unrolled loops in the Value library
 - Add new methods to Python API to support FastGRNN models
 - Add easy node-creation functions

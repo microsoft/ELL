@@ -116,9 +116,10 @@ class AudioModelTester:
                     self.rate * 100, expected, prediction, name))
             elif not self.silent:
                 self.logger.error("FAILED: {}, expecting {}, path={}".format(prediction, expected, name))
+        return prediction == expected
 
     def run_test(self, featurizer_model, classifier_model, list_file, max_tests, dataset, categories, sample_rate,
-                 auto_scale):
+                 auto_scale, output_file):
         """
         Run the test using the given input models (featurizer and classifier) which may or may not be compiled.
         The test set is defined by a list_file or a dataset.  The list file lists .wav files which we will featurize
@@ -137,6 +138,8 @@ class AudioModelTester:
 
         if transform.using_map != predictor.using_map:
             raise Exception("cannot mix .ell and compiled models")
+
+        failed_tests = []
 
         if list_file:
             with open(list_file, "r") as fp:
@@ -158,7 +161,8 @@ class AudioModelTester:
                 reader.open(wav_file, transform.input_size, None)
                 transform.open(reader)
                 prediction, confidence, _, elapsed = self.get_prediction(name, transform, predictor)
-                self.process_prediction(name, prediction, expected, confidence)
+                if not self.process_prediction(name, prediction, expected, confidence):
+                    failed_tests += [name]
                 if self.best_time is None or elapsed < self.best_time:
                     self.best_time = elapsed
 
@@ -190,6 +194,12 @@ class AudioModelTester:
         end = time.time()
         seconds = end - start
 
+        self.logger.info("Saving '{}'".format(output_file))
+        with open(output_file, "w") as f:
+            for line in failed_tests:
+                f.write(line)
+                f.write('\n')
+
         self.logger.info("Test completed in {:.2f} seconds".format(seconds))
         self.logger.info("{} passed, {} failed, pass rate of {:.2f} %".format(
             self.passed, self.failed, self.rate * 100))
@@ -219,6 +229,7 @@ if __name__ == "__main__":
                         default=None)
     parser.add_argument("--auto_scale", help="Whether to auto-scale audio input to range [-1, 1] (default false).",
                         action='store_true')
+    parser.add_argument("--output", help="Name of text file to contain list of failed tests.", default="failed.txt")
 
     logger.add_logging_args(parser)
     args = parser.parse_args()
@@ -236,4 +247,4 @@ if __name__ == "__main__":
 
     test = AudioModelTester(args.reset)
     test.run_test(args.featurizer, args.classifier, args.list_file, args.max_tests, args.dataset, args.categories,
-                  sample_rate, args.auto_scale)
+                  sample_rate, args.auto_scale, args.output)

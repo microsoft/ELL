@@ -25,6 +25,8 @@ from torch.autograd import Variable
 import torch.onnx
 from torch.utils.data import Dataset, DataLoader
 
+from training_config import TrainingConfig
+
 
 class TriangularLR(optim.lr_scheduler._LRScheduler):
     def __init__(self, optimizer, stepsize, lr_min, lr_max, gamma):
@@ -116,9 +118,35 @@ class KeywordSpotter(nn.Module):
         loss_function = nn.NLLLoss()
         initial_rate = options.learning_rate
         lr_scheduler = options.lr_scheduler
-        optimizer = optim.RMSprop(self.parameters(), lr=initial_rate, weight_decay=options.weight_decay)
+        oo = options.optimizer_options
 
-        num_epochs = options.epochs
+        if options.optimizer == "Adadelta":
+            optimizer = optim.Adadelta(self.parameters(), lr=initial_rate, weight_decay=oo.weight_decay,
+                                       rho=oo.rho, eps=oo.eps)
+        elif options.optimizer == "Adagrad":
+            optimizer = optim.Adagrad(self.parameters(), lr=initial_rate, weight_decay=oo.weight_decay,
+                                      lr_decay=oo.lr_decay)
+        elif options.optimizer == "Adam":
+            optimizer = optim.Adam(self.parameters(), lr=initial_rate, weight_decay=oo.weight_decay,
+                                   betas=oo.betas, eps=oo.eps)
+        elif options.optimizer == "Adamax":
+            optimizer = optim.Adamax(self.parameters(), lr=initial_rate, weight_decay=oo.weight_decay,
+                                     betas=oo.betas, eps=oo.eps)
+        elif options.optimizer == "ASGD":
+            optimizer = optim.ASGD(self.parameters(), lr=initial_rate, weight_decay=oo.weight_decay,
+                                   lambd=oo.lambd, alpha=oo.alpha, t0=oo.t0)
+        elif options.optimizer == "RMSprop":
+            optimizer = optim.RMSprop(self.parameters(), lr=initial_rate, weight_decay=oo.weight_decay,
+                                      eps=oo.eps, alpha=oo.alpha, momentum=oo.momentum, centered=oo.centered)
+        elif options.optimizer == "Rprop":
+            optimizer = optim.RMSprop(self.parameters(), lr=initial_rate, etas=oo.etas,
+                                      step_sizes=oo.step_sizes)
+        elif options.optimizer == "SGD":
+            optimizer = optim.SGD(self.parameters(), lr=initial_rate, weight_decay=oo.weight_decay,
+                                  momentum=oo.momentum, dampening=oo.dampening)
+
+        print(optimizer)
+        num_epochs = options.max_epochs
         batch_size = options.batch_size
         learning_rate = options.learning_rate
         lr_min = options.lr_min
@@ -422,54 +450,21 @@ def create_model(arch, input_size, num_keywords, hidden_units, num_layers):
         raise Exception("Model architecture '{}' not supported".format(arch))
 
 
-class TrainingOptions:
-    def __init__(self):
-        self.epochs = 30
-        self.hidden_units = 128
-        self.lr_scheduler = None
-        self.learning_rate = 1e-3
-        self.lr_min = 1e-5
-        self.lr_peaks = 0
-        self.weight_decay = 1e-5
-        self.batch_size = 128
-        self.architecture = "GRU"
-        self.num_layers = 2
-        self.job_id = None
-
-    def set(self, name, value):
-        if name not in self.__dict__:
-            return
-        t = self.__dict__[name]
-        if type(t) == int:
-            self.__dict__[name] = int(value)
-        if type(t) == float:
-            self.__dict__[name] = float(value)
-        if type(t) == str:
-            self.__dict__[name] = str(value)
-        else:
-            self.__dict__[name] = value
-
-    def load(self, filename):
-        with open(filename, "r") as f:
-            loaded_options = json.load(f)
-            for k in self.__dict__:
-                if k in loaded_options:
-                    self.set(k, loaded_options[k])
-
-
 def save_json(obj, filename):
     with open(filename, "w") as f:
         json.dump(obj, f, indent=2)
 
 
-def train(options, filename=None, evaluate_only=False, categories_file=None, wav_directory=None, outdir=".",
-          detail=False):
+def train(config, evaluate_only=False, outdir=".", detail=False):
 
-    epochs = options.epochs
-    batch_size = options.batch_size
-    hidden_units = options.hidden_units
-    architecture = options.architecture
-    num_layers = options.num_layers
+    filename = config.model.filename
+    categories_file = config.dataset.categories
+    wav_directory = config.dataset.path
+    batch_size = config.training.batch_size
+    hidden_units = config.model.hidden_units
+    architecture = config.model.architecture
+    num_layers = config.model.num_layers
+    use_gpu = config.training.use_gpu
 
     valid_layers = [1, 2, 3]
     if num_layers not in valid_layers:
@@ -478,12 +473,13 @@ def train(options, filename=None, evaluate_only=False, categories_file=None, wav
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
 
-    if filename is None:
+    if not filename:
         filename = os.path.join(outdir, "{}{}KeywordSpotter.pt".format(architecture, hidden_units))
+        config.model.filename = filename
 
     # load the featurized data
     if not os.path.isdir(wav_directory):
-        print("### Error: please specify valid --audio folder location")
+        print("### Error: please specify valid --dataset folder location: {}".format(wav_directory))
         sys.exit(1)
 
     if not categories_file:
@@ -511,13 +507,12 @@ def train(options, filename=None, evaluate_only=False, categories_file=None, wav
 
     model = None
 
-    device = None
-    if torch.cuda.is_available():
-        device = torch.device("cuda")
-        if model and device:
-            model.cuda()  # move the processing to GPU
-    else:
-        print("### CUDA not available!!")
+    device = torch.device("cpu")
+    if use_gpu:
+        if torch.cuda.is_available():
+            device = torch.device("cuda")
+        else:
+            print("### CUDA not available!!")
 
     print("Loading {}...".format(testing_file))
     test_data = AudioDataset(testing_file, keywords)
@@ -530,13 +525,14 @@ def train(options, filename=None, evaluate_only=False, categories_file=None, wav
         print("Loading {}...".format(validation_file))
         validation_data = AudioDataset(validation_file, keywords)
 
+        print("Training model {}".format(filename))
         model = create_model(architecture, training_data.input_size, training_data.num_keywords, hidden_units,
                              num_layers)
-        if device:
+        if device.type == 'cuda':
             model.cuda()  # move the processing to GPU
 
         start = time.time()
-        log = model.fit(training_data, validation_data, options, device, detail)
+        log = model.fit(training_data, validation_data, config.training, device, detail)
         end = time.time()
 
         passed, total, rate = model.evaluate(training_data, batch_size, device)
@@ -551,7 +547,7 @@ def train(options, filename=None, evaluate_only=False, categories_file=None, wav
         print(msg.format(test_data.input_size, hidden_units, test_data.num_keywords))
         model = create_model(architecture, test_data.input_size, test_data.num_keywords, hidden_units, num_layers)
         model.load_state_dict(torch.load(filename))
-        if model and device:
+        if model and device.type == 'cuda':
             model.cuda()  # move the processing to GPU
 
     passed, total, rate = model.evaluate(test_data, batch_size, device)
@@ -561,83 +557,90 @@ def train(options, filename=None, evaluate_only=False, categories_file=None, wav
     print("saving onnx file: {}".format(name))
     model.export(name, device)
 
+    config.dataset.sample_rate = test_data.sample_rate
+    config.dataset.input_size = test_data.audio_size
+    config.dataset.num_filters = test_data.input_size
+    config.dataset.window_size = test_data.window_size
+    config.dataset.shift = test_data.shift
+
     logdata = {
-        "accuracy": rate,
-        "architecture": architecture,
-        "batch_size": batch_size,
-        "epochs": epochs,
-        "filename": os.path.basename(filename),
-        "hidden_size": hidden_units,
-        "lr_scheduler": options.lr_scheduler,
-        "learning_rate": options.learning_rate,
-        "weight_decay": options.weight_decay,
-        "lr_min": options.lr_min,
-        "lr_peaks": options.lr_peaks,
-        "num_layers": num_layers,
+        "accuracy_val": rate,
         "training_time": end - start,
-        "auto_scale": True,
-        "sample_rate": test_data.sample_rate,
-        "input_size": test_data.audio_size,
-        "num_filters": test_data.input_size,  # input to classifier size
-        "window_size": test_data.window_size,
-        "shift": test_data.shift,
         "log": log
     }
+    d = TrainingConfig.to_dict(config)
+    logdata.update(d)
+
     logname = os.path.join(os.path.dirname(filename), "train_results.json")
     save_json(logdata, logname)
 
     return rate, log
 
 
+def str2bool(s):
+    s = s.lower()
+    return s in ["t", "true", "yes", "1"]
+
+
 if __name__ == '__main__':
-    options = TrainingOptions()
+    config = TrainingConfig()
     parser = argparse.ArgumentParser("train a GRU based neural network for keyword spotting")
 
     # all the training parameters
-    parser.add_argument("--epochs", help="Number of epochs to train", default=options.epochs, type=int)
-    parser.add_argument("--hidden_units", "-hu", help="Number of hidden units in the GRU layers",
-                        default=options.hidden_units, type=int)
+    parser.add_argument("--epochs", help="Number of epochs to train", type=int)
     parser.add_argument("--lr_scheduler", help="Type of learning rate scheduler (None, TriangleLR, CosineAnnealingLR,"
-                                               " ExponentialLR, ExponentialResettingLR)",
-                        default=options.lr_scheduler)
-    parser.add_argument("--learning_rate", help="Default learning rate, and maximum for schedulers",
-                        default=options.learning_rate, type=float)
-    parser.add_argument("--lr_min", help="Minimum learning rate for the schedulers",
-                        default=options.lr_min, type=float)
-    parser.add_argument("--lr_peaks", help="Number of peaks for triangle and cosine schedules",
-                        default=options.lr_peaks, type=float)
-    parser.add_argument("--batch_size", "-bs", help="Batch size of training",
-                        default=options.batch_size, type=int)
-    parser.add_argument("--architecture", help="Specify model architecture (GRU, LSTM)",
-                        default=options.architecture)
-    parser.add_argument("--num_layers", type=int, help="Number of RNN layers (1, 2 or 3)",
-                        default=options.num_layers)
+                                               " ExponentialLR, ExponentialResettingLR)")
+    parser.add_argument("--learning_rate", help="Default learning rate, and maximum for schedulers", type=float)
+    parser.add_argument("--lr_min", help="Minimum learning rate for the schedulers", type=float)
+    parser.add_argument("--lr_peaks", help="Number of peaks for triangle and cosine schedules", type=float)
+    parser.add_argument("--batch_size", "-bs", help="Batch size of training", type=int)
+    parser.add_argument("--architecture", help="Specify model architecture (GRU, LSTM)")
+    parser.add_argument("--num_layers", type=int, help="Number of RNN layers (1, 2 or 3)")
+    parser.add_argument("--hidden_units", "-hu", help="Number of hidden units in the GRU layers")
+    parser.add_argument("--use_gpu", help="Whether to use GPU for training")
 
     # or you can just specify an options file.
-    parser.add_argument("--options", help="Use json file containing all these options")
+    parser.add_argument("--config", help="Use json file containing all these options (as per 'training_config.py')")
 
     # and some additional stuff ...
-    parser.add_argument("--eval", "-e", help="No training, just evaluate existing model",
-                        action='store_true')
-    parser.add_argument("--model", "-o", help="Name of file to load/save model to/from", default=None)
-    parser.add_argument("--categories", "-c", help="Name of file containing keywords", default=None)
-    parser.add_argument("--audio", "-a", help="Path to the audio folder containing 'training.npz' file", default=None)
-    parser.add_argument("--outdir", help="Folder in which to store output file and log files", default=".")
+    parser.add_argument("--eval", "-e", help="No training, just evaluate existing model", action='store_true')
+    parser.add_argument("--filename", "-o", help="Name of model file to generate")
+    parser.add_argument("--categories", "-c", help="Name of file containing keywords")
+    parser.add_argument("--dataset", "-a", help="Path to the audio folder containing 'training.npz' file")
+    parser.add_argument("--outdir", help="Folder in which to store output file and log files")
     parser.add_argument("--detail", "-d", help="Save loss info for every iteration not just every epoch",
                         action="store_true")
     args = parser.parse_args()
 
-    options.epochs = args.epochs
-    options.hidden_units = args.hidden_units
-    options.learning_rate = args.learning_rate
-    options.lr_min = args.lr_min
-    options.lr_peaks = args.lr_peaks
-    options.lr_scheduler = args.lr_scheduler
-    options.batch_size = args.batch_size
-    options.architecture = args.architecture
-    options.num_layers = args.num_layers
+    if args.config:
+        config.load(args.config)
 
-    if args.options:
-        options.load(args.options)
+    # then any user defined options overrides these defaults
+    if args.epochs:
+        config.training.max_epochs = args.epochs
+    if args.learning_rate:
+        config.training.learning_rate = args.learning_rate
+    if args.lr_min:
+        config.training.lr_min = args.lr_min
+    if args.lr_peaks:
+        config.training.lr_peaks = args.lr_peaks
+    if args.lr_scheduler:
+        config.training.lr_scheduler = args.lr_scheduler
+    if args.batch_size:
+        config.training.batch_size = args.batch_size
+    if args.architecture:
+        config.model.architecture = args.architecture
+    if args.num_layers:
+        config.model.num_layers = args.num_layers
+    if args.hidden_units:
+        config.model.hidden_units = args.hidden_units
+    if args.filename:
+        config.model.filename = args.filename
+    if args.use_gpu:
+        config.training.use_gpu = str2bool(args.use_gpu)
+    if args.categories:
+        config.dataset.categories = args.categories
+    if args.dataset:
+        config.dataset.path = args.dataset
 
-    train(options, args.model, args.eval, args.categories, args.audio, args.outdir, args.detail)
+    train(config, args.eval, args.outdir, args.detail)
