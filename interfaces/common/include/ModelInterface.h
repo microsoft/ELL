@@ -162,6 +162,8 @@ public:
                      const std::vector<int>& offset = {},
                      const std::vector<int>& order = {});
 
+    PortMemoryLayout(const ell::api::math::TensorShape& size);
+
     bool IsEqual(const PortMemoryLayout& other);
 
 #ifndef SWIG

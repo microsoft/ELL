@@ -125,30 +125,6 @@ Node ModelBuilder::AddNeuralNetworkPredictorNode(Model model, PortElements input
     return Node(newNode);
 }
 
-InputNode ModelBuilder::AddInputNode(Model model, const ell::api::math::TensorShape& tensorShape, PortType type)
-{
-    using namespace std::string_literals;
-    ell::model::Node* newNode = nullptr;
-    switch (type)
-    {
-    case PortType::boolean:
-        newNode = model.GetModel().AddNode<ell::model::InputNode<bool>>(tensorShape.ToMemoryShape());
-        break;
-    case PortType::integer:
-        newNode = model.GetModel().AddNode<ell::model::InputNode<int>>(tensorShape.ToMemoryShape());
-        break;
-    case PortType::real:
-        newNode = model.GetModel().AddNode<ell::model::InputNode<double>>(tensorShape.ToMemoryShape());
-        break;
-    case PortType::smallReal:
-        newNode = model.GetModel().AddNode<ell::model::InputNode<float>>(tensorShape.ToMemoryShape());
-        break;
-    default:
-        throw std::invalid_argument("Error: could not create InputNode of the requested type");
-    }
-    return InputNode(newNode);
-}
-
 InputNode ModelBuilder::AddInputNode(Model model, const PortMemoryLayout& memoryLayout, PortType type)
 {
     auto outputLayout = memoryLayout.Get();
@@ -172,31 +148,6 @@ InputNode ModelBuilder::AddInputNode(Model model, const PortMemoryLayout& memory
         throw std::invalid_argument("Error: could not create InputNode of the requested type");
     }
     return InputNode(newNode);
-}
-
-OutputNode ModelBuilder::AddOutputNode(Model model, const ell::api::math::TensorShape& tensorShape, PortElements input)
-{
-    auto type = input.GetType();
-    auto elements = input.GetPortElements();
-    ell::model::Node* newNode = nullptr;
-    switch (type)
-    {
-    case PortType::boolean:
-        newNode = model.GetModel().AddNode<ell::model::OutputNode<bool>>(ell::model::PortElements<bool>(elements), tensorShape.ToMemoryShape());
-        break;
-    case PortType::integer:
-        newNode = model.GetModel().AddNode<ell::model::OutputNode<int>>(ell::model::PortElements<int>(elements), tensorShape.ToMemoryShape());
-        break;
-    case PortType::real:
-        newNode = model.GetModel().AddNode<ell::model::OutputNode<double>>(ell::model::PortElements<double>(elements), tensorShape.ToMemoryShape());
-        break;
-    case PortType::smallReal:
-        newNode = model.GetModel().AddNode<ell::model::OutputNode<float>>(ell::model::PortElements<float>(elements), tensorShape.ToMemoryShape());
-        break;
-    default:
-        throw std::invalid_argument(std::string("Error: could not create OutputNode of the requested type") + typeid(type).name());
-    }
-    return OutputNode(newNode);
 }
 
 OutputNode ModelBuilder::AddOutputNode(Model model, const PortMemoryLayout& memoryLayout, PortElements input)
@@ -334,7 +285,7 @@ ell::model::PortElements<ElementType> GetPortElementsFromList(const std::vector<
     return ell::model::PortElements<ElementType>(elements_list);
 }
 
-Node ModelBuilder::AddConcatenationNode(Model model, const ell::api::math::TensorShape& outputShape, const std::vector<PortElements*>& inputs)
+Node ModelBuilder::AddConcatenationNode(Model model, const PortMemoryLayout& outputMemoryLayout, const std::vector<PortElements*>& inputs)
 {
     if (inputs.size() < 1)
     {
@@ -342,20 +293,21 @@ Node ModelBuilder::AddConcatenationNode(Model model, const ell::api::math::Tenso
     }
     auto type = inputs[0]->GetType();
     ell::model::Node* newNode = nullptr;
+    ell::utilities::MemoryShape outputShape = outputMemoryLayout.Get().GetActiveSize();
 
     switch (type)
     {
     case PortType::boolean:
-        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<bool>>(GetPortElementsFromList<bool>(inputs), outputShape.ToMemoryShape());
+        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<bool>>(GetPortElementsFromList<bool>(inputs), outputShape);
         break;
     case PortType::integer:
-        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<int>>(GetPortElementsFromList<int>(inputs), outputShape.ToMemoryShape());
+        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<int>>(GetPortElementsFromList<int>(inputs), outputShape);
         break;
     case PortType::real:
-        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<double>>(GetPortElementsFromList<double>(inputs), outputShape.ToMemoryShape());
+        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<double>>(GetPortElementsFromList<double>(inputs), outputShape);
         break;
     case PortType::smallReal:
-        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<float>>(GetPortElementsFromList<float>(inputs), outputShape.ToMemoryShape());
+        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<float>>(GetPortElementsFromList<float>(inputs), outputShape);
         break;
     default:
         throw std::invalid_argument("Error: could not create ConcatenationNode of the requested type");
@@ -430,12 +382,13 @@ Node ModelBuilder::AddReorderDataNode(Model model, PortElements input, PortMemor
     return Node(newNode);
 }
 
-Node ModelBuilder::AddSinkNode(Model model, PortElements input, const ell::api::math::TensorShape& tensorShape, const std::string& sinkFunctionName, PortElements trigger)
+Node ModelBuilder::AddSinkNode(Model model, PortElements input, const PortMemoryLayout& memoryLayout, const std::string& sinkFunctionName, PortElements trigger)
 {
     auto type = input.GetType();
     auto elements = input.GetPortElements();
     auto triggerElements = trigger.GetPortElements();
     ell::model::Node* newNode = nullptr;
+    auto layout = memoryLayout.Get();
 
     if (triggerElements.Size() == 0)
     {
@@ -450,35 +403,35 @@ Node ModelBuilder::AddSinkNode(Model model, PortElements input, const ell::api::
         newNode = model.GetModel().AddNode<ell::nodes::SinkNode<double>>(
             ell::model::PortElements<double>(elements),
             ell::model::PortElements<bool>(triggerElements),
-            tensorShape.ToMemoryShape(),
+            layout.GetActiveSize(),
             sinkFunctionName);
         break;
     case PortType::smallReal:
         newNode = model.GetModel().AddNode<ell::nodes::SinkNode<float>>(
             ell::model::PortElements<float>(elements),
             ell::model::PortElements<bool>(triggerElements),
-            tensorShape.ToMemoryShape(),
+            layout.GetActiveSize(),
             sinkFunctionName);
         break;
     case PortType::integer:
         newNode = model.GetModel().AddNode<ell::nodes::SinkNode<int>>(
             ell::model::PortElements<int>(elements),
             ell::model::PortElements<bool>(triggerElements),
-            tensorShape.ToMemoryShape(),
+            layout.GetActiveSize(),
             sinkFunctionName);
         break;
     case PortType::bigInt:
         newNode = model.GetModel().AddNode<ell::nodes::SinkNode<int64_t>>(
             ell::model::PortElements<int64_t>(elements),
             ell::model::PortElements<bool>(triggerElements),
-            tensorShape.ToMemoryShape(),
+            layout.GetActiveSize(),
             sinkFunctionName);
         break;
     case PortType::boolean:
         newNode = model.GetModel().AddNode<ell::nodes::SinkNode<bool>>(
             ell::model::PortElements<bool>(elements),
             ell::model::PortElements<bool>(triggerElements),
-            tensorShape.ToMemoryShape(),
+            layout.GetActiveSize(),
             sinkFunctionName);
         break;
     default:
@@ -487,7 +440,7 @@ Node ModelBuilder::AddSinkNode(Model model, PortElements input, const ell::api::
     return Node(newNode);
 }
 
-Node ModelBuilder::AddSourceNode(Model model, PortElements input, PortType outputType, const ell::api::math::TensorShape& tensorShape, const std::string& sourceFunctionName)
+Node ModelBuilder::AddSourceNode(Model model, PortElements input, PortType outputType, const PortMemoryLayout& memoryLayout, const std::string& sourceFunctionName)
 {
     auto inputType = input.GetType();
     if (inputType != PortType::real)
@@ -498,27 +451,29 @@ Node ModelBuilder::AddSourceNode(Model model, PortElements input, PortType outpu
     using TimeTickType = double;
     auto inputElements = input.GetPortElements();
     ell::model::Node* newNode = nullptr;
+    auto layout = memoryLayout.Get();
+
     switch (outputType)
     {
     case PortType::real:
         newNode = model.GetModel().AddNode<ell::nodes::SourceNode<double>>(
-            ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMemoryShape(), sourceFunctionName);
+            ell::model::PortElements<TimeTickType>(inputElements), layout, sourceFunctionName);
         break;
     case PortType::smallReal:
         newNode = model.GetModel().AddNode<ell::nodes::SourceNode<float>>(
-            ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMemoryShape(), sourceFunctionName);
+            ell::model::PortElements<TimeTickType>(inputElements), layout, sourceFunctionName);
         break;
     case PortType::integer:
         newNode = model.GetModel().AddNode<ell::nodes::SourceNode<int>>(
-            ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMemoryShape(), sourceFunctionName);
+            ell::model::PortElements<TimeTickType>(inputElements), layout, sourceFunctionName);
         break;
     case PortType::bigInt:
         newNode = model.GetModel().AddNode<ell::nodes::SourceNode<int64_t>>(
-            ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMemoryShape(), sourceFunctionName);
+            ell::model::PortElements<TimeTickType>(inputElements), layout, sourceFunctionName);
         break;
     case PortType::boolean:
         newNode = model.GetModel().AddNode<ell::nodes::SourceNode<bool>>(
-            ell::model::PortElements<TimeTickType>(inputElements), tensorShape.ToMemoryShape(), sourceFunctionName);
+            ell::model::PortElements<TimeTickType>(inputElements), layout, sourceFunctionName);
         break;
     default:
         throw std::invalid_argument("Error: could not create SourceNode of the requested type");
@@ -552,34 +507,7 @@ Node ModelBuilder::AddConstantNode(Model model, std::vector<double> values, Port
     return Node(newNode);
 }
 
-Node ModelBuilder::AddConstantNode(Model model, std::vector<double> values, const ell::api::math::TensorShape& outputShape, PortType type)
-{
-    auto shape = outputShape.ToMemoryShape();
-    ell::model::Node* newNode = nullptr;
-    switch (type)
-    {
-    case PortType::boolean:
-        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<bool>>(CastVector<bool>(values), shape);
-        break;
-    case PortType::integer:
-        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<int>>(CastVector<int>(values), shape);
-        break;
-    case PortType::real:
-        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<double>>(values, shape);
-        break;
-    case PortType::smallReal:
-        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<float>>(CastVector<float>(values), shape);
-        break;
-    case PortType::bigInt:
-        newNode = model.GetModel().AddNode<ell::nodes::ConstantNode<int64_t>>(CastVector<int64_t>(values), shape);
-        break;
-    default:
-        throw std::invalid_argument("Error: could not create ConstantNode of the requested type");
-    }
-    return Node(newNode);
-}
-
-Node ModelBuilder::AddConstantNode(Model model, std::vector<double> values, PortMemoryLayout outputMemoryLayout, PortType type)
+Node ModelBuilder::AddConstantNode(Model model, std::vector<double> values, const PortMemoryLayout& outputMemoryLayout, PortType type)
 {
     auto outputLayout = outputMemoryLayout.Get();
     ell::model::Node* newNode = nullptr;

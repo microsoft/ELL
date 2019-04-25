@@ -234,11 +234,11 @@ class ImporterEngine:
             # Add the sink node
             last_ell_node = self.ell_model_builder.AddSinkNode(
                 self.ell_model, ell.nodes.PortElements(last_ell_node.GetOutputPort("output")),
-                ell_output_shape,
+                ell.model.PortMemoryLayout(ell_output_shape),
                 "{}OutputCallback".format(function_prefix))
 
         output_node = self.ell_model_builder.AddOutputNode(
-            self.ell_model, ell_output_shape, ell.nodes.PortElements(last_ell_node.GetOutputPort("output")))
+            self.ell_model, ell.model.PortMemoryLayout(ell_output_shape), ell.nodes.PortElements(last_ell_node.GetOutputPort("output")))
         output_node.CopyMetadataFrom(last_ell_node)
         self.lookup_table.add_ell_output(output_node)
 

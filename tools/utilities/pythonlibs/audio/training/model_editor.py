@@ -87,11 +87,8 @@ class ModelEditor:
             print("node '{}' already has a SinkNode".format(node.GetRuntimeTypeName()))
             return False
         output_port = node.GetOutputPort("output")
-        size = list(output_port.GetMemoryLayout().size)
-        while len(size) < 3:
-            size = [1] + size
-        shape = ell.math.TensorShape(size[0], size[1], size[2])
-        self.builder.AddSinkNode(self.model, ell.nodes.PortElements(output_port), shape, functionName)
+        layout = output_port.GetMemoryLayout()
+        self.builder.AddSinkNode(self.model, ell.nodes.PortElements(output_port), layout, functionName)
         return True
 
     def attach_sink(self, nameExpr, functionName):

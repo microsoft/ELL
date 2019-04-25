@@ -67,11 +67,12 @@ def create_model(callbacks=True):
 
     # we want an input vectors of size 10
     shape = ell.math.TensorShape(1, 1, 10)
+    layout = ell.model.PortMemoryLayout(shape)
 
     if callbacks:
         # add node representing input (input nodes have no input, they are the input)
         # the OutputPort of the InputNode is the input data they pass along to the next node
-        inputNode = mb.AddInputNode(model, ell.math.TensorShape(1, 1, 1), ell.nodes.PortType.real)
+        inputNode = mb.AddInputNode(model, ell.model.PortMemoryLayout([1]), ell.nodes.PortType.real)
         inputLink = inputNode.GetOutputPort("output")
 
         # clock node is required to setup the timing of the callbacks.
@@ -82,16 +83,16 @@ def create_model(callbacks=True):
         # add a SourceNode that gets input from the application
         sourceNode = mb.AddSourceNode(
             model, ell.nodes.PortElements(clockLink),
-            ell.nodes.PortType.real, shape, "SourceCallback")
+            ell.nodes.PortType.real, layout, "SourceCallback")
         sourceLink = sourceNode.GetOutputPort("output")
     else:
-        inputNode = mb.AddInputNode(model, shape, ell.nodes.PortType.real)
+        inputNode = mb.AddInputNode(model, layout, ell.nodes.PortType.real)
         sourceNode = inputNode
         sourceLink = sourceNode.GetOutputPort("output")
 
     # add a constant vector to the input provided in the InputCallback
-    constNode = mb.AddConstantNode(model, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0], shape,
-                                   ell.nodes.PortType.real)
+    constNode = mb.AddConstantNode(model, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0],
+                                   layout, ell.nodes.PortType.real)
     constLink = constNode.GetOutputPort("output")
 
     print("sourceLink size: {}".format(sourceLink.GetMemoryLayout().size.size()))
@@ -104,13 +105,13 @@ def create_model(callbacks=True):
     if callbacks:
         # add a SinkNode to send this output to the application via OutputCallback
         # (setup a condition for the sink node that is always true).
-        sinkNode = mb.AddSinkNode(model, ell.nodes.PortElements(addLink), shape, "SinkCallback")
+        sinkNode = mb.AddSinkNode(model, ell.nodes.PortElements(addLink), layout, "SinkCallback")
         sinkLink = sinkNode.GetOutputPort("output")
     else:
         sinkLink = addLink
 
     # add a node representing output from the model.
-    outputNode = mb.AddOutputNode(model, shape, ell.nodes.PortElements(sinkLink))
+    outputNode = mb.AddOutputNode(model, layout, ell.nodes.PortElements(sinkLink))
     outputResult = outputNode.GetOutputPort("output")
 
     # create Map that wraps the model.

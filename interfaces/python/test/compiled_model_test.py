@@ -4,6 +4,7 @@ import ell
 import os
 import numpy as np
 
+
 def test():
     # Load the map created by proton trainer test and compile it
     map = ell.model.Map("protonnTestData.ell")

@@ -44,7 +44,7 @@ def ell_map_from_predictor(predictor, step_interval_msec=None, lag_threshold_mse
         if step_interval_msec:
             # in the steppable case the input is a clock ticks (which is a double)
             inputNode = builder.AddInputNode(
-                model, ell.math.TensorShape(1, 1, 1), ell.nodes.PortType.real)
+                model, ell.model.PortMemoryLayout([1]), ell.nodes.PortType.real)
             originalInputNode = inputNode
             clockNode = builder.AddClockNode(
                 model, ell.nodes.PortElements(inputNode.GetOutputPort("output")),
@@ -52,12 +52,12 @@ def ell_map_from_predictor(predictor, step_interval_msec=None, lag_threshold_mse
                 "{}LagNotification".format(function_prefix))
             sourceNode = builder.AddSourceNode(
                 model, ell.nodes.PortElements(clockNode.GetOutputPort("output")),
-                portType, inputShape,
+                portType, ell.model.PortMemoryLayout(inputShape),
                 "{}InputCallback".format(function_prefix))
             inputNode = sourceNode
         else:
             inputNode = builder.AddInputNode(
-                model, inputShape, portType)
+                model, ell.model.PortMemoryLayout(inputShape), portType)
             originalInputNode = inputNode
 
         nnNode = builder.AddNeuralNetworkPredictorNode(
@@ -69,12 +69,12 @@ def ell_map_from_predictor(predictor, step_interval_msec=None, lag_threshold_mse
             # add a sink node that always triggers
             sinkNode = builder.AddSinkNode(
                 model, ell.nodes.PortElements(output.GetOutputPort("output")),
-                outputShape,
+                ell.model.PortMemoryLayout(outputShape),
                 "{}OutputCallback".format(function_prefix))
             output = sinkNode
 
         outputNode = builder.AddOutputNode(
-            model, outputShape, ell.nodes.PortElements(output.GetOutputPort("output")))
+            model, ell.model.PortMemoryLayout(outputShape), ell.nodes.PortElements(output.GetOutputPort("output")))
 
         ell_map = ell.model.Map(model, originalInputNode, 
             ell.nodes.PortElements(outputNode.GetOutputPort("output")))
@@ -122,12 +122,12 @@ def ell_map_from_model(model, model_input_node, input_shape, model_output_node, 
                 "{}LagNotification".format(function_prefix))
             sourceNode = builder.AddSourceNode(
                 model, ell.nodes.PortElements(clockNode.GetOutputPort("output")),
-                portType, inputShape,
+                portType, ell.model.PortMemoryLayout(inputShape),
                 "{}InputCallback".format(function_prefix))
             # add a sink node that always triggers
             sinkNode = builder.AddSinkNode(
                 model, ell.nodes.PortElements(outputNode.GetOutputPort("output")),
-                outputShape,
+                ell.model.PortMemoryLayout(outputShape),
                 "{}OutputCallback".format(function_prefix))
             outputNode = sinkNode
             

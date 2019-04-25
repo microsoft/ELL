@@ -930,7 +930,7 @@ class ConvertInput(ConvertBase):
         if step_interval_msec is not None:
             # in the steppable case the input is a clock ticks (which is a double)
             input_node = builder.AddInputNode(
-                model, ell.math.TensorShape(1, 1, 1), ell.nodes.PortType.real)
+                model, ell.model.PortMemoryLayout([1]), ell.nodes.PortType.real)
 
             if lag_threshold_msec is None:
                 lag_threshold_msec = 2 * step_interval_msec
@@ -948,7 +948,7 @@ class ConvertInput(ConvertBase):
             input_node = source_node
         else:
             input_node = builder.AddInputNode(
-                model, ell_shape, ell.nodes.PortType.smallReal)
+                model, ell.model.PortMemoryLayout(ell_shape), ell.nodes.PortType.smallReal)
             original_input_node = input_node
 
         # Register the mapping
@@ -1655,7 +1655,7 @@ class ConvertSplice(ConvertBase):
         for ell_node in reorder_nodes:
             portElements = lookup_table.get_output_port_elements_for_node(ell_node)
             input_port_elements_list.append(portElements)
-        concatenation_node = builder.AddConcatenationNode(model, reordered_output_shape, ell.nodes.PortElementsList(input_port_elements_list))
+        concatenation_node = builder.AddConcatenationNode(model, ell.model.PortMemoryLayout(reordered_output_shape), ell.nodes.PortElementsList(input_port_elements_list))
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, concatenation_node)
 

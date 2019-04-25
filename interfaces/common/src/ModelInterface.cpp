@@ -541,6 +541,11 @@ PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<
 {
 }
 
+PortMemoryLayout::PortMemoryLayout(const ell::api::math::TensorShape& size) :
+    PortMemoryLayout(ell::model::PortMemoryLayout(size.ToMemoryShape()))
+{
+}
+
 PortMemoryLayout::PortMemoryLayout(const ell::model::PortMemoryLayout& layout) :
     size(layout.GetActiveSize().ToVector()),
     padding(layout.GetExtent().ToVector()),
