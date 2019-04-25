@@ -69,13 +69,20 @@ namespace passes
 
             const int numFilters = layer.GetOutputShape().NumChannels();
 
+            // Skip convolutions that have only a single input channel e.g. in the spatial portion
+            // of depthwise separable convolutions
+            if (weights.NumChannels() == 1)
+            {
+                return DetectedWeightType::FullPrecision;
+            }
+
             // Perform detection based on each filter, since for xnor, each filter is mean or -mean.
             // Later, we confirm that each filter detects the same type.
             for (int filter = 0; filter < numFilters; ++filter)
             {
                 // Keep track of unique values for this filter
                 std::set<ValueType> uniqueValues;
-                const size_t numChannels = layer.GetInputShape().NumChannels();
+                const size_t numChannels = weights.NumChannels();
                 const size_t numRows = layer.GetConvolutionalParameters().receptiveField;
 
                 for (size_t channel = 0; channel < numChannels; ++channel)
