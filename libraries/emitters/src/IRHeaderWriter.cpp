@@ -24,6 +24,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <cctype>
 
 namespace ell
 {
@@ -208,9 +209,7 @@ namespace emitters
             bool first = true;
             size_t i = 0;
 
-            auto argTypes = functionDeclaration.GetArguments();
-
-            for (const auto& arg : function.args())
+            for (const auto& arg : functionDeclaration.GetArguments())
             {
                 if (!first)
                 {
@@ -218,13 +217,14 @@ namespace emitters
                 }
                 first = false;
 
-                std::string argName = arg.getName();
-                VariableType argType = VariableType::Custom;
-                if (i < argTypes.size())
+                std::string argName = arg.GetName();
+                VariableType argType = arg.GetType();
+                LLVMType llvmType = arg.GetLLVMType();
+                if (llvmType == nullptr)
                 {
-                    argType = argTypes[i].second;
+                    llvmType = moduleEmitter.GetIREmitter().Type(argType);
                 }
-                WriteLLVMType(os, arg.getType(), argType);
+                WriteLLVMType(os, llvmType, argType);
 
                 if (!argName.empty())
                 {
@@ -438,14 +438,16 @@ namespace emitters
                 std::string callbackFunction = cb.functionName;
                 std::string callbackMethod = TrimPrefix(callbackFunction, info.moduleName + "_");
                 std::string argName = cb.argNames[1];
+                std::string memberName = "_" + callbackFunction + "_" + argName;
+                memberName[1] = ::tolower(memberName[1]);
 
                 // setup an internal method for the callback in our Wrapper class and delegate to
                 // a virtual method that can be implemented in another language (via SWIG)
                 info.helperMethods << "    void Internal_" << callbackMethod << "(" << outputType << "* buffer)\n";
                 info.helperMethods << "    {\n";
                 info.helperMethods << "        int32_t size = GetSinkOutputSize(" << sinkIndex << ");\n";
-                info.helperMethods << "        _" << argName << ".assign(buffer, buffer + size);\n";
-                info.helperMethods << "        " << callbackMethod << "(_" << argName << ");\n"; // pass it to virtual method
+                info.helperMethods << "        " << memberName << ".assign(buffer, buffer + size);\n";
+                info.helperMethods << "        " << callbackMethod << "(" << memberName << ");\n"; // pass it to virtual method
                 info.helperMethods << "    }\n\n";
                 info.helperMethods << "    virtual void " << callbackMethod << "(std::vector<" << outputType << ">& " << argName << ")\n";
                 info.helperMethods << "    {\n";
@@ -456,11 +458,11 @@ namespace emitters
                 {
                     // in the SourceNode case any OutputNodes have to be returned via SinkNode, but we
                     // can expose the first Sink the return value of our Predict method just for convenience,
-                    // We just return the value of the _argname member that the Internal sink callback saved, see above.
+                    // We just return the value of the member that the Internal sink callback saved, see above.
                     info.predictReturnType = "std::vector<" + outputType + ">&";
-                    info.predictReturnMember = "_" + argName;
+                    info.predictReturnMember = memberName;
                 }
-                info.memberDecls << "    std::vector<" << outputType << "> _" << argName << ";\n";
+                info.memberDecls << "    std::vector<" << outputType << "> " << memberName << ";\n";
 
                 // Delegate the "C" callback function to the above virtual method on the Wrapper class.
                 info.cdecls << "    void " << callbackFunction << "(void* context, " << outputType << "* " << argName << ")\n";
@@ -476,13 +478,21 @@ namespace emitters
         }
     }
 
-    void WriteSimplePredictMethod(LLVMFunction predictFunction, CppWrapperInfo& info)
+    void WriteSimplePredictMethod(LLVMFunction predictFunction, CppWrapperInfo& info, IRModuleEmitter& moduleEmitter)
     {
-
+        size_t index = 0;
         int outputCount = 0;
+        FunctionDeclaration funDecl = moduleEmitter.GetFunctionDeclaration(predictFunction->getName());
+        auto argDecls = funDecl.GetArguments();
+
         // then there are no SourceNodes, so we have a regular predict function with direct inputs.
         for (auto arg = predictFunction->arg_begin(), end = predictFunction->arg_end(); arg != end; ++arg)
         {
+            ArgumentFlags flags = ArgumentFlags::InOut;
+            if (index < argDecls.size()) 
+            {
+                flags = argDecls[index++].GetFlags();
+            }
             std::string argName = arg->getName();
             if (argName == "context")
             {
@@ -496,25 +506,18 @@ namespace emitters
                 WriteLLVMType(ss, arg->getType()->getPointerElementType());
                 std::string argType = ss.str();
                 bool passArgument = false;
-                if (argName.find("output") != std::string::npos)
+                if ((flags & ArgumentFlags::Output) && outputCount == 0)
                 {
-                    if (outputCount == 0)
-                    {
-                        // first argument is special, it is a member and is the return value for this function.
-                        // This argument comes from our member variable
-                        info.predictCallArgs.push_back("_" + argName + ".data()");
-                        info.predictReturnType = "std::vector<" + argType + ">&";
-                        info.predictReturnMember = "_" + argName;
-                    }
-                    else
-                    {
-                        // this output is passed as an argument.
-                        info.predictCallArgs.push_back(argName + ".data()"); // convert vector to raw buffer.
-                        passArgument = true;
-                    }
+                    // first argument is special, it becomes a class member and the return value for this function.
+                    std::string memberName = "_" + funDecl.GetFunctionName() + "_" + argName;
+                    info.predictCallArgs.push_back(memberName + ".data()");
+                    info.predictReturnType = "std::vector<" + argType + ">&";
+                    info.predictReturnMember = memberName;
+
                     // the predict output arg is a cached member vector so we only have to allocate it once.
-                    info.constructorInit << "        _" << argName << ".resize(GetOutputSize(" << outputCount++ << "));\n";
-                    info.memberDecls << "    std::vector<" << argType << "> _" << argName << ";\n";
+                    info.constructorInit << "        " << memberName << ".resize(GetOutputSize(" << outputCount << "));\n";
+                    info.memberDecls << "    std::vector<" << argType << "> " << memberName << ";\n";
+                    outputCount++;
                 }
                 else
                 {
@@ -603,7 +606,7 @@ namespace emitters
 
         if (!hasSourceNodes)
         {
-            WriteSimplePredictMethod(predictFunction, info);
+            WriteSimplePredictMethod(predictFunction, info, moduleEmitter);
         }
         else
         {

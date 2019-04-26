@@ -1696,6 +1696,7 @@ namespace emitters
         IRFunctionEmitter(IRModuleEmitter* pModule, LLVMFunction pFunction, const std::string& name);
         IRFunctionEmitter(IRModuleEmitter* pModule, LLVMFunction pFunction, const NamedVariableTypeList& arguments, const std::string& name);
         IRFunctionEmitter(IRModuleEmitter* pModule, LLVMFunction pFunction, const NamedLLVMTypeList& arguments, const std::string& name);
+        IRFunctionEmitter(IRModuleEmitter* pModule, LLVMFunction pFunction, const FunctionArgumentList& arguments, const std::string& name);
 
         class EntryBlockScope
         {
@@ -1723,8 +1724,10 @@ namespace emitters
         llvm::BasicBlock* GetEntryBlock() { return _entryBlock; }
         void SetUpFunction();
 
-        template <typename ArgsListType>
-        void RegisterFunctionArgs(const ArgsListType& args);
+        void RegisterFunctionArgs(const NamedVariableTypeList& args);
+        void RegisterFunctionArgs(const NamedLLVMTypeList& args);
+        void RegisterFunctionArgs(const FunctionArgumentList& args);
+
         void CompleteFunction();
 
         bool CanUseBlas() const;
@@ -1954,17 +1957,6 @@ namespace emitters
         MemoryCopy<ValueType>(pNewData, 0, buffer, (bufferSize - shiftCount), shiftCount);
     }
 
-    template <typename ArgsListType>
-    void IRFunctionEmitter::RegisterFunctionArgs(const ArgsListType& args)
-    {
-        auto argumentsIterator = Arguments().begin();
-        for (size_t i = 0; i < args.size(); ++i)
-        {
-            auto arg = &(*argumentsIterator);
-            _locals.Add(args[i].first, arg);
-            ++argumentsIterator;
-        }
-    }
 } // namespace emitters
 } // namespace ell
 

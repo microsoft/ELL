@@ -174,13 +174,13 @@ namespace model
     {
         emitters::IRModuleEmitter& module = compiler.GetModule();
         emitters::NamedVariableTypeList args;
-        utilities::UniqueNameList list;
+        utilities::UniqueNameList uniqueNameScope;
         for (auto port : GetInputPorts())
         {
             auto varType = PortTypeToVariableType(port->GetType());
             auto ptrType = emitters::GetPointerType(varType);
 
-            auto var = compiler.AllocatePortFunctionArgument(module, port->GetReferencedPort(), MapCompiler::ArgType::input, list);
+            auto var = compiler.AllocatePortFunctionArgument(module, port->GetReferencedPort(), emitters::ArgumentFlags::Input, uniqueNameScope);
             auto varName = var->EmittedName();
             args.emplace_back(varName, ptrType);
         };
@@ -197,7 +197,7 @@ namespace model
             auto varType = PortTypeToVariableType(port->GetType());
             auto ptrType = emitters::GetPointerType(varType);
 
-            auto var = compiler.AllocatePortFunctionArgument(module, *port, MapCompiler::ArgType::output, list);
+            auto var = compiler.AllocatePortFunctionArgument(module, *port, emitters::ArgumentFlags::Output, uniqueNameScope);
             auto varName = var->EmittedName();
             args.emplace_back(varName, ptrType);
         };

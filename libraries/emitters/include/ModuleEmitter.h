@@ -47,7 +47,7 @@ namespace emitters
         ///
         /// <param name="functionName"> The name of the function to create </param>
         /// <param name="args"> The names and types of the arguments </param>
-        virtual void BeginMapPredictFunction(const std::string& functionName, NamedVariableTypeList& args) = 0;
+        virtual void BeginMapPredictFunction(const std::string& functionName, FunctionArgumentList& args) = 0;
 
         /// <summary> End the function </summary>
         virtual void EndMapPredictFunction() = 0;

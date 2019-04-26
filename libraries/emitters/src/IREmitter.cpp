@@ -777,6 +777,16 @@ namespace emitters
         return pFunction;
     }
 
+    LLVMFunction IREmitter::Function(llvm::Module* pModule, const std::string& name, LLVMType returnType, llvm::Function::LinkageTypes linkage, const FunctionArgumentList& arguments)
+    {
+        assert(pModule != nullptr);
+
+        auto types = BindArgumentTypes(arguments);
+        LLVMFunction pFunction = Function(pModule, name, returnType, linkage, types);
+        BindArgumentNames(pFunction, arguments);
+        return pFunction;
+    }
+
     //
     // Blocks
     //
@@ -1162,6 +1172,22 @@ namespace emitters
         for (auto pair : arguments)
         {
             VariableType t = pair.second;
+            if (t == VariableType::VoidPointer)
+            {
+                // LLVM doesn't support VoidPointer
+                t = VariableType::BytePointer;
+            }
+            types.push_back(Type(t));
+        }
+        return types;
+    }
+
+    std::vector<LLVMType> IREmitter::BindArgumentTypes(const FunctionArgumentList& args)
+    {
+        std::vector<LLVMType> types;
+        for (auto fa : args)
+        {
+            VariableType t = fa.GetType();
             if (t == VariableType::VoidPointer)
             {
                 // LLVM doesn't support VoidPointer

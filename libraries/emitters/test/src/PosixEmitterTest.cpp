@@ -95,7 +95,7 @@ void TestPthreadCreate()
 
     // Thread task function
     std::string taskFunctionName = "Task";
-    auto taskFunction = module.BeginFunction(taskFunctionName, VariableType::BytePointer, { { "context", VariableType::BytePointer } });
+    auto taskFunction = module.BeginFunction(taskFunctionName, VariableType::BytePointer, NamedVariableTypeList{ { "context", VariableType::BytePointer } });
     auto taskSelfVal = taskFunction.PthreadSelf();
     taskFunction.Printf("Task self = %x\n", { taskSelfVal });
     taskFunction.Return(taskFunction.NullPointer(int8PtrType));

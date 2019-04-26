@@ -110,7 +110,7 @@ namespace emitters
         ///
         /// <param name="functionName"> The name of the function. </param>
         /// <param name="args"> The arguments to the function. </param>
-        void BeginMapPredictFunction(const std::string& functionName, NamedVariableTypeList& args) override;
+        void BeginMapPredictFunction(const std::string& functionName, FunctionArgumentList& args) override;
 
         /// <summary> Ends the current model prediction function. </summary>
         void EndMapPredictFunction() override;
@@ -150,6 +150,13 @@ namespace emitters
         /// <param name="returnType"> The return type of the function. </param>
         /// <param name="args"> The arguments to the function. </param>
         IRFunctionEmitter& BeginFunction(const std::string& functionName, VariableType returnType, const NamedVariableTypeList& args);
+
+        /// <summary> Begins an IR function and directs subsequent commands to it. </summary>
+        ///
+        /// <param name="functionName"> The name of the function. </param>
+        /// <param name="returnType"> The return type of the function. </param>
+        /// <param name="args"> The arguments to the function. </param>
+        IRFunctionEmitter& BeginFunction(const std::string& functionName, VariableType returnType, const FunctionArgumentList& args);
 
         /// <summary> Begins an IR function and directs subsequent commands to it. </summary>
         ///
@@ -705,6 +712,7 @@ namespace emitters
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const std::initializer_list<VariableType>& arguments, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, LLVMType returnType, const std::vector<LLVMType>& argTypes, bool isPublic = false);
         IRFunctionEmitter Function(const std::string& name, LLVMType returnType, const NamedLLVMTypeList& arguments, bool isPublic = false);
+        IRFunctionEmitter Function(const std::string& name, LLVMType returnType, const FunctionArgumentList& arguments, bool isPublic = false);
 
         // Associate metadata with a given function.
         // Note: to insert well-known metadata, prefer the "IncludeInXXX" metadata methods.

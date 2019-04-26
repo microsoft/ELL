@@ -154,11 +154,8 @@ namespace model
 
     void IRMapCompiler::EmitGetInputSizeFunction(const Map& map)
     {
-        auto& context = _moduleEmitter.GetLLVMContext();
-        auto int32Type = llvm::Type::getInt32Ty(context);
-
-        const emitters::NamedLLVMTypeList parameters = { { "index", int32Type } };
-        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetInputSize", int32Type, parameters);
+        const emitters::NamedVariableTypeList parameters = { { "index", emitters::VariableType::Int32 } };
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetInputSize", emitters::VariableType::Int32, parameters);
         function.IncludeInHeader();
 
         std::vector<int> sizes;
@@ -172,11 +169,8 @@ namespace model
 
     void IRMapCompiler::EmitGetOutputSizeFunction(const Map& map)
     {
-        auto& context = _moduleEmitter.GetLLVMContext();
-        auto int32Type = llvm::Type::getInt32Ty(context);
-
-        const emitters::NamedLLVMTypeList parameters = { { "index", int32Type } };
-        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetOutputSize", int32Type, parameters);
+        const emitters::NamedVariableTypeList parameters = { { "index", emitters::VariableType::Int32 } };
+        auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetOutputSize", emitters::VariableType::Int32, parameters);
         function.IncludeInHeader();
 
         std::vector<int> sizes;
@@ -193,11 +187,8 @@ namespace model
         auto nodes = map.GetSinkNodes();
         if (nodes.size() > 0)
         {
-            auto& context = _moduleEmitter.GetLLVMContext();
-            auto int32Type = llvm::Type::getInt32Ty(context);
-
-            const emitters::NamedLLVMTypeList parameters = { { "index", int32Type } };
-            auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetSinkOutputSize", int32Type, parameters);
+            const emitters::NamedVariableTypeList parameters = { { "index", emitters::VariableType::Int32 } };
+            auto function = _moduleEmitter.BeginFunction(GetNamespacePrefix() + "_GetSinkOutputSize", emitters::VariableType::Int32, parameters);
             function.IncludeInHeader();
 
             std::vector<int> sizes;

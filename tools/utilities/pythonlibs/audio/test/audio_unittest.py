@@ -2,7 +2,7 @@
 ###################################################################################################
 #
 #  Project:  Embedded Learning Library (ELL)
-#  File:     unittest.py
+#  File:     audio_unittest.py
 #  Authors:  Chris Lovett
 #
 #  Requires: Python 3.x
@@ -101,9 +101,7 @@ class AudioUnitTest(unittest.TestCase):
         self.wrap_model(model_file, outputdir, module_name, "python")
         self.make_project(outputdir)
 
-    def compile_keyword_spotter(self):
-        if not os.path.exists('test'):
-            os.mkdir("test")
+    def download_model(self):
         path = self.get_test_model_repo()
         path = os.path.join(path, "models", "speech_commands_v0.01")
         if os.path.exists(path):
@@ -116,15 +114,20 @@ class AudioUnitTest(unittest.TestCase):
                                                      local_folder="test")
         self.categories_file = download_file(os.path.join(path, "categories.txt"), local_folder="test")  # noqa: F405
         _log.info("Unzipped: {}".format(local_onnx_file))
-        classifier_model = onnx_import.convert(local_onnx_file)
-        featurizer_model = self.make_featurizer(path, "test/featurizer.ell")
-        self.compile_model(featurizer_model, "test/compiled_featurizer", "mfcc")
-        self.compile_model(classifier_model, "test/compiled_classifier", "model")
+        self.classifier_model = onnx_import.convert(local_onnx_file)
+        self.featurizer_model = self.make_featurizer(path, "test/featurizer.ell")
 
-    def test_keyword_spotter(self):
-        _log.info("---------------- test_keyword_spotter")
-        self.compile_keyword_spotter()
+    def add_vad_callback(self):
+        import model_editor
+        editor = model_editor.ModelEditor(self.classifier_model)
+        for node in editor.find_rnns():
+            editor.add_vad(node, 16000, 512, 1.54, 0.074326, 2.40016, 0.002885, 3.552713, 0.931252, 0.007885)
+        editor.attach_sink("VoiceActivityDetector", "VadCallback")
+        filename = os.path.splitext(os.path.basename(self.classifier_model))[0]
+        self.classifier_model2 = os.path.join(os.path.dirname(self.classifier_model), filename + "2.ell")
+        editor.save(self.classifier_model2)
 
+    def run_classifier(self, classifier="test/compiled_classifier/model"):
         try:
             import pyaudio  # noqa: F401
             import run_classifier  # noqa: F401
@@ -139,7 +142,7 @@ class AudioUnitTest(unittest.TestCase):
         copyfile(os.path.join(example_data, "bed.wav"), os.path.join(wav_dir, "bed.wav"))
 
         result = run_classifier.test_keyword_spotter("test/compiled_featurizer/mfcc",
-                                                     "test/compiled_classifier/model",
+                                                     classifier,
                                                      self.categories_file,
                                                      wav_dir,
                                                      threshold=0.95,
@@ -157,6 +160,18 @@ class AudioUnitTest(unittest.TestCase):
             raise Exception("Did not get expected predictions 'bed' and 'seven'")
 
         return 0
+
+    def test_keyword_spotter(self):
+        _log.info("---------------- test_keyword_spotter")
+        if not os.path.exists('test'):
+            os.mkdir("test")
+        self.download_model()
+        self.add_vad_callback()
+        self.compile_model(self.featurizer_model, "test/compiled_featurizer", "mfcc")
+        self.compile_model(self.classifier_model, "test/compiled_classifier", "model")
+        self.run_classifier()
+        self.compile_model(self.classifier_model2, "test/compiled_classifier2", "model")
+        self.run_classifier("test/compiled_classifier2/model")
 
 
 if __name__ == "__main__":

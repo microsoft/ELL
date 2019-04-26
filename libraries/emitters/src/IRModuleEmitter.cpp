@@ -93,7 +93,7 @@ namespace emitters
     // Creating functions
     //
 
-    void IRModuleEmitter::BeginMapPredictFunction(const std::string& functionName, NamedVariableTypeList& args)
+    void IRModuleEmitter::BeginMapPredictFunction(const std::string& functionName, FunctionArgumentList& args)
     {
         IRFunctionEmitter& function = BeginFunction(functionName, VariableType::Void, args);
         function.SetAttributeForArguments(IRFunctionEmitter::Attributes::NoAlias);
@@ -156,6 +156,16 @@ namespace emitters
         return BeginFunction(functionName, _emitter.Type(returnType), args);
     }
 
+    IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, VariableType returnType, const FunctionArgumentList& args)
+    {
+        _functions[functionName] = FunctionDeclaration(functionName, returnType, args);
+        Log() << "Begin emitting IR for function " << functionName << EOL;
+        auto currentPos = _emitter.GetCurrentInsertPoint();
+        IRFunctionEmitter newFunction = Function(functionName, _emitter.Type(returnType), args, false);
+        _functionStack.emplace(newFunction, currentPos);
+        return _functionStack.top().first;
+    }
+
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, LLVMType returnType, const NamedVariableTypeList& args)
     {
         if (_functions.find(functionName) == _functions.end())
@@ -171,6 +181,15 @@ namespace emitters
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, LLVMType returnType, const std::vector<LLVMType>& argTypes)
     {
+        if (_functions.find(functionName) == _functions.end())
+        {
+            FunctionArgumentList argInfo;
+            for (auto t : argTypes)
+            {
+                argInfo.push_back({ "", ToVariableType(t), ArgumentFlags::Input, t });
+            }
+            _functions[functionName] = FunctionDeclaration(functionName, ToVariableType(returnType), argInfo);
+        }
         Log() << "Begin emitting IR for function " << functionName << EOL;
         auto currentPos = _emitter.GetCurrentInsertPoint();
         IRFunctionEmitter newFunction = Function(functionName, returnType, argTypes, false);
@@ -180,6 +199,15 @@ namespace emitters
 
     IRFunctionEmitter& IRModuleEmitter::BeginFunction(const std::string& functionName, LLVMType returnType, const NamedLLVMTypeList& args)
     {
+        if (_functions.find(functionName) == _functions.end())
+        {
+            FunctionArgumentList argInfo;
+            for (auto t : args)
+            {
+                argInfo.push_back({ t.first, ToVariableType(t.second), ArgumentFlags::Input, t.second });
+            }
+            _functions[functionName] = FunctionDeclaration(functionName, ToVariableType(returnType), argInfo);
+        }
         Log() << "Begin emitting IR for function " << functionName << EOL;
         auto currentPos = _emitter.GetCurrentInsertPoint();
         IRFunctionEmitter newFunction = Function(functionName, returnType, args, false);
@@ -491,6 +519,18 @@ namespace emitters
     }
 
     IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, LLVMType returnType, const NamedVariableTypeList& arguments, bool isPublic)
+    {
+        LLVMFunction pFunction = _emitter.Function(GetLLVMModule(), name, returnType, Linkage(isPublic), arguments);
+        if (pFunction == nullptr)
+        {
+            throw EmitterException(EmitterError::functionNotFound);
+        }
+        // TODO: put the above IREmitter call in the IRFunctionEmitter constructor
+
+        return IRFunctionEmitter(this, pFunction, arguments, name);
+    }
+
+    IRFunctionEmitter IRModuleEmitter::Function(const std::string& name, LLVMType returnType, const FunctionArgumentList& arguments, bool isPublic)
     {
         LLVMFunction pFunction = _emitter.Function(GetLLVMModule(), name, returnType, Linkage(isPublic), arguments);
         if (pFunction == nullptr)

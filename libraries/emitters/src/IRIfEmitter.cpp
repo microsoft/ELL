@@ -227,5 +227,35 @@ namespace emitters
     {
         return (_pEndBlock != nullptr) ? _pEndBlock : _functionEmitter->GetCurrentBlock();
     }
+
+    void IREmitter::BindArgumentNames(LLVMFunction pFunction, const FunctionArgumentList& arguments)
+    {
+        size_t i = 0;
+        for (auto& argument : pFunction->args())
+        {
+            argument.setName(arguments[i++].GetName());
+        }
+    }
+
+    void IREmitter::BindArgumentNames(LLVMFunction pFunction, const NamedVariableTypeList& arguments)
+    {
+        size_t i = 0;
+        for (auto& argument : pFunction->args())
+        {
+            argument.setName(arguments[i++].first);
+        }
+    }
+
+    void IREmitter::BindArgumentNames(LLVMFunction pFunction, const NamedLLVMTypeList& arguments)
+    {
+        size_t i = 0;
+        for (auto& argument : pFunction->args())
+        {
+            argument.setName(arguments[i++].first);
+        }
+    }
+
+
+
 } // namespace emitters
 } // namespace ell

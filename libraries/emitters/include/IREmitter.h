@@ -8,6 +8,7 @@
 #pragma once
 
 #include "EmitterTypes.h"
+#include "FunctionDeclaration.h"
 #include "LLVMUtilities.h"
 #include "SymbolTable.h"
 
@@ -691,6 +692,17 @@ namespace emitters
         /// <returns> Pointer to the declared function. </returns>
         LLVMFunction Function(llvm::Module* pModule, const std::string& name, LLVMType returnType, llvm::Function::LinkageTypes linkage, const NamedLLVMTypeList& arguments);
 
+        /// <summary> Emits the function declaration and arguments, when beginning a new function. </summary>
+        ///
+        /// <param name="pModule"> The module in which the function is declared. </param>
+        /// <param name="name"> The function name. </param>
+        /// <param name="returnType"> Function return type. </param>
+        /// <param name="linkage"> The linkage. </param>
+        /// <param name="arguments"> Function arguments. </param>
+        ///
+        /// <returns> Pointer to the declared function. </returns>
+        LLVMFunction Function(llvm::Module* pModule, const std::string& name, LLVMType returnType, llvm::Function::LinkageTypes linkage, const FunctionArgumentList& arguments);
+
         /// <summary> Emit the beginning of a new code block in the given function. </summary>
         ///
         /// <param name="pFunction"> Pointer to the function to which the block is added. </param>
@@ -1110,9 +1122,11 @@ namespace emitters
 
         std::vector<LLVMType> BindArgumentTypes(const NamedVariableTypeList& arguments);
         std::vector<LLVMType> BindArgumentTypes(const NamedLLVMTypeList& arguments);
+        std::vector<LLVMType> BindArgumentTypes(const FunctionArgumentList& args);
 
-        template <typename ListType>
-        void BindArgumentNames(LLVMFunction pFunction, const ListType& arguments);
+        void BindArgumentNames(LLVMFunction pFunction, const NamedVariableTypeList& arguments);
+        void BindArgumentNames(LLVMFunction pFunction, const NamedLLVMTypeList& arguments);
+        void BindArgumentNames(LLVMFunction pFunction, const FunctionArgumentList& arguments);
 
         LLVMFunction CreateFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pFunctionType);
         LLVMValue Zero();
@@ -1165,16 +1179,6 @@ namespace emitters
         auto ptrValue = Literal(reinterpret_cast<int64_t>(ptr));
         auto ptrType = PointerType(GetVariableType<ValueType>());
         return llvm::ConstantExpr::getIntToPtr(ptrValue, ptrType);
-    }
-
-    template <typename ListType>
-    void IREmitter::BindArgumentNames(LLVMFunction pFunction, const ListType& arguments)
-    {
-        size_t i = 0;
-        for (auto& argument : pFunction->args())
-        {
-            argument.setName(arguments[i++].first);
-        }
     }
 
     template <typename ValueType>

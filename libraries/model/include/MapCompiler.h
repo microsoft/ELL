@@ -126,7 +126,7 @@ namespace model
         /// <summary>
         /// Allocate variables for the map function arguments, based on the input and output nodes.
         /// </summary>
-        emitters::NamedVariableTypeList AllocateMapFunctionArguments(Map& map, emitters::ModuleEmitter& emitter);
+        emitters::FunctionArgumentList AllocateMapFunctionArguments(Map& map, emitters::ModuleEmitter& emitter);
 
         //
         // These methods may be implemented by specific compilers
@@ -140,17 +140,12 @@ namespace model
         virtual emitters::ModuleEmitter* GetModuleEmitter() = 0;
 
     private:
-        enum class ArgType
-        {
-            input,
-            output
-        };
 
         friend class CompilableNode;
 
         void CompileNodes(Model& model);
-        emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const OutputPortBase& port, ArgType argType, ell::utilities::UniqueNameList& list);
-        emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const PortElementBase& element, ArgType argType, ell::utilities::UniqueNameList& list);
+        emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const OutputPortBase& port, emitters::ArgumentFlags argDirection, ell::utilities::UniqueNameList& uniqueNameScope);
+        emitters::Variable* AllocatePortFunctionArgument(emitters::ModuleEmitter& emitter, const PortElementBase& element, emitters::ArgumentFlags argDirection, ell::utilities::UniqueNameList& uniqueNameScope);
 
         MapCompilerOptions _parameters;
         ModelOptimizerOptions _optimizerOptions;

@@ -89,8 +89,7 @@ namespace model
         auto pModuleEmitter = GetModuleEmitter();
 
         Log() << "Creating 'predict' function" << EOL;
-        emitters::NamedVariableTypeList mainFunctionArguments = AllocateMapFunctionArguments(map, *pModuleEmitter);
-        pModuleEmitter->BeginMapPredictFunction(functionName, mainFunctionArguments);
+        emitters::FunctionArgumentList mainFunctionArguments = AllocateMapFunctionArguments(map, *pModuleEmitter);
 
         std::vector<std::string> comments;
         auto numInputs = map.NumInputs();
@@ -104,6 +103,8 @@ namespace model
         {
             comments.emplace_back("Output "s + std::to_string(i) + " ('" + map.GetOutputName(i) + "') size: "s + std::to_string(map.GetOutput(i).Size()));
         }
+
+        pModuleEmitter->BeginMapPredictFunction(functionName, mainFunctionArguments);
 
         pModuleEmitter->GetFunctionDeclaration(functionName).GetComments() = comments;
 
@@ -173,41 +174,41 @@ namespace model
     //
     // Allocating variables for function arguments
     //
-    emitters::NamedVariableTypeList MapCompiler::AllocateMapFunctionArguments(Map& map, emitters::ModuleEmitter& module)
+    emitters::FunctionArgumentList MapCompiler::AllocateMapFunctionArguments(Map& map, emitters::ModuleEmitter& module)
     {
-        emitters::NamedVariableTypeList functionArguments;
+        emitters::FunctionArgumentList functionArguments;
 
         // context parameter
-        functionArguments.push_back({ "context", emitters::VariableType::VoidPointer });
+        functionArguments.push_back({ "context", emitters::VariableType::VoidPointer, emitters::ArgumentFlags::Input });
 
-        utilities::UniqueNameList list;
+        utilities::UniqueNameList uniqueNameScope;
         // Allocate variables for inputs
         for (auto inputNode : map.GetInputs())
         {
-            auto argVar = AllocatePortFunctionArgument(module, inputNode->GetOutputPort(), ArgType::input, list);
-            functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
+            auto argVar = AllocatePortFunctionArgument(module, inputNode->GetOutputPort(), emitters::ArgumentFlags::Input, uniqueNameScope);
+            functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()), emitters::ArgumentFlags::Input });
         }
 
         // Allocate variables for outputs -- scalar outputs are treated the same as vectors
         for (auto output : map.GetOutputs())
         {
             // TODO: can we use an array type here?
-            auto argVar = AllocatePortFunctionArgument(module, *output, ArgType::output, list);
-            functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()) });
+            auto argVar = AllocatePortFunctionArgument(module, *output, emitters::ArgumentFlags::Output, uniqueNameScope);
+            functionArguments.push_back({ argVar->EmittedName(), GetPointerType(argVar->Type()), emitters::ArgumentFlags::Output });
         }
         return functionArguments;
     }
 
-    emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const OutputPortBase& port, ArgType argType, ell::utilities::UniqueNameList& list)
+    emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const OutputPortBase& port, emitters::ArgumentFlags argDirection, ell::utilities::UniqueNameList& uniqueNameScope)
     {
         emitters::VariableType varType = PortTypeToVariableType(port.GetType());
-        emitters::VariableScope scope = argType == ArgType::input ? emitters::VariableScope::input : emitters::VariableScope::output;
+        emitters::VariableScope scope = argDirection == emitters::ArgumentFlags::Input ? emitters::VariableScope::input : emitters::VariableScope::output;
 
-        // outputs are modelled as Vectors
+        // all inputs and outputs are modelled as Vectors
         emitters::Variable* pVar = module.Variables().AddVectorVariable(scope, varType, port.Size());
 
-        std::string defaultName = argType == ArgType::input ? "input" : "output";
-        std::string friendlyName = list.Add(port.GetVariableName(defaultName));
+        std::string defaultName = argDirection == emitters::ArgumentFlags::Input ? "input" : "output";
+        std::string friendlyName = uniqueNameScope.Add(port.GetVariableName(defaultName));
         pVar->SetEmittedName(friendlyName);
 
         module.AllocateVariable(*pVar);
@@ -215,9 +216,9 @@ namespace model
         return pVar;
     }
 
-    emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const PortElementBase& element, ArgType argType, ell::utilities::UniqueNameList& list)
+    emitters::Variable* MapCompiler::AllocatePortFunctionArgument(emitters::ModuleEmitter& module, const PortElementBase& element, emitters::ArgumentFlags argDirection, ell::utilities::UniqueNameList& uniqueNameScope)
     {
-        return AllocatePortFunctionArgument(module, *element.ReferencedPort(), argType, list);
+        return AllocatePortFunctionArgument(module, *element.ReferencedPort(), argDirection, uniqueNameScope);
     }
 
     void MapCompiler::PushScope()

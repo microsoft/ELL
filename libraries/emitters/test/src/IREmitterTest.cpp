@@ -223,7 +223,7 @@ void TestLLVMShiftRegister()
     std::vector<double> newData1({ 1.2, 2.2 });
     std::vector<double> newData2({ 3.3, 4.3 });
 
-    auto fn = module.BeginFunction("ShiftRegisterTest", VariableType::Void, { { "values", VariableType::DoublePointer } });
+    auto fn = module.BeginFunction("ShiftRegisterTest", VariableType::Void, NamedVariableTypeList{ { "values", VariableType::DoublePointer } });
     {
         auto arguments = fn.Arguments().begin();
         auto output = &(*arguments++);
@@ -353,7 +353,7 @@ void TestLogicalAnd()
 {
     auto module = MakeHostModuleEmitter("LogicalAnd");
 
-    auto fn = module.BeginFunction("LogicalAndTest", VariableType::Int32, { { "x1", VariableType::Int32 }, { "x2", VariableType::Int32 }, { "x3", VariableType::Int32 } });
+    auto fn = module.BeginFunction("LogicalAndTest", VariableType::Int32, NamedVariableTypeList{ { "x1", VariableType::Int32 }, { "x2", VariableType::Int32 }, { "x3", VariableType::Int32 } });
     {
         auto args = fn.Arguments().begin();
         llvm::Argument& val1 = *args++;
@@ -386,7 +386,7 @@ void TestLogicalOr()
 {
     auto module = MakeHostModuleEmitter("LogicalOr");
 
-    auto fn = module.BeginFunction("LogicalOrTest", VariableType::Int32, { { "x1", VariableType::Int32 }, { "x2", VariableType::Int32 }, { "x3", VariableType::Int32 } });
+    auto fn = module.BeginFunction("LogicalOrTest", VariableType::Int32, NamedVariableTypeList{ { "x1", VariableType::Int32 }, { "x2", VariableType::Int32 }, { "x3", VariableType::Int32 } });
     {
         auto args = fn.Arguments().begin();
         llvm::Argument& val1 = *args++;
@@ -419,7 +419,7 @@ void TestLogicalNot()
 {
     auto module = MakeHostModuleEmitter("LogicalNot");
 
-    auto fn = module.BeginFunction("LogicalNotTest", VariableType::Int32, { { "x1", VariableType::Int32 }, { "x2", VariableType::Int32 } });
+    auto fn = module.BeginFunction("LogicalNotTest", VariableType::Int32, NamedVariableTypeList{ { "x1", VariableType::Int32 }, { "x2", VariableType::Int32 } });
     {
         auto args = fn.Arguments().begin();
         llvm::Argument& val1 = *args++;
@@ -865,7 +865,7 @@ void TestScopedIf()
     auto module = MakeHostModuleEmitter("If");
 
     // returns `1` if arg is < 10.0, otherwise returns `2`
-    auto fn = module.BeginFunction("ScopedIfTest", VariableType::Int32, { { "x", VariableType::Double } });
+    auto fn = module.BeginFunction("ScopedIfTest", VariableType::Int32, NamedVariableTypeList{ { "x", VariableType::Double } });
     {
         auto arguments = fn.Arguments().begin();
         auto x = &(*arguments++);
@@ -904,7 +904,7 @@ void TestScopedIfElse()
 {
     auto module = MakeHostModuleEmitter("IfElse");
 
-    auto fn = module.BeginFunction("ScopedIfElseTest", VariableType::Int32, { { "x", VariableType::Int32 } });
+    auto fn = module.BeginFunction("ScopedIfElseTest", VariableType::Int32, NamedVariableTypeList{ { "x", VariableType::Int32 } });
     {
         auto arguments = fn.Arguments().begin();
         auto x = &(*arguments++);
@@ -952,7 +952,7 @@ void TestScopedIfElse2()
 {
     auto module = MakeHostModuleEmitter("IfElse2");
 
-    auto fn = module.BeginFunction("ScopedIfElse2Test", VariableType::Int32, { { "x", VariableType::Int32 } });
+    auto fn = module.BeginFunction("ScopedIfElse2Test", VariableType::Int32, NamedVariableTypeList{ { "x", VariableType::Int32 } });
     {
         auto arguments = fn.Arguments().begin();
         auto x = &(*arguments++);

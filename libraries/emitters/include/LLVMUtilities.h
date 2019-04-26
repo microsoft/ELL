@@ -67,5 +67,12 @@ namespace emitters
     ///
     /// <returns> The TypedComparison for comparing values of the given type. </returns>
     emitters::TypedComparison GetComparison(LLVMType type, BinaryPredicateType operation);
+
+    /// <summary> Get VariableType from an LLVMType. </summary>
+    /// <param name="type"> The LLVM type. </param>
+    ///
+    /// <returns> The VariableType or VariableType::Custom for anything that doesn't map. </returns>
+    VariableType ToVariableType(LLVMType type);
+
 } // namespace emitters
 } // namespace ell

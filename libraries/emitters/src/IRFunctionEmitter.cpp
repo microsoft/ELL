@@ -157,6 +157,13 @@ namespace emitters
         RegisterFunctionArgs(arguments);
     }
 
+    IRFunctionEmitter::IRFunctionEmitter(IRModuleEmitter* pModuleEmitter, LLVMFunction pFunction, const FunctionArgumentList& arguments, const std::string& name) :
+        IRFunctionEmitter(pModuleEmitter, pFunction, name)
+    {
+        // Note: already called other constructor
+        RegisterFunctionArgs(arguments);
+    }
+
     void IRFunctionEmitter::CompleteFunction()
     {
         Verify();
@@ -1801,6 +1808,40 @@ namespace emitters
     bool IRFunctionEmitter::CanUseBlas() const
     {
         return GetCompilerOptions().useBlas;
+    }
+
+    void IRFunctionEmitter::RegisterFunctionArgs(const NamedVariableTypeList& args)
+    {
+        auto argumentsIterator = Arguments().begin();
+        for (size_t i = 0; i < args.size(); ++i)
+        {
+            auto arg = &(*argumentsIterator);
+            _locals.Add(args[i].first, arg);
+            ++argumentsIterator;
+        }
+    }
+
+
+    void IRFunctionEmitter::RegisterFunctionArgs(const NamedLLVMTypeList& args)
+    {
+        auto argumentsIterator = Arguments().begin();
+        for (size_t i = 0; i < args.size(); ++i)
+        {
+            auto arg = &(*argumentsIterator);
+            _locals.Add(args[i].first, arg);
+            ++argumentsIterator;
+        }
+    }
+
+    void IRFunctionEmitter::RegisterFunctionArgs(const FunctionArgumentList& args)
+    {
+        auto argumentsIterator = Arguments().begin();
+        for (size_t i = 0; i < args.size(); ++i)
+        {
+            auto arg = &(*argumentsIterator);
+            _locals.Add(args[i].GetName(), arg);
+            ++argumentsIterator;
+        }
     }
 
     //
