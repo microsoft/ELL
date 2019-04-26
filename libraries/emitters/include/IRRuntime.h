@@ -94,9 +94,14 @@ namespace emitters
         LLVMFunction GetExpFunction(VariableType argType);
         LLVMFunction GetPowFunction(VariableType argType);
         LLVMFunction GetLogFunction(VariableType argType);
+        LLVMFunction GetLog10Function(VariableType argType);
+        LLVMFunction GetLog2Function(VariableType argType);
         LLVMFunction GetTanhFunction(VariableType argType);
         LLVMFunction GetSinFunction(VariableType argType);
         LLVMFunction GetCosFunction(VariableType argType);
+        LLVMFunction GetRoundFunction(VariableType argType);
+        LLVMFunction GetFloorFunction(VariableType argType);
+        LLVMFunction GetCeilFunction(VariableType argType);
         LLVMFunction GetCopySignFunction(VariableType argType);
 
         // llvm types
@@ -105,9 +110,14 @@ namespace emitters
         LLVMFunction GetExpFunction(LLVMType argType);
         LLVMFunction GetPowFunction(LLVMType argType);
         LLVMFunction GetLogFunction(LLVMType argType);
+        LLVMFunction GetLog10Function(LLVMType argType);
+        LLVMFunction GetLog2Function(LLVMType argType);
         LLVMFunction GetTanhFunction(LLVMType argType);
         LLVMFunction GetSinFunction(LLVMType argType);
         LLVMFunction GetCosFunction(LLVMType argType);
+        LLVMFunction GetRoundFunction(LLVMType argType);
+        LLVMFunction GetFloorFunction(LLVMType argType);
+        LLVMFunction GetCeilFunction(LLVMType argType);
         LLVMFunction GetCopySignFunction(LLVMType argType);
 
         //

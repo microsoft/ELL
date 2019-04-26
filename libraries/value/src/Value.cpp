@@ -256,11 +256,16 @@ namespace value
 
         switch (_type.first)
         {
-        case ValueType::Boolean: // [[fallthrough]];
-        case ValueType::Byte: // [[fallthrough]];
-        case ValueType::Char8: // [[fallthrough]];
-        case ValueType::Int16: // [[fallthrough]];
-        case ValueType::Int32: // [[fallthrough]];
+        case ValueType::Boolean:
+            [[fallthrough]];
+        case ValueType::Byte: 
+            [[fallthrough]];
+        case ValueType::Char8: 
+            [[fallthrough]];
+        case ValueType::Int16: 
+            [[fallthrough]];
+        case ValueType::Int32: 
+            [[fallthrough]];
         case ValueType::Int64:
             return true;
         default:
@@ -296,11 +301,16 @@ namespace value
 
         switch (_type.first)
         {
-        case ValueType::Boolean: // [[fallthrough]];
-        case ValueType::Byte: // [[fallthrough]];
-        case ValueType::Int16: // [[fallthrough]];
-        case ValueType::Char8: // [[fallthrough]];
-        case ValueType::Int32: // [[fallthrough]];
+        case ValueType::Boolean: 
+            [[fallthrough]];
+        case ValueType::Byte: 
+            [[fallthrough]];
+        case ValueType::Int16: 
+            [[fallthrough]];
+        case ValueType::Char8: 
+            [[fallthrough]];
+        case ValueType::Int32: 
+            [[fallthrough]];
         case ValueType::Int64:
             return true;
         default:
@@ -344,12 +354,54 @@ namespace value
     Value::UnderlyingDataType& Value::GetUnderlyingData() { return _data; }
 
     const Value::UnderlyingDataType& Value::GetUnderlyingData() const { return _data; }
-
+    
     namespace detail
     {
         Value StoreConstantData(ConstantData data) { return GetContext().StoreConstantData(data); }
     } // namespace detail
 
+#define ADD_TO_STRING_ENTRY(NAMESPACE, OPERATOR) \
+    case NAMESPACE::OPERATOR:                    \
+        return #OPERATOR;
+#define BEGIN_FROM_STRING if (false)
+#define ADD_FROM_STRING_ENTRY(NAMESPACE, OPERATOR) else if (name == #OPERATOR) return NAMESPACE::OPERATOR
+
+    std::string ToString(ValueType vt)
+    {
+        switch (vt)
+        {
+            ADD_TO_STRING_ENTRY(ValueType, Undefined);
+            ADD_TO_STRING_ENTRY(ValueType, Void);
+            ADD_TO_STRING_ENTRY(ValueType, Boolean);
+            ADD_TO_STRING_ENTRY(ValueType, Char8);
+            ADD_TO_STRING_ENTRY(ValueType, Byte);
+            ADD_TO_STRING_ENTRY(ValueType, Int16);
+            ADD_TO_STRING_ENTRY(ValueType, Int32);
+            ADD_TO_STRING_ENTRY(ValueType, Int64);
+            ADD_TO_STRING_ENTRY(ValueType, Float);
+            ADD_TO_STRING_ENTRY(ValueType, Double);
+
+        default:
+            return "Undefined";
+        }
+    }
+
+    ValueType FromString(std::string name)
+    {
+        BEGIN_FROM_STRING;
+        ADD_FROM_STRING_ENTRY(ValueType, Undefined);
+        ADD_FROM_STRING_ENTRY(ValueType, Void);
+        ADD_FROM_STRING_ENTRY(ValueType, Boolean);
+        ADD_FROM_STRING_ENTRY(ValueType, Char8);
+        ADD_FROM_STRING_ENTRY(ValueType, Byte);
+        ADD_FROM_STRING_ENTRY(ValueType, Int16);
+        ADD_FROM_STRING_ENTRY(ValueType, Int32);
+        ADD_FROM_STRING_ENTRY(ValueType, Int64);
+        ADD_FROM_STRING_ENTRY(ValueType, Float);
+        ADD_FROM_STRING_ENTRY(ValueType, Double);
+
+        return ValueType::Undefined;
+    }
 } // namespace value
 } // namespace ell
 

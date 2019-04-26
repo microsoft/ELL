@@ -241,7 +241,7 @@ namespace value
         IfContext If(Scalar test, std::function<void()> fn);
 
         std::optional<Value> Call(FunctionDeclaration func, std::vector<Value> args);
-
+        
         void DebugDump(Value value, std::string tag, std::ostream* stream) const;
 
     protected:
@@ -452,24 +452,34 @@ namespace value
     extern FunctionDeclaration CopySignFunctionDeclaration;
     extern FunctionDeclaration ExpFunctionDeclaration;
     extern FunctionDeclaration LogFunctionDeclaration;
+    extern FunctionDeclaration Log10FunctionDeclaration;
+    extern FunctionDeclaration Log2FunctionDeclaration;
     extern FunctionDeclaration MaxNumFunctionDeclaration;
     extern FunctionDeclaration MinNumFunctionDeclaration;
     extern FunctionDeclaration PowFunctionDeclaration;
     extern FunctionDeclaration SinFunctionDeclaration;
     extern FunctionDeclaration SqrtFunctionDeclaration;
     extern FunctionDeclaration TanhFunctionDeclaration;
+    extern FunctionDeclaration RoundFunctionDeclaration;
+    extern FunctionDeclaration FloorFunctionDeclaration;
+    extern FunctionDeclaration CeilFunctionDeclaration;
 
     Scalar Abs(Scalar s);
     Scalar Cos(Scalar s);
     Scalar CopySign(Scalar s1, Scalar s2);
     Scalar Exp(Scalar s);
     Scalar Log(Scalar s);
+    Scalar Log10(Scalar s);
+    Scalar Log2(Scalar s);
     Scalar Max(Scalar s1, Scalar s2);
     Scalar Min(Scalar s1, Scalar s2);
     Scalar Pow(Scalar base, Scalar exp);
     Scalar Sin(Scalar s);
     Scalar Sqrt(Scalar s);
     Scalar Tanh(Scalar s);
+    Scalar Round(Scalar s);
+    Scalar Floor(Scalar s);
+    Scalar Ceil(Scalar s);
     Scalar Sign(Scalar s);
     Scalar LogicalNot(Scalar v);
 
@@ -477,12 +487,17 @@ namespace value
     Vector Cos(Vector v);
     Vector Exp(Vector v);
     Vector Log(Vector v);
+    Vector Log10(Vector v);
+    Vector Log2(Vector v);
     Scalar Max(Vector v);
     Scalar Min(Vector v);
     Vector Pow(Vector bases, Scalar exp);
     Vector Sin(Vector v);
     Vector Sqrt(Vector v);
     Vector Tanh(Vector v);
+    Vector Round(Vector v);
+    Vector Floor(Vector v);
+    Vector Ceil(Vector v);
 
 } // namespace value
 } // namespace ell

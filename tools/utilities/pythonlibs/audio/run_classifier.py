@@ -9,6 +9,7 @@
 #
 ###################################################################################################
 import argparse
+import os
 
 # helper classes
 import featurizer
@@ -24,26 +25,8 @@ CHANNELS = 1  # default classifier was trained on mono audio
 SMOOTHING = 0  # default no smoothing
 
 
-def test_keyword_spotter(featurizer_model, classifier_model, categories, wav_file, threshold, sample_rate,
-                         output_speaker=False, auto_scale=False):
-    predictor = classifier.AudioClassifier(classifier_model, categories, threshold, SMOOTHING)
-    transform = featurizer.AudioTransform(featurizer_model, predictor.input_size)
-
-    if transform.using_map != predictor.using_map:
-        raise Exception("cannot mix .ell and compiled models")
-
+def get_prediction(reader, transform, predictor, categories):
     # set up inputs and outputs
-    if wav_file:
-        the_speaker = None
-        if output_speaker:
-            the_speaker = speaker.Speaker()
-        reader = wav_reader.WavReader(sample_rate, CHANNELS, auto_scale)
-        reader.open(wav_file, transform.input_size, the_speaker)
-    else:
-        reader = microphone.Microphone(True, True)
-        reader.open(transform.input_size, sample_rate, CHANNELS)
-        print("Please type 'x' and enter to terminate this app...")
-
     transform.open(reader)
     results = None
     try:
@@ -63,7 +46,6 @@ def test_keyword_spotter(featurizer_model, classifier_model, categories, wav_fil
         pass
 
     transform.close()
-
     average_time = predictor.avg_time() + transform.avg_time()
     print("Average processing time: {}".format(average_time))
     if results is None:
@@ -71,9 +53,46 @@ def test_keyword_spotter(featurizer_model, classifier_model, categories, wav_fil
     return tuple(list(results) + [average_time])
 
 
+def test_keyword_spotter(featurizer_model, classifier_model, categories, wav_files, threshold, sample_rate,
+                         output_speaker=False, auto_scale=False, reset=False):
+
+    predictor = classifier.AudioClassifier(classifier_model, categories, threshold, SMOOTHING)
+    transform = featurizer.AudioTransform(featurizer_model, predictor.input_size)
+
+    if transform.using_map != predictor.using_map:
+        raise Exception("cannot mix .ell and compiled models")
+
+    the_speaker = None
+    if output_speaker:
+        the_speaker = speaker.Speaker()
+
+    results = []
+    if wav_files:
+        if not os.path.isdir(wav_files):
+            raise Exception("--wav_files {} dir not found".format(wav_files))
+        file_list = os.listdir(wav_files)
+        file_list.sort()
+        for filename in file_list:
+            reader = wav_reader.WavReader(sample_rate, CHANNELS, auto_scale)
+            path = os.path.join(wav_files, filename)
+            reader.open(path, transform.input_size, the_speaker)
+            result = get_prediction(reader, transform, predictor, categories)
+            results += [result]
+            if reset:
+                predictor.reset()
+    else:
+        reader = microphone.Microphone(True, True)
+        reader.open(transform.input_size, sample_rate, CHANNELS)
+        print("Please type 'x' and enter to terminate this app...")
+        result = get_prediction(reader, transform, predictor, categories)
+        results += [result]
+
+    return results
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("test the classifier and featurizer against mic or wav file input")
-    parser.add_argument("--wav_file", help="optional path to wav file to test", default=None)
+    parser.add_argument("--wav_files", help="optional path to folder containing wav files to test", default=None)
     parser.add_argument("--featurizer", "-f", required=True,
                         help="specify path to featurizer model (*.ell or compiled_folder/model_name)")
     parser.add_argument("--classifier", "-c", required=True,
@@ -85,8 +104,12 @@ if __name__ == "__main__":
     parser.add_argument("--speaker", help="Output audio to the speaker.", action='store_true')
     parser.add_argument("--auto_scale", help="Whether to auto-scale audio input to range [-1, 1] (default false).",
                         action='store_true')
+    parser.add_argument("--reset", help="Whether to reset model between tests (default false).",
+                        action='store_true')
 
     args = parser.parse_args()
 
-    test_keyword_spotter(args.featurizer, args.classifier, args.categories, args.wav_file, args.threshold,
-                         args.sample_rate, args.speaker, args.auto_scale)
+    results = test_keyword_spotter(args.featurizer, args.classifier, args.categories, args.wav_files, args.threshold,
+                                   args.sample_rate, args.speaker, args.auto_scale, args.reset)
+
+    print(results)

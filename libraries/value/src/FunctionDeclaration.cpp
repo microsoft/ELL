@@ -18,7 +18,7 @@ namespace value
 
     FunctionDeclaration::FunctionDeclaration(std::string name) :
         _originalFunctionName(name),
-        _isEmpty(false) 
+        _isEmpty(false)
     {}
 
     FunctionDeclaration& FunctionDeclaration::Returns(Value returnType)
@@ -114,12 +114,17 @@ namespace value
     /*extern*/ FunctionDeclaration CopySignFunctionDeclaration = DeclareFunction("CopySign");
     /*extern*/ FunctionDeclaration ExpFunctionDeclaration = DeclareFunction("Exp");
     /*extern*/ FunctionDeclaration LogFunctionDeclaration = DeclareFunction("Log");
+    /*extern*/ FunctionDeclaration Log10FunctionDeclaration = DeclareFunction("Log10");
+    /*extern*/ FunctionDeclaration Log2FunctionDeclaration = DeclareFunction("Log2");
     /*extern*/ FunctionDeclaration MaxNumFunctionDeclaration = DeclareFunction("MaxNum");
     /*extern*/ FunctionDeclaration MinNumFunctionDeclaration = DeclareFunction("MinNum");
     /*extern*/ FunctionDeclaration PowFunctionDeclaration = DeclareFunction("Pow");
     /*extern*/ FunctionDeclaration SinFunctionDeclaration = DeclareFunction("Sin");
     /*extern*/ FunctionDeclaration SqrtFunctionDeclaration = DeclareFunction("Sqrt");
     /*extern*/ FunctionDeclaration TanhFunctionDeclaration = DeclareFunction("Tanh");
+    /*extern*/ FunctionDeclaration RoundFunctionDeclaration = DeclareFunction("Round");
+    /*extern*/ FunctionDeclaration FloorFunctionDeclaration = DeclareFunction("Floor");
+    /*extern*/ FunctionDeclaration CeilFunctionDeclaration = DeclareFunction("Ceil");
 
 } // namespace value
 } // namespace ell

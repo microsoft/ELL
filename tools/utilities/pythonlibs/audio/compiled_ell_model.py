@@ -66,3 +66,4 @@ class CompiledModel:
 
     def reset(self):
         self.hidden_state = self.module.FloatVector(self.state_size)
+        self.wrapper.Reset()

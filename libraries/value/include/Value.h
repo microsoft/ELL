@@ -16,6 +16,7 @@
 #include <utilities/include/Exception.h>
 #include <utilities/include/MemoryLayout.h>
 #include <utilities/include/TypeTraits.h>
+#include <utilities/include/StringUtil.h>
 
 #include <initializer_list>
 #include <optional>
@@ -234,7 +235,8 @@ namespace value
             auto ptr = TryGet<T>();
             if (!ptr.has_value())
             {
-                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented,
+                    ell::utilities::FormatString("Cannot get const value of type %s from Value of type %s", typeid(T).name(), ToString(GetBaseType()).c_str()));
             }
 
             return *ptr;
@@ -249,7 +251,8 @@ namespace value
             auto ptr = TryGet<T>();
             if (!ptr.has_value())
             {
-                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented,
+                    ell::utilities::FormatString("Cannot get value of type %s from Value of type %s", typeid(T).name(), ToString(GetBaseType()).c_str()));
             }
 
             return *ptr;

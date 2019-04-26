@@ -241,6 +241,10 @@ namespace emitters
 
     IRFunctionEmitter& IRModuleEmitter::GetCurrentFunction()
     {
+        if (_functionStack.empty())
+        {
+            throw EmitterException(EmitterError::indexOutOfRange, "There is no current function on the stack");
+        }
         return _functionStack.top().first;
     }
 

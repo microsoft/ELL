@@ -242,12 +242,17 @@ namespace value
             std::ref(CosFunctionDeclaration),
             std::ref(ExpFunctionDeclaration),
             std::ref(LogFunctionDeclaration),
+            std::ref(Log10FunctionDeclaration),
+            std::ref(Log2FunctionDeclaration),
             std::ref(MaxNumFunctionDeclaration),
             std::ref(MinNumFunctionDeclaration),
             std::ref(PowFunctionDeclaration),
             std::ref(SinFunctionDeclaration),
             std::ref(SqrtFunctionDeclaration),
-            std::ref(TanhFunctionDeclaration)
+            std::ref(TanhFunctionDeclaration),
+            std::ref(RoundFunctionDeclaration),
+            std::ref(FloorFunctionDeclaration),
+            std::ref(CeilFunctionDeclaration)
         };
 
         return intrinsics;
@@ -341,6 +346,16 @@ namespace value
         return *GetContext().Call(LogFunctionDeclaration, { s.GetValue() });
     }
 
+    Scalar Log10(Scalar s)
+    {
+        return *GetContext().Call(Log10FunctionDeclaration, { s.GetValue() });
+    }
+
+    Scalar Log2(Scalar s)
+    {
+        return *GetContext().Call(Log2FunctionDeclaration, { s.GetValue() });
+    }
+
     Scalar Max(Scalar s1, Scalar s2)
     {
         return *GetContext().Call(MaxNumFunctionDeclaration, { s1.GetValue(), s2.GetValue() });
@@ -371,6 +386,21 @@ namespace value
         return *GetContext().Call(TanhFunctionDeclaration, { s.GetValue() });
     }
 
+    Scalar Round(Scalar v)
+    {
+        return *GetContext().Call(RoundFunctionDeclaration, { v.GetValue() });
+    }
+
+    Scalar Floor(Scalar s)
+    {
+        return *GetContext().Call(FloorFunctionDeclaration, { s.GetValue() });
+    }
+
+    Scalar Ceil(Scalar s)
+    {
+        return *GetContext().Call(CeilFunctionDeclaration, { s.GetValue() });
+    }
+
     Scalar Sign(Scalar s)
     {
         return *GetContext().Call(CopySignFunctionDeclaration, { Cast(1, s.GetType()).GetValue(), s.GetValue() });
@@ -394,6 +424,16 @@ namespace value
     Vector Log(Vector v)
     {
         return *GetContext().Call(LogFunctionDeclaration, { v.GetValue() });
+    }
+
+    Vector Log10(Vector v)
+    {
+        return *GetContext().Call(Log10FunctionDeclaration, { v.GetValue() });
+    }
+
+    Vector Log2(Vector v)
+    {
+        return *GetContext().Call(Log2FunctionDeclaration, { v.GetValue() });
     }
 
     Scalar Max(Vector v)
@@ -436,17 +476,29 @@ namespace value
         }
         else
         {
-            If(v == Cast(0, v.GetType()), [&]
-            {
+            If(v == Cast(0, v.GetType()), [&] {
                 r = Cast(1, v.GetType());
-            }).Else([&]
-            {
-                r = Cast(0, v.GetType());
-            });
+            })
+                .Else([&] {
+                    r = Cast(0, v.GetType());
+                });
         }
         return r;
     }
 
+    Vector Round(Vector v)
+    {
+        return *GetContext().Call(RoundFunctionDeclaration, { v.GetValue() });
+    }
+    Vector Floor(Vector v)
+    {
+        return *GetContext().Call(FloorFunctionDeclaration, { v.GetValue() });
+    }
+
+    Vector Ceil(Vector v)
+    {
+        return *GetContext().Call(CeilFunctionDeclaration, { v.GetValue() });
+    }
 
 } // namespace value
 } // namespace ell

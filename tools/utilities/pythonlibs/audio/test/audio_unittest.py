@@ -13,7 +13,7 @@ import json
 import os
 import unittest
 import sys
-from shutil import rmtree
+from shutil import rmtree, copyfile
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(script_path))
@@ -120,7 +120,6 @@ class AudioUnitTest(unittest.TestCase):
         featurizer_model = self.make_featurizer(path, "test/featurizer.ell")
         self.compile_model(featurizer_model, "test/compiled_featurizer", "mfcc")
         self.compile_model(classifier_model, "test/compiled_classifier", "model")
-        self.wav_file = os.path.join(example_data, "seven.wav")
 
     def test_keyword_spotter(self):
         _log.info("---------------- test_keyword_spotter")
@@ -133,15 +132,29 @@ class AudioUnitTest(unittest.TestCase):
             _log.info("---------------- skipping test_keyword_spotter because you don't have pyaudio module.")
             return 0
 
+        wav_dir = os.path.join("test", "wav")
+        if not os.path.exists(wav_dir):
+            os.mkdir(wav_dir)
+        copyfile(os.path.join(example_data, "seven.wav"), os.path.join(wav_dir, "seven.wav"))
+        copyfile(os.path.join(example_data, "bed.wav"), os.path.join(wav_dir, "bed.wav"))
+
         result = run_classifier.test_keyword_spotter("test/compiled_featurizer/mfcc",
                                                      "test/compiled_classifier/model",
                                                      self.categories_file,
-                                                     self.wav_file,
+                                                     wav_dir,
                                                      threshold=0.95,
                                                      sample_rate=self.sample_rate,
-                                                     auto_scale=True)
-        if not result or result[2] != "seven":
-            raise Exception("Did not get expected prediction 'seven': {}".format(result))
+                                                     output_speaker=False,
+                                                     auto_scale=True,
+                                                     reset=True)
+        print(result)
+        if len(result) != 2:
+            raise Exception("Did not get 2 predictions")
+
+        actual = [x[2] for x in result]
+
+        if actual != ["bed", "seven"]:
+            raise Exception("Did not get expected predictions 'bed' and 'seven'")
 
         return 0
 

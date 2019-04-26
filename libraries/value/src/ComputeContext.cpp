@@ -1078,12 +1078,17 @@ namespace value
             { CosFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::cos(n); }) },
             { ExpFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::exp(n); }) },
             { LogFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::log(n); }) },
+            { Log10FunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::log10(n); }) },
+            { Log2FunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::log2(n); }) },
             { MaxNumFunctionDeclaration, SimpleMinMaxNumFunctionIntrinsic{}(MaxFn{}) },
             { MinNumFunctionDeclaration, SimpleMinMaxNumFunctionIntrinsic{}(MinFn{}) },
             { PowFunctionDeclaration, PowFunctionIntrinsic{} },
             { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::sin(n); }) },
             { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::sqrt(n); }) },
             { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::tanh(n); }) },
+            { RoundFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::round(n); }) },
+            { FloorFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::floor(n); }) },
+            { CeilFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::ceil(n); }) },
             { CopySignFunctionDeclaration, CopySignFunctionIntrinsic{} },
         };
 

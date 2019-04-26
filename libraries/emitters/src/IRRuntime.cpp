@@ -395,6 +395,26 @@ namespace emitters
         return _module.GetIntrinsic(llvm::Intrinsic::log, { argType });
     }
 
+    LLVMFunction IRRuntime::GetLog10Function(VariableType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::log10, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetLog2Function(VariableType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::log2, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetFloorFunction(VariableType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::floor, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetCeilFunction(VariableType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::ceil, { argType });
+    }
+
     LLVMFunction IRRuntime::GetSinFunction(VariableType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::sin, { argType });
@@ -417,6 +437,11 @@ namespace emitters
         auto valueType = emitter.Type(argType);
         return GetTanhFunction(valueType);
     }
+
+    LLVMFunction IRRuntime::GetRoundFunction(VariableType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::round, { argType });
+    }    
 
     LLVMFunction IRRuntime::GetSqrtFunction(LLVMType argType)
     {
@@ -441,6 +466,26 @@ namespace emitters
     LLVMFunction IRRuntime::GetLogFunction(LLVMType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::log, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetLog10Function(LLVMType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::log10, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetLog2Function(LLVMType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::log2, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetFloorFunction(LLVMType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::floor, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetCeilFunction(LLVMType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::ceil, { argType });
     }
 
     LLVMFunction IRRuntime::GetTanhFunction(LLVMType valueType)
@@ -472,6 +517,11 @@ namespace emitters
     LLVMFunction IRRuntime::GetCosFunction(LLVMType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::cos, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetRoundFunction(LLVMType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::round, { argType });
     }
 
     LLVMFunction IRRuntime::GetCopySignFunction(LLVMType argType)

@@ -1248,12 +1248,17 @@ namespace value
                 { CosFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetCosFunction) },
                 { ExpFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetExpFunction) },
                 { LogFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetLogFunction) },
+                { Log10FunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetLog10Function) },
+                { Log2FunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetLog2Function) },
                 { MaxNumFunctionDeclaration, MaxMinIntrinsicFunction(MaxMinIntrinsic::Max) },
                 { MinNumFunctionDeclaration, MaxMinIntrinsicFunction(MaxMinIntrinsic::Min) },
                 { PowFunctionDeclaration, PowFunctionIntrinsic() },
                 { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetSinFunction) },
                 { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetSqrtFunction) },
                 { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetTanhFunction) },
+                { RoundFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetRoundFunction) },
+                { FloorFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetFloorFunction) },
+                { CeilFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetCeilFunction) },
                 { CopySignFunctionDeclaration, CopySignFunctionIntrinsic() },
             };
 
@@ -1325,11 +1330,13 @@ namespace value
 
             if (arg.PointerLevel() == type.PointerLevel())
             {
-                argValues.push_back(ToLLVMValue(arg));
+                auto varg = ToLLVMValue(arg);
+                argValues.push_back(varg);
             }
             else if (arg.PointerLevel() == (type.PointerLevel() + 1))
             {
-                argValues.push_back(fnEmitter.ValueAt(ToLLVMValue(arg), 0));
+                auto varg = ToLLVMValue(arg);
+                argValues.push_back(fnEmitter.ValueAt(varg, 0));
             }
             else
             {

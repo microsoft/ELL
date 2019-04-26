@@ -42,6 +42,10 @@ namespace value
 
         const emitters::IRModuleEmitter& GetModuleEmitter() const;
 
+        emitters::IRFunctionEmitter& GetFunctionEmitter() const;
+
+        std::optional<Value> EmitExternalCall(FunctionDeclaration func, std::vector<Value> args);
+
     private:
         Value AllocateImpl(ValueType value, MemoryLayout layout) override;
 
@@ -81,15 +85,11 @@ namespace value
 
         Value IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args);
 
-        std::optional<Value> EmitExternalCall(FunctionDeclaration func, std::vector<Value> args);
-
         bool TypeCompatible(Value value1, Value value2);
 
         std::string GetScopeAdjustedName(GlobalAllocationScope scope, std::string name) const;
         std::string GetGlobalScopedName(std::string name) const;
         std::string GetCurrentFunctionScopedName(std::string name) const;
-
-        emitters::IRFunctionEmitter& GetFunctionEmitter() const;
 
         struct PromotedConstantDataDescription
         {

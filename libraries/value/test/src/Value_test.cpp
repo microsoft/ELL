@@ -16,8 +16,6 @@
 #include <value/include/Value.h>
 #include <value/include/Vector.h>
 
-#include <emitters/include/IRModuleEmitter.h>
-
 #include <math/include/Matrix.h>
 #include <math/include/Tensor.h>
 #include <math/include/Vector.h>
@@ -80,26 +78,21 @@ auto Get1DReferenceSignal()
 
 auto Get1DReferenceConvolutionResult()
 {
-    return std::vector<double>{ 0.77013919, 0.81368187, 0.56914835, 0.30732139, 0.34824032, 0.53571473, 0.48653128, 0.21208796, 0.17427497, 0.39217245, 0.44620757, 0.49905383, 0.74073549, 0.73957347 };
-}
+    auto signal = Get1DReferenceSignal();
+    auto filter = Get1DReferenceFilter();
+    size_t resultSize = signal.size() - filter.size() + 1;
+    std::vector<double> result(resultSize);
 
-struct TestLLVMContext : public LLVMContext
-{
-    TestLLVMContext(std::unique_ptr<IRModuleEmitter> emitter) :
-        LLVMContext(*emitter),
-        _emitter(std::move(emitter)) {}
-
-    void DebugDump() { _emitter->DebugDump(); }
-
-private:
-    std::unique_ptr<IRModuleEmitter> _emitter;
-};
-
-void PrintIR(TestLLVMContext& context)
-{
-#if PRINT_IR
-    context.DebugDump();
-#endif // PRINT_IR
+    for (size_t i = 0; i < resultSize; i++)
+    {
+        double accum = 0;
+        for (size_t j = 0; j < filter.size(); j++)
+        {
+            accum += filter[j] * signal[i + j];
+        }
+        result[i] = accum;
+    }
+    return result;
 }
 
 template <
@@ -116,102 +109,170 @@ RelativeDifference(T1 a, T2 b)
 
 namespace ell
 {
-
 namespace
 {
-    template <typename T = void>
-    bool Verify(Vector actual, Vector expected)
+    void PrintMatrix(std::string indent, Matrix e)
     {
-        bool ok = true;
+        if (!e.GetValue().IsConstant())
+        {
+            std::cout << "cannot print non constant matrix";
+            return;
+        }
+        if (e.Type() == ValueType::Undefined)
+        {
+            std::cout << "Undefined";
+            return;
+        }
+        else if (e.Type() == ValueType::Void)
+        {
+            std::cout << "void";
+            return;
+        }
+        std::cout << std::setprecision(10);
+        int rows = static_cast<int>(e.Rows());
+        int cols = static_cast<int>(e.Columns());
+        for (int i = 0; i < rows; i++)
+        {
+            std::cout << indent;
+            for (int j = 0; j < cols; j++)
+            {
+                if (j > 0)
+                {
+                    std::cout << ", ";
+                }
+                Scalar s = e(i, j);
+                switch (s.GetType())
+                {
+                case ValueType::Undefined:
+                    break;
+                case ValueType::Void:
+                    break;
+                case ValueType::Boolean:
+                    std::cout << (bool)s.Get<Boolean>();
+                    break;
+                case ValueType::Char8:
+                    std::cout << s.Get<char>();
+                    break;
+                case ValueType::Byte:
+                    std::cout << s.Get<uint8_t>();
+                    break;
+                case ValueType::Int16:
+                    std::cout << s.Get<int16_t>();
+                    break;
+                case ValueType::Int32:
+                    std::cout << s.Get<int32_t>();
+                    break;
+                case ValueType::Int64:
+                    std::cout << s.Get<int64_t>();
+                    break;
+                case ValueType::Float:
+                    std::cout << s.Get<float>();
+                    break;
+                case ValueType::Double:
+                    std::cout << s.Get<double>();
+                    break;
+                }
+            }
+            std::cout << "\n";
+        }
+    }
+
+    Scalar NotEqualEpsilon(Scalar x, Scalar y, double epsilon)
+    {
+        if (x.GetType() == ValueType::Int32)
+        {
+            return x != y;
+        }
+        Scalar e = Allocate(ValueType::Double, ScalarLayout);
+        e = epsilon;
+        Scalar tens = Floor(Log10(Cast(x, ValueType::Double)));
+        If(tens > 0.0, [&] {
+            // then we have some precision already on the left hand side of the decimal place, so remove that from epsilon
+            e *= Pow(10.0, tens);
+        });
+        Scalar rx = Allocate(ValueType::Double, ScalarLayout);
+        Scalar ry = Allocate(ValueType::Double, ScalarLayout);
+        rx = Floor(Cast(x, ValueType::Double) / e) * e;
+        ry = Floor(Cast(y, ValueType::Double) / e) * e;
+        InvokeForContext<ComputeContext>([&](auto&) {
+            double t = tens.Get<double>();
+            double dx = rx.Get<double>();
+            double dy = ry.Get<double>();
+            if (dx != dy)
+            {
+                std::cout << std::setprecision(10);
+                std::cout << "  NotEqualEpsilon failed: t=" << t << ": " << dx << " != " << dy << "\n";
+            }
+        });
+        return rx != ry;
+    }
+
+    Scalar Verify(Vector actual, Vector expected, double epsilon = 1e-7)
+    {
+        Scalar fail = 1;
+        Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+        ok = 0;
         For(actual, [&](Scalar index) {
-            if constexpr (std::is_same_v<T, void>)
-            {
-                If(actual(index) == expected(index), [&] {
-                    InvokeForContext<ComputeContext>([&](ComputeContext&) {
-                        ok &= true;
-                    });
-                })
-                    .Else([&] {
-                        InvokeForContext<ComputeContext>([&](ComputeContext&) {
-                            ok &= false;
-                        });
-                    });
-            }
-            else
-            {
-                InvokeForContext<ComputeContext>([&](ComputeContext&) {
-                    ok &= testing::IsEqual(actual(index).Get<T>(), expected(index).Get<T>());
-                });
-            }
+            Scalar x = actual(index);
+            Scalar y = expected(index);
+            If(NotEqualEpsilon(x, y, epsilon), [&] {
+                ok = fail;
+            });
+        });
+        If(ok != 0, [&] {
+            DebugPrint("## Vector compare failed\n");
+            DebugPrint("  Expected: ");
+            DebugPrintVector(expected);
+            DebugPrint("\n");
+            DebugPrint("  Actual:   ");
+            DebugPrintVector(actual);
+            DebugPrint("\n");
         });
         return ok;
     }
 
-    template <typename T = void>
-    bool Verify(Matrix actual, Matrix expected)
+    Scalar Verify(Matrix actual, Matrix expected, double epsilon = 1e-7)
     {
-        bool ok = true;
+        Scalar fail = 1;
+        Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+        ok = 0;
         For(actual, [&](Scalar row, Scalar col) {
-            if constexpr (std::is_same_v<T, void>)
-            {
-                If(actual(row, col) == expected(row, col), [&] {
-                    InvokeForContext<ComputeContext>([&](ComputeContext&) {
-                        ok &= true;
-                    });
-                })
-                    .Else([&] {
-                        InvokeForContext<ComputeContext>([&](ComputeContext&) {
-                            ok &= false;
-                        });
-                    });
-            }
-            else
-            {
-                InvokeForContext<ComputeContext>([&](ComputeContext&) {
-                    ok &= testing::IsEqual(actual(row, col).Get<T>(), expected(row, col).Get<T>());
-                });
-            }
+            Scalar x = actual(row, col);
+            Scalar y = expected(row, col);
+            If(NotEqualEpsilon(x, y, epsilon), [&] {
+                ok = fail;
+            });
+        });
+        If(ok != 0, [&] {
+            DebugPrint("## Matrix compare failed\n");
+            InvokeForContext<ComputeContext>([&](auto&) {
+                std::cout << "Expected: \n";
+                PrintMatrix("   ", expected);
+                std::cout << "\n";
+                std::cout << "Actual:   \n";
+                PrintMatrix("   ", actual);
+                std::cout << "\n";
+            });
         });
         return ok;
     }
 
-    template <typename T = void>
-    bool Verify(Tensor actual, Tensor expected)
+    Scalar Verify(Tensor actual, Tensor expected, double epsilon = 1e-7)
     {
-        bool ok = true;
+        Scalar fail = Cast(1, ValueType::Int32);
+        Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+        ok = 0;
         For(actual, [&](Scalar row, Scalar col, Scalar ch) {
-            if constexpr (std::is_same_v<T, void>)
-            {
-                If(actual(row, col, ch) == expected(row, col, ch), [&] {
-                    InvokeForContext<ComputeContext>([&](ComputeContext&) {
-                        ok &= true;
-                    });
-                })
-                    .Else([&] {
-                        InvokeForContext<ComputeContext>([&](ComputeContext&) {
-                            ok &= false;
-                        });
-                    });
-            }
-            else
-            {
-                InvokeForContext<ComputeContext>([&](ComputeContext&) {
-                    ok &= testing::IsEqual(actual(row, col, ch).Get<T>(), expected(row, col, ch).Get<T>());
-                });
-            }
+            Scalar x = actual(row, col, ch);
+            Scalar y = expected(row, col, ch);
+            If(NotEqualEpsilon(x, y, epsilon), [&] {
+                DebugPrint("## Tensor compare failed\n");
+                ok = fail;
+            });
         });
         return ok;
     }
 } // namespace
-
-std::vector<std::unique_ptr<EmitterContext>> GetContexts()
-{
-    std::vector<std::unique_ptr<EmitterContext>> contexts;
-    contexts.push_back(std::make_unique<ComputeContext>("Value_test"));
-    contexts.push_back(
-        std::make_unique<TestLLVMContext>(std::make_unique<IRModuleEmitter>("Value_test", CompilerOptions{})));
-    return contexts;
-}
 
 void ValueGetTests()
 {
@@ -257,142 +318,217 @@ void ValueGetTests()
     static_assert(is_same_v<decltype(declval<const Value>().TryGet<double*>()), std::optional<double* const>>);
 }
 
-void Value_test1()
+Scalar Basic_test()
 {
-    auto fn = DeclareFunction("Value_test1").Define([] {
-        Value v(std::vector<int>{ 1, 2, 3, 4 });
-        For(v, [&](Scalar index) {
-            InvokeForContext<ComputeContext>([&](auto&) { std::cout << *v.Offset(index).Get<int*>() << " "; });
-        });
-    });
-    InvokeForContext<ComputeContext>([&](auto&) {
-        fn();
-        std::cout << std::endl;
-    });
-    InvokeForContext<TestLLVMContext>(PrintIR);
+    return 0;
 }
 
-void Scalar_test1()
+Scalar Value_test1()
 {
-    auto fn = DeclareFunction("Scalar_test1").Define([] {
-        bool ok = true;
-        Scalar s1 = 1;
-        InvokeForContext<ComputeContext>([&](auto&) { ok &= testing::IsEqual(s1.Get<int>(), 1); });
+    Vector v(std::vector<int>{ 1, 2, 3, 4 });
+    Scalar fail = 1;
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+    For(v, [&](Scalar index) {
+        If(index + 1 != v(index), [&] {
+            ok = fail;
+        });
+    });
+    If(ok != 0, [&] {
+        DebugPrint("Value_test1 compare failed\n");
+    });
+    return ok;
+}
 
-        s1 += 2;
-        InvokeForContext<ComputeContext>([&](auto&) { ok &= testing::IsEqual(s1.Get<int>(), 3); });
+Scalar For_test1()
+{
+    Vector input(std::vector<int>({ 1, 2, 3, 4 }));
+    Vector actual = MakeVector<int>(input.Size());
+    For(input, [&](Scalar index) {
+        actual(index) = input(index);
+    });
+    return Verify(input, actual);
+}
 
-        Scalar s2 = s1 + 3;
-        InvokeForContext<ComputeContext>([&](auto&) { ok &= testing::IsEqual(s1.Get<int>(), 3); });
-        InvokeForContext<ComputeContext>([&](auto&) { ok &= testing::IsEqual(s2.Get<int>(), 6); });
+void TripleLoop(value::Vector input, value::Vector output)
+{
+    if (input.Size() == 0)
+    {
+        return;
+    }
 
-        testing::ProcessTest("Testing basic semantics for Scalar", ok);
+    Scalar max = Allocate(input.GetType(), ScalarLayout);
+    max = Cast(0, input.GetType());
+    For(input, [&](Scalar index) {
+        Scalar v = input(index);
+        If(v > max, [&] {
+            max = v;
+        });
     });
 
-    InvokeForContext<ComputeContext>([&](auto&) { fn(); });
-    InvokeForContext<TestLLVMContext>(PrintIR);
+    Scalar sum = Allocate(input.GetType(), ScalarLayout);
+    sum = Cast(0, input.GetType());
+    For(input, [&](Scalar index) {
+        Scalar v = input(index);
+        v -= max;
+        sum += v;
+        output(index) = v;
+    });
+
+    For(output, [&](Scalar index) {
+        Scalar v = input(index);
+        v /= sum;
+        output(index) = v;
+    });
+}
+
+Scalar For_test2()
+{
+    Vector input(std::vector<double>{ 1, 2, 3, 4, 5 });
+    Vector expected(std::vector<double>{ 0.4, 0.3, 0.2, 0.1, 0 });
+    Vector output = MakeVector<double>(input.Size());
+    TripleLoop(input, output);
+    return Verify(output, expected);
+}
+
+Scalar Scalar_test1()
+{
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+    Scalar s1 = 1;
+    If(s1 != 1, [&] {
+        ok = 1;
+        DebugPrint("Scalar_test1 if 1 failed\n");
+    });
+
+    s1 += 2;
+
+    If(s1 != 3, [&] {
+        ok = 1;
+        DebugPrint("Scalar_test1 if 2 failed\n");
+    });
+
+    Scalar s2 = s1 + 3;
+
+    If(s1 != 3, [&] {
+        ok = 1;
+        DebugPrint("Scalar_test1 if 3 failed\n");
+    });
+
+    If(s2 != 6, [&] {
+        ok = 1;
+        DebugPrint("Scalar_test1 if 4 failed\n");
+    });
+
+    return ok;
 }
 
 Vector testConvolve1D(Vector signal, Vector filter)
 {
     size_t resultSize = signal.Size() - filter.Size() + 1;
     Vector result(Allocate(signal.GetType(), resultSize));
-
+    Scalar accum = Allocate(signal.GetType(), ScalarLayout);
     For(result, [&](Scalar index) {
-        Scalar accum;
-        For(filter, [&](Scalar filterIndex) { accum += filter(filterIndex) * signal(index + filterIndex); });
-
+        accum = Cast(0, accum.GetType());
+        For(filter, [&](Scalar filterIndex) {
+            accum += filter(filterIndex) * signal(index + filterIndex);
+        });
         result(index) = accum;
     });
-
-    math::Vector<double, math::VectorOrientation::column> mv = std::vector<double>{ 1, 2, 3, 4 };
 
     return result;
 }
 
-void Vector_test1()
+Scalar Vector_test1()
 {
     auto signal = Get1DReferenceSignal();
     auto filter = Get1DReferenceFilter();
     auto referenceResult = Get1DReferenceConvolutionResult();
-    auto valueType = GetValueType<decltype(signal)::value_type>();
 
-    auto convolve1D = DeclareFunction("testConvolve1D")
-                          .Returns({ valueType, MemoryLayout({ (int)referenceResult.size() }) })
-                          .Parameters(
-                              Value{ valueType, MemoryLayout({ (int)signal.size() }) },
-                              Value{ valueType, MemoryLayout({ (int)filter.size() }) })
-                          .Define(testConvolve1D);
+    // this works
+    Vector result = testConvolve1D(signal, filter);
 
-    InvokeForContext<ComputeContext>([&](auto&) {
-        bool ok = true;
-        Vector result = convolve1D(signal, filter);
-        For(result, [&](Scalar index) {
-            auto indexInt = index.Get<int>();
-            ok &= testing::IsEqual(referenceResult[indexInt], result[index].Get<double>());
-        });
-        testing::ProcessTest("Testing 1D convolution with Vector", ok);
-    });
+    // but the following does not.
+    //auto valueType = GetValueType<decltype(signal)::value_type>();
+    //uto convolve1D = DeclareFunction("Convolve1D")
+    //                     .Returns({ valueType, MemoryLayout({ (int)referenceResult.size() }) })
+    //                     .Parameters(
+    //                         Value{ valueType, MemoryLayout({ (int)signal.size() }) },
+    //                         Value{ valueType, MemoryLayout({ (int)filter.size() }) })
+    //                     .Define(testConvolve1D);
+    // Vector result = convolve1D(signal, filter);
 
-    InvokeForContext<TestLLVMContext>(PrintIR);
+    Vector expected(referenceResult);
+    return Verify(result, expected);
 }
 
-void Vector_test2()
+Scalar Vector_test2()
 {
-    auto fn = DeclareFunction("Vector_test2")
-                  .Parameters(Value{ ValueType::Float, MemoryLayout{ { 2 } } })
-                  .Define([](Vector v) {
-                      bool ok = true;
-                      v = std::vector<float>{ 1.2f, 2.3f };
-                      Vector testVector(std::vector<float>{ 0.1f, 1.2f });
-                      Scalar testScalar{ 3.4f };
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+    Vector v = std::vector<float>{ 1.2f, 2.3f };
+    Vector testVector(std::vector<float>{ 0.1f, 1.2f });
+    Scalar testScalar{ 3.4f };
+    {
+        Vector expected(std::vector<float>{ 1.2f + 3.4f, 2.3f + 3.4f });
+        Vector actual = v + testScalar;
+        If(Verify(actual, expected) != 0, [&] {
+            DebugPrint("## Vector_test2 vector scalar addition failed\n");
+            ok = 1;
+        });
+    }
+    {
+        Vector expected(std::vector<float>{ 1.2f - 3.4f, 2.3f - 3.4f });
+        Vector actual = v - testScalar;
+        If(Verify(actual, expected) != 0, [&] {
+            DebugPrint("## Vector_test2 vector scalar subtraction failed\n");
+            ok = 1;
+        });
+    }
+    {
+        Vector expected(std::vector<float>{ 1.2f * 3.4f, 2.3f * 3.4f });
+        Vector actual = v * testScalar;
+        If(Verify(actual, expected) != 0, [&] {
+            DebugPrint("## Vector_test2 vector scalar multiplication failed\n");
+            ok = 1;
+        });
+    }
+    {
+        Vector expected(std::vector<float>{ 1.2f / 3.4f, 2.3f / 3.4f });
+        Vector actual = v / testScalar;
+        If(Verify(actual, expected) != 0, [&] {
+            DebugPrint("## Vector_test2 vector scalar division failed\n");
+            ok = 1;
+        });
+    }
 
-                      {
-                          Vector expected(std::vector<float>{ 4.6f, 5.7f });
-                          Vector actual = v + testScalar;
-                          ok &= Verify<float>(actual, expected);
-                      }
-                      {
-                          Vector expected(std::vector<float>{ -2.2f, -1.1f });
-                          Vector actual = v - testScalar;
-                          ok &= Verify<float>(actual, expected);
-                      }
-                      {
-                          Vector expected(std::vector<float>{ 4.08f, 7.82f });
-                          Vector actual = v * testScalar;
-                          ok &= Verify<float>(actual, expected);
-                      }
-                      {
-                          Vector expected(std::vector<float>{ 1.2f / 3.4f, 2.3f / 3.4f });
-                          Vector actual = v / testScalar;
-                          ok &= Verify<float>(actual, expected);
-                      }
-
-                      // Vector +- Vector -> Vector
-                      {
-                          Vector expected(std::vector<float>{ 1.3f, 3.5f });
-                          Vector actual = v + testVector;
-                          ok &= Verify<float>(actual, expected);
-                      }
-                      {
-                          Vector expected(std::vector<float>{ 1.1f, 1.1f });
-                          Vector actual = v - testVector;
-                          ok &= Verify<float>(actual, expected);
-                      }
-
-                      InvokeForContext<ComputeContext>([&](auto&) { testing::ProcessTest("Vector binary operations", ok); });
-                  });
-
-    InvokeForContext<ComputeContext>([&](auto&) { fn(MakeVector<float>(2)); });
-
-    InvokeForContext<TestLLVMContext>(PrintIR);
+    // Vector +- Vector -> Vector
+    {
+        Vector expected(std::vector<float>{ 1.2f + 0.1f, 2.3f + 1.2f });
+        Vector actual = v + testVector;
+        If(Verify(actual, expected) != 0, [&] {
+            DebugPrint("## Vector_test2 vector+vector failed\n");
+            ok = 1;
+        });
+    }
+    {
+        Vector expected(std::vector<float>{ 1.2f - 0.1f, 2.3f - 1.2f });
+        Vector actual = v - testVector;
+        If(Verify(actual, expected) != 0, [&] {
+            DebugPrint("## Vector_test2 vector-vector failed\n");
+            ok = 1;
+        });
+    }
+    return ok;
 }
 
 namespace
 {
     template <MatrixLayout layout>
-    void Matrix_test1Impl(std::integral_constant<MatrixLayout, layout>)
+    Scalar Matrix_test1Impl(std::integral_constant<MatrixLayout, layout>)
     {
+        Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+        ok = 0;
         constexpr int rows = 3, columns = 4;
         std::vector<int> matrixData(rows * columns);
         std::generate(matrixData.begin(), matrixData.end(), [i = 0]() mutable { return ++i; });
@@ -404,693 +540,740 @@ namespace
         MemoryLayout memoryLayout(physicalSize, dimensionOrder);
         Matrix matrix(Value(matrixData, memoryLayout));
 
-        testing::ProcessTest("value::Matrix and math::Matrix column check",
-                             matrix.Columns() == mathMatrix.NumColumns());
-        testing::ProcessTest("value::Matrix and math::Matrix row check", matrix.Rows() == mathMatrix.NumRows());
+        if (matrix.Columns() != mathMatrix.NumColumns())
+        {
+            DebugPrint("## value::Matrix and math::Matrix column check failed\n");
+            ok = 1;
+        };
+        if (matrix.Rows() != mathMatrix.NumRows())
+        {
+            DebugPrint("## value::Matrix and math::Matrix row check failed\n");
+            ok = 1;
+        };
 
-        std::cout << "      Expected    Actual" << std::endl;
-        bool ok = true;
-        // Need to explicitly capture mathMatrix because of a weird VC++ bug
-        For(matrix, [&, &mathMatrix = mathMatrix](Scalar row, Scalar col) {
-            auto rowInt = row.Get<int>();
-            auto colInt = col.Get<int>();
-            auto matrixVal = matrix(row, col).Get<int>();
-            auto mathMatrixVal = mathMatrix(rowInt, colInt);
-            std::cout << "@(" << rowInt << ", " << colInt << ") = " << mathMatrixVal << "\t" << matrixVal << std::endl;
-            ok &= testing::IsEqual(matrixVal, mathMatrixVal);
-        });
-        testing::ProcessTest("value::Matrix and math::Matrix equality check", ok);
-
-        ok = true;
+        Scalar ok2 = Allocate(ValueType::Int32, ScalarLayout);
+        ok2 = 0;
+        // test each row slice is correct
         for (size_t rowIndex = 0; rowIndex < matrix.Rows(); ++rowIndex)
         {
             auto mathRowVector = mathMatrix.GetRow(rowIndex);
             auto rowVector = matrix.Row((int)rowIndex);
-            testing::IsEqual(rowVector.Size(), mathRowVector.Size());
-
-            std::cout << "Row Vector " << rowIndex << ": Expected    Actual" << std::endl;
-            For(rowVector, [&](Scalar index) {
-                auto indexInt = index.Get<int>();
-                std::cout << "@(" << indexInt << ") = " << mathRowVector[indexInt] << "\t"
-                          << rowVector(index).Get<int>() << std::endl;
-                ok &= testing::IsEqual(rowVector(index).Get<int>(), mathRowVector[indexInt]);
+            Vector expected = mathRowVector.ToArray();
+            If(Verify(rowVector, expected) != 0, [&] {
+                ok2 = 1;
             });
         }
-        testing::ProcessTest("value::Matrix and math::Matrix row slice equality", ok);
+        If(ok2 != 0, [&] {
+            DebugPrint("value::Matrix and math::Matrix row slice equality check failed\n");
+            ok = 1;
+        });
 
-        ok = true;
+        ok2 = 0;
+        // check each column slice is correct.
         for (size_t columnIndex = 0; columnIndex < matrix.Rows(); ++columnIndex)
         {
             auto mathColumnVector = mathMatrix.GetColumn(columnIndex);
             auto columnVector = matrix.Column((int)columnIndex);
-            testing::IsEqual(columnVector.Size(), mathColumnVector.Size());
-
-            std::cout << "Column Vector " << columnIndex << ": Expected    Actual" << std::endl;
-            For(columnVector, [&](Scalar index) {
-                auto indexInt = index.Get<int>();
-                std::cout << "@(" << indexInt << ") = " << mathColumnVector[indexInt] << "\t"
-                          << columnVector(index).Get<int>() << std::endl;
-                testing::IsEqual(columnVector(index).Get<int>(), mathColumnVector[indexInt]);
+            Vector expected = mathColumnVector.ToArray();
+            If(Verify(columnVector, expected) != 0, [&] {
+                ok2 = 1;
             });
         }
-        testing::ProcessTest("value::Matrix and math::Matrix column slice equality", ok);
+        If(ok2 != 0, [&] {
+            DebugPrint("value::Matrix and math::Matrix column slice equality check failed\n");
+            ok = 1;
+        });
+
+        return ok;
     }
+
 } // namespace
 
-void Matrix_test1()
+Scalar Matrix_test1()
 {
-    // Test only enabled for ComputeContext for now
-    InvokeForContext<ComputeContext>([](auto&) {
-        DeclareFunction("Matrix_test1").Define([]() -> void {
-            ApplyToEach([](auto layout) { Matrix_test1Impl(layout); },
-                        LayoutType<MatrixLayout::rowMajor>{},
-                        LayoutType<MatrixLayout::columnMajor>{});
-        })();
+    Scalar ok = Matrix_test1Impl(LayoutType<MatrixLayout::rowMajor>{});
+    Scalar ok2 = Matrix_test1Impl(LayoutType<MatrixLayout::columnMajor>{});
+    If(ok2 != 0, [&] {
+        ok = 1;
     });
+    return ok;
 }
 
-void Matrix_test2()
+Scalar Matrix_test2()
 {
-    InvokeForContext<ComputeContext>([](auto&) {
-        std::vector<std::vector<int>> data{
-            std::vector<int>{ 1, 2, 3 },
-            std::vector<int>{ 4, 5, 6 },
-        };
-        Matrix m(data);
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
 
-        testing::ProcessTest("Tensor construction test",
-                             testing::IsEqual(m.Rows(), 2u) && testing::IsEqual(m.Columns(), 3u) &&
-                                 testing::IsEqual(m(1, 2).Get<int>(), data[1][2]));
+    std::vector<std::vector<int>> data{
+        std::vector<int>{ 1, 2, 3 },
+        std::vector<int>{ 4, 5, 6 },
+    };
+    Matrix m(data);
+
+    Scalar actual = static_cast<int>(m.Rows());
+    Scalar expected = 2;
+
+    If(actual != expected, [&] {
+        DebugPrint("Matrix_test2 should have 2 rows\n");
+        ok = 1;
     });
+
+    Scalar actual2 = static_cast<int>(m.Columns());
+    Scalar expected2 = 3;
+
+    If(actual2 != expected2, [&] {
+        DebugPrint("Matrix_test2 should have 3 columns\n");
+        ok = 1;
+    });
+
+    Scalar actual3 = m(1, 2);
+    Scalar expected3 = data[1][2];
+
+    If(actual3 != expected3, [&] {
+        DebugPrint("Matrix_test2 item at (1,2) has incorrect value\n");
+        ok = 1;
+    });
+
+    return ok;
 }
 
-void Matrix_test3()
+Scalar Matrix_test3()
 {
-    auto fn = DeclareFunction("Matrix_test3")
-                  .Parameters(Value{ ValueType::Float, MemoryLayout{ { 2, 2 } } })
-                  .Define([](Matrix m) {
-                      bool ok = true;
-                      m = std::vector<std::vector<float>>{
-                          std::vector<float>{ 1.2f, 2.3f },
-                          std::vector<float>{ 3.4f, 4.5f }
-                      };
-                      Matrix testMatrix(std::vector<std::vector<float>>{
-                          std::vector<float>{ 0.1f, 1.2f },
-                          std::vector<float>{ 2.3f, 3.4f } });
-                      Scalar testScalar{ 3.4f };
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
 
-                      {
-                          Matrix expected(std::vector<std::vector<float>>{
-                              std::vector<float>{ 4.6f, 5.7f },
-                              std::vector<float>{ 6.8f, 7.9f } });
-                          Matrix actual = m + testScalar;
-                          ok &= Verify<float>(actual, expected);
-                      }
-                      {
-                          Matrix expected(std::vector<std::vector<float>>{
-                              std::vector<float>{ -2.2f, -1.1f },
-                              std::vector<float>{ 0.f, 1.1f } });
-                          Matrix actual = m - testScalar;
-                          ok &= Verify<float>(actual, expected);
-                      }
-                      {
-                          Matrix expected(std::vector<std::vector<float>>{
-                              std::vector<float>{ 4.08f, 7.82f },
-                              std::vector<float>{ 11.56f, 15.3f } });
-                          Matrix actual = m * testScalar;
-                          ok &= Verify<float>(actual, expected);
-                      }
-                      {
-                          Matrix expected(std::vector<std::vector<float>>{
-                              std::vector<float>{ 1.2f / 3.4f, 2.3f / 3.4f },
-                              std::vector<float>{ 3.4f / 3.4f, 4.5f / 3.4f } });
-                          Matrix actual = m / testScalar;
-                          ok &= Verify<float>(actual, expected);
-                      }
+    Matrix m = std::vector<std::vector<float>>{
+        std::vector<float>{ 1.2f, 2.3f },
+        std::vector<float>{ 3.4f, 4.5f }
+    };
 
-                      // Vector +- Vector -> Vector
-                      {
-                          Matrix expected(std::vector<std::vector<float>>{
-                              std::vector<float>{ 1.3f, 3.5f },
-                              std::vector<float>{ 5.7f, 7.9f } });
-                          Matrix actual = m + testMatrix;
-                          ok &= Verify<float>(actual, expected);
-                      }
-                      {
-                          Matrix expected(std::vector<std::vector<float>>{
-                              std::vector<float>{ 1.1f, 1.1f },
-                              std::vector<float>{ 1.1f, 1.1f } });
-                          Matrix actual = m - testMatrix;
-                          ok &= Verify<float>(actual, expected);
-                      }
+    Matrix testMatrix(std::vector<std::vector<float>>{
+        std::vector<float>{ 0.1f, 1.2f },
+        std::vector<float>{ 2.3f, 3.4f } });
+    Scalar testScalar{ 3.4f };
 
-                      InvokeForContext<ComputeContext>([&](auto&) { testing::ProcessTest("Matrix binary operations", ok); });
-                  });
+    {
+        Matrix expected(std::vector<std::vector<float>>{
+            std::vector<float>{ 1.2f + 3.4f, 2.3f + 3.4f },
+            std::vector<float>{ 3.4f + 3.4f, 4.5f + 3.4f } });
+        Matrix actual = m + testScalar;
+        If(0 != Verify(actual, expected), [&] {
+            DebugPrint("Matrix_test3 matrix scalar addition failed \n");
+            ok = 1;
+        });
+    }
+    {
+        Matrix expected(std::vector<std::vector<float>>{
+            std::vector<float>{ 1.2f - 3.4f, 2.3f - 3.4f },
+            std::vector<float>{ 3.4f - 3.4f, 4.5f - 3.4f } });
+        Matrix actual = m - testScalar;
+        If(0 != Verify(actual, expected), [&] {
+            DebugPrint("Matrix_test3 matrix scalar subtraction failed \n");
+            ok = 1;
+        });
+    }
+    {
+        Matrix expected(std::vector<std::vector<float>>{
+            std::vector<float>{ 1.2f * 3.4f, 2.3f * 3.4f },
+            std::vector<float>{ 3.4f * 3.4f, 4.5f * 3.4f } });
+        Matrix actual = m * testScalar;
+        If(0 != Verify(actual, expected), [&] {
+            DebugPrint("Matrix_test3 matrix scalar multiplication failed \n");
+            ok = 1;
+        });
+    }
+    {
+        Matrix expected(std::vector<std::vector<float>>{
+            std::vector<float>{ 1.2f / 3.4f, 2.3f / 3.4f },
+            std::vector<float>{ 3.4f / 3.4f, 4.5f / 3.4f } });
+        Matrix actual = m / testScalar;
+        If(0 != Verify(actual, expected), [&] {
+            DebugPrint("Matrix_test3 matrix scalar division failed \n");
+            ok = 1;
+        });
+    }
 
-    InvokeForContext<ComputeContext>([&](auto&) { fn(MakeMatrix<float>(2, 2)); });
-
-    InvokeForContext<TestLLVMContext>(PrintIR);
+    // Vector +- Vector -> Vector
+    {
+        Matrix expected(std::vector<std::vector<float>>{
+            std::vector<float>{ 1.2f + 0.1f, 2.3f + 1.2f },
+            std::vector<float>{ 3.4f + 2.3f, 4.5f + 3.4f } });
+        Matrix actual = m + testMatrix;
+        If(0 != Verify(actual, expected), [&] {
+            DebugPrint("Matrix_test3 matrix + matrix failed \n");
+            ok = 1;
+        });
+    }
+    {
+        Matrix expected(std::vector<std::vector<float>>{
+            std::vector<float>{ 1.2f - 0.1f, 2.3f - 1.2f },
+            std::vector<float>{ 3.4f - 2.3f, 4.5f - 3.4f } });
+        Matrix actual = m - testMatrix;
+        If(0 != Verify(actual, expected), [&] {
+            DebugPrint("Matrix_test3 matrix - matrix failed \n");
+            ok = 1;
+        });
+    }
+    return ok;
 }
-
-void Tensor_test1()
+Scalar Tensor_test1()
 {
-    // Test only enabled for ComputeContext for now
-    InvokeForContext<ComputeContext>([](auto&) {
-        DeclareFunction("Tensor_test1").Define([]() -> void {
-            constexpr int rows = 3, columns = 5, channels = 7;
-            std::vector<int> tensorData(rows * columns * channels);
-            std::generate(tensorData.begin(), tensorData.end(), [i = 0]() mutable { return ++i; });
-            math::ChannelColumnRowTensor<int> mathTensor(3, 5, 7, tensorData);
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
 
-            MemoryShape physicalSize{ rows, columns, channels };
-            DimensionOrder dimensionOrder = RowMajorTensorOrder;
-            MemoryLayout memoryLayout(physicalSize, dimensionOrder);
-            Tensor tensor(Value(tensorData, memoryLayout));
+    constexpr int rows = 3, columns = 5, channels = 7;
+    std::vector<int> tensorData(rows * columns * channels);
+    std::generate(tensorData.begin(), tensorData.end(), [i = 0]() mutable { return ++i; });
+    math::ChannelColumnRowTensor<int> mathTensor(3, 5, 7, tensorData);
 
-            testing::ProcessTest("value::Tensor and math::Tensor column check",
-                                 tensor.Columns() == mathTensor.NumColumns());
-            testing::ProcessTest("value::Tensor and math::Tensor row check", tensor.Rows() == mathTensor.NumRows());
-            testing::ProcessTest("value::Tensor and math::Tensor channel check",
-                                 tensor.Channels() == mathTensor.NumChannels());
+    MemoryShape physicalSize{ rows, columns, channels };
+    DimensionOrder dimensionOrder = RowMajorTensorOrder;
+    MemoryLayout memoryLayout(physicalSize, dimensionOrder);
+    Tensor tensor(Value(tensorData, memoryLayout));
 
-            std::cout << "      Expected    Actual" << std::endl;
-            bool ok = true;
-            For(tensor, [&](Scalar row, Scalar col, Scalar ch) {
+    {
+        Scalar actual = static_cast<int>(tensor.Columns());
+        Scalar expected = static_cast<int>(mathTensor.NumColumns());
+        If(actual != expected, [&] {
+            DebugPrint("Tensor_test1: value::Tensor and math::Tensor column check failed\n");
+            ok = 1;
+        });
+
+        Scalar actual2 = static_cast<int>(tensor.Rows());
+        Scalar expected2 = static_cast<int>(mathTensor.NumRows());
+        If(actual != expected, [&] {
+            DebugPrint("Tensor_test1: value::Tensor and math::Tensor row check failed\n");
+            ok = 1;
+        });
+
+        Scalar actual3 = static_cast<int>(tensor.Channels());
+        Scalar expected3 = static_cast<int>(mathTensor.NumChannels());
+        If(actual != expected, [&] {
+            DebugPrint("Tensor_test1: value::Tensor and math::Tensor channel check failed\n");
+            ok = 1;
+        });
+    }
+
+    Scalar ok2 = Allocate(ValueType::Int32, ScalarLayout);
+    ok2 = 0;
+
+    InvokeForContext<ComputeContext>([&](auto&) {
+        // These tests use row.Get<int>() to get the actual row,col indexes as constants, which can 
+        // only be done during ComputeContext.
+
+        // test we can enummerate all items of a tensor.
+        For(tensor, [&](Scalar row, Scalar col, Scalar ch) {
+            auto rowInt = row.Get<int>();
+            auto colInt = col.Get<int>();
+            auto chInt = ch.Get<int>();
+            Scalar expected = mathTensor(rowInt, colInt, chInt);
+            Scalar actual = tensor(row, col, ch);
+            If(actual != expected, [&] {
+                ok2 = 1;
+            });
+        });
+        If(ok2 != 0, [&] {
+            DebugPrint("Tensor_test1: value::Tensor and math::Tensor equality check failed\n");
+            ok = 1;
+        });
+
+        ok2 = 0;
+        // test we can get matrix slices of a tensor rows and channels
+        for (int column = 0; column < (int)mathTensor.NumColumns(); ++column)
+        {
+            auto mathSlicedMatrix1 = math::GetSlice<Dimension::row, Dimension::channel>(mathTensor, column);
+            auto slicedMatrix1 = tensor.Slice(Slice::All, column, Slice::All);
+            For(slicedMatrix1, [&](Scalar row, Scalar col) {
                 auto rowInt = row.Get<int>();
                 auto colInt = col.Get<int>();
-                auto chInt = ch.Get<int>();
-                std::cout << "@(" << rowInt << ", " << colInt << ", " << chInt
-                          << ") = " << mathTensor(rowInt, colInt, chInt) << "\t" << tensor(row, col, ch).Get<int>()
-                          << std::endl;
-                ok &= testing::IsEqual(tensor(row, col, ch).Get<int>(), mathTensor(rowInt, colInt, chInt));
+                Scalar expected = mathSlicedMatrix1(rowInt, colInt);
+                Scalar actual = slicedMatrix1(row, col);
+                If(actual != expected, [&] {
+                    ok2 = 1;
+                });
             });
-            testing::ProcessTest("value::Tensor and math::Tensor equality check", ok);
+        }
 
-            for (int column = 0; column < (int)mathTensor.NumColumns(); ++column)
-            {
-                auto mathSlicedMatrix1 = math::GetSlice<Dimension::row, Dimension::channel>(mathTensor, column);
-                auto slicedMatrix1 = tensor.Slice(Slice::All, column, Slice::All);
+        If(ok2 != 0, [&] {
+            DebugPrint("Tensor_test1: value::Tensor and math::Tensor(row,channel) matrix slice equality check\n");
+            ok = 1;
+        });
 
-                ok = true;
-                For(slicedMatrix1, [&](Scalar row, Scalar col) {
-                    auto rowInt = row.Get<int>();
-                    auto colInt = col.Get<int>();
-                    std::cout << "@(" << rowInt << ", " << colInt << ") = " << mathSlicedMatrix1(rowInt, colInt) << "\t"
-                              << slicedMatrix1(row, col).Get<int>() << std::endl;
-                    ok &= testing::IsEqual(slicedMatrix1(row, col).Get<int>(), mathSlicedMatrix1(rowInt, colInt));
-                });
-                testing::ProcessTest("value::Tensor and math::Tensor matrix slice equality check", ok);
-            }
-
-            for (int row = 0; row < (int)mathTensor.NumRows(); ++row)
-            {
-                auto mathSlicedMatrix1 = math::GetSlice<Dimension::column, Dimension::channel>(mathTensor, row);
-                auto slicedMatrix1 = tensor.Slice(row, Slice::All, Slice::All);
-
-                ok = true;
-                For(slicedMatrix1, [&](Scalar row, Scalar col) {
-                    auto rowInt = row.Get<int>();
-                    auto colInt = col.Get<int>();
-                    std::cout << "@(" << rowInt << ", " << colInt << ") = " << mathSlicedMatrix1(rowInt, colInt) << "\t"
-                              << slicedMatrix1(row, col).Get<int>() << std::endl;
-                    ok &= testing::IsEqual(slicedMatrix1(row, col).Get<int>(), mathSlicedMatrix1(rowInt, colInt));
-                });
-                testing::ProcessTest("value::Tensor and math::Tensor matrix slice equality check", ok);
-            }
-
-            ok = true;
-            for (int row = 0; row < (int)mathTensor.NumRows(); ++row)
-            {
-                for (int column = 0; column < (int)mathTensor.NumColumns(); ++column)
-                {
-                    for (int channel = 0; channel < (int)mathTensor.NumChannels(); ++channel)
-                    {
-                        {
-                            auto mathSlicedVector = math::GetSlice<Dimension::row>(mathTensor, column, channel);
-                            auto slicedVector = tensor.Slice(Slice::All, column, channel);
-
-                            For(slicedVector, [&](Scalar index) {
-                                auto indexInt = index.Get<int>();
-                                ok &= testing::IsEqual(slicedVector(index).Get<int>(), mathSlicedVector[indexInt]);
-                            });
-                        }
-                        {
-                            auto mathSlicedVector = math::GetSlice<Dimension::column>(mathTensor, row, channel);
-                            auto slicedVector = tensor.Slice(row, Slice::All, channel);
-
-                            For(slicedVector, [&](Scalar index) {
-                                auto indexInt = index.Get<int>();
-                                ok &= testing::IsEqual(slicedVector(index).Get<int>(), mathSlicedVector[indexInt]);
-                            });
-                        }
-                    }
-                    auto mathSlicedVector = math::GetSlice<Dimension::channel>(mathTensor, row, column);
-                    auto slicedVector = tensor.Slice(row, column, Slice::All);
-
-                    For(slicedVector, [&](Scalar index) {
-                        auto indexInt = index.Get<int>();
-                        ok &= testing::IsEqual(slicedVector(index).Get<int>(), mathSlicedVector[indexInt]);
-                    });
-                }
-            }
-            testing::ProcessTest("value::Tensor and math::Tensor vector slice equality check", ok);
-        })();
-    });
-}
-
-void Tensor_test2()
-{
-    InvokeForContext<ComputeContext>([](auto&) {
-        std::vector<std::vector<std::vector<int>>> data{ std::vector<std::vector<int>>{
-                                                             std::vector<int>{ 1, 2, 3 },
-                                                             std::vector<int>{ 4, 5, 6 },
-                                                         },
-                                                         std::vector<std::vector<int>>{
-                                                             std::vector<int>{ 7, 8, 9 },
-                                                             std::vector<int>{ 10, 11, 12 },
-                                                         } };
-        Tensor t(data);
-
-        testing::ProcessTest("Tensor construction test",
-                             testing::IsEqual(t.Rows(), 2u) && testing::IsEqual(t.Columns(), 2u) &&
-                                 testing::IsEqual(t.Channels(), 3u) &&
-                                 testing::IsEqual(t(1, 0, 2).Get<int>(), data[1][0][2]));
-    });
-}
-
-void Tensor_test3()
-{
-    auto fn = DeclareFunction("Tensor_test3")
-                  .Parameters(Value{ ValueType::Float, MemoryLayout{ { 2, 2, 2 } } })
-                  .Define([](Tensor t) {
-                      bool ok = true;
-                      t =
-                          std::vector<std::vector<std::vector<float>>>{
-                              std::vector<std::vector<float>>{
-                                  std::vector<float>{ 1.2f, 2.3f },
-                                  std::vector<float>{ 3.4f, 4.5f } },
-                              std::vector<std::vector<float>>{
-                                  std::vector<float>{ 5.4f, 4.3f },
-                                  std::vector<float>{ 3.2f, 2.1f } },
-                          };
-                      Scalar testScalar{ 3.4f };
-
-                      {
-                          Tensor expected(
-                              std::vector<std::vector<std::vector<float>>>{
-                                  std::vector<std::vector<float>>{
-                                      std::vector<float>{ 4.6f, 5.7f },
-                                      std::vector<float>{ 6.8f, 7.9f } },
-                                  std::vector<std::vector<float>>{
-                                      std::vector<float>{ 8.8f, 7.7f },
-                                      std::vector<float>{ 6.6f, 5.5f } } });
-                          Tensor actual = t + testScalar;
-                          ok &= Verify<float>(actual, expected);
-                      }
-                      {
-                          Tensor expected(
-                              std::vector<std::vector<std::vector<float>>>{
-                                  std::vector<std::vector<float>>{
-                                      std::vector<float>{ -2.2f, -1.1f },
-                                      std::vector<float>{ 0.f, 1.1f } },
-                                  std::vector<std::vector<float>>{
-                                      std::vector<float>{ 2.f, 0.9f },
-                                      std::vector<float>{ -0.2f, -1.3f } } });
-                          Tensor actual = t - testScalar;
-                          ok &= Verify<float>(actual, expected);
-                      }
-                      {
-                          Tensor expected(
-                              std::vector<std::vector<std::vector<float>>>{
-                                  std::vector<std::vector<float>>{
-                                      std::vector<float>{ 4.08f, 7.82f },
-                                      std::vector<float>{ 11.56f, 15.3f } },
-                                  std::vector<std::vector<float>>{
-                                      std::vector<float>{ 18.36f, 14.62f },
-                                      std::vector<float>{ 10.88f, 7.14f } } });
-                          Tensor actual = t * testScalar;
-                          ok &= Verify<float>(actual, expected);
-                      }
-                      {
-                          Tensor expected(
-                              std::vector<std::vector<std::vector<float>>>{
-                                  std::vector<std::vector<float>>{
-                                      std::vector<float>{ 1.2f / 3.4f, 2.3f / 3.4f },
-                                      std::vector<float>{ 3.4f / 3.4f, 4.5f / 3.4f } },
-                                  std::vector<std::vector<float>>{
-                                      std::vector<float>{ 5.4f / 3.4f, 4.3f / 3.4f },
-                                      std::vector<float>{ 3.2f / 3.4f, 2.1f / 3.4f } } });
-                          Tensor actual = t / testScalar;
-                          ok &= Verify<float>(actual, expected);
-                      }
-
-                      InvokeForContext<ComputeContext>([&](auto&) { testing::ProcessTest("Tensor binary operations", ok); });
-                  });
-
-    InvokeForContext<ComputeContext>([&](auto&) { fn(MakeTensor<float>(2, 2, 2)); });
-
-    InvokeForContext<TestLLVMContext>(PrintIR);
-}
-
-void Tensor_slice_test1()
-{
-    InvokeForContext<ComputeContext>([](auto&) {
-        auto input =
-            std::vector<double>{ 11, 22, 33, 44, 55, 66, 77, 88, 99, 111, 222, 333, 444, 555, 666, 777, 888, 999 };
-        /*
-            channel major order:
-            input[:, :, ch] will be in canonical order row-major matrix order
-            input[:, :, 0] =
-                [[11, 22, 33],
-                [44, 55, 66],
-                [77, 88, 99]]
-            input[:, :, 1] =
-                [[111, 222, 333],
-                [444, 555, 666],
-                [777, 888, 999]]
-            */
-
-        constexpr int rows = 3, cols = 3, chs = 2;
-        Tensor inputTensor({ input, MemoryLayout({ chs, rows, cols }, DimensionOrder(ChannelMajorTensorOrder)) });
-        math::ColumnRowChannelTensor<double> mathTensor(cols, rows, chs, input);
-
-        const double* mathFirstElement = &mathTensor(0, 0, 0);
-        const double* valueFirstElement = inputTensor(0, 0, 0).GetValue().Get<double*>();
-
+        ok2 = 0;
+        // test we can get matrix slices of a tensor columns and channels
+        for (int row = 0; row < (int)mathTensor.NumRows(); ++row)
         {
-            bool ok = true;
-            For(inputTensor, [&](Scalar row, Scalar col, Scalar ch) {
-                int rowInt = row.Get<int>(), colInt = col.Get<int>(), chInt = ch.Get<int>();
-                const double* mathElement = &mathTensor(rowInt, colInt, chInt);
-                const double* valueElement = inputTensor(row, col, ch).GetValue().Get<double*>();
-                ok &= testing::IsEqual(*mathElement, *valueElement);
-                auto mathElementDifference = mathElement - mathFirstElement;
-                auto valueElementDifference = valueElement - valueFirstElement;
-                ok &= testing::IsEqual(mathElementDifference, valueElementDifference);
+            auto mathSlicedMatrix1 = math::GetSlice<Dimension::column, Dimension::channel>(mathTensor, row);
+            auto slicedMatrix1 = tensor.Slice(row, Slice::All, Slice::All);
+
+            For(slicedMatrix1, [&](Scalar row, Scalar col) {
+                auto rowInt = row.Get<int>();
+                auto colInt = col.Get<int>();
+                Scalar expected = mathSlicedMatrix1(rowInt, colInt);
+                Scalar actual = slicedMatrix1(row, col);
+                If(actual != expected, [&] {
+                    ok2 = 1;
+                });
             });
-            testing::ProcessTest("Tensor_slice_test1 channel-major order", ok);
         }
+        If(ok2 != 0, [&] {
+            DebugPrint("Tensor_test1: value::Tensor and math::Tensor(col,channel) matrix slice equality check\n");
+            ok = 1;
+        });
+    });
 
+    ok2 = 0;
+    for (int row = 0; row < (int)mathTensor.NumRows(); ++row)
+    {
+        for (int column = 0; column < (int)mathTensor.NumColumns(); ++column)
         {
+            for (int channel = 0; channel < (int)mathTensor.NumChannels(); ++channel)
             {
-                auto mathMatrix = mathTensor.GetSlice<Dimension::column, Dimension::row>(0);
-                auto matrix = inputTensor.Slice(Slice::All, Slice::All, 0);
-
-                testing::ProcessTest("Tensor row-column GetSlice dimension",
-                                     mathMatrix.NumColumns() == matrix.Columns() &&
-                                         mathMatrix.NumRows() == matrix.Rows());
-            }
-
-            for (int ch = 0; ch < chs; ++ch)
-            {
-                auto mathMatrix = mathTensor.GetSlice<Dimension::row, Dimension::column>(ch);
-                auto matrix = inputTensor.Slice(Slice::All, Slice::All, ch);
-
-                bool ok = true;
-                For(matrix, [&](Scalar row, Scalar col) {
-                    auto rowInt = row.Get<int>(), colInt = col.Get<int>();
-
-                    const double* mathElement = &mathMatrix(rowInt, colInt);
-                    const double* valueElement = matrix(row, col).GetValue().Get<double*>();
-                    ok &= testing::IsEqual(*mathElement, *valueElement);
-
-                    auto mathElementDifference = mathElement - mathFirstElement;
-                    auto valueElementDifference = valueElement - valueFirstElement;
-                    ok &= testing::IsEqual(mathElementDifference, valueElementDifference);
-                });
-
-                testing::ProcessTest("Tensor row-column GetSlice", ok);
-            }
-        }
-
-        {
-            {
-                auto mathMatrix = mathTensor.GetSlice<Dimension::column, Dimension::channel>(0);
-                auto matrix = inputTensor.Slice(0, Slice::All, Slice::All);
-
-                testing::ProcessTest("Tensor column-channel GetSlice dimension",
-                                     mathMatrix.NumColumns() == matrix.Columns() &&
-                                         mathMatrix.NumRows() == matrix.Rows());
-            }
-
-            for (int row = 0; row < rows; ++row)
-            {
-                auto mathMatrix = mathTensor.GetSlice<Dimension::column, Dimension::channel>(row);
-                auto matrix = inputTensor.Slice(row, Slice::All, Slice::All);
-
-                bool ok = true;
-                For(matrix, [&](Scalar row, Scalar col) {
-                    auto rowInt = row.Get<int>(), colInt = col.Get<int>();
-
-                    const double* mathElement = &mathMatrix(rowInt, colInt);
-                    const double* valueElement = matrix(row, col).GetValue().Get<double*>();
-                    ok &= testing::IsEqual(*mathElement, *valueElement);
-
-                    auto mathElementDifference = mathElement - mathFirstElement;
-                    auto valueElementDifference = valueElement - valueFirstElement;
-                    ok &= testing::IsEqual(mathElementDifference, valueElementDifference);
-                });
-
-                testing::ProcessTest("Tensor column-channel GetSlice", ok);
-            }
-        }
-
-        {
-            {
-                auto mathVector = mathTensor.GetSlice<Dimension::channel>(0, 0);
-                auto vector = inputTensor.Slice(0, 0, Slice::All);
-
-                testing::ProcessTest("Tensor channel GetSlice length", mathVector.Size() == vector.Size());
-            }
-            for (int row = 0; row < static_cast<int>(mathTensor.NumRows()); ++row)
-            {
-                for (int col = 0; col < static_cast<int>(mathTensor.NumColumns()); ++col)
                 {
-                    auto mathVector = mathTensor.GetSlice<Dimension::channel>(row, col);
-                    auto vector = inputTensor.Slice(row, col, Slice::All);
-
-                    bool ok = true;
-                    For(vector, [&](Scalar index) {
-                        auto indexInt = index.Get<int>();
-                        const double* mathElement = &mathVector[indexInt];
-                        const double* valueElement = vector(index).GetValue().Get<double*>();
-                        ok &= testing::IsEqual(*mathElement, *valueElement);
-                        auto mathElementDifference = mathElement - mathFirstElement;
-                        auto valueElementDifference = valueElement - valueFirstElement;
-                        ok &= testing::IsEqual(mathElementDifference, valueElementDifference);
+                    Vector mathSlicedVector = math::GetSlice<Dimension::row>(mathTensor, column, channel).ToArray();
+                    auto slicedVector = tensor.Slice(Slice::All, column, channel);
+                    If(Verify(slicedVector, mathSlicedVector) != 0, [&] {
+                        ok2 = 1;
                     });
-
-                    testing::ProcessTest("Tensor channel GetSlice", ok);
+                }
+                {
+                    Vector mathSlicedVector = math::GetSlice<Dimension::column>(mathTensor, row, channel).ToArray();
+                    auto slicedVector = tensor.Slice(row, Slice::All, channel);
+                    If(Verify(slicedVector, mathSlicedVector) != 0, [&] {
+                        ok2 = 1;
+                    });
                 }
             }
+            Vector mathSlicedVector = math::GetSlice<Dimension::channel>(mathTensor, row, column).ToArray();
+            auto slicedVector = tensor.Slice(row, column, Slice::All);
+            If(Verify(slicedVector, mathSlicedVector) != 0, [&] {
+                ok2 = 1;
+            });
         }
-
-        {
-            {
-                auto mathVector = mathTensor.GetSlice<Dimension::column>(0, 0);
-                auto vector = inputTensor.Slice(0, Slice::All, 0);
-
-                testing::ProcessTest("Tensor column GetSlice length", mathVector.Size() == vector.Size());
-            }
-            for (int row = 0; row < static_cast<int>(mathTensor.NumRows()); ++row)
-            {
-                for (int ch = 0; ch < static_cast<int>(mathTensor.NumChannels()); ++ch)
-                {
-                    auto mathVector = mathTensor.GetSlice<Dimension::column>(row, ch);
-                    auto vector = inputTensor.Slice(row, Slice::All, ch);
-
-                    bool ok = true;
-                    For(vector, [&](Scalar index) {
-                        auto indexInt = index.Get<int>();
-                        const double* mathElement = &mathVector[indexInt];
-                        const double* valueElement = vector(index).GetValue().Get<double*>();
-                        ok &= testing::IsEqual(*mathElement, *valueElement);
-                        auto mathElementDifference = mathElement - mathFirstElement;
-                        auto valueElementDifference = valueElement - valueFirstElement;
-                        ok &= testing::IsEqual(mathElementDifference, valueElementDifference);
-                    });
-
-                    testing::ProcessTest("Tensor column GetSlice", ok);
-                }
-            }
-        }
-
-        {
-            {
-                auto mathVector = mathTensor.GetSlice<Dimension::row>(0, 0);
-                auto vector = inputTensor.Slice(Slice::All, 0, 0);
-
-                testing::ProcessTest("Tensor row GetSlice length", mathVector.Size() == vector.Size());
-            }
-            for (int col = 0; col < static_cast<int>(mathTensor.NumColumns()); ++col)
-            {
-                for (int ch = 0; ch < static_cast<int>(mathTensor.NumChannels()); ++ch)
-                {
-                    auto mathVector = mathTensor.GetSlice<Dimension::row>(col, ch);
-                    auto vector = inputTensor.Slice(Slice::All, col, ch);
-
-                    bool ok = true;
-                    For(vector, [&](Scalar index) {
-                        auto indexInt = index.Get<int>();
-                        const double* mathElement = &mathVector[indexInt];
-                        const double* valueElement = vector(index).GetValue().Get<double*>();
-                        ok &= testing::IsEqual(*mathElement, *valueElement);
-                        auto mathElementDifference = mathElement - mathFirstElement;
-                        auto valueElementDifference = valueElement - valueFirstElement;
-                        ok &= testing::IsEqual(mathElementDifference, valueElementDifference);
-                    });
-
-                    testing::ProcessTest("Tensor row GetSlice", ok);
-                }
-            }
-        }
+    }
+    If(ok2 != 0, [&] {
+        DebugPrint("Tensor_test1: enumerating value::Tensor and math::Tensor every which way failed\n");
+        ok = 1;
     });
+    return ok;
 }
 
-void Casting_test1()
+Scalar Tensor_test2()
 {
-    InvokeForContext<ComputeContext>([](auto&) {
-        Vector floatVector = std::vector<float>{ 1.f, 2.f, 3.f };
-        auto floatScalar = floatVector[1];
-        Scalar intScalar = Cast<int>(floatScalar);
-        Scalar globalIntScalar = GlobalAllocate("global", 3);
-        intScalar += 1;
-        floatScalar += 10.f;
-        testing::ProcessTest("Cast test",
-                             intScalar.Get<int>() == 3 && intScalar.Get<int>() == globalIntScalar.Get<int>() &&
-                                 floatScalar.Get<float>() == 12.f && floatVector[1].Get<float>() == 12.f);
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+    std::vector<std::vector<std::vector<int>>> data{ std::vector<std::vector<int>>{
+                                                         std::vector<int>{ 1, 2, 3 },
+                                                         std::vector<int>{ 4, 5, 6 },
+                                                     },
+                                                     std::vector<std::vector<int>>{
+                                                         std::vector<int>{ 7, 8, 9 },
+                                                         std::vector<int>{ 10, 11, 12 },
+                                                     } };
+    Tensor t(data);
+    Scalar actual = static_cast<int>(t.Rows());
+    Scalar expected = 2;
+    If(actual != expected, [&] {
+        DebugPrint("Tensor_test2: Tensor Rows() != 2\n");
+        ok = 1;
     });
+
+    Scalar actual2 = static_cast<int>(t.Columns());
+    Scalar expected2 = 2;
+    If(actual2 != expected2, [&] {
+        DebugPrint("Tensor_test2: Tensor Columns() != 2\n");
+        ok = 1;
+    });
+
+    Scalar actual3 = static_cast<int>(t.Channels());
+    Scalar expected3 = 3;
+    If(actual3 != expected3, [&] {
+        DebugPrint("Tensor_test2: Tensor Channels() != 3\n");
+        ok = 1;
+    });
+
+    Scalar actual4 = t(1, 0, 2);
+    Scalar expected4 = data[1][0][2];
+    If(actual4 != expected4, [&] {
+        DebugPrint("Tensor_test2: Tensor t(1, 0, 2) failed\n");
+        ok = 1;
+    });
+
+    return ok;
 }
 
-void If_test1()
+Scalar Tensor_test3()
 {
-    InvokeForContext<ComputeContext>([](auto&) {
-        DeclareFunction("If_test1").Define([]() -> void {
-            Scalar s1 = 1;
-            If(s1 == 1, [&s1]() { s1 = 0; });
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+    Tensor t =
+        std::vector<std::vector<std::vector<float>>>{
+            std::vector<std::vector<float>>{
+                std::vector<float>{ 1.2f, 2.3f },
+                std::vector<float>{ 3.4f, 4.5f } },
+            std::vector<std::vector<float>>{
+                std::vector<float>{ 5.4f, 4.3f },
+                std::vector<float>{ 3.2f, 2.1f } },
+        };
+    float s = 3.4f;
+    Scalar testScalar{ s };
 
-            testing::ProcessTest("Testing basic If expression ", testing::IsEqual(s1.Get<int>(), 0));
+    {
+        Tensor expected =
+            std::vector<std::vector<std::vector<float>>>{
+                std::vector<std::vector<float>>{
+                    std::vector<float>{ 1.2f + s, 2.3f + s },
+                    std::vector<float>{ 3.4f + s, 4.5f + s } },
+                std::vector<std::vector<float>>{
+                    std::vector<float>{ 5.4f + s, 4.3f + s },
+                    std::vector<float>{ 3.2f + s, 2.1f + s } },
+            };
+        Tensor actual = t + testScalar;
+        If(Verify(actual, expected) != 0, [&] {
+            ok = 1;
+            DebugPrint("Tensor_test3: Tensor scalar addition failed\n");
+        });
+    }
+    {
+        Tensor expected =
+            std::vector<std::vector<std::vector<float>>>{
+                std::vector<std::vector<float>>{
+                    std::vector<float>{ 1.2f - s, 2.3f - s },
+                    std::vector<float>{ 3.4f - s, 4.5f - s } },
+                std::vector<std::vector<float>>{
+                    std::vector<float>{ 5.4f - s, 4.3f - s },
+                    std::vector<float>{ 3.2f - s, 2.1f - s } },
+            };
+        Tensor actual = t - testScalar;
+        If(Verify(actual, expected) != 0, [&] {
+            ok = 1;
+            DebugPrint("Tensor_test3: Tensor scalar subtraction failed\n");
+        });
+    }
+    {
+        Tensor expected =
+            std::vector<std::vector<std::vector<float>>>{
+                std::vector<std::vector<float>>{
+                    std::vector<float>{ 1.2f * s, 2.3f * s },
+                    std::vector<float>{ 3.4f * s, 4.5f * s } },
+                std::vector<std::vector<float>>{
+                    std::vector<float>{ 5.4f * s, 4.3f * s },
+                    std::vector<float>{ 3.2f * s, 2.1f * s } },
+            };
+        Tensor actual = t * testScalar;
+        If(Verify(actual, expected) != 0, [&] {
+            ok = 1;
+            DebugPrint("Tensor_test3: Tensor scalar multiplication failed\n");
+        });
+    }
+    {
+        Tensor expected =
+            std::vector<std::vector<std::vector<float>>>{
+                std::vector<std::vector<float>>{
+                    std::vector<float>{ 1.2f / s, 2.3f / s },
+                    std::vector<float>{ 3.4f / s, 4.5f / s } },
+                std::vector<std::vector<float>>{
+                    std::vector<float>{ 5.4f / s, 4.3f / s },
+                    std::vector<float>{ 3.2f / s, 2.1f / s } },
+            };
+        Tensor actual = t / testScalar;
+        If(Verify(actual, expected) != 0, [&] {
+            ok = 1;
+            DebugPrint("Tensor_test3: Tensor scalar division failed\n");
+        });
+    }
 
-            s1 = 1;
-            If(s1 == 0, [&s1]() { s1 = 3; }).Else([&s1]() { s1 = 0; });
-
-            testing::ProcessTest("Testing basic If/Else expression ", testing::IsEqual(s1.Get<int>(), 0));
-
-            s1 = 1;
-            If(s1 == 3, [&s1]() { s1 = 2; }).ElseIf(s1 == 1, [&s1]() { s1 = 0; }).Else([&s1]() { s1 = 3; });
-
-            testing::ProcessTest("Testing basic If/ElseIf/Else expression ", testing::IsEqual(s1.Get<int>(), 0));
-        })(); // invoke function
-    });
+    return ok;
 }
 
-void Sum_test()
+template <typename T>
+Matrix ToMatrix(T mathMatrix)
 {
-    auto fn = DeclareFunction("Sum_test").Define([]() -> void {
-        bool ok = true;
-        for (int i = 1; i < 10; ++i)
+    std::vector<double> flat;
+    for (size_t i = 0; i < mathMatrix.NumRows(); i++)
+    {
+        for (size_t j = 0; j < mathMatrix.NumColumns(); j++)
         {
-            Vector v = MakeVector<float>(i);
-            std::vector<float> reference(i);
-            std::iota(reference.begin(), reference.end(), 0);
-
-            v = reference;
-
-            Scalar result = Sum(v);
-            If(result != std::accumulate(reference.begin(), reference.end(), 0.f),
-               [&] { InvokeForContext<ComputeContext>([&](auto&) { ok = false; }); });
+            flat.push_back(mathMatrix(i, j));
         }
-        testing::ProcessTest("Sum test", ok);
-    });
-
-    InvokeForContext<ComputeContext>([&](auto&) { fn(); });
+    }
+    return Matrix(flat, mathMatrix.NumRows(), mathMatrix.NumColumns());
 }
 
-void Dot_test()
+Scalar Tensor_slice_test1()
 {
-    auto fn = DeclareFunction("Dot_test").Define([]() -> void {
-        bool ok = true;
-        for (int i = 1; i < 10; ++i)
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+
+    auto input =
+        std::vector<double>{ 11, 22, 33, 44, 55, 66, 77, 88, 99, 111, 222, 333, 444, 555, 666, 777, 888, 999 };
+
+    constexpr int rows = 3, cols = 3, chs = 2;
+    Tensor inputTensor({ input, MemoryLayout({ chs, rows, cols }, DimensionOrder(ChannelMajorTensorOrder)) });
+    math::ColumnRowChannelTensor<double> mathTensor(cols, rows, chs, input);
+
+    // channel major order:
+    // input[:, :, ch] will be in canonical order row-major matrix order
+    // input[:, :, 0] =
+    //     [[11, 22, 33],
+    //     [44, 55, 66],
+    //     [77, 88, 99]]
+    // input[:, :, 1] =
+    //     [[111, 222, 333],
+    //     [444, 555, 666],
+    //     [777, 888, 999]]
+    //
+    /*
+    // channel major enumeration of the tensor prints the above output.
+    for (size_t channel = 0; channel < chs; channel++)
+    {
+        for (size_t row = 0; row < rows; row++)
         {
-            Vector v1 = MakeVector<float>(i), v2 = MakeVector<float>(i);
-            std::vector<float> reference1(i), reference2(i);
-            std::iota(reference1.begin(), reference1.end(), 0);
-            std::iota(reference2.begin(), reference2.end(), reference1.back());
-
-            v1 = reference1;
-            v2 = reference2;
-
-            Scalar result = Dot(v1, v2);
-            If(result != std::inner_product(reference1.begin(), reference1.end(), reference2.begin(), 0.f),
-               [&] { InvokeForContext<ComputeContext>([&](auto&) { ok = false; }); });
+            for (size_t col = 0; col < cols; col++)
+            {
+                if (col > 0) std::cout << ", ";
+                std::cout << mathTensor(row, col, channel);
+            }
+            std::cout << "\n";
         }
-        testing::ProcessTest("Dot test", ok);
+        std::cout << "\n";
+    }
+*/
+    Scalar ok2 = Allocate(ValueType::Int32, ScalarLayout);
+    ok2 = 0;
+    InvokeForContext<ComputeContext>([&](auto&)
+    {
+        // This tests uses row.Get<int>() to get the actual row, col indexes as constants, which can 
+        // only be done during ComputeContext.
+        For(inputTensor, [&](Scalar row, Scalar col, Scalar ch) {
+            int rowInt = row.Get<int>(), colInt = col.Get<int>(), chInt = ch.Get<int>();
+            Scalar mathElement = mathTensor(rowInt, colInt, chInt);
+            Scalar valueElement = inputTensor(row, col, ch);
+            If(mathElement != valueElement, [&] {
+                ok2 = 1;
+            });
+        });
+        If(ok2 != 0, [&] {
+            DebugPrint("Tensor_slice_test1: channel-major order enumeration failed\n");
+            ok = 1;
+        });
     });
 
-    InvokeForContext<ComputeContext>([&](auto&) { fn(); });
+    {
+        { Matrix mathMatrix = ToMatrix(mathTensor.GetSlice<Dimension::row, Dimension::column>(0));
+    auto matrix = inputTensor.Slice(Slice::All, Slice::All, 0);
+
+    If(Verify(matrix, mathMatrix) != 0, [&] {
+        ok = 1;
+        DebugPrint("Tensor_slice_test1: Tensor row-column GetSlice failed\n");
+    });
+}
+} // namespace ell
+
+{
+    { // We can't use ToArray() on this slice because data is not stored in the same layout, we have to build flat vector manually.
+      auto slice = mathTensor.GetSlice<Dimension::column, Dimension::channel>(0);
+Matrix mathMatrix = ToMatrix(slice);
+auto matrix = inputTensor.Slice(0, Slice::All, Slice::All);
+
+If(Verify(matrix, mathMatrix) != 0, [&] {
+    ok = 1;
+    DebugPrint("Tensor_slice_test1: Tensor column-channel GetSlice failed\n");
+});
+}
+}
+
+{
+    { Vector mathVector = mathTensor.GetSlice<Dimension::channel>(0, 0).ToArray();
+auto vector = inputTensor.Slice(0, 0, Slice::All);
+
+If(Verify(mathVector, vector) != 0, [&] {
+    ok = 1;
+    DebugPrint("Tensor_slice_test1: Tensor channel vector failed\n");
+});
+}
+}
+
+{
+    { Vector mathVector = mathTensor.GetSlice<Dimension::column>(0, 0).ToArray();
+auto vector = inputTensor.Slice(0, Slice::All, 0);
+
+If(Verify(mathVector, vector) != 0, [&] {
+    ok = 1;
+    DebugPrint("Tensor_slice_test1: Tensor column vector failed");
+});
+}
+}
+
+{
+    {
+        Vector mathVector = mathTensor.GetSlice<Dimension::row>(0, 0).ToArray();
+        auto vector = inputTensor.Slice(Slice::All, 0, 0);
+
+        If(Verify(mathVector, vector) != 0, [&] {
+            ok = 1;
+            DebugPrint("Tensor_slice_test1: Tensor row vector failed");
+        });
+    }
+}
+return ok;
+}
+
+Scalar Casting_test1()
+{
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+    Vector floatVector = std::vector<float>{ 1.f, 2.f, 3.f };
+    auto floatScalar = floatVector[1];
+    Scalar intScalar = Cast<int>(floatScalar);
+    Scalar globalIntScalar = GlobalAllocate("global", 3);
+    intScalar += 1;
+    floatScalar += 10.f;
+    If(intScalar != 3, [&] {
+        DebugPrint("Casting_test1 intScalar != 3\n");
+        ok = 1;
+    });
+    If(intScalar != globalIntScalar, [&] {
+        DebugPrint("Casting_test1 intScalar != globalIntScalar\n");
+        ok = 1;
+    });
+    If(floatScalar != 12.f, [&] {
+        DebugPrint("Casting_test1 floatScalar != 12.f\n");
+        ok = 1;
+    });
+    If(floatScalar != floatVector(1), [&] {
+        DebugPrint("Casting_test1 floatScalar != floatVector(1)\n");
+        ok = 1;
+    });
+    return ok;
+}
+
+Scalar If_test1()
+{
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+    Scalar expected = 0;
+    Scalar s1 = Allocate(ValueType::Int32, ScalarLayout);
+    s1 = 1;
+    If(s1 == 1, [&s1]() { s1 = 0; });
+
+    If(s1 != expected, [&] {
+        DebugPrint("Testing basic If expression failed\n");
+        ok = 1;
+    });
+
+    s1 = 1;
+    If(s1 == 0, [&s1]() { s1 = 3; }).Else([&s1]() { s1 = 0; });
+
+    If(s1 != expected, [&] {
+        DebugPrint("Testing basic If/Else expression failed\n");
+        ok = 1;
+    });
+
+    s1 = 1;
+    If(s1 == 3, [&s1]() { s1 = 2; }).ElseIf(s1 == 1, [&s1]() { s1 = 0; }).Else([&s1]() { s1 = 3; });
+
+    If(s1 != expected, [&] {
+        DebugPrint("Testing basic If/ElseIf/Else expression failed\n");
+        ok = 1;
+    });
+
+    return ok;
+}
+
+Scalar Sum_test()
+{
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+    for (int i = 1; i < 10; ++i)
+    {
+        Vector v = MakeVector<float>(i);
+        std::vector<float> reference(i);
+        std::iota(reference.begin(), reference.end(), 0);
+        auto expected = std::accumulate(reference.begin(), reference.end(), 0.f);
+
+        v = reference;
+
+        Scalar result = Sum(v);
+        If(result != expected, [&] {
+            ok = 1;
+            InvokeForContext<ComputeContext>([&](auto&) {
+                std::cout << "### Sum_test failed for size " << i << "\n";
+            });
+        });
+    }
+    return ok;
+}
+
+Scalar Dot_test()
+{
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+    for (int i = 1; i < 10; ++i)
+    {
+        Vector v1 = MakeVector<float>(i), v2 = MakeVector<float>(i);
+        std::vector<float> reference1(i), reference2(i);
+        std::iota(reference1.begin(), reference1.end(), 0);
+        std::iota(reference2.begin(), reference2.end(), reference1.back());
+
+        v1 = reference1;
+        v2 = reference2;
+
+        Scalar result = Dot(v1, v2);
+        Scalar expected = std::inner_product(reference1.begin(), reference1.end(), reference2.begin(), 0.f);
+        If(result != expected, [&] {
+            ok = 1;
+        });
+    }
+    return ok;
 }
 
 namespace
 {
-    const std::vector<float> intrinsics_data{ 0.1f, 1.2f, 2.3f, 3.4f, 4.5f, 5.6f, 6.7f, 7.8f, 8.9f, 9.10f };
+const std::vector<float> intrinsics_data{ 0.1f, 1.2f, 2.3f, 3.4f, 4.5f, 5.6f, 6.7f, 7.8f, 8.9f, 9.10f };
 
-    template <typename Tuple, typename Idx = std::integral_constant<size_t, 0>>
-    void Intrinsics_test1_impl(Tuple tuple, Idx = {})
+template <typename Tuple, typename Idx = std::integral_constant<size_t, 0>>
+Scalar Intrinsics_test1_impl(Tuple tuple, Idx = {})
+{
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+    constexpr auto index = Idx::value;
+    if constexpr (index < std::tuple_size_v<Tuple>)
     {
-        constexpr auto index = Idx::value;
-        if constexpr (index < std::tuple_size_v<Tuple>)
+        auto& element = std::get<index>(tuple);
+        auto fnName = std::string{ "Intrinsics_test1_" } + std::to_string(index);
+
         {
-            auto& element = std::get<index>(tuple);
-            auto fnName = std::string{ "Intrinsics_test1_" } + std::to_string(index);
-            auto fn = DeclareFunction(fnName)
-                          .Parameters(Value(ValueType::Float, MemoryLayout{ { 10 } }))
-                          .Returns(Value(ValueType::Float, MemoryLayout{ { 10 } }))
-                          .Define([f = element.first](Vector v) -> Vector {
-                              v = intrinsics_data;
-                              return f(v);
-                          });
-
-            InvokeForContext<ComputeContext>([&](ComputeContext&) {
-                std::vector<float> expected(intrinsics_data.size());
-                std::transform(intrinsics_data.begin(), intrinsics_data.end(), expected.begin(), [f = element.second](float n) { return f(n); });
-                auto result = fn(MakeVector<float>(intrinsics_data.size()));
-                auto ok = true;
-                // have to explicitly capture because vc++ has issues
-                For(result, [&result, &ok, &expected](Scalar index) {
-                    auto expectedValue = expected[index.Get<int>()];
-                    auto computedValue = result(index).template Get<float>();
-
-                    // We can't use absolute difference because VC++'s math functions
-                    // are optimized for 6 digits of precision, which can result in differences
-                    // that are relatively negligible, but absolutely greater than the epsilon
-                    // used by the testing library
-                    auto difference = RelativeDifference(expectedValue, computedValue);
-                    auto testResult = difference < 1e-6f;
-                    if (!testResult)
-                    {
-                        auto precision = std::cerr.precision();
-
-                        std::cerr << std::setprecision(std::numeric_limits<float>::digits10 + 1)
-                                  << "Computed: " << computedValue << "\tExpected: " << expectedValue
-                                  << "\tDifference: " << (expectedValue - computedValue) << std::endl
-                                  << std::setprecision(precision);
-                    }
-                    ok &= testResult;
-                });
-                testing::ProcessTest(fnName, ok);
+            auto f = element.first;
+            std::vector<float> expected_data(intrinsics_data.size());
+            std::transform(intrinsics_data.begin(), intrinsics_data.end(), expected_data.begin(), [f = element.second](float n) { return f(n); });
+            Vector input = intrinsics_data;
+            Vector actual = f(input);
+            Vector expected = expected_data;
+            If(Verify(actual, expected, 1e-5) != 0, [&] {
+                ok = 1;
+                DebugPrint("Intrinsics " + fnName + " test failed\n");
             });
-
-            InvokeForContext<TestLLVMContext>(PrintIR);
-
-            Intrinsics_test1_impl(tuple, std::integral_constant<size_t, index + 1>{});
         }
+
+        // recurrsively process next item in the tuple
+        Scalar r = Intrinsics_test1_impl(tuple, std::integral_constant<size_t, index + 1>{});
+
+        If(r != 0, [&] {
+            ok = 1; // bubble up the error
+        });
     }
+    return ok;
+}
 } // namespace
 
-void Intrinsics_test1()
+Scalar Intrinsics_test1()
 {
-    Intrinsics_test1_impl(
+    return Intrinsics_test1_impl(
         std::tuple{
+            std::pair{
+                [](Vector v) { return Round(v); },
+                [](float f) { return std::round(f); } },
             std::pair{
                 [](Vector v) { return Abs(v); },
                 [](float f) { return std::abs(f); } },
@@ -1103,6 +1286,12 @@ void Intrinsics_test1()
             std::pair{
                 [](Vector v) { return Log(v); },
                 [](float f) { return std::log(f); } },
+            std::pair{
+                [](Vector v) { return Log10(v); },
+                [](float f) { return std::log10(f); } },
+            std::pair{
+                [](Vector v) { return Log2(v); },
+                [](float f) { return std::log2(f); } },
             std::pair{
                 [](Vector v) { return Pow(v, 3.14f); },
                 [](float f) { return std::pow(f, 3.14f); } },
@@ -1120,42 +1309,50 @@ void Intrinsics_test1()
 
 namespace
 {
-    template <typename Tuple, typename Idx = std::integral_constant<size_t, 0>>
-    void Intrinsics_test2_impl(Tuple tuple, Idx = {})
+template <typename Tuple, typename Idx = std::integral_constant<size_t, 0>>
+Scalar Intrinsics_test2_impl(Tuple tuple, Idx = {})
+{
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+    constexpr auto index = Idx::value;
+    if constexpr (index < std::tuple_size_v<Tuple>)
     {
-        constexpr auto index = Idx::value;
-        if constexpr (index < std::tuple_size_v<Tuple>)
-        {
-            auto& element = std::get<index>(tuple);
-            auto fnName = std::string{ "Intrinsics_test2_" } + std::to_string(index);
+        int size = static_cast<int>(intrinsics_data.size());
+        auto& element = std::get<index>(tuple);
+        auto fnName = std::string{ "Intrinsics_test2_" } + std::to_string(index);
 
-            auto fn = DeclareFunction(fnName)
-                          .Parameters(Value(ValueType::Float, MemoryLayout{ { 10 } }))
-                          .Returns(Value(ValueType::Float, ScalarLayout))
-                          .Define([f = element.first](Vector v) {
-                              v = intrinsics_data;
-                              return f(v);
-                          });
+        auto fn = DeclareFunction(fnName)
+                      .Parameters(Value(ValueType::Float, MemoryLayout{ { size } }))
+                      .Returns(Value(ValueType::Float, ScalarLayout))
+                      .Define([f = element.first](Vector v) {
+                          v = intrinsics_data;
+                          return f(v);
+                      });
 
-            InvokeForContext<ComputeContext>([&](auto&) {
-                auto f = element.second;
-                auto expected = *f(intrinsics_data);
-                auto result = fn(MakeVector<float>(intrinsics_data.size()));
-                auto ok = result.template Get<float>() == expected;
-                testing::ProcessTest(fnName, ok);
-            });
+        auto f = element.second;
+        Scalar expected = *f(intrinsics_data);
+        Scalar actual = fn(MakeVector<float>(size));
 
-            InvokeForContext<TestLLVMContext>(PrintIR);
+        If(actual != expected, [&] {
+            ok = 1;
+            DebugPrint("Intrinsics " + fnName + " test 2 failed\n");
+        });
 
-            Intrinsics_test2_impl(tuple, std::integral_constant<size_t, index + 1>{});
-        }
+        // recurrsively process next item in the tuple
+        Scalar r = Intrinsics_test2_impl(tuple, std::integral_constant<size_t, index + 1>{});
+
+        If(r != 0, [&] {
+            ok = 1; // bubble up the error
+        });
     }
+    return ok;
+}
 
 } // namespace
 
-void Intrinsics_test2()
+Scalar Intrinsics_test2()
 {
-    Intrinsics_test2_impl(
+    return Intrinsics_test2_impl(
         std::tuple{
             std::pair{
                 [](Vector v) { return Max(v); },

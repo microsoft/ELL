@@ -37,6 +37,14 @@ namespace value
         template <typename T>
         Matrix(const std::vector<std::vector<T>>& data);
 
+        /// <summary> Constructs an instance from a 1D std::vector reshaped into the given rows and columns </summary>
+        /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
+        /// <param name="data"> The data represented as a std::vector, in canonical row-major layout </param>
+        /// <param name="numRows"> The number of rows </param>
+        /// <param name="numColumns"> The the number of columns </param>
+        template <typename T>
+        Matrix(const std::vector<T>& data, int numRows, int numColumns);
+
         Matrix(const Matrix&);
         Matrix(Matrix&&) noexcept;
         Matrix& operator=(const Matrix&);
@@ -153,6 +161,20 @@ namespace value
             it = std::copy(row.begin(), row.end(), it);
         }
 
+        _value = Value(coalesced, MemoryLayout({ numRows, numColumns }));
+    }
+
+    template <typename T>
+    Matrix::Matrix(const std::vector<T>& data, int numRows, int numColumns)
+    {
+        using namespace utilities;
+
+        int size = static_cast<int>(data.size());
+        if (size != numRows * numColumns)
+        {
+            throw InputException(InputExceptionErrors::invalidSize);
+        }
+        std::vector<T> coalesced = data; // non-const copy
         _value = Value(coalesced, MemoryLayout({ numRows, numColumns }));
     }
 

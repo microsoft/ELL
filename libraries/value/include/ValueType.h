@@ -12,6 +12,7 @@
 #include <utilities/include/TypeTraits.h>
 
 #include <cstdint>
+#include <string>
 
 namespace ell
 {
@@ -118,6 +119,10 @@ namespace value
             return ValueType::Double;
         }
     }
+
+    /// <summary> Get a string representation of the enum value </summary>
+    std::string ToString(ValueType t);
+    ValueType FromString(std::string name);
 
 } // namespace value
 } // namespace ell
