@@ -812,8 +812,7 @@ namespace value
                 // we're only copying active areas below. should we copy padded too?
                 auto& layout = source.GetLayout();
                 std::visit(
-                    VariantVisitor{ [](Undefined) {},
-                                    [](Emittable) {},
+                    VariantVisitor{ [](Emittable) {},
                                     [destValue, &irEmitter, &layout](auto&& data) {
                                         ConstantForLoop(layout, [&](int offset) {
                                             auto srcAtOffset = irEmitter.Literal(*(data + offset));
@@ -918,10 +917,7 @@ namespace value
         std::visit(
             [this, destination = EnsureEmittable(destination), &source, op, &fn](auto&& sourceData) {
                 using SourceDataType = std::decay_t<decltype(sourceData)>;
-                if constexpr (std::is_same_v<SourceDataType, Undefined>)
-                {
-                }
-                else if constexpr (std::is_same_v<Boolean*, SourceDataType>)
+                if constexpr (std::is_same_v<Boolean*, SourceDataType>)
                 {
                     throw LogicException(LogicExceptionErrors::notImplemented);
                 }
@@ -1044,7 +1040,6 @@ namespace value
 
         Value returnValue = std::visit(
             VariantVisitor{
-                [](Undefined) -> Value { throw LogicException(LogicExceptionErrors::illegalState); },
                 [this,
                  comparisonOp,
                  &source1,
@@ -1052,9 +1047,6 @@ namespace value
                     // source1 is an Emittable type, so source2 can be constant or Emittable
                     return std::visit(
                         VariantVisitor{
-                            [](Undefined) -> Value {
-                                throw LogicException(LogicExceptionErrors::illegalState);
-                            },
                             [&, this](Emittable source2Data) -> Value {
                                 auto& fn = this->GetFunctionEmitter();
                                 auto result = fn.TrueBit();

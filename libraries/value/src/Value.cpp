@@ -218,8 +218,7 @@ namespace value
             throw InputException(InputExceptionErrors::invalidArgument);
         }
 
-        std::visit(VariantVisitor{ [](Undefined) { throw InputException(InputExceptionErrors::invalidArgument); },
-                                   [this](Emittable emittable) {
+        std::visit(VariantVisitor{ [this](Emittable emittable) {
                                        auto type = GetContext().GetType(emittable);
                                        if (type.first != _type.first)
                                        {
@@ -243,7 +242,16 @@ namespace value
 
     bool Value::IsDefined() const { return _type.first != ValueType::Undefined; }
 
-    bool Value::IsEmpty() const { return std::holds_alternative<Undefined>(_data); }
+    bool Value::IsEmpty() const
+    {
+        return std::visit(
+            VariantVisitor {
+                [](Emittable data) -> bool { return data.GetDataAs<void*>() == nullptr; },
+                [](auto&& data) -> bool { return data == nullptr; }
+            },
+            _data
+        );
+    }
 
     bool Value::IsConstant() const { return !std::holds_alternative<Emittable>(_data); }
 

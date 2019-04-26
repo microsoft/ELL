@@ -157,7 +157,7 @@ namespace value
                             using Type = std::decay_t<decltype(data)>;
                             using DataType = std::remove_pointer_t<Type>;
 
-                            if constexpr (IsOneOf<DataType, Undefined, Emittable, Boolean>)
+                            if constexpr (IsOneOf<DataType, Emittable, Boolean>)
                             {
                                 throw InputException(InputExceptionErrors::invalidArgument);
                             }
@@ -190,7 +190,7 @@ namespace value
                             [&value, fn](auto&& data) -> Value {
                                 using Type = std::decay_t<decltype(data)>;
                                 using DataType = std::remove_pointer_t<Type>;
-                                if constexpr (IsOneOf<DataType, Undefined, Emittable, Boolean>)
+                                if constexpr (IsOneOf<DataType, Emittable, Boolean>)
                                 {
                                     throw InputException(InputExceptionErrors::invalidArgument);
                                 }
@@ -234,8 +234,8 @@ namespace value
                                 using DataType1 = std::remove_pointer_t<Type1>;
                                 using DataType2 = std::remove_pointer_t<Type2>;
 
-                                if constexpr (IsOneOf<DataType1, Undefined, Emittable, Boolean> ||
-                                              IsOneOf<DataType2, Undefined, Emittable, Boolean>)
+                                if constexpr (IsOneOf<DataType1, Emittable, Boolean> ||
+                                              IsOneOf<DataType2, Emittable, Boolean>)
                                 {
                                     throw InputException(InputExceptionErrors::invalidArgument);
                                 }
@@ -293,8 +293,8 @@ namespace value
                         using DataType1 = std::remove_pointer_t<Type1>;
                         using DataType2 = std::remove_pointer_t<Type2>;
 
-                        if constexpr (IsOneOf<DataType1, Undefined, Emittable, Boolean> ||
-                                      IsOneOf<DataType2, Undefined, Emittable, Boolean>)
+                        if constexpr (IsOneOf<DataType1, Emittable, Boolean> ||
+                                      IsOneOf<DataType2, Emittable, Boolean>)
                         {
                             throw InputException(InputExceptionErrors::invalidArgument);
                         }
@@ -343,8 +343,8 @@ namespace value
                         using DataType1 = std::remove_pointer_t<Type1>;
                         using DataType2 = std::remove_pointer_t<Type2>;
 
-                        if constexpr (IsOneOf<DataType1, Undefined, Emittable, Boolean> ||
-                                      IsOneOf<DataType2, Undefined, Emittable, Boolean>)
+                        if constexpr (IsOneOf<DataType1, Emittable, Boolean> ||
+                                      IsOneOf<DataType2, Emittable, Boolean>)
                         {
                             throw InputException(InputExceptionErrors::invalidArgument);
                         }
@@ -377,8 +377,7 @@ namespace value
         using Iterator = ConstantDataList::const_iterator;
 
         auto it =
-            std::visit(VariantVisitor{ [](Undefined) -> Iterator { return {}; },
-                                       [](Emittable) -> Iterator { return {}; },
+            std::visit(VariantVisitor{ [](Emittable) -> Iterator { return {}; },
                                        [this](auto&& data) -> Iterator {
                                            using Type = std::decay_t<decltype(data)>;
                                            using RealType = std::remove_pointer_t<Type>;
@@ -482,7 +481,7 @@ namespace value
                     return std::visit(
                         [indexValue](auto&& begin) -> Value {
                             using BeginType = std::decay_t<decltype(begin)>;
-                            if constexpr (std::is_same_v<BeginType, Emittable> || std::is_same_v<BeginType, Undefined>)
+                            if constexpr (std::is_same_v<BeginType, Emittable>)
                             {
                                 throw InputException(InputExceptionErrors::invalidArgument);
                             }
@@ -505,8 +504,7 @@ namespace value
     {
         ConstantData movedOutOfScope;
 
-        std::visit(VariantVisitor{ [](Undefined) {},
-                                   [](Emittable) {},
+        std::visit(VariantVisitor{ [](Emittable) {},
                                    [&movedOutOfScope, this](auto&& data) {
                                        using Type = std::decay_t<decltype(data)>;
                                        using RealType = std::remove_pointer_t<Type>;
@@ -542,10 +540,7 @@ namespace value
 
     bool ComputeContext::IsGlobalValue(Value value)
     {
-        return std::visit(VariantVisitor{ [](Undefined) -> bool {
-                                             throw LogicException(LogicExceptionErrors::illegalState);
-                                         },
-                                          [](Emittable) -> bool {
+        return std::visit(VariantVisitor{ [](Emittable) -> bool {
                                               throw LogicException(LogicExceptionErrors::illegalState);
                                           },
                                           [this](auto&& data) -> bool {
@@ -657,8 +652,7 @@ namespace value
 
     void ComputeContext::CopyDataImpl(const Value& source, Value& destination)
     {
-        std::visit(VariantVisitor{ [](Undefined) {},
-                                   [](Emittable) {},
+        std::visit(VariantVisitor{ [](Emittable) {},
                                    [&destination, &source](auto&& sourceData) {
                                        using SourceDataType = std::decay_t<decltype(sourceData)>;
 
@@ -720,7 +714,7 @@ namespace value
         std::visit(
             [&](auto&& data) {
                 using Type = std::remove_pointer_t<std::decay_t<decltype(data)>>;
-                if constexpr (IsOneOf<Type, Undefined, Emittable, Boolean>)
+                if constexpr (IsOneOf<Type, Emittable, Boolean>)
                 {
                     // no op
                 }
@@ -766,7 +760,6 @@ namespace value
 
         std::visit(
             VariantVisitor{
-                [](Undefined) {},
                 [](Emittable) {},
                 [](Boolean*) {},
                 [&destination, &source, op](auto&& destinationData) {
@@ -852,9 +845,6 @@ namespace value
         Value returnValue =
             std::visit(
                 VariantVisitor{
-                    [](Undefined) -> Boolean {
-                        throw LogicException(LogicExceptionErrors::illegalState);
-                    },
                     [](Emittable) -> Boolean {
                         throw LogicException(LogicExceptionErrors::illegalState);
                     },
@@ -934,7 +924,6 @@ namespace value
 
         std::visit(
             VariantVisitor{
-                [](Undefined) {},
                 [](Emittable) {},
                 [&castedData, destType, &value](auto&& data) {
                     auto ptrBegin = data;
@@ -1052,7 +1041,7 @@ namespace value
         std::visit(
             [&tag, &stream, &value](auto&& data) {
                 using Type = std::decay_t<decltype(data)>;
-                if constexpr (utilities::IsOneOf<Type, Emittable, Undefined>)
+                if constexpr (std::is_same_v<Type, Emittable>)
                 {
                     return;
                 }

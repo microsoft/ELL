@@ -37,8 +37,6 @@ namespace value
         using ConstantData =
             std::variant<std::vector<utilities::Boolean>, std::vector<char>, std::vector<uint8_t>, std::vector<int16_t>, std::vector<int32_t>, std::vector<int64_t>, std::vector<float>, std::vector<double>>;
 
-        using Undefined = std::monostate;
-
         // ValueType is the base type, the int represents how many
         // pointer levels there are
         using ValueTypeDescription = std::pair<ValueType, int>;
@@ -99,7 +97,7 @@ namespace value
             return { GetValueType<T>(), utilities::CountOfPointers<T> };
         }
 
-        using UnderlyingDataType = std::variant<detail::Undefined, Emittable, Boolean*, char*, uint8_t*, int16_t*, int32_t*, int64_t*, float*, double*>;
+        using UnderlyingDataType = std::variant<Emittable, Boolean*, char*, uint8_t*, int16_t*, int32_t*, int64_t*, float*, double*>;
 
         using MemoryLayout = utilities::MemoryLayout;
 
