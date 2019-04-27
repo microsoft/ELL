@@ -1,15 +1,26 @@
-## 2.4.1*
-- Improvements to audio python library and updates to audio training tutorial
+## 2.5.0
+- Improve audio python library and update audio training tutorial
 - Add support for non-unrolled loops in the Value library
 - Add new methods to Python API to support FastGRNN models
 - Add easy node-creation functions
 - Fix bugs in ReinterpretLayoutNode
 - Fix importing of DenseNet models
-- Improvements to FFT and MelFilterBank nodes so that non-power of 2 sized input buffers can be processed.
+- Improve FFT and MelFilterBank nodes so that non-power of 2 sized input buffers can be processed
 - Fix darknet importer
 - Add shuffling of test and validation sets to audio train_classifier
+- Update OpenBLASSetup.cmake so it can find a locally built version of OpenBLAS
+- Fix compiling for cortex-m4 targets
+- Add a link back to the original model file name in our emitted header file
+- Clean up Python API, removing "TensorShape" specific API in favor of the more general PortMemoryLayout
+- Fix bug in Microphone and WavReader classes so they properly handle auto-resampling of audio with multiple channels
+- Add an -auto_scale option to audio scripts to control whether audio is scaled or not before featurization
+- Add ability to mix noise with audio during make_dataset process
+- Add support for shuffling and cleaning the audio training list
+- Add many new options to audio train_classifier, including ability to control learning rate schedulers
+- Fix link error when building on a Mac
+- Fix exception in DetectLowPrecisionConvolutionTransformation when running Compile in Debug mode
 
-## 2.4.0 
+## 2.4.0
 - Initial release of the finetune utility
 - Remove stale references to VS 2015
 - Add logging of build tool options
@@ -39,15 +50,15 @@
 - Fix importing of depthwise separable models
 - Fix "Repurposing a pretrained image classifier" tutorial
 
-## v2.3.6 
+## v2.3.6
 - Initial version of the ONNX importer
 - Tools now have a -v/--verbose option that will control the output of additional helpful logging - data
 - Demo helper script has been modified to print labels to STDOUT instead of drawing on the image. - This is useful for some training sets like CIFAR
-- Couple of new options for wrap.py: 
+- Couple of new options for wrap.py:
     - --convolution_method: this lets you specify the convolution method (it just passes the value on to the compile executable)
     - --llvm-format gets a new option: obj. This, along with --no-llc-tool and --no-opt-tool let you skip the time-consuming llc and opt steps. To retain compatibility with compile, the object file suffix is now .o.
 
-## v2.3.5 
+## v2.3.5
 - Fixed typos in some tutorials (thanks @lisaong )
 - Added support for emitting relocatable object code
 - Added Travis-CI support (thanks @lisaong )
@@ -60,11 +71,11 @@
 - make_profiler.sh can now be run from anywhere
 - Various bug fixes (#161, #157, #149)
 
-## v2.3.4 
+## v2.3.4
 - Fix importing CNTK models with a Softmax layer
 - Add a Reset function to LSTM and GRU models to clear the state
 
-## v2.3.3 
+## v2.3.3
 - Fixes issue #140
 - Helps issue #138 by fixing importing of Darknet models with Fully Connected layers
 - Simplified and improved LLVM IR optimization in emitted code
@@ -74,20 +85,20 @@
 - Fix running build.sh without any command line args
 - Miscellaneous bug fixes
 
-## v2.3.2 
+## v2.3.2
 - Fix issue #137
 - Added resnet models to gallery
 - Add support for naive depthwise separable convolution layers
 
-## v2.3.1 
+## v2.3.1
 - Added more fine grained profiling support for emitted code
 - Make find_package for LLVM more resilient to finding the version that ELL needs
 - Updated Setting up your Raspberry Pi device for tutorials to move to Raspbian Stretch
 - Updated links to YOLOv2 configuration and weights in Getting started with object detection using - region of interest networks
 - Added better support for importing models from older versions of CNTK
 
-## v2.3.0 
-- New tutorials available: 
+## v2.3.0
+- New tutorials available:
 - Getting started with object detection using region of interest networks
 - Getting started with audio keyword classification on the Raspberry Pi
 - Updated importer to handle the importing of resnet models
