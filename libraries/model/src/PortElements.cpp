@@ -64,9 +64,16 @@ namespace model
                 throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't concatenate layouts of different suffix strides");
             }
 
+            auto layout1Order = layout1.GetLogicalDimensionOrder();
+            auto layout2Order = layout2.GetLogicalDimensionOrder();
+            if (layout1Order != layout2Order)
+            {
+                throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't concatenate layouts of different orders");
+            }
+
             auto resultSize = layout1Size;
             resultSize[0] += layout2Size[0];
-            return { resultSize };
+            return { resultSize, layout1Order };
         }
 
         //
@@ -319,9 +326,10 @@ namespace model
         auto stride = portLayout.GetExtent();
         auto activeSize = portLayout.GetActiveSize();
         auto offset = portLayout.GetOffset();
+        auto order = portLayout.GetLogicalDimensionOrder();
         activeSize[0] = Size();
         offset[0] += GetStartIndex();
-        return { activeSize, stride, offset };
+        return { activeSize, stride, offset, order };
     }
 
     bool PortRange::IsFullPortRange() const

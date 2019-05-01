@@ -83,6 +83,7 @@ public:
     Node AddTypeCastNode(Model model, PortElements input, PortType outputType);
     Node AddClockNode(Model model, PortElements input, double interval, double lagThreshold, const std::string& lagNotificationName);
     Node AddConcatenationNode(Model model, const PortMemoryLayout& outputMemoryLayout, const std::vector<PortElements*>& inputs);
+    Node AddSpliceNode(Model model, const std::vector<PortElements*>& inputs);
     Node AddConstantNode(Model model, std::vector<double> values, PortType type);
     Node AddConstantNode(Model model, std::vector<double> values, const PortMemoryLayout& outputMemoryLayout, PortType type);
     Node AddDCTNode(Model model, PortElements input, int numFilters);

@@ -1,3 +1,7 @@
+## 2.5.1 *
+- Fixed API wrapper for PortMemoryLayout to produce correct extent
+- Fixed processing of ConcatenationNode in importer engine
+
 ## 2.5.0
 - Improve audio python library and update audio training tutorial
 - Add support for non-unrolled loops in the Value library

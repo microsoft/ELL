@@ -59,6 +59,26 @@ def remove_padding(v, shape, padding):
     v = v.reshape(shape)
     return v
 
+def get_active_region(v, shape, extent, offset):
+    """ get active region from the ell output (since torch won't include padding in it's version) """
+    shape = list(shape)
+    offset = list(offset)
+    v = v.reshape(extent)
+    for i in range(len(shape)):
+        s = shape[i]
+        o = offset[i]
+        if i == 0:
+            v = v[offset[i]:offset[i]+shape[i],:,:]
+        elif i == 1:
+            v = v[:,offset[i]:offset[i]+shape[i],:]
+        elif i == 2:
+            v = v[:,:,offset[i]:offset[i]+shape[i]]
+        elif i == 3:
+            v = v[:,:,:,offset[i]:offset[i]+shape[i]]
+        else:
+            raise Exception("Too many dimensions, 5 dimensions not supported.")
+    #v = v.reshape(shape)
+    return v
 
 def get_nodes(ell_map):
     nodes = []
@@ -281,10 +301,13 @@ class TorchModelVerifier:
                         if node is not None:
                             port = node.GetOutputPort("output")
                             shape = tuple(port.GetMemoryLayout().size) 
-                            padding = tuple(port.GetMemoryLayout().padding) # output shape includes padding
+                            extent = tuple(port.GetMemoryLayout().extent)
+                            offset = tuple(port.GetMemoryLayout().offset)
+                                                        
+                            #padding = tuple(port.GetMemoryLayout().padding) # output shape includes padding
                             ell_output = np.array(port.GetDoubleOutput()).astype(np.float32)
                             # now to compare ell (row,col,channel) with torch (channel,row,col) we have to reorder
-                            ell_output = remove_padding(ell_output, shape, padding)
+                            ell_output = get_active_region(ell_output, shape, extent, offset)
                             ell_output = np.moveaxis(ell_output, 2, 0).ravel()
 
                             #close = np.allclose(torch_output, ell_output, atol=1e-3)

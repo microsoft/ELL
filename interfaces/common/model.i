@@ -26,7 +26,7 @@ WRAP_CALLABLES_AS_COMPILED_MAP_CALLBACKS(FloatCallbackBase, FloatCallbackBase, f
 
 // naturalvar declarations for members that are object types (see ..\Readme.md)
 %naturalvar ELL_API::PortMemoryLayout::size;
-%naturalvar ELL_API::PortMemoryLayout::padding;
+%naturalvar ELL_API::PortMemoryLayout::extent;
 %naturalvar ELL_API::PortMemoryLayout::offset;
 %naturalvar ELL_API::PortMemoryLayout::order;
 

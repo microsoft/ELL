@@ -43,13 +43,13 @@ namespace nodes
         ConcatenationNode();
 
         /// <summary> Constructor </summary>
-        /// <param name="input"> The inputs to concatenate specified as a PortElements. </param>
+        /// <param name="input"> The inputs to concatenate specified as an Output port. </param>
         ConcatenationNode(const model::OutputPort<ValueType>& input);
 
         /// <summary> Constructor </summary>
-        /// <param name="input"> The inputs to concatenate specified as a PortElements. </param>
-        /// <param name="shape"> The shape of the output data. </param>
-        ConcatenationNode(const model::OutputPort<ValueType>& input, const model::MemoryShape& shape);
+        /// <param name="input"> The inputs to concatenate specified as an Output port. </param>
+        /// <param name="shape"> The  memory layout of the output. </param>
+        ConcatenationNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout);
 
         /// <summary> Gets the output shape. </summary>
         ///
@@ -101,13 +101,13 @@ namespace nodes
     ConcatenationNode<ValueType>::ConcatenationNode(const model::OutputPort<ValueType>& input) :
         CompilableNode({ &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
-        _output(this, defaultOutputPortName, input.Size()){};
+        _output(this, defaultOutputPortName, input.GetMemoryLayout()){};
 
     template <typename ValueType>
-    ConcatenationNode<ValueType>::ConcatenationNode(const model::OutputPort<ValueType>& input, const model::MemoryShape& shape) :
+    ConcatenationNode<ValueType>::ConcatenationNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputMemoryLayout) :
         CompilableNode({ &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
-        _output(this, defaultOutputPortName, shape){};
+        _output(this, defaultOutputPortName, outputMemoryLayout){};
 
     template <typename ValueType>
     void ConcatenationNode<ValueType>::Compute() const

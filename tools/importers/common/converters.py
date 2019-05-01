@@ -186,28 +186,6 @@ class LookupTable:
         original_tensor, order = self.tensors[uid]
 
         return memory_shapes.get_tensor_in_ell_order(original_tensor, order)
-        # original_shape = original_tensor.shape
-        # if order == "filter_channel_row_column":
-        #     ordered_weights = np.moveaxis(original_tensor, 1, -1)
-        #     ordered_weights = ordered_weights.ravel().astype(np.float).reshape(
-        #         original_shape[0] * original_shape[2], original_shape[3], original_shape[1])
-        # elif order == "row_column":
-        #     ordered_weights = np.moveaxis(original_tensor, 0, -1)
-        #     ordered_weights = ordered_weights.ravel().astype(
-        #         np.float).reshape(original_shape[1], original_shape[0], 1)
-        # elif order == "channel":
-        #     ordered_weights = original_tensor.ravel().astype(
-        #         np.float).reshape(1, 1, original_shape.size)
-        # elif order == "channel_row_column_filter":
-        #     ordered_weights = np.moveaxis(original_tensor, 0, -1)
-        #     ordered_weights = np.moveaxis(ordered_weights, 2, 0)
-        #     ordered_weights = ordered_weights.ravel().astype(np.float).reshape(
-        #     original_shape[3] * original_shape[1], original_shape[2], original_shape[0])
-        # else:
-        #     raise NotImplementedError(
-        #         "Unsupported tensor order {}, for {}".format(order, uid))
-
-        # return ordered_weights
 
     def get_vector_from_constant(self, uid: str, size: int):
         """
@@ -1601,36 +1579,27 @@ class ConvertSplice(ConvertBase):
         first_in_block = conversion_parameters["first_in_block"]
         last_in_block = conversion_parameters["last_in_block"]
 
-        pre_order = [0,1,2]
-        post_order = [0,1,2]
+        pre_order = [0, 1, 2]
+        post_order = [0, 1, 2]
         if self.importer_node.attributes["dimension_to_stack"] == "channel":
             # When output from nodes are concatenated together in the
             # order (channel, row, column), they effectively stack in the
             # channel dimension.
             pre_order = [2,0,1]
-            # The final order must put the elements back into row, column,
-            # channel order.
-            post_order = [1,2,0]
         elif self.importer_node.attributes["dimension_to_stack"] == "row":
             # When output from nodes are concatenated together in the
             # order (row, column, channel), they effectively stack in the
             # row dimension.
             pre_order = [0,1,2]
-            # The final order must put the elements back into row, column,
-            # channel order.
-            post_order = [0,1,2]
-            # NOTE: The ReorderDataNodes that are inserted will be removed by the
-            # optimizer since they'll be redundant
         elif self.importer_node.attributes["dimension_to_stack"] == "column":
             # When output from nodes are concatenated together in the
             # order (column, row, channel), they effectively stack in the
             # column dimension.
             pre_order = [1,0,2]
-            # The final order must put the elements back into row, column,
-            # channel order.
-            post_order = [1,0,2]
         else:
             raise Exception("Splice does not yet support stacking along dimension {}, just row, column or channel".format(self.required_attributes["dimension_to_stack"]))
+        # NOTE: The ReorderDataNodes that are inserted can be removed by the
+        # optimizer if they're redundant
 
         # Loop over all inputs and for each, insert a reorder node to
         # put into specified order.
@@ -1648,25 +1617,29 @@ class ConvertSplice(ConvertBase):
             # Register the mapping
             lookup_table.add_imported_ell_node(self.importer_node, reorder_node)
 
-        # Insert an ConcatenationNode together the reorder nodes
+        # Splice together the reorder nodes
         output_shape, output_padding = self.get_output_parameters(last_in_block)
         reordered_output_shape = ell.math.TensorShape(output_shape.channels, output_shape.rows, output_shape.columns)
         input_port_elements_list = []
         for ell_node in reorder_nodes:
             portElements = lookup_table.get_output_port_elements_for_node(ell_node)
             input_port_elements_list.append(portElements)
-        concatenation_node = builder.AddConcatenationNode(model, ell.model.PortMemoryLayout(reordered_output_shape), ell.nodes.PortElementsList(input_port_elements_list))
+        splice_node = builder.AddSpliceNode(model, ell.nodes.PortElementsList(input_port_elements_list))
         # Register the mapping
-        lookup_table.add_imported_ell_node(self.importer_node, concatenation_node)
+        lookup_table.add_imported_ell_node(self.importer_node, splice_node)
 
-        # Insert a reorder node to to be in row, column, channel order.
-        port_elements = lookup_table.get_output_port_elements_for_node(concatenation_node)
+        # Insert a reorder node to to be in row, column, channel order with appropriate padding.
+        port_elements = lookup_table.get_output_port_elements_for_node(splice_node)
         padding_size = output_padding.paddingSize
 
-        reorderedPortMemoryLayout = ell.model.PortMemoryLayout([reordered_output_shape.rows, reordered_output_shape.columns, reordered_output_shape.channels], [reordered_output_shape.rows, reordered_output_shape.columns, reordered_output_shape.channels], [0, 0, 0], pre_order)
-        outputPortMemoryLayout = ell.model.PortMemoryLayout([output_shape.rows - 2*padding_size, output_shape.columns - 2*padding_size, output_shape.channels],
-                                                            [padding_size, padding_size, 0])
-        final_reorder_node = builder.AddReorderDataNode(model, port_elements, reorderedPortMemoryLayout, outputPortMemoryLayout, [0, 1, 2], 0)
+        reorderedPortMemoryLayout = ell.model.PortMemoryLayout([reordered_output_shape.rows, reordered_output_shape.columns, reordered_output_shape.channels],
+                                                               [reordered_output_shape.rows, reordered_output_shape.columns, reordered_output_shape.channels],
+                                                               [0, 0, 0], pre_order)
+        outputPortMemoryLayout = ell.model.PortMemoryLayout([output_shape.rows, output_shape.columns, output_shape.channels],
+                                                            [output_shape.rows - 2*padding_size, output_shape.columns - 2*padding_size, output_shape.channels],
+                                                            [padding_size, padding_size, 0], post_order)
+        final_reorder_node = builder.AddReorderDataNode(model, port_elements, reorderedPortMemoryLayout, outputPortMemoryLayout, post_order, 0)
+
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, final_reorder_node)
 

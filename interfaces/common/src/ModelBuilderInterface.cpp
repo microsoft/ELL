@@ -21,15 +21,16 @@
 #include <model/include/InputNodeBase.h>
 #include <model/include/ModelEditor.h>
 #include <model/include/OutputNode.h>
+#include <model/include/SpliceNode.h>
 
 #include <nodes/include/BinaryOperationNode.h>
 #include <nodes/include/BroadcastOperationNodes.h>
 #include <nodes/include/BufferNode.h>
 #include <nodes/include/ClockNode.h>
 #include <nodes/include/ConcatenationNode.h>
-#include <nodes/include/DotProductNode.h>
 #include <nodes/include/DCTNode.h>
 #include <nodes/include/DTWDistanceNode.h>
+#include <nodes/include/DotProductNode.h>
 #include <nodes/include/FFTNode.h>
 #include <nodes/include/FilterBankNode.h>
 #include <nodes/include/GRUNode.h>
@@ -293,24 +294,63 @@ Node ModelBuilder::AddConcatenationNode(Model model, const PortMemoryLayout& out
     }
     auto type = inputs[0]->GetType();
     ell::model::Node* newNode = nullptr;
-    ell::utilities::MemoryShape outputShape = outputMemoryLayout.Get().GetActiveSize();
 
     switch (type)
     {
     case PortType::boolean:
-        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<bool>>(GetPortElementsFromList<bool>(inputs), outputShape);
+        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<bool>>(GetPortElementsFromList<bool>(inputs), outputMemoryLayout.Get());
         break;
     case PortType::integer:
-        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<int>>(GetPortElementsFromList<int>(inputs), outputShape);
+        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<int>>(GetPortElementsFromList<int>(inputs), outputMemoryLayout.Get());
         break;
     case PortType::real:
-        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<double>>(GetPortElementsFromList<double>(inputs), outputShape);
+        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<double>>(GetPortElementsFromList<double>(inputs), outputMemoryLayout.Get());
         break;
     case PortType::smallReal:
-        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<float>>(GetPortElementsFromList<float>(inputs), outputShape);
+        newNode = model.GetModel().AddNode<ell::nodes::ConcatenationNode<float>>(GetPortElementsFromList<float>(inputs), outputMemoryLayout.Get());
         break;
     default:
         throw std::invalid_argument("Error: could not create ConcatenationNode of the requested type");
+    }
+    return Node(newNode);
+}
+
+std::vector<const ell::model::OutputPortBase*> GeOutputPortElementsFromList(const std::vector<PortElements*>& inputs)
+{
+    auto port_list = std::vector<const ell::model::OutputPortBase*>{};
+    for (const auto input : inputs)
+    {
+        const auto outputPortBase = input->GetPortElements().GetElement(0).ReferencedPort();
+        port_list.push_back(outputPortBase);
+    }
+    return port_list;
+}
+
+Node ModelBuilder::AddSpliceNode(Model model, const std::vector<PortElements*>& inputs)
+{
+    if (inputs.size() < 1)
+    {
+        throw std::invalid_argument("Error: expected at least one input port element for AddSpliceNode");
+    }
+    auto type = inputs[0]->GetType();
+    ell::model::Node* newNode = nullptr;
+
+    switch (type)
+    {
+    case PortType::boolean:
+        newNode = model.GetModel().AddNode<ell::model::SpliceNode<bool>>(GeOutputPortElementsFromList(inputs));
+        break;
+    case PortType::integer:
+        newNode = model.GetModel().AddNode<ell::model::SpliceNode<int>>(GeOutputPortElementsFromList(inputs));
+        break;
+    case PortType::real:
+        newNode = model.GetModel().AddNode<ell::model::SpliceNode<double>>(GeOutputPortElementsFromList(inputs));
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel().AddNode<ell::model::SpliceNode<float>>(GeOutputPortElementsFromList(inputs));
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create SpliceNode of the requested type");
     }
     return Node(newNode);
 }
@@ -794,7 +834,7 @@ Node ModelBuilder::AddMatrixMultiplyNode(Model model, PortElements input1, PortE
 
     if (layout1.NumDimensions() == 1 && layout2.NumDimensions() == 2)
     {
-        // then this is a MatrixVectorMultiplyNode, but MatrixVectorMultiplyNode requires matrix first so we 
+        // then this is a MatrixVectorMultiplyNode, but MatrixVectorMultiplyNode requires matrix first so we
         // have to transpose input2 in this case.
         // TODO: fix MatrixVectorMultiplyNode so it exposes the transpose options supported by BLAS GEMV functions.
         // In the meantime we can handle the constant case.
@@ -838,7 +878,7 @@ Node ModelBuilder::AddMatrixMultiplyNode(Model model, PortElements input1, PortE
         // etc.
         throw std::invalid_argument("Error: input sizes not yet supported");
     }
-    
+
     return Node(newNode);
 }
 

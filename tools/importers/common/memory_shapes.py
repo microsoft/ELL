@@ -59,7 +59,7 @@ def get_ell_port_memory_layout(shape: tuple, order: str, padding: int = 0):
     else:
         raise NotImplementedError("Unsupported input shape order: {}".format(order))
     
-    return ell.model.PortMemoryLayout([rows, columns, channels], [padding, padding, 0])
+    return ell.model.PortMemoryLayout([rows, columns, channels], [rows + 2 * padding, columns + 2 * padding, channels], [padding, padding, 0])
 
 
 def get_tensor_in_ell_order(tensor: np.array, order: str):

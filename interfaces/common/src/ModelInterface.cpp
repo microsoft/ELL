@@ -516,28 +516,40 @@ bool IsAllZeros(const std::vector<int>& p)
     return std::all_of(p.begin(), p.end(), [](const int& value) { return value == 0; });
 }
 
-ell::model::PortMemoryLayout GetPortMemoryLayout(const std::vector<int>& size, const std::vector<int>& padding, const std::vector<int>& offset, const std::vector<int>& order)
+ell::model::PortMemoryLayout GetPortMemoryLayout(const std::vector<int>& size, const std::vector<int>& extent, const std::vector<int>& offset, const std::vector<int>& order)
 {
-    if (IsAllZeros(padding) && IsAllZeros(offset))
+    ell::model::MemoryShape sizeMemoryShape = ell::model::MemoryShape{ size };
+    ell::model::MemoryShape extentMemoryShape = {};
+
+    if (IsAllZeros(extent))
     {
-        return ell::model::PortMemoryLayout(ell::model::MemoryShape{ size });
-    }
-    else if (IsAllZeros(offset))
-    {
-        return ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding });
-    }
-    else if (IsAllZeros(order))
-    {
-        return ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding }, ell::model::MemoryShape{ offset });
+        extentMemoryShape = ell::model::MemoryShape{ size };
     }
     else
     {
-        return ell::model::PortMemoryLayout(ell::model::MemoryShape{ size }, ell::model::MemoryShape{ padding }, ell::model::MemoryShape{ offset }, ell::model::DimensionOrder{ order });
+        extentMemoryShape = ell::model::MemoryShape{ extent };
+    }
+
+    if (IsAllZeros(offset) && IsAllZeros(order))
+    {
+        return ell::model::PortMemoryLayout(sizeMemoryShape);
+    }
+    else if (IsAllZeros(order))
+    {
+        return ell::model::PortMemoryLayout(sizeMemoryShape, extentMemoryShape, ell::model::MemoryShape{ offset });
+    }
+    else if (IsAllZeros(offset))
+    {
+        return ell::model::PortMemoryLayout(sizeMemoryShape, ell::model::DimensionOrder{ order });
+    }
+    else
+    {
+        return ell::model::PortMemoryLayout(sizeMemoryShape, extentMemoryShape, ell::model::MemoryShape{ offset }, ell::model::DimensionOrder{ order });
     }
 }
 
-PortMemoryLayout::PortMemoryLayout(const std::vector<int>& s, const std::vector<int>& p, const std::vector<int>& o, const std::vector<int>& order) :
-    PortMemoryLayout(GetPortMemoryLayout(s, p, o, order))
+PortMemoryLayout::PortMemoryLayout(const std::vector<int>& size, const std::vector<int>& extent, const std::vector<int>& offset, const std::vector<int>& order) :
+    PortMemoryLayout(GetPortMemoryLayout(size, extent, offset, order))
 {
 }
 
@@ -548,7 +560,7 @@ PortMemoryLayout::PortMemoryLayout(const ell::api::math::TensorShape& size) :
 
 PortMemoryLayout::PortMemoryLayout(const ell::model::PortMemoryLayout& layout) :
     size(layout.GetActiveSize().ToVector()),
-    padding(layout.GetExtent().ToVector()),
+    extent(layout.GetExtent().ToVector()),
     offset(layout.GetOffset().ToVector()),
     order(layout.GetLogicalDimensionOrder().ToVector()),
     _layout(layout)

@@ -153,12 +153,12 @@ class PortMemoryLayout
 {
 public:
     const std::vector<int> size;
-    const std::vector<int> padding;
+    const std::vector<int> extent;
     const std::vector<int> offset;
     const std::vector<int> order;
 
     PortMemoryLayout(const std::vector<int>& size,
-                     const std::vector<int>& padding = {},
+                     const std::vector<int>& extent = {},
                      const std::vector<int>& offset = {},
                      const std::vector<int>& order = {});
 
