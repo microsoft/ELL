@@ -14,3 +14,6 @@ add_subdirectory(profile)
 add_subdirectory(pythonlibs)
 add_subdirectory(pythonPlugins)
 add_subdirectory(remoterun)
+
+add_custom_target(tools)
+add_dependencies(tools apply compile debugCompiler finetune print profile pythonPlugins)
