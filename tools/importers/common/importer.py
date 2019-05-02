@@ -81,6 +81,7 @@ operation_map = {
     "Subtract": ConvertSubtract,
     "Tanh": ConvertTanh,
     "VAD": ConvertVAD,
+    "Cast": ConvertTypeCast,
     }
 
 class ImporterModel:
