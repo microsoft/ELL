@@ -269,3 +269,9 @@ Gemfile.lock
 tags
 .amlignore
 aml_config/
+
+# CLion/PyCharm IDE
+.idea/
+cmake-build-debug/
+cmake-build-release/
+
