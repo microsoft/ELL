@@ -1,6 +1,7 @@
 ## 2.5.1 *
 - Fixed API wrapper for PortMemoryLayout to produce correct extent
 - Fixed processing of ConcatenationNode in importer engine
+- Add support for ONNX Cast operator (thanks to Ehsan Azar)
 
 ## 2.5.0
 - Improve audio python library and update audio training tutorial
