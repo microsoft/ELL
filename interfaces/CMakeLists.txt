@@ -112,3 +112,9 @@ add_subdirectory(python)
 # add_subdirectory(csharp EXCLUDE_FROM_ALL)
 add_subdirectory(javascript)
 add_subdirectory(xml)
+
+add_custom_target(bindings)
+if(TARGET _ELL_python)
+    add_dependencies(bindings
+        _ELL_python)
+endif()
