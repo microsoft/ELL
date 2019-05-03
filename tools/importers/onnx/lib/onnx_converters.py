@@ -266,6 +266,41 @@ class OnnxInputConverter(OnnxNodeConverter):
         return (shape, order)
 
 
+class OnnxCastConverter(OnnxNodeConverter):
+    def __init__(self, converter):
+        super().init(converter, "Cast")
+
+    def convert(self, node: NodeProto):
+        node = super().convert(node)
+        return node
+
+    def get_attributes(self, attrs: Attributes):
+        attributes = {}
+        enum_val = attrs["to"]
+        if enum_val == 1 or enum_val == 10:
+            # float or float16
+            cast_to = ell.nodes.PortType.smallReal
+        elif enum_val == 11:
+            cast_to = ell.nodes.PortType.real
+        elif 2 <= enum_val <= 6 or enum_val == 12:
+            # small integer types
+            cast_to = ell.nodes.PortType.integer
+        elif enum_val == 7 or enum_val == 13:
+            cast_to = ell.nodes.PortType.bigInt
+        elif enum_val == 9:
+            cast_to = ell.nodes.PortType.boolean
+        elif enum_val == 8:
+            # string
+            cast_to = ell.nodes.PortType.categorical
+        else:
+            raise Exception("Cast type {} is not supported".format(enum_val))
+        attributes["cast_to"] = cast_to
+        return attributes
+
+    def get_output_shapes(self):
+        return [self.node.input_shapes[0]]
+
+
 class OnnxPlusConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Plus")
@@ -1498,7 +1533,8 @@ ONNX_OP_TYPE_TO_CONVERTER_MAP  = {
     "Tanh"                    : OnnxTanhConverter,
     "Transpose"               : OnnxTransposeConverter, 
     "Unsqueeze"               : OnnxUnsqueezeConverter, 
-    "Squeeze"                 : OnnxSqueezeConverter
+    "Squeeze"                 : OnnxSqueezeConverter,
+    "Cast"                    : OnnxCastConverter
 }
 
 class OnnxConverter:
