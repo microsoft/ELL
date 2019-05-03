@@ -199,7 +199,7 @@ Node ModelBuilder::AddTypeCastNode(Model model, PortElements input, PortType out
         switch (outputType)
         {
         case PortType::integer:
-            throw std::invalid_argument("Error: CastNode from int to int is redundant");
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<int, int>>(ell::model::PortElements<int>(elements));
         case PortType::real:
             newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<int, double>>(ell::model::PortElements<int>(elements));
             break;
@@ -220,7 +220,7 @@ Node ModelBuilder::AddTypeCastNode(Model model, PortElements input, PortType out
             newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<double, int>>(ell::model::PortElements<double>(elements));
             break;
         case PortType::real:
-            throw std::invalid_argument("Error: CastNode from real to real is redundant");
+            model.GetModel().AddNode<ell::nodes::TypeCastNode<double, double>>(ell::model::PortElements<double>(elements));
         case PortType::smallReal:
             newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<double, float>>(ell::model::PortElements<double>(elements));
             break;
@@ -241,7 +241,7 @@ Node ModelBuilder::AddTypeCastNode(Model model, PortElements input, PortType out
             newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<float, double>>(ell::model::PortElements<float>(elements));
             break;
         case PortType::smallReal:
-            throw std::invalid_argument("Error: CastNode from smallReal to smallReal is redundant");
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<float, float>>(ell::model::PortElements<float>(elements));
         case PortType::boolean:
             newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<float, bool>>(ell::model::PortElements<float>(elements));
             break;
@@ -262,7 +262,7 @@ Node ModelBuilder::AddTypeCastNode(Model model, PortElements input, PortType out
             newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<bool, float>>(ell::model::PortElements<bool>(elements));
             break;
         case PortType::boolean:
-            throw std::invalid_argument("Error: CastNode from boolean to boolean is redundant");
+            newNode = model.GetModel().AddNode<ell::nodes::TypeCastNode<bool, bool>>(ell::model::PortElements<bool>(elements));
             break;
         default:
             throw std::invalid_argument("Error: CastNode unknown output type");
