@@ -147,6 +147,8 @@ namespace value
         template <typename Fn>
         struct Function : public std::function<Fn>
         {
+            Function(const std::function<Fn>& fn) : std::function<Fn>(fn) {}
+            Function(std::function<Fn>&& fn) : std::function<Fn>(std::move(fn)) {}
             using std::function<Fn>::function;
         };
 
@@ -178,12 +180,14 @@ namespace value
             using Type = ReturnT(Args...);
         };
 
+        // Function pointer
         template <typename ReturnT, typename... Args>
-        Function(ReturnT (*)(Args...))->Function<ReturnT(Args...)>;
+        Function(ReturnT (*)(Args...)) -> Function<ReturnT(Args...)>;
 
+        // Functor
         template <typename Functor,
                   typename Signature = typename StdFunctionDeductionGuideHelper<decltype(&Functor::operator())>::Type>
-        Function(Functor)->Function<Signature>;
+        Function(Functor) -> Function<Signature>;
 #endif // defined(__APPLE__)
 
     } // namespace detail
