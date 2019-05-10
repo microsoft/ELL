@@ -3,6 +3,7 @@
 - Fixed processing of ConcatenationNode in importer engine
 - Added four build target aliases that build groups of targets: bindings, libraries, tests, and tools
 - Add support for ONNX Cast operator (thanks to Ehsan Azar)
+- Fixed build error on macOS (GitHub issue #216)
 
 ## 2.5.0
 - Improve audio python library and update audio training tutorial
