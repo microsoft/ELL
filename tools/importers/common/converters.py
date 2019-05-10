@@ -953,6 +953,38 @@ class ConvertInput(ConvertBase):
         lookup_table.add_ell_input(original_input_node)
 
 
+class ConvertTypeCast(ConvertBase):
+    """
+    Converter for explicit TypeCast
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node)
+        self.required_weights = []
+        self.required_attributes = ["cast_to"]
+
+    def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Return the appropriate ELL node
+        """
+        raise Exception("No corresponding ELL layer for TypeCast. Use node instead.")
+
+    def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Derived classes override to convert the importer node to appropriate ELL node(s)
+        and insert into the model
+        """
+        model = conversion_parameters["model"]
+        builder = conversion_parameters["builder"]
+        lookup_table = conversion_parameters["lookup_table"]
+        # Get the port elements from the input
+        input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
+        castTo = self.importer_node.attributes["cast_to"]
+        # Add the TypeCastNode to the model
+        ell_node = builder.AddTypeCastNode(model, input_port_elements, castTo)
+        # Register the mapping
+        lookup_table.add_imported_ell_node(self.importer_node, ell_node)
+
+
 class ConvertLeakyReLU(ConvertActivation):
     """
     Converter for LeakyReLU, which is equivalent to
