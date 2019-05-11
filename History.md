@@ -1,4 +1,4 @@
-## 2.5.1 *
+## 2.5.1
 - Fixed API wrapper for PortMemoryLayout to produce correct extent
 - Fixed processing of ConcatenationNode in importer engine
 - Added four build target aliases that build groups of targets: bindings, libraries, tests, and tools
