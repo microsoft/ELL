@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description="ELL optimier script for optimizing model based on profiles.\n")
+        description="ELL optimizer script for optimizing model based on profiles.\n")
 
     verbosity = parser.add_mutually_exclusive_group()
     verbose_help = "Turn on verbosity logging level. Available levels are {}".format(

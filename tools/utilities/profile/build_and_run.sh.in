@@ -10,6 +10,11 @@ if [[ -d $build_dir ]]; then
     rm -rf build
 fi
 
+if [ -f "/home/pi/miniconda3/bin/activate" ]; then
+  export PATH="/home/pi/miniconda3/bin:$PATH"
+  source activate py34 > /dev/null 2>&1
+fi
+
 mkdir -p build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -23,23 +28,23 @@ make -s
 # Run profile tool with arguments given on the command line
 if [[ -f ./profile ]] ; then
   echo "Running ELL profiler tool -- no opt" | tee -a ../profile_report_noopt.txt
-  /bin/bash -c "./profile 100 20 | tee -a ../profile_report_noopt.txt"
+  /bin/bash -c "LD_PRELOAD=/home/pi/miniconda3/envs/py34/lib/libopenblas.so ./profile 100 20 | tee -a ../profile_report_noopt.txt"
 fi
 
 if [[ -f ./profile_opt ]] ; then
   echo "Running ELL profiler tool -- opt" | tee -a ../profile_report_opt.txt
-  /bin/bash -c "./profile_opt 100 20 | tee -a ../profile_report_opt.txt"
+  /bin/bash -c "LD_PRELOAD=/home/pi/miniconda3/envs/py34/lib/libopenblas.so ./profile_opt 100 20 | tee -a ../profile_report_opt.txt"
 fi
 
 # Run exercise_model tool with 10 iterations
 if [[ -f ./exercise_model ]] ; then
   echo "Timing ELL exercise tool -- no opt" | tee -a ../profile_report_noopt.txt
-  /bin/bash -c "time ./exercise_model 100" 2>&1 | tee -a ../profile_report_noopt.txt
+  /bin/bash -c "LD_PRELOAD=/home/pi/miniconda3/envs/py34/lib/libopenblas.so time ./exercise_model 100" 2>&1 | tee -a ../profile_report_noopt.txt
 fi
 
 if [[ -f ./exercise_model_opt ]] ; then
   echo "Timing ELL exercise tool -- opt" | tee -a ../profile_report_opt.txt
-  /bin/bash -c "time ./exercise_model_opt 100" 2>&1 | tee -a ../profile_report_opt.txt
+  /bin/bash -c "LD_PRELOAD=/home/pi/miniconda3/envs/py34/lib/libopenblas.so time ./exercise_model_opt 100" 2>&1 | tee -a ../profile_report_opt.txt
 fi
 
 # Run perf tool to get low-level events

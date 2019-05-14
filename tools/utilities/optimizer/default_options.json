@@ -1,0 +1,19 @@
+{
+    "convolution_methods": [
+        "simple",
+        "unrolled",
+        "winograd"
+    ],
+    "parallel": [
+        true,
+        false
+    ],
+    "winograd_parameters": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        16
+    ]
+}

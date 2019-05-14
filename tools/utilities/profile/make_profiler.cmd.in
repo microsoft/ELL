@@ -8,6 +8,8 @@ REM   - copy c++ and cmake files to subdirectory
 
 REM Usage: make_profiler.cmd model_file <compile options> 
 
+set script_dir=%~dp0
+
 pushd .
 
 if "%1"=="" (
@@ -43,15 +45,15 @@ cd %profiler_directory%
 @OPT_EXECUTABLE@ compiled_model_noprofile.ll -o compiled_model_noprofile_opt.ll -O3 -S
 @LLC_EXECUTABLE@ compiled_model_noprofile_opt.ll -o compiled_model_noprofile_opt.o -O3 --filetype=obj %llc_opts%
 
-copy ..\tools\utilities\profile\CompiledProfile_main.cpp .
-copy ..\tools\utilities\profile\CompiledExerciseModel_main.cpp .
-copy ..\tools\utilities\profile\ProfileReport.h .
-copy ..\tools\utilities\profile\ProfileReport.cpp .
-copy ..\tools\utilities\profile\OpenBLASSetup.cmake .\OpenBLASSetup.cmake
-copy ..\tools\utilities\profile\build_and_run.sh .
-copy ..\tools\utilities\profile\build_and_run.cmd .
+copy %script_dir%..\tools\utilities\profile\CompiledProfile_main.cpp .
+copy %script_dir%..\tools\utilities\profile\CompiledExerciseModel_main.cpp .
+copy %script_dir%..\tools\utilities\profile\ProfileReport.h .
+copy %script_dir%..\tools\utilities\profile\ProfileReport.cpp .
+copy %script_dir%..\tools\utilities\profile\OpenBLASSetup.cmake .\OpenBLASSetup.cmake
+copy %script_dir%..\tools\utilities\profile\build_and_run.sh .
+copy %script_dir%..\tools\utilities\profile\build_and_run.cmd .
 
-copy ..\tools\utilities\profile\CMakeLists-device-parallel.txt.in .\CMakeLists.txt
+copy %script_dir%..\tools\utilities\profile\CMakeLists-device-parallel.txt.in .\CMakeLists.txt
 popd
 
 exit /b

@@ -17,6 +17,7 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <random>
 
 struct ProfileArguments
 {
@@ -107,8 +108,18 @@ void ResetProfilingInfo()
     ELL_ResetRegionProfilingInfo();
 }
 
+template <typename InputType>
+void RandomFill(std::vector<InputType>& vec, InputType min, InputType max)
+{
+    std::default_random_engine engine(123);
+    std::uniform_real_distribution<InputType> dist(min, max);
+    std::generate(vec.begin(), vec.end(), [&]() {
+        return dist(engine);
+    });
+}
+
 template <typename InputType, typename OutputType>
-void ProfileModel(const ProfileArguments& profileArguments)
+void ProfileModel(const ProfileArguments& profileArguments, InputType lowDataValue, InputType highDataValue)
 {
     auto& profileOutputStream = std::cout;
     const auto comment = profileArguments.outputComment;
@@ -122,6 +133,7 @@ void ProfileModel(const ProfileArguments& profileArguments)
     auto outputSize = ELL_GetOutputSize(0);
 
     std::vector<InputType> input(inputSize);
+    RandomFill(input, lowDataValue, highDataValue);
     std::vector<OutputType> output(outputSize);
 
 #ifdef ELL_WRAPPER_CLASS
@@ -203,7 +215,7 @@ int main(int argc, char* argv[])
     profileArguments.numWarmUpIterations = numWarmUpIterations;
     profileArguments.numIterations = numIterations;
     profileArguments.outputFormat = ProfileOutputFormat::text;
-    ProfileModel<InputType, OutputType>(profileArguments);
+    ProfileModel<InputType, OutputType>(profileArguments, 0.0f, 1.0f);
 
     return 0;
 }

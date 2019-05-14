@@ -52,6 +52,13 @@ def find_ell_build():
     return build_dir
 
 
+def add_ell_root_args(arg_parser):
+    default_ell_root = get_ell_root()
+    default_ell_build_dir = find_ell_build()
+    arg_parser.add_argument("--ell_root", help="Path to ELL root.", default=default_ell_root)
+    arg_parser.add_argument("--ell_build_root", help="Path to ELL build directory.", default=default_ell_build_dir)
+
+
 ell_build_dir = find_ell_build()
 if not ell_build_dir:
   ell_build_dir = os.path.join(os.getenv("ELL_ROOT"), "build")
