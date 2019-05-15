@@ -190,6 +190,14 @@ namespace value
         Function(Functor) -> Function<Signature>;
 #endif // defined(__APPLE__)
 
+        template <typename ViewType, std::enable_if_t<std::is_same_v<decltype(std::declval<ViewType>().GetValue()), Value>, void*> = nullptr>
+        Value GetValue(ViewType value)
+        {
+            return value.GetValue();
+        }
+
+        inline Value GetValue(Value value) { return value; }
+
     } // namespace detail
 
 #if defined(__APPLE__)
@@ -249,7 +257,7 @@ namespace value
             else
             {
                 ReturnT r = std::apply(fn, tupleArgs);
-                return r.GetValue();
+                return detail::GetValue(r);
             }
         });
 
@@ -257,7 +265,7 @@ namespace value
             constexpr auto argSize = sizeof...(Args);
             std::vector<Value> argValues;
             argValues.reserve(argSize);
-            (argValues.push_back(args.GetValue()), ...);
+            (argValues.push_back(detail::GetValue(args)), ...);
 
             auto fnReturn = createdFn(argValues);
             if constexpr (std::is_same_v<void, ReturnT>)
