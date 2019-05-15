@@ -119,6 +119,76 @@ def create_model(callbacks=True):
     return map
 
 
+def memory_test(func):
+    # make sure we don't leak.
+    func()
+    gc.collect()
+    before = dict((id(o), o) for o in gc.get_objects())
+    gc.collect()
+    func()
+    gc.collect()
+    after = dict((id(o), o) for o in gc.get_objects())
+    if id(before) in after:
+        after.pop(id(before))
+    for key in after:
+        if key in before:
+            before.pop(key)
+
+    # skip python built in types, we only care about leaks in ELL types.
+    leaks = {}
+    for k in before:
+        o = before[k]
+        if not isinstance(o, list) and not isinstance(o, dict) and not isinstance(o, tuple) and not isinstance(o, set):
+            leaks[k] = o
+
+    if len(leaks) != 0:
+        print("### FAILED wrap_test python detected a memory leak in our predict call")
+        for k in leaks:
+            print("### Leak {}: {}\n".format(k, str(type(leaks[k]))))
+        return 1
+    else:
+        print("### PASSED: Memory leak test")
+        if os.path.isfile("gc.txt"):
+            os.remove("gc.txt")
+
+
+def get_model_wrapper():
+
+    from model import model
+
+    class MyWrapper(model.ModelWrapper):
+        def __init__(self, input):
+            super(MyWrapper, self).__init__()
+            self.input = input
+            self.lag = None
+            self.sourceCallback = False
+            self.sinkCallback = False
+
+        def SourceCallback(self, buffer):
+            print("requesting input...")
+            buffer.copy_from(self.input.astype(np.float))
+            self.sourceCallback = True
+
+        def LagNotification(self, lag):
+            print("Predict is lagging by {}".format(lag))
+            self.lag = lag
+
+        def SinkCallback(self, buffer):
+            print("output callback happening...")
+            self.sinkCallback = True
+
+    from model import model
+    print("Input size={}".format(model.get_default_input_shape().Size()))
+
+    input = np.ones((model.get_default_input_shape().Size()))
+    return MyWrapper(input)
+
+
+def simple_test():
+    wrapper = get_model_wrapper()
+    return wrapper.Predict()
+
+
 def test_python(model_path, target_dir):
     target_dir = os.path.join(os.path.dirname(model_path), target_dir)
 
@@ -148,29 +218,9 @@ def test_python(model_path, target_dir):
     sys.path += [target_dir]
 
     from model import model
-
-    class MyWrapper(model.ModelWrapper):
-        def __init__(self, input):
-            super(MyWrapper, self).__init__()
-            self.input = input
-            self.lag = None
-
-        def SourceCallback(self, buffer):
-            print("requesting input...")
-            buffer.copy_from(self.input.astype(np.float))
-
-        def LagNotification(self, lag):
-            print("Predict is lagging by {}".format(lag))
-            self.lag = lag
-
-        def SinkCallback(self, buffer):
-            print("output callback happening...")
-
     print("Input size={}".format(model.get_default_input_shape().Size()))
 
-    input = np.ones((model.get_default_input_shape().Size()))
-
-    wrapper = MyWrapper(input)
+    wrapper = get_model_wrapper()
     output = wrapper.Predict()
     time.sleep(1)  # this should cause the lag notification.
     output = wrapper.Predict()
@@ -183,6 +233,16 @@ def test_python(model_path, target_dir):
         return 1
     else:
         print("### PASSED wrap_test: test_python")
+
+    # make sure callbacks happened
+    if not wrapper.sinkCallback:
+        print("### FAILED SinkCallback never happened")
+        return 1
+
+    # make sure callbacks happened
+    if not wrapper.sourceCallback:
+        print("### FAILED SourceCallback never happened")
+        return 1
 
     # make sure lag notification was called.
     if wrapper.lag is None:
@@ -201,21 +261,7 @@ def test_python(model_path, target_dir):
         print("### FAILED wrap_test python failed to call helper methods")
         return 1
 
-    # make sure we don't leak.
-    before = 0
-    after = 0
-    output = None
-    gc.collect()
-    before = len(gc.get_objects())
-    output = wrapper.Predict()
-    output = None
-    gc.collect()
-    after = len(gc.get_objects())
-
-    if before != after:
-        print("### FAILED wrap_test python detected a memory leak in our predict call, before# {}, after# {}"
-              .format(before, after))
-        return 1
+    memory_test(simple_test)
 
     return 0
 
