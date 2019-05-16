@@ -14,10 +14,13 @@
 #include "SliceNode.h"
 #include "SpliceNode.h"
 
+#include <utilities/include/Logger.h>
 #include <utilities/include/StringUtil.h>
 
 #include <algorithm>
 #include <unordered_map>
+
+using namespace ell::logging;
 
 namespace ell
 {
@@ -81,7 +84,47 @@ namespace model
                 }
             });
         }
+
+        void LogInputPortParents(InputPortBase* port)
+        {
+            auto parentNodes = port->GetParentNodes();
+            if (!parentNodes.empty())
+            {
+                for (auto parentNodesIt = parentNodes.begin(); parentNodesIt != parentNodes.end() - 1; ++parentNodesIt)
+                {
+                    Log() << (*parentNodesIt)->GetId().ToString() << ", ";
+                }
+                Log() << parentNodes.back()->GetId().ToString();
+            }
+        }
     } // namespace
+
+    namespace detail
+    {
+        void LogNewNode(Node* node)
+        {
+            if (ShouldLog())
+            {
+                const auto& inputPorts = node->GetInputPorts();
+
+                Log() << "Added node " << node->GetRuntimeTypeName() << " [id = " << node->GetId().ToString() << "] with " << inputPorts.size() << " inputs";
+                if (!inputPorts.empty())
+                {
+                    Log() << " from ";
+                    for (auto inputPortIt = inputPorts.begin(); inputPortIt != inputPorts.end() - 1; ++inputPortIt)
+                    {
+                        Log() << "{ ";
+                        LogInputPortParents(*inputPortIt);
+                        Log() << " }, ";
+                    }
+                    Log() << "{ ";
+                    LogInputPortParents(inputPorts.back());
+                    Log() << " }";
+                }
+                Log() << EOL;
+            }
+        }
+    } // namespace detail
 
     //
     // Model

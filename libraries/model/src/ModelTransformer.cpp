@@ -14,8 +14,11 @@
 
 #include <utilities/include/Exception.h>
 #include <utilities/include/StringUtil.h>
+#include <utilities/include/Logger.h>
 
 #include <algorithm>
+
+using namespace ell::logging;
 
 namespace ell
 {
@@ -585,6 +588,8 @@ namespace model
         auto action = GetContext().GetNodeAction(node);
         if (action == NodeAction::refine || action == NodeAction::abstain)
         {
+            Log() << "Attempting to refine " << node.GetRuntimeTypeName() << " [id = " << node.GetId().ToString() << "]" << EOL;
+
             auto didRefineNode = node.Refine(*this);
             AssignNodeAncestor(node);
             return didRefineNode;

@@ -124,15 +124,15 @@ namespace model
 
         /// <summary> Explicit method to create a shallow copy of the model. </summary>
         ///
-        /// <returns> 
-        /// A shallow copy of the model, containing the same nodes as the original. Any 
+        /// <returns>
+        /// A shallow copy of the model, containing the same nodes as the original. Any
         /// changes to the original model will be reflected in the copy, and vice-versa.
         /// </returns>
         Model ShallowCopy() const;
 
         /// <summary> Explicit method to create a deep copy of the model. </summary>
         ///
-        /// <returns> 
+        /// <returns>
         /// A deep copy of the model. This is an entirely different model, constructed by
         /// cloning each of the nodes in the original model. Any changes made in the original
         /// model won't affect the copy (and vice-versa).
@@ -512,6 +512,8 @@ namespace model
                     std::integral_constant<bool, shouldUseInitList>{});
             }
         };
+
+        void LogNewNode(Node* node);
     } // namespace detail
 
     //
@@ -522,6 +524,9 @@ namespace model
     {
         auto node = std::make_unique<NodeType>(detail::ModelNodeRouter::ConvertPortElementsArg(*this, std::forward<Args>(args))...);
         auto result = node.get();
+
+        detail::LogNewNode(result);
+
         AddExistingNode(std::move(node));
         return result;
     }
