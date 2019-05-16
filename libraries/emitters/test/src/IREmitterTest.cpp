@@ -22,8 +22,6 @@
 #include <utilities/include/Unused.h>
 #include <utilities/include/StringUtil.h>
 
-#include <llvm/IR/TypeBuilder.h>
-
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -91,7 +89,12 @@ void DebugPrint(char* message)
 
 LLVMFunction DeclareDebugPrint(IRModuleEmitter& module)
 {
-    llvm::FunctionType* type = llvm::TypeBuilder<int(char*), false>::get(module.GetIREmitter().GetContext());
+    auto& context = module.GetIREmitter().GetContext();
+    auto type = llvm::FunctionType::get(
+        llvm::Type::getInt32Ty(context),
+        { llvm::Type::getInt8PtrTy(context) },
+        false
+    );
     return module.DeclareFunction("DebugPrint", type);
 }
 

@@ -64,7 +64,7 @@ namespace model
     {
         if (!_executionEngine)
         {
-            auto moduleClone = std::unique_ptr<llvm::Module>(llvm::CloneModule(_module.GetLLVMModule()));
+            auto moduleClone = std::unique_ptr<llvm::Module>(llvm::CloneModule(*_module.GetLLVMModule()));
             _executionEngine = std::make_unique<emitters::IRExecutionEngine>(std::move(moduleClone), _verifyJittedModule);
         }
     }

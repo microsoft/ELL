@@ -182,7 +182,7 @@ namespace emitters
                 throw EmitterException(EmitterError::notSupported);
             }
 
-            if (targetMachine->addPassesToEmitFile(passManager, bufferedStream, fileType, ellOptions.verifyModule))
+            if (targetMachine->addPassesToEmitFile(passManager, bufferedStream, nullptr, fileType, ellOptions.verifyModule))
             {
                 throw EmitterException(EmitterError::unexpected, "target does not support generation of this file type!");
             }
@@ -196,7 +196,7 @@ namespace emitters
             switch (outputFormat)
             {
             case ModuleOutputFormat::bitcode:
-                llvm::WriteBitcodeToFile(&module, os);
+                llvm::WriteBitcodeToFile(module, os);
                 break;
             case ModuleOutputFormat::ir:
                 module.print(os, nullptr);

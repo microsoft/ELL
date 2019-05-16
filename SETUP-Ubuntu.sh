@@ -20,9 +20,14 @@ if ! grep -q "^deb .*ubuntu-toolchain-r/test" /etc/apt/sources.list /etc/apt/sou
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 fi
 
+echo === Adding LLVM 8 package repositories ===
+sudo sh -c 'echo deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main >> /etc/apt/sources.list'
+sudo sh -c 'echo deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main >> /etc/apt/sources.list'
+wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+
 echo === Update packages ===
 sudo apt-get update -y
-sudo apt-get install -y gcc-8 g++-8 cmake libedit-dev zlibc zlib1g zlib1g-dev libopenblas-dev doxygen llvm-6.0-dev curl make portaudio19-dev
+sudo apt-get install -y gcc-8 g++-8 cmake libedit-dev zlibc zlib1g zlib1g-dev libopenblas-dev doxygen llvm-8 curl make portaudio19-dev
 
 set +e
 cmake_ver=$(cmake --version 2>&1 | head -n1 | cut -d ' ' -f3 | awk '{print $NF}')

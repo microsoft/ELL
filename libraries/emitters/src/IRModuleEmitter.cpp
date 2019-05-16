@@ -23,7 +23,7 @@
 #include <llvm/ADT/Triple.h>
 #include <llvm/AsmParser/Parser.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
-#include <llvm/IR/TypeBuilder.h>
+#include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
@@ -798,7 +798,7 @@ namespace emitters
     {
         llvm::MemoryBufferRef buffer(text, "<string>"); // See Parser.cpp in LLVM code base for why...
         llvm::SMDiagnostic errorHandler;
-        bool hadError = llvm::parseAssemblyInto(buffer, *GetLLVMModule(), errorHandler);
+        bool hadError = llvm::parseAssemblyInto(buffer, GetLLVMModule(), nullptr, errorHandler);
         if (hadError)
         {
             std::string message = errorHandler.getMessage(); //IRLoader::ErrorToString(errorHandler);
@@ -836,7 +836,12 @@ namespace emitters
 
     void IRModuleEmitter::DeclarePrintf()
     {
-        llvm::FunctionType* type = llvm::TypeBuilder<int(char*, ...), false>::get(_emitter.GetContext());
+        auto& context = _emitter.GetContext();
+        auto type = llvm::FunctionType::get(
+            llvm::Type::getInt32Ty(context),
+            {
+                llvm::Type::getInt8PtrTy(context)
+            }, true);
         DeclareFunction("printf", type);
     }
 

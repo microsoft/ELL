@@ -201,13 +201,13 @@ namespace emitters
     llvm::Constant* IREmitter::Literal(const std::vector<int8_t>& value)
     {
         return llvm::ConstantDataArray::get(_llvmContext,
-                                            { reinterpret_cast<const uint8_t*>(value.data()), value.size() });
+                                            llvm::makeArrayRef(reinterpret_cast<const uint8_t*>(value.data()), value.size()));
     }
 
     llvm::Constant* IREmitter::Literal(const std::vector<char>& value)
     {
         return llvm::ConstantDataArray::get(_llvmContext,
-                                            { reinterpret_cast<const uint8_t*>(value.data()), value.size() });
+                                            llvm::makeArrayRef(reinterpret_cast<const uint8_t*>(value.data()), value.size()));
     }
 
     llvm::Constant* IREmitter::Literal(const std::vector<float>& value)
@@ -223,19 +223,19 @@ namespace emitters
     llvm::Constant* IREmitter::Literal(const std::vector<int16_t>& value)
     {
         return llvm::ConstantDataArray::get(_llvmContext,
-                                            { reinterpret_cast<const uint16_t*>(value.data()), value.size() });
+                                            llvm::makeArrayRef(reinterpret_cast<const uint16_t*>(value.data()), value.size()));
     }
 
     llvm::Constant* IREmitter::Literal(const std::vector<int>& value)
     {
         return llvm::ConstantDataArray::get(_llvmContext,
-                                            { reinterpret_cast<const uint32_t*>(value.data()), value.size() });
+                                            llvm::makeArrayRef(reinterpret_cast<const uint32_t*>(value.data()), value.size()));
     }
 
     llvm::Constant* IREmitter::Literal(const std::vector<int64_t>& value)
     {
         return llvm::ConstantDataArray::get(_llvmContext,
-                                            { reinterpret_cast<const uint64_t*>(value.data()), value.size() });
+                                            llvm::makeArrayRef(reinterpret_cast<const uint64_t*>(value.data()), value.size()));
     }
 
     LLVMValue IREmitter::Literal(const std::string& name, const std::string& value)
@@ -880,7 +880,7 @@ namespace emitters
         assert(pSource != nullptr);
         assert(pDestination != nullptr);
         assert(pCountBytes != nullptr);
-        return _irBuilder.CreateMemMove(pDestination, pSource, pCountBytes, 0);
+        return _irBuilder.CreateMemMove(pDestination, 0, pSource, 0, pCountBytes);
     }
 
     llvm::CallInst* IREmitter::MemoryCopy(LLVMValue pSource, LLVMValue pDestination, LLVMValue pCountBytes)
@@ -888,7 +888,7 @@ namespace emitters
         assert(pSource != nullptr);
         assert(pDestination != nullptr);
         assert(pCountBytes != nullptr);
-        return _irBuilder.CreateMemCpy(pDestination, pSource, pCountBytes, 0);
+        return _irBuilder.CreateMemCpy(pDestination, 0, pSource, 0, pCountBytes);
     }
 
     llvm::CallInst* IREmitter::MemorySet(LLVMValue pDestination, LLVMValue value, LLVMValue size)

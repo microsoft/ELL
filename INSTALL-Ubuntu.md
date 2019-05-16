@@ -1,6 +1,6 @@
 # Building the Embedded Learning Library (ELL) on Ubuntu Linux
 
-ELL enables you to design and deploy intelligent machine-learned models onto single-board computers, like Raspberry Pi and Arduino. Most of your interaction with ELL occurs on a laptop or desktop computer, rather than the single-board machine itself. The steps below describe how to build ELL on a laptop or desktop running Ubuntu Linux. Note, following instructions are only for Xenial (16.04). You can also use `SETUP-Unbuntu.sh` to setup your computer.
+ELL enables you to design and deploy intelligent machine-learned models onto single-board computers, like Raspberry Pi and Arduino. Most of your interaction with ELL occurs on a laptop or desktop computer, rather than the single-board machine itself. The steps below describe how to build ELL on a laptop or desktop running Ubuntu Linux. Note, following instructions are only for Bionic Beaver (18.04). You can also use `SETUP-Ubuntu.sh` to setup your computer.
 
 ## Cloning the ELL repository
 
@@ -50,15 +50,19 @@ To install all of the above, type
 sudo apt-get install -y gcc-8 g++-8 cmake libedit-dev zlibc zlib1g zlib1g-dev make
 sudo apt-get install -y libopenblas-dev doxygen
 ```
-### LLVM 6.0
+### LLVM 8.0
 
-ELL depends on the [*LLVM*](http://llvm.org/) compiler framework, version 6.0-dev. To install it use this command
+ELL depends on the [*LLVM*](http://llvm.org/) compiler framework, version 8.0. To install it use this command
 
 ```shell
-sudo apt-get install -y llvm-6.0-dev
+sudo sh -c 'echo deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main >> /etc/apt/sources.list'
+sudo sh -c 'echo deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main >> /etc/apt/sources.list'
+wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install llvm-8 -y
 ```
 
-This works on Ubuntu 16.04 Xenial.  If you have some other Linux version and `llvm-6.0-dev` is not available then
+This works on Ubuntu 18.04 Bionic Beaver.  If you have some other Linux version then
 [*LLVM*](http://llvm.org/) has more instructions on how to install it manually.
 
 ### curl

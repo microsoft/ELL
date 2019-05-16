@@ -32,16 +32,16 @@ brew update
 
 ### LLVM and Clang
 
-ELL depends on the [*LLVM*](http://llvm.org/) compiler framework, version 6.0.  `Clang` is a C++ compiler built on top of LLVM, and it is the best choice for building ELL. To download and install LLVM and Clang, type
+ELL depends on the [*LLVM*](http://llvm.org/) compiler framework, version 8.0.  `Clang` is a C++ compiler built on top of LLVM, and it is the best choice for building ELL. To download and install LLVM and Clang, type
 
 ```shell
-brew install llvm@6
+brew install llvm@8
 ```
 
 Alternatively, if you have already have *Xcode* installed and prefer to use the version of *Clang* included with it, you must still install LLVM and make sure that the command-line version of the *Xcode* tools are available.
 
 ```shell
-brew install llvm@6
+brew install llvm@8
 xcode-select --install
 ```
 

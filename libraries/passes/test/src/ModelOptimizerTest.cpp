@@ -6,8 +6,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// #include "ModelTestUtilities.h"
-
 #include <model/include/IRMapCompiler.h>
 #include <model/include/InputNode.h>
 #include <model/include/Map.h>

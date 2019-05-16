@@ -22,8 +22,6 @@
 
 #include <testing/include/testing.h>
 
-#include <llvm/IR/TypeBuilder.h>
-
 #include <functional>
 #include <iostream>
 #include <type_traits>
@@ -88,13 +86,23 @@ ell::emitters::LLVMFunction printDoublesFunction;
 
 void DeclarDebugPrintFunctions(ell::emitters::IRModuleEmitter& module)
 {
-    llvm::FunctionType* type = llvm::TypeBuilder<int(char*), false>::get(module.GetIREmitter().GetContext());
+    auto& context = module.GetIREmitter().GetContext();
+    auto type = llvm::FunctionType::get(
+        llvm::Type::getInt32Ty(context),
+        { llvm::Type::getInt8PtrTy(context) },
+        false);
     printFunction = module.DeclareFunction("DebugPrint", type);
 
-    llvm::FunctionType* type2 = llvm::TypeBuilder<int(float*, int*), false>::get(module.GetIREmitter().GetContext());
+    auto type2 = llvm::FunctionType::get(
+        llvm::Type::getInt32Ty(context),
+        { llvm::Type::getFloatPtrTy(context), llvm::Type::getInt32PtrTy(context) },
+        false);
     printFloatsFunction = module.DeclareFunction("DebugPrintFloats", type2);
 
-    llvm::FunctionType* type3 = llvm::TypeBuilder<int(double*, int*), false>::get(module.GetIREmitter().GetContext());
+    auto type3 = llvm::FunctionType::get(
+        llvm::Type::getInt32Ty(context),
+        { llvm::Type::getDoublePtrTy(context), llvm::Type::getInt32PtrTy(context) },
+        false);
     printDoublesFunction = module.DeclareFunction("DebugPrintDoubles", type3);
 }
 

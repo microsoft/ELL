@@ -498,8 +498,8 @@ void TestCompilableUnaryOperationNode()
             std::vector<std::vector<double>> signal = { { 1, -2, 3 }, { 4, -5, 6 }, { 7, 8, -9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
             if (opValue == UnaryOperationType::sqrt || opValue == UnaryOperationType::log)
             {
-                std::transform(signal.begin(), signal.end(), signal.begin(), [](auto vec) 
-				{ 
+                std::transform(signal.begin(), signal.end(), signal.begin(), [](auto vec)
+				{
 					std::transform(vec.begin(), vec.end(), vec.begin(), [](double value) { return std::abs(value); });
                     return vec;
 				});
@@ -1360,10 +1360,10 @@ void TestShapeFunctionGeneration()
     std::string result = buffer.str();
     std::cout << result << std::endl;
     // some minimal strings for testing, full verbose string comparison might be too fragile to future code gen changes.
-    auto inputFuncPos = result.find("define void @ELL_GetInputShape(i32 %index, %TensorShape* %shape");
-    auto inputFuncPos2 = result.find("define void @ELL_GetInputShape(i32 %index, %TensorShape* nocapture %shape");
-    auto outputFuncPos = result.find("define void @ELL_GetOutputShape(i32 %index, %TensorShape* %shape");
-    auto outputFuncPos2 = result.find("define void @ELL_GetOutputShape(i32 %index, %TensorShape* nocapture %shape");
+    auto inputFuncPos = result.find("define dso_local void @ELL_GetInputShape(i32 %index, %TensorShape* %shape");
+    auto inputFuncPos2 = result.find("define dso_local void @ELL_GetInputShape(i32 %index, %TensorShape* nocapture %shape");
+    auto outputFuncPos = result.find("define dso_local void @ELL_GetOutputShape(i32 %index, %TensorShape* %shape");
+    auto outputFuncPos2 = result.find("define dso_local void @ELL_GetOutputShape(i32 %index, %TensorShape* nocapture %shape");
     auto storePos = result.find("store i32 224, i32* %rows, align 4");
 
     auto hasInputFunc = inputFuncPos != npos || inputFuncPos2 != npos;
