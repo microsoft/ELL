@@ -182,7 +182,7 @@ public:
 
         // Return as a vector of floats
         // datastart and dataend give uchar* references to the data, cast to float* to get appropriate pixel values
-        return { reinterpret_cast<float*>(converted.datastart), reinterpret_cast<float*>(converted.dataend) };
+        return { reinterpret_cast<const float*>(converted.datastart), reinterpret_cast<const float*>(converted.dataend) };
     }
 
     // Returns the top N scores that exceed a given threshold. The result is a vector of std::pair,
