@@ -1,7 +1,8 @@
-## 2.5.2 *
+## 2.5.2
 - Moved to LLVM 8.0
 - Added Asparagus and Pear models to the gallery, removed Elderflower
 - Added support for image preprocessing metadata and image normalization defaults for pytorch + imagenet
+- Updated find_ell.py (and thus other python tools) to work if your working directory contains ELL's build output
 
 ## 2.5.1
 - Fixed API wrapper for PortMemoryLayout to produce correct extent
