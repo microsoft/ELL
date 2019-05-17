@@ -7,6 +7,7 @@ if(${PYTHON_ENABLED})
     set(module_name "pythonlibs-vision")
 
     set(lib_src
+        add_image_preprocessing_metadata.py
         demo.py
         demoHelper.py
         tiled_image.py)

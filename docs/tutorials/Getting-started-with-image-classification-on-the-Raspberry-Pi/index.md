@@ -139,11 +139,16 @@ Next, load the Python module representing the wrapped ELL model.
 import model
 ```
 
+Create a model wrapper to interact with the model
+```python
+model_wrapper = model.model.ModelWrapper()
+```
+
 Print the model's input and output shapes.
 
 ```python
-input_shape = model.get_default_input_shape()
-output_shape = model.get_default_output_shape()
+input_shape = model_wrapper.GetInputShape()
+output_shape = model_wrapper.GetOutputShape()
 
 print("Model input shape: [{0.rows}, {0.columns}, {0.channels}]".format(
     input_shape))
@@ -158,6 +163,11 @@ Model input shape: [224, 224, 3]
 Model output shape: [1, 1, 1000]
 ```
 
+Models may need specific preprocessing for particular datasets, get the preprocessing metadata for the model for use later.
+```python
+preprocessing_metadata = helpers.get_image_preprocessing_metadata(model_wrapper)
+```
+
 The input to the model is a 3-channel image of height 224 and width 224, which can also be represented as an array of size 224 * 224 * 3 = 150528. The shape of the output is 1 x 1 x 1000, which can be represented as an array of 1,000 elements. The model's **predict** method will receive the input array and return the output array.
 
 Choose an image file to send to the model. For example, use this [coffee mug image](/ELL/tutorials/shared/coffeemug.jpg). Use OpenCV to read the image.
@@ -170,16 +180,21 @@ The image stored in the `sample_image` variable cannot be sent to the model as-i
 
 ```python
 input_data = helpers.prepare_image_for_model(sample_image, input_shape.columns,
-                                             input_shape.rows)
+                                             input_shape.rows, preprocessing_metadata=preprocessing_metadata)
 ```
 
-Invoke the model by calling its **predict** method.
+Wrap the input_data numpy array in a FloatVector
+```python
+input_data = model.model.FloatVector(input_data) 
+```
+
+Invoke the model by calling its **Predict** method.
 
 ```python
-predictions = model.predict(input_data)
+predictions = model_wrapper.Predict(input_data)
 ```
 
-The `predict` method returns a `predictions` array with non-negative scores that sum to 1. Each element of this array corresponds to one of the 1000 image categories recognized by the model and represents the model's confidence that the image contains an object from that category. For example, recall that category 504 is **coffee mug** - the value of `predictions[504]` is the model's confidence that the image contains a coffee mug.
+The `Predict` method returns a `predictions` array with non-negative scores that sum to 1. Each element of this array corresponds to one of the 1000 image categories recognized by the model and represents the model's confidence that the image contains an object from that category. For example, recall that category 504 is **coffee mug** - the value of `predictions[504]` is the model's confidence that the image contains a coffee mug.
 
 Print the index of the highest confidence category.
 
@@ -266,10 +281,20 @@ The argument **0** in the function call above selects the default camera. If you
         categories = categories_file.read().splitlines()
 ```
 
+Create a model wrapper to interact with the model
+```python
+    model_wrapper = model.model.ModelWrapper()
+```
+
 The model expects its input in a certain shape. Get this shape and store it for use later on.
 
 ```python
-    input_shape = model.get_default_input_shape()
+    input_shape = model_wrapper.GetInputShape()
+```
+
+Models may need specific preprocessing for particular datasets, get the preprocessing metadata for the model for use later.
+```python
+    preprocessing_metadata = helpers.get_image_preprocessing_metadata(model_wrapper)
 ```
 
 Next, set up a loop that keeps going until OpenCV indicates it is done, which is when the user presses any key. At the start of each iteration, read an image from the camera.
@@ -283,16 +308,21 @@ As mentioned above, the image stored in the `image` variable cannot be sent to t
 
 ```python
         input_data = helpers.prepare_image_for_model(
-            image, input_shape.columns, input_shape.rows)
+            image, input_shape.columns, input_shape.rows, preprocessing_metadata=preprocessing_metadata)
 ```
 
-With the processed image input handy, call the **predict** method to invoke the model.
+Wrap the input_data numpy array in a FloatVector
+```python
+        input_data = model.model.FloatVector(input_data) 
+```
+
+With the processed image input handy, call the **Predict** method to invoke the model.
 
 ```python
-        predictions = model.predict(input_data)
+        predictions = model_wrapper.Predict(input_data)
 ```
 
-As before, the **predict** method fills the **predictions** array with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n`.
+As before, the **Predict** method fills the **predictions** array with the model output. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top 5 predicted categories by calling the helper function `get_top_n`.
 
 ```python
         top_5 = helpers.get_top_n(predictions, 5)

@@ -20,7 +20,8 @@ sys.path.append(os.path.join(script_path, 'build'))
 sys.path.append(os.path.join(script_path, 'build/Release'))
 
 
-def prepare_image_for_model(image, requiredWidth, requiredHeight, reorder_to_rgb=False, convert_to_float=True):
+def prepare_image_for_model(image, requiredWidth, requiredHeight, reorder_to_rgb=False, convert_to_float=True,
+                            preprocess_tag=None):
     """ Prepare an image for use with a model. Typically, this involves:
         - Resize and center crop to the required width and height while
         preserving the image's aspect ratio. Simple resize may result in a
@@ -45,6 +46,15 @@ def prepare_image_for_model(image, requiredWidth, requiredHeight, reorder_to_rgb
     cropped = image[rowStart:rowEnd, colStart:colEnd]
     # Resize to model's requirements
     resized = cv2.resize(cropped, (requiredHeight, requiredWidth))
+
+    # Handle preprocessing tags
+    if preprocess_tag == "normalize_for_imagenet":
+        imagenet_means = [0.406, 0.456, 0.485]
+        imagenet_std_dev = [0.229, 0.224, 0.225]
+        resized = resized / 255  # Scale pixels to (0, 1.0)
+        resized = resized - imagenet_means  # Re-center around imagenet mean
+        resized = resized / imagenet_std_dev  # Scale based on imagenet standard deviation
+
     # Re-order if needed
     if reorder_to_rgb:
         resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)

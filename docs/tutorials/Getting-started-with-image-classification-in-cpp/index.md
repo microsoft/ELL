@@ -177,6 +177,11 @@ The model expects its input in a certain shape. Get this shape and store it for 
     TensorShape inputShape = wrapper.GetInputShape();
 ```
 
+Models may need specific preprocessing for particular datasets, get the preprocessing tag for the model for use later on.
+```cpp
+    tutorialHelpers::ImagePreprocessingMetadata metadata = tutorialHelpers::GetImagePreprocessingMetadata(wrapper);
+```
+
 Allocate a vector to store the model's output.
 
 ```cpp
@@ -194,7 +199,7 @@ Next, set up a loop that keeps going until the user presses the ESC key. At the 
 The image stored in the **image** variable cannot be sent to the model as-is, because the model takes its input as a vector of **float** values. In addition, the model expects the input image to have a certain shape and a specific ordering of the color channels (in this case, Blue-Green-Red). Because preparing images for the model is a common operation, there is a helper function for it named **PrepareImageForModel**.
 
 ```cpp
-        auto input = tutorialHelpers::PrepareImageForModel(image, inputShape.columns, inputShape.rows);
+        auto input = tutorialHelpers::PrepareImageForModel(image, inputShape.columns, inputShape.rows, &metadata);
 ```
 
 With the processed image input handy, call the **Predict** method to invoke the model.

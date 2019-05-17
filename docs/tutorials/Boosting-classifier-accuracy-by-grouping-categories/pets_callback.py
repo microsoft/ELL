@@ -37,14 +37,14 @@ def prediction_index_in_set(prediction_index, category_set):
     return False
 
 
-class CatsDogsPredictor(model.Model):
+class CatsDogsPredictor(model.ModelWrapper):
     """Class that implements input and output callbacks for the ELL model
     by deriving from the Model base class.
     """
     def __init__(self, camera, cats, dogs):
         """Initializes this object with the camera source and model-related
         information"""
-        model.Model.__init__(self)
+        super(CatsDogsPredictor, self).__init__(self)
 
         self.camera = camera
         self.dogs = dogs
@@ -52,7 +52,10 @@ class CatsDogsPredictor(model.Model):
 
         # Get the model's input dimensions. We'll use this information later to
         # resize images appropriately.
-        self.input_shape = model.get_default_input_shape()
+        self.input_shape = self.GetInputShape()
+
+        # Get the model-specific preprocessing metadata
+        self.preprocessing_metadata = helpers.get_image_preprocessing_metadata(self)
 
         # Holds the image from the camera or other sources
         self.image = None
@@ -69,8 +72,8 @@ class CatsDogsPredictor(model.Model):
         # - reorders the image channels if needed
         # - returns the data as a ravelled numpy array of floats so it can be
         # handed to the model
-        return helpers.prepare_image_for_model(
-            self.image, self.input_shape.columns, self.input_shape.rows)
+        return model.model.FloatVector(helpers.prepare_image_for_model(
+            self.image, self.input_shape.columns, self.input_shape.rows, preprocessing_metadata=self.preprocessing_metadata))
 
     def output_callback(self, predictions):
         """The output callback that the model calls when predictions are ready"""
@@ -126,7 +129,7 @@ def main():
         # Run the predictor. The ELL model will call the input callback
         # to get an image, and call the output callback when predictions
         # are available
-        predictor.predict()
+        predictor.Predict()
 
 if __name__ == "__main__":
     main()

@@ -108,27 +108,43 @@ The argument **0** in the function call above selects the default camera. If you
         cats = cats_file.read().splitlines()
 ```
 
+Create a model wrapper to interact with the model
+```python
+    model_wrapper = model.model.ModelWrapper()
+```
+
 Get the model input shape, which we will use to prepare the input data.
 
 ```python
-    input_shape = model.get_default_input_shape()
+    input_shape = model_wrapper.GetInputShape()
+```
+
+Models may need specific preprocessing for particular datasets, get the preprocessing metadata for the model for use later.
+```python
+    preprocessing_metadata = helpers.get_image_preprocessing_metadata(model_wrapper)
 ```
 
 Declare a loop so that the camera can get an image and prepare it to be used as input to the model. The preparation of the image involves cropping and resizing the image while maintaining the aspect ratio,
-reordering the image channels (if needed), and returning the image data as a flat **NumPy** array of floats so that it can be provided as input to the model.
+reordering the image channels (if needed), and returning the image data as a flat **NumPy** array of floats.
 
 ```python
     while (cv2.waitKey(1) & 0xFF) == 0xFF:
         image = get_image_from_camera(camera)
 
         input_data = helpers.prepare_image_for_model(
-            image, input_shape.columns, input_shape.rows)
+            image, input_shape.columns, input_shape.rows, 
+            preprocessing_metadata=preprocessing_metadata)
 ```
 
-Send the processed image to the model to get a **NumPy** array of predictions.
+Wrap the input_data **NumPy** array in a FloatVector
+```python
+        input_data = model.model.FloatVector(input_data) 
+```
+
+Send the processed image to the model to get a vector of predictions.
 
 ```python
-        predictions = model.predict(input_data)
+        predictions = model_wrapper.Predict(input_data)
 ```
 
 Use the helper function to get the top prediction. The *threshold* parameter selects predictions with a 5% or higher confidence.
@@ -201,7 +217,7 @@ The `pets_callback.py` script from [here](/ELL/tutorials/Boosting-classifier-acc
 First, define a class called **CatsDogsPredictor** that extends the **model.Model** class.
 
 ```python
-class CatsDogsPredictor(model.Model):
+class CatsDogsPredictor(model.ModelWrapper):
     """Class that implements input and output callbacks for the ELL model
     by deriving from the Model base class.
     """
@@ -213,13 +229,16 @@ class CatsDogsPredictor(model.Model):
     def __init__(self, camera, cats, dogs):
         """Initializes this object with the camera source and model-related
         information"""
-        model.Model.__init__(self)
+        super(CatsDogsPredictor, self).__init__(self)
 
         self.camera = camera
         self.dogs = dogs
         self.cats = cats
 
-        self.input_shape = model.get_default_input_shape()
+        self.input_shape = self.GetInputShape()
+
+        self.preprocessing_metadata = helpers.get_image_preprocessing_metadata(self)
+
         self.image = None
 ```
 
@@ -230,8 +249,8 @@ class CatsDogsPredictor(model.Model):
         """The input callback that returns an image to the model"""
         self.image = get_image_from_camera(self.camera)
 
-        return helpers.prepare_image_for_model(
-            self.image, self.input_shape.columns, self.input_shape.rows)
+        return model.model.FloatVector(helpers.prepare_image_for_model(
+            self.image, self.input_shape.columns, self.input_shape.rows, preprocess_tag=self.preprocess_tag))
 ```
 
 **CatsDogsPredictor.output_callback** receives predictions from the ELL model and determines which group the top prediction belongs to. This prints *Woof!* and *Meow!* appropriately while showing the class *Dog* or *Cat* as the window header text. Alternatively, you can choose to play a sound by following the instructions in [Playing sounds](#playing-sounds)).
@@ -270,7 +289,7 @@ def main():
     predictor = CatsDogsPredictor(camera, cats, dogs)
 
     while (cv2.waitKey(1) & 0xFF) == 0xFF:
-        predictor.predict()
+        predictor.Predict()
 ```
 
 ## Troubleshooting

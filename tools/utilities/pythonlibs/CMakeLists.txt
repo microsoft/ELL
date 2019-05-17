@@ -7,6 +7,7 @@ if(${PYTHON_ENABLED})
     set(module_name "pythonlibs")
 
     set(lib_src
+        add_input_metadata.py
         buildtools.py
         cpuinfo.py
         dependency_installer.py

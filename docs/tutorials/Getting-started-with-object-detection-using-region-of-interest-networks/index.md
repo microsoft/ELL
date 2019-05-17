@@ -195,17 +195,27 @@ camera to use by changing this argument. Read the list of categories from
         categories = categories_file.read().splitlines()
 ```
 
+Create a model wrapper to interact with the model
+```python
+    model_wrapper = model.model.ModelWrapper()
+```
+
 Get the model input shape, which you will use to prepare the input data.
 
 ```python
-    input_shape = model.get_default_input_shape()
+    input_shape = model_wrapper.GetInputShape()
 ```
 
 Get the model output shape, which you will use to do post-processing after
 running the model.
 
 ```python
-    output_shape = model.get_default_output_shape()
+    output_shape = model_wrapper.GetOutputShape()
+```
+
+Models may need specific preprocessing for particular datasets, get the preprocessing metadata for the model for use later.
+```python
+    preprocessing_metadata = helpers.get_image_preprocessing_metadata(model_wrapper)
 ```
 
 Next, set up a loop that keeps going until OpenCV indicates it is done, which
@@ -225,13 +235,18 @@ that it can be provided as input to the model.
 ```python
         image, offset, scale = helpers.prepare_image_for_model(
             original, input_shape.columns, input_shape.rows, reorder_to_rgb=True,
-            ravel=False)
+            ravel=False, preprocessing_metadata=preprocessing_metadata)
 ```
 
-Send the processed image to the model to get a `numpy` array of predictions.
+Wrap the input_data `numpy` array in a FloatVector
+```python
+        input_data = model.model.FloatVector(input_data) 
+```
+
+Send the processed image to the model to get a vector of predictions.
 
 ```python
-        predictions = model.predict(image)
+        predictions = model_wrapper.Predict(image)
 ```
 
 Next, reshape the predictions so that it is no longer a flat array. The
@@ -250,7 +265,7 @@ The reshaped predictions can now be used to get a list of detected regions by
 calling `helpers.get_regions`. To get the correct values for the detected
 regions, the helper function applies sigmoid activation to the X and Y
 offset coordinates and exponentiates the width and height values returned from
-`model.predict`. It also applies softmax activation to the category
+`model_wrapper.Predict`. It also applies softmax activation to the category
 probabilities to identify the most likely classification of the detected
 object.
 

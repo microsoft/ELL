@@ -59,9 +59,15 @@ def main():
         dogs = dogs_file.read().splitlines()
         cats = cats_file.read().splitlines()
 
+    # Get the model wrapper in order to interact with the model
+    model_wrapper = model.model.ModelWrapper()
+
     # Get the model's input dimensions. We'll use this information later to
     # resize images appropriately.
-    input_shape = model.get_default_input_shape()
+    input_shape = model_wrapper.GetInputShape()
+
+    # Get the model-specific preprocessing metadata
+    preprocessing_metadata = helpers.get_image_preprocessing_metadata(model_wrapper)
 
     while (cv2.waitKey(1) & 0xFF) == 0xFF:
         # Get an image from the camera. If you'd like to use a different image,
@@ -74,13 +80,16 @@ def main():
         # - returns the data as a ravelled numpy array of floats so it can be
         # handed to the model
         input_data = helpers.prepare_image_for_model(
-            image, input_shape.columns, input_shape.rows)
+            image, input_shape.columns, input_shape.rows, preprocessing_metadata=preprocessing_metadata)
+
+        # Wrap the resulting numpy array in a FloatVector
+        input_data = model.model.FloatVector(input_data) 
 
         # Get the predicted classes using the model's predict function on the
         # image input data. The predictions are returned as a numpy array with the
         # probability that the image # contains the class represented by that
         # index.
-        predictions = model.predict(input_data)
+        predictions = model_wrapper.Predict(input_data)
 
         # Let's grab the value of the top prediction and its index, which
         # represents the top most confident match and the class or category it

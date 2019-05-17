@@ -40,11 +40,16 @@ def main():
         categories = categories_file.read().splitlines()
 
     # Define the models we'll be using
-    models = [model1.model1, model2.model2]
+    model_wrappers = [model1.model1.Model1Wrapper(), model2.model2.Model2Wrapper()]
+
+    model_modules = [model1.model1, model2.model2]
 
     # Get the models' input dimensions. We'll use this information later to
     # resize images appropriately.
-    input_shapes = [model.get_default_input_shape() for model in models]
+    input_shapes = [model_wrapper.GetInputShape() for model_wrapper in model_wrappers]
+
+    # Get the model-specific preprocessing metadata
+    preprocessing_metadata = [helpers.get_image_preprocessing_metadata(model_wrapper) for model_wrapper in model_wrappers]
 
     # Create an array to hold the models' output predictions
     prediction_arrays = [None, None]
@@ -54,7 +59,7 @@ def main():
     mean_time_to_predict = [0.0, 0.0]
 
     # Declare a tiled image used to compose our results
-    tiled_image = helpers.TiledImage(len(models))
+    tiled_image = helpers.TiledImage(len(model_wrappers))
 
     while (cv2.waitKey(1) & 0xFF) == 0xFF:
         # Get an image from the camera. If you'd like to use a different image,
@@ -63,11 +68,11 @@ def main():
 
         # Run through models in random order to get a fairer average of
         # evaluation time
-        model_indices = np.arange(len(models))
+        model_indices = np.arange(len(model_wrappers))
         np.random.shuffle(model_indices)
 
         for model_index in model_indices:
-            model = models[model_index]
+            model_wrapper = model_wrappers[model_index]
 
             # Prepare the image to pass to the model. This helper:
             # - crops and resizes the image maintaining proper aspect ratio
@@ -76,14 +81,17 @@ def main():
             # be handed to the model
             input_data = helpers.prepare_image_for_model(
                 image, input_shapes[model_index].columns,
-                input_shapes[model_index].rows)
+                input_shapes[model_index].rows, preprocessing_metadata=preprocessing_metadata[model_index])
+
+            # Wrap the resulting numpy array in a FloatVector
+            input_data = model_modules[model_index].FloatVector(input_data) 
 
             # Get the predicted classes using the model's predict function on
             # the image input data. The predictions are returned as a vector
             # with the probability that the image # contains the class
             # represented by that index.
             start = time.time()
-            prediction_arrays[model_index] = model.predict(input_data)
+            prediction_arrays[model_index] = model_wrapper.Predict(input_data)
             end = time.time()
 
             # Let's grab the value of the top 5 predictions and their index,

@@ -163,16 +163,26 @@ The argument **0** in the function call above selects the default camera. If you
         categories = categories_file.read().splitlines()
 ```
 
-Define an array to hold the models.
+Define a list to hold the model wrappers.
 
 ```python
-    models = [model1.model1, model2.model2]
+    model_wrappers = [model1.model1.Model1Wrapper(), model2.model2.Model2Wrapper()]
+```
+
+Define a list to hold the model module references
+```python
+    model_modules = [model1.model1, model2.model2]
 ```
 
 The models expect input in a certain shape. For each model, get this shape and store it for use later on.
 
 ```python
-    input_shapes = [model.get_default_input_shape() for model in models]
+    input_shapes = [model_wrapper.GetInputShape() for model_wrapper in model_wrappers]
+```
+
+Models may need specific preprocessing for particular datasets, get the preprocessing metadata for the models for use later.
+```python
+    preprocessing_metadata = [helpers.get_image_preprocessing_metadata(model_wrapper) for model_wrapper in model_wrappers]
 ```
 
 Define an array to hold each model's output.
@@ -184,7 +194,7 @@ Define an array to hold each model's output.
 Create a tiled image that will be used to display the two frames side-by-side. This function is provided by the helper module that you imported earlier.
 
 ```python
-    tiled_image = helpers.TiledImage(len(models))
+    tiled_image = helpers.TiledImage(len(model_wrappers))
 ```
 
 Next, set up a loop that keeps going until OpenCV indicates that it is done, which is when the user hits any key. At the start of every loop iteration, read an image from the camera.
@@ -197,28 +207,34 @@ Next, set up a loop that keeps going until OpenCV indicates that it is done, whi
 Iterate over the models. Randomize the order so that, on average, neither model has an advantage over the other.
 
 ```python
-        model_indices = np.arange(len(models))
+        model_indices = np.arange(len(model_wrappers))
         np.random.shuffle(model_indices)
 
         for model_index in model_indices:
-            model = models[model_index]
+            model_wrapper = model_wrappers[model_index]
 ```
 
-For each model, prepare the image as input to the model's **predict** function.
+For each model, prepare the image as input to the model wrapper's **Predict** function.
 
 ```python
             input_data = helpers.prepare_image_for_model(
                 image, input_shapes[model_index].columns,
-                input_shapes[model_index].rows)
+                input_shapes[model_index].rows,
+                preprocessing_metadata=preprocessing_metadata[model_index])
 ```
 
-With the processed image input handy, call the **predict** method to invoke the model.
+Wrap the resulting numpy array in a FloatVector
+```python
+            input_data = model_modules[model_index].FloatVector(input_data) 
+```
+
+With the processed image input handy, call the **Predict** method to invoke the model.
 
 ```python
-            prediction_arrays[model_index] = model.predict(input_data)
+            prediction_arrays[model_index] = model_wrapper.Predict(input_data)
 ```
 
-As before, the **predict** method stores an array of scores in `predictions_array[modelIndex]`. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top five predicted categories by calling the helper function `get_top_n`, selecting predictions with a 10% or higher confidence. A threshold of 10% will show more predictions from the binarized model for comparison purposes.
+As before, the **Predict** method stores an array of scores in `predictions_array[modelIndex]`. Each element of this array corresponds to one of the 1000 image classes recognized by the model. Extract the top five predicted categories by calling the helper function `get_top_n`, selecting predictions with a 10% or higher confidence. A threshold of 10% will show more predictions from the binarized model for comparison purposes.
 
 ```python
             top_5 = helpers.get_top_n(

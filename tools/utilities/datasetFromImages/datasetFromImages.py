@@ -166,7 +166,7 @@ def write_examples_to_dataset_file(example_list, categories, width, height, use_
 
                 # Write image data
                 resized = modelHelpers.prepare_image_for_model(image, width, height, not use_bgr_ordering,
-                                                               convert_to_float=False)
+                                                               convert_to_float=False, preprocess_tag=None)
                 dataset_file.write("\t")
                 resized.tofile(dataset_file, sep="\t", format="%s")
                 # Write label, source file as comment

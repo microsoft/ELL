@@ -43,8 +43,14 @@ def main():
     with open("categories.txt", "r") as categories_file:
         categories = categories_file.read().splitlines()
 
-    input_shape = model.get_default_input_shape()
-    output_shape = model.get_default_output_shape()
+    # Get the model wrapper in order to interact with the model
+    model_wrapper = model.model.ModelWrapper()
+
+    input_shape = model_wrapper.GetInputShape()
+    output_shape = model_wrapper.GetOutputShape()
+
+    # Get the model-specific preprocessing metadata
+    preprocessing_metadata = helpers.get_image_preprocessing_metadata(model_wrapper)
 
     while (cv2.waitKey(1) & 0xFF) != 27:
         # Get the image from the camera
@@ -56,11 +62,14 @@ def main():
         # reorder the image from BGR to RGB
         image, offset, scale = helpers.prepare_image_for_model(
             original, input_shape.columns, input_shape.rows, reorder_to_rgb=True,
-            ravel=False)
+            ravel=False, preprocessing_metadata=preprocessing_metadata)
+
+        # Wrap the resulting numpy array in a FloatVector
+        image = model.model.FloatVector(image) 
 
         # Get the predictions by running the model. `predictions` is returned
         # as a flat array
-        predictions = model.predict(image)
+        predictions = model_wrapper.Predict(image)
 
         # Reshape the output of the model into a tensor that matches the
         # expected shape

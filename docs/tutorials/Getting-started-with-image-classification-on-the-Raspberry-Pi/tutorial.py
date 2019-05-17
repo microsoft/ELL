@@ -38,9 +38,15 @@ def main():
     with open("categories.txt", "r") as categories_file:
         categories = categories_file.read().splitlines()
 
+    # Get the model wrapper in order to interact with the model
+    model_wrapper = model.model.ModelWrapper()
+
     # Get the model's input shape. We will use this information later to resize
     # images appropriately.
-    input_shape = model.get_default_input_shape()
+    input_shape = model_wrapper.GetInputShape()
+
+    # Get the model-specific preprocessing metadata
+    preprocessing_metadata = helpers.get_image_preprocessing_metadata(model_wrapper)
 
     # Declare a variable to hold the prediction times
     prediction_times = []
@@ -57,12 +63,15 @@ def main():
         #   channels to RGB.
         # - Convert the OpenCV result to a std::vector<float>
         input_data = helpers.prepare_image_for_model(
-            image, input_shape.columns, input_shape.rows)
+            image, input_shape.columns, input_shape.rows, preprocessing_metadata=preprocessing_metadata)
 
-        # Send the image to the compiled model and get the predictions numpy array
+        # Wrap the resulting numpy array in a FloatVector
+        input_data = model.model.FloatVector(input_data) 
+
+        # Send the image to the compiled model and get the predictions vector
         # with scores, measure how long it takes
         start = time.time()
-        predictions = model.predict(input_data)
+        predictions = model_wrapper.Predict(input_data)
         end = time.time()
 
         # Get the value of the top 5 predictions

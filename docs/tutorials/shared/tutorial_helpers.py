@@ -51,6 +51,29 @@ else:
     sys.path += [os.path.join(d, "build") for d in SEARCH_DIRS]
 
 
+class ImagePreprocessingMetadata:
+    red_key = "r"
+    green_key = "g"
+    blue_key = "b"
+    def __init__(self, color_channel_order_str=None, pixel_scale_range=None, channel_mean_dict=None, channel_std_dev_dict=None):
+        self.color_channel_order_str = color_channel_order_str
+        if pixel_scale_range:
+            try:
+                self.pixel_scale_range = [float(value) for value in pixel_scale_range]
+            except ValueError:
+                self.pixel_scale_range = None
+        if channel_mean_dict:
+            try:
+                self.channel_mean_dict = {key : float(channel_mean_dict[key]) for key in channel_mean_dict}
+            except ValueError:
+                self.channel_mean_dict = None
+        if channel_std_dev_dict:
+            try:
+                self.channel_std_dev_dict = {key : float(channel_std_dev_dict[key]) for key in channel_std_dev_dict}
+            except ValueError:
+                self.channel_std_dev_dict = None
+
+
 def sigmoid(x):
     "Returns sigmoid activation applied to the input"
     if x > 0:
@@ -72,15 +95,39 @@ def set_camera_resolution(camera, width, height):
     camera.set(4, height)
 
 
+def get_image_preprocessing_metadata(model_wrapper):
+    color_order = model_wrapper.GetMetadata("model.input.expectedColorChannelOrder")
+
+    pixel_scale_range = [model_wrapper.GetMetadata("model.input.expectedPixelRangeLow"),
+                         model_wrapper.GetMetadata("model.input.expectedPixelRangeHigh")]
+
+    channel_mean_dict = {
+        ImagePreprocessingMetadata.red_key: model_wrapper.GetMetadata("model.input.redChannelMean"),
+        ImagePreprocessingMetadata.green_key: model_wrapper.GetMetadata("model.input.greenChannelMean"),
+        ImagePreprocessingMetadata.blue_key: model_wrapper.GetMetadata("model.input.blueChannelMean")
+    }
+
+    channel_std_dev_dict = {
+        ImagePreprocessingMetadata.red_key: model_wrapper.GetMetadata("model.input.redChannelStdDev"),
+        ImagePreprocessingMetadata.green_key: model_wrapper.GetMetadata("model.input.greenChannelStdDev"),
+        ImagePreprocessingMetadata.blue_key: model_wrapper.GetMetadata("model.input.blueChannelStdDev")
+    }
+
+    return ImagePreprocessingMetadata(color_channel_order_str=color_order,
+                                      pixel_scale_range=pixel_scale_range,
+                                      channel_mean_dict=channel_mean_dict,
+                                      channel_std_dev_dict=channel_std_dev_dict)
+
+
 def prepare_image_for_model(
-        image, width, height, reorder_to_rgb=False, ravel=True):
+        image, width, height, reorder_to_rgb=False, ravel=True, preprocessing_metadata=None):
     """Prepare an image for use with a model. Typically, this involves:
         - Resize and center crop to the required width and height while
           preserving the image's aspect ratio.
           Simple resize may result in a stretched or squashed image which will
           affect the model's ability to classify images.
-        - OpenCV gives the image in BGR order, so we may need to re-order the
-          channels to RGB.
+        - Perform image preprocessing and channel reordering. OpenCV gives the
+          image in BGR order, so we may need to re-order the channels to RGB.
         - Optionally, convert the OpenCV result to a std::vector<float> for use
           with the ELL model.
     """
@@ -101,9 +148,40 @@ def prepare_image_for_model(
     # Resize to model's requirements
     resized = cv2.resize(cropped, (height, width))
 
-    # Re-order color channels if needed
     if reorder_to_rgb:
-        resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+        if preprocessing_metadata is None:
+            preprocessing_metadata = ImagePreprocessingMetadata()
+        preprocessing_metadata.color_channel_order_str = "rgb"
+
+    # Perform image preprocessing
+    if preprocessing_metadata:
+        color_order = [ImagePreprocessingMetadata.blue_key, ImagePreprocessingMetadata.green_key, ImagePreprocessingMetadata.red_key]
+        if preprocessing_metadata.color_channel_order_str == "bgr":
+            # OpenCV images are already in BGR order
+            pass
+        elif preprocessing_metadata.color_channel_order_str == "rgb":
+            resized = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+            color_order = [ImagePreprocessingMetadata.red_key, ImagePreprocessingMetadata.green_key, ImagePreprocessingMetadata.blue_key]
+
+        if preprocessing_metadata.pixel_scale_range:
+            # OpenCV pixel values are integers in [0, 255]
+            # To scale [0, 255] to [low, high]: low + (pixel / 255.0) * (high - low)
+            low = preprocessing_metadata.pixel_scale_range[0]
+            high = preprocessing_metadata.pixel_scale_range[1]
+            resized = resized / 255.0
+            resized = resized * (high - low)
+            resized = resized + low
+
+        if preprocessing_metadata.channel_mean_dict:
+            # Create a mean list in the correct color channel order after re-ordering
+            mean_list = np.array([preprocessing_metadata.channel_mean_dict[color_key] for color_key in color_order])
+            resized = resized - mean_list
+
+        if preprocessing_metadata.channel_std_dev_dict:
+            # Create a std dev list in the correct color channel order after re-ordering
+            std_dev_list = np.array([preprocessing_metadata.channel_std_dev_dict[color_key] for color_key in color_order])
+            resized = resized / std_dev_list
+
     if ravel:
         # Return as a vector of floats
         result = resized.astype(np.float).ravel()

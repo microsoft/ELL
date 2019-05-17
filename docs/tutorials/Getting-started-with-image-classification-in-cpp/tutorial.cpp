@@ -64,6 +64,9 @@ int main(int argc, char** argv)
     // Get the model's input shape. We will use this information later to resize images appropriately.
     TensorShape inputShape = wrapper.GetInputShape();
 
+    // Get the model's preprocessing metadata. We will use this information later to preprocess images
+    tutorialHelpers::ImagePreprocessingMetadata metadata = tutorialHelpers::GetImagePreprocessingMetadata(wrapper);
+
     // Create a vector to hold the model's output predictions
     std::vector<float> predictions(wrapper.GetOutputSize());
 
@@ -80,7 +83,7 @@ int main(int argc, char** argv)
         // - Resize and center-crop to the required width and height while preserving aspect ratio.
         // - OpenCV gives the image in BGR order. If needed, re-order the channels to RGB.
         // - Convert the OpenCV result to a std::vector<float>
-        auto input = tutorialHelpers::PrepareImageForModel(image, inputShape.columns, inputShape.rows);
+        auto input = tutorialHelpers::PrepareImageForModel(image, inputShape.columns, inputShape.rows, &metadata);
 
         // Send the image to the compiled model and fill the predictions vector with scores, measure how long it takes
         auto start = std::chrono::steady_clock::now();

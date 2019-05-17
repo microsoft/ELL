@@ -18,9 +18,15 @@ import tutorial_helpers as helpers
 # Load the wrapped model's Python module
 import model
 
+# Get the model wrapper in order to interact with the model
+model_wrapper = model.model.ModelWrapper()
+
 # Get the input and output shapes
-input_shape = model.get_default_input_shape()
-output_shape = model.get_default_output_shape()
+input_shape = model_wrapper.GetInputShape()
+output_shape = model_wrapper.GetOutputShape()
+
+# Get the model-specific preprocessing metadata
+preprocessing_metadata = helpers.get_image_preprocessing_metadata(model_wrapper)
 
 print("Model input shape: [{0.rows}, {0.columns}, {0.channels}]".format(
     input_shape))
@@ -32,7 +38,10 @@ sample_image = cv2.imread("coffeemug.jpg")
 
 # Prepare the image to send to the model
 input_data = helpers.prepare_image_for_model(sample_image, input_shape.columns,
-                                             input_shape.rows)
+                                             input_shape.rows, preprocessing_metadata=preprocessing_metadata)
+
+# Wrap the resulting numpy array in a FloatVector
+input_data = model.model.FloatVector(input_data) 
 
 # Send the input to the predict function and get the prediction result
 predictions = model.predict(input_data)
