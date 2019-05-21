@@ -286,7 +286,7 @@ class DriveTest:
         mpp = __import__("wrap")
         builder = mpp.ModuleBuilder()
         builder_args = ["--model_file", self.ell_model, "--target", self.target, "--outdir",
-                        self.output_dir, "--blas", str(self.blas)]
+                        self.output_dir, "--blas", str(self.blas), "--stats"]
         builder_args.append("--verbosity")
         builder_args.append(self.logger.getVerbosity())
         if self.profile:

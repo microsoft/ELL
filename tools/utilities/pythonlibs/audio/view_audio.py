@@ -276,7 +276,7 @@ class AudioDemo(Frame):
     def evaluate_classifier(self):
         """ run the classifier model on the current feature data and show the prediction, if any """
         if self.evaluate_classifier and self.classifier and self.classifier_feature_data is not None:
-            prediction, probability, label = self.classifier.predict(self.classifier_feature_data.ravel())
+            prediction, probability, label, _ = self.classifier.predict(self.classifier_feature_data.ravel())
             if prediction is not None:
                 percent = int(100 * probability)
                 if self.last_prediction != prediction or self.probability < probability:

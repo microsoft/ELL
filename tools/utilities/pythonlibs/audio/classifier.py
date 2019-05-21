@@ -86,9 +86,9 @@ class AudioClassifier:
             if self.categories and prediction < len(self.categories):
                 label = self.categories[prediction]
             if label not in self.ignore_list:
-                return (prediction, output[prediction], label)
+                return (prediction, output[prediction], label, output)
 
-        return (None, None, None)
+        return (None, None, None, None)
 
     def reset(self):
         self.model.reset()

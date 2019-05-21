@@ -40,7 +40,7 @@ class TriangularLR(optim.lr_scheduler._LRScheduler):
         it = self.last_epoch
         cycle = math.floor(1 + it / (2 * self.stepsize))
         x = abs(it / self.stepsize - 2 * cycle + 1)
-        decayed_range = (self.lr_max - self.lr_min) * self.gamma ** it
+        decayed_range = (self.lr_max - self.lr_min) * self.gamma ** (it / 3)
         lr = self.lr_min + decayed_range * x
         return [lr]
 
@@ -99,13 +99,14 @@ class KeywordSpotter(nn.Module):
         """ Compute the training accuracy of the results of a single mini-batch """
         batch_size = scores.shape[0]
         passed = 0
+        results = []
         for i in range(batch_size):
             expected = labels[i]
             actual = scores[i].argmax()
+            results += [int(actual)]
             if expected == actual:
                 passed += 1
-
-        return (float(passed) * 100.0 / float(batch_size), passed)
+        return (float(passed) * 100.0 / float(batch_size), passed, results)
 
     def fit(self, training_data, validation_data, options, device=None, detail=False):
         """
@@ -139,8 +140,8 @@ class KeywordSpotter(nn.Module):
             optimizer = optim.RMSprop(self.parameters(), lr=initial_rate, weight_decay=oo.weight_decay,
                                       eps=oo.eps, alpha=oo.alpha, momentum=oo.momentum, centered=oo.centered)
         elif options.optimizer == "Rprop":
-            optimizer = optim.RMSprop(self.parameters(), lr=initial_rate, etas=oo.etas,
-                                      step_sizes=oo.step_sizes)
+            optimizer = optim.Rprop(self.parameters(), lr=initial_rate, etas=oo.etas,
+                                    step_sizes=oo.step_sizes)
         elif options.optimizer == "SGD":
             optimizer = optim.SGD(self.parameters(), lr=initial_rate, weight_decay=oo.weight_decay,
                                   momentum=oo.momentum, dampening=oo.dampening)
@@ -153,31 +154,24 @@ class KeywordSpotter(nn.Module):
         lr_peaks = options.lr_peaks
         ticks = training_data.num_rows / batch_size  # iterations per epoch
         total_iterations = ticks * num_epochs
-        gamma_iterations = total_iterations
-        if lr_peaks > 1:
-            gamma_iterations /= lr_peaks
+        gamma = options.lr_gamma
 
         if not lr_min:
             lr_min = learning_rate
-        # compute the gamma for those schedulers that take a gamma such that the decay results
-        # in us reaching the desired minimum learning rate after the right number of iterations.
-        gamma = math.exp(math.log(lr_min / learning_rate) / gamma_iterations)
-
         scheduler = None
         if lr_scheduler == "TriangleLR":
-            steps = options.lr_peaks * 2 + 1
+            steps = lr_peaks * 2 + 1
             stepsize = num_epochs / steps
-            # we need a larger gamma so the decline is not so dramatic.
-            gamma_iterations = total_iterations * 1.25
-            gamma = math.exp(math.log(lr_min / learning_rate) / gamma_iterations)
             scheduler = TriangularLR(optimizer, stepsize * ticks, lr_min, learning_rate, gamma)
         elif lr_scheduler == "CosineAnnealingLR":
             # divide by odd number to finish on the minimum learning rate
-            cycles = options.lr_peaks * 2 + 1
+            cycles = lr_peaks * 2 + 1
             scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=total_iterations / cycles,
                                                              eta_min=lr_min)
         elif lr_scheduler == "ExponentialLR":
             scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma)
+        elif lr_scheduler == "StepLR":
+            scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=options.lr_step_size, gamma=gamma)
         elif lr_scheduler == "ExponentialResettingLR":
             reset = (num_epochs * ticks) / 3  # reset at the 1/3 mark.
             scheduler = ExponentialResettingLR(optimizer, gamma, reset)
@@ -244,7 +238,7 @@ class KeywordSpotter(nn.Module):
         print("Trained in {:.2f} seconds".format(end - start))
         return log
 
-    def evaluate(self, test_data, batch_size, device=None):
+    def evaluate(self, test_data, batch_size, device=None, outfile=None):
         """
         Evaluate the given test data and print the pass rate
         """
@@ -252,6 +246,7 @@ class KeywordSpotter(nn.Module):
         passed = 0
         total = 0
         self.zero_grad()
+        results = []
         with torch.no_grad():
             for i_batch, (audio, labels) in enumerate(test_data.get_data_loader(batch_size)):
                 batch_size = audio.shape[0]
@@ -262,8 +257,14 @@ class KeywordSpotter(nn.Module):
                 total += batch_size
                 self.init_hidden()
                 keyword_scores = self(audio)
-                last_accuracy, ok = self.batch_accuracy(keyword_scores, labels)
+                last_accuracy, ok, actual = self.batch_accuracy(keyword_scores, labels)
+                results += actual
                 passed += ok
+
+        if outfile:
+            print("Saving evaluation results in '{}'".format(outfile))
+            with open(outfile, "w") as f:
+                json.dump(results, f)
 
         return (passed, total, passed / total)
 
@@ -474,7 +475,7 @@ def train(config, evaluate_only=False, outdir=".", detail=False):
         os.makedirs(outdir)
 
     if not filename:
-        filename = os.path.join(outdir, "{}{}KeywordSpotter.pt".format(architecture, hidden_units))
+        filename = "{}{}KeywordSpotter.pt".format(architecture, hidden_units)
         config.model.filename = filename
 
     # load the featurized data
@@ -538,7 +539,7 @@ def train(config, evaluate_only=False, outdir=".", detail=False):
         passed, total, rate = model.evaluate(training_data, batch_size, device)
         print("Training accuracy = {:.3f} %".format(rate * 100))
 
-        torch.save(model.state_dict(), filename)
+        torch.save(model.state_dict(), os.path.join(outdir, filename))
 
     print("Evaluating {} keyword spotter using {} rows of featurized test audio...".format(
           architecture, test_data.num_rows))
@@ -550,29 +551,31 @@ def train(config, evaluate_only=False, outdir=".", detail=False):
         if model and device.type == 'cuda':
             model.cuda()  # move the processing to GPU
 
-    passed, total, rate = model.evaluate(test_data, batch_size, device)
+    results_file = os.path.join(outdir, "results.txt")
+    passed, total, rate = model.evaluate(test_data, batch_size, device, results_file)
     print("Testing accuracy = {:.3f} %".format(rate * 100))
 
-    name = os.path.splitext(filename)[0] + ".onnx"
-    print("saving onnx file: {}".format(name))
-    model.export(name, device)
+    if not evaluate_only:
+        name = os.path.splitext(filename)[0] + ".onnx"
+        print("saving onnx file: {}".format(name))
+        model.export(os.path.join(outdir, name), device)
 
-    config.dataset.sample_rate = test_data.sample_rate
-    config.dataset.input_size = test_data.audio_size
-    config.dataset.num_filters = test_data.input_size
-    config.dataset.window_size = test_data.window_size
-    config.dataset.shift = test_data.shift
+        config.dataset.sample_rate = test_data.sample_rate
+        config.dataset.input_size = test_data.audio_size
+        config.dataset.num_filters = test_data.input_size
+        config.dataset.window_size = test_data.window_size
+        config.dataset.shift = test_data.shift
 
-    logdata = {
-        "accuracy_val": rate,
-        "training_time": end - start,
-        "log": log
-    }
-    d = TrainingConfig.to_dict(config)
-    logdata.update(d)
+        logdata = {
+            "accuracy_val": rate,
+            "training_time": end - start,
+            "log": log
+        }
+        d = TrainingConfig.to_dict(config)
+        logdata.update(d)
 
-    logname = os.path.join(os.path.dirname(filename), "train_results.json")
-    save_json(logdata, logname)
+        logname = os.path.join(outdir, "train_results.json")
+        save_json(logdata, logname)
 
     return rate, log
 

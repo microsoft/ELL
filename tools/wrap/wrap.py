@@ -14,6 +14,7 @@ import json
 import logging
 import os
 import sys
+import time
 from shutil import copyfile
 
 __script_path = os.path.dirname(os.path.abspath(__file__))
@@ -145,6 +146,12 @@ If '0' or 'g', opt is not run (default '3')",
             "short": "dbg",
             "default": False,
             "help": "emit debug code"
+        },
+        "stats":
+        {
+            "short": "stats",
+            "default": False,
+            "help": "write compiler performance stats to 'wrap_stats.json' file"
         }
     }
 
@@ -232,7 +239,10 @@ The supported target platforms are:
             raise Exception("You have a python module named '{}', which will conflict with the --outdir of '{}'. \
 Please specify a different outdir.".format(self.output_dir + ".py", self.output_dir))
         self.profile = args.profile
+
         self.verbose = self.logger.getVerbose() or args.verbose
+        if args.verbose:
+            self.logger.setLevel(logging.INFO)
         self.llvm_format = args.llvm_format
         self.optimization_level = args.optimization_level
         self.no_opt_tool = args.no_opt_tool or self.optimization_level in ['0', 'g']
@@ -245,6 +255,8 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
         self.swig = self.language != "cpp"
         self.cpp_header = self.language == "cpp"
         self.compile_args = compile_args
+        self.stats = args.stats
+        self.times = {}
 
     def find_files(self):
         __script_path = os.path.dirname(os.path.abspath(__file__))
@@ -303,6 +315,18 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
             f.write(config_json)
             f.close()
 
+    def start_timer(self, name):
+        self.times[name] = time.time()
+
+    def stop_timer(self, name):
+        self.times[name] = time.time() - self.times[name]
+
+    def write_stats(self):
+        if self.stats:
+            filename = os.path.join(self.output_dir, "wrap_stats.json")
+            with open(filename, 'w') as f:
+                json.dump(self.times, f, indent=2)
+
     def run(self):
         self.build_root = find_ell.find_ell_build()
         self.ell_root = os.path.dirname(self.build_root)
@@ -310,6 +334,7 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
         self.find_files()
         self.copy_files(self.files, "")
         self.copy_files(self.includes, "include")
+        self.start_timer("compile")
         out_file = self.tools.compile(
             model_file=self.model_file,
             func_name=self.func_name,
@@ -328,13 +353,21 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
             header=self.cpp_header,
             objext="." + self.objext,
             extra_options=self.compile_args)
+        self.stop_timer("compile")
         if self.swig:
+            self.start_timer("swig")
             self.tools.swig(self.output_dir, self.model_file_base, self.language)
+            self.stop_timer("swig")
         if not self.no_opt_tool:
+            self.start_timer("opt")
             out_file = self.tools.opt(self.output_dir, out_file, self.optimization_level)
+            self.stop_timer("opt")
         if not self.no_llc_tool:
+            self.start_timer("llc")
             out_file = self.tools.llc(self.output_dir, out_file, self.target, self.optimization_level,
                                       "." + self.objext)
+            self.stop_timer("llc")
+        self.write_stats()
         self.create_cmake_file()
         if self.language == "python":
             self.create_module_init_file()

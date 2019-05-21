@@ -35,7 +35,7 @@ def get_prediction(reader, transform, predictor, categories):
             if feature_data is None:
                 break
             else:
-                prediction, probability, label = predictor.predict(feature_data)
+                prediction, probability, label, _ = predictor.predict(feature_data)
                 if probability is not None:
                     if not results or results[1] < probability:
                         results = (prediction, probability, label)
@@ -73,13 +73,18 @@ def test_keyword_spotter(featurizer_model, classifier_model, categories, wav_fil
         file_list = os.listdir(wav_files)
         file_list.sort()
         for filename in file_list:
-            reader = wav_reader.WavReader(sample_rate, CHANNELS, auto_scale)
-            path = os.path.join(wav_files, filename)
-            reader.open(path, transform.input_size, the_speaker)
-            result = get_prediction(reader, transform, predictor, categories)
-            results += [result]
-            if reset:
-                predictor.reset()
+            ext = os.path.splitext(filename)[1]
+            if ext != ".wav":
+                print("Skipping non-wav file: ", filename)
+            else:
+                reader = wav_reader.WavReader(sample_rate, CHANNELS, auto_scale)
+                path = os.path.join(wav_files, filename)
+                print("opening ", path)
+                reader.open(path, transform.input_size, the_speaker)
+                result = get_prediction(reader, transform, predictor, categories)
+                results += [result]
+                if reset:
+                    predictor.reset()
     else:
         reader = microphone.Microphone(True, True)
         reader.open(transform.input_size, sample_rate, CHANNELS)

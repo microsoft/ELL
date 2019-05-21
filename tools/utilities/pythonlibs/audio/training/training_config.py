@@ -43,6 +43,8 @@ class TrainingOptions:
         self.lr_scheduler = None
         self.lr_peaks = 1
         self.lr_min = 1e-5
+        self.lr_gamma = 1
+        self.lr_step_size = 1
         self.batch_size = 128
         self.optimizer = "RMSprop"
         self.optimizer_options = OptimizerOptions()

@@ -57,7 +57,7 @@ class CompiledModel:
 
     def transform(self, input):
         if self.state_size:
-            self.wrapper.Predict(self.get_vector(input), self.hidden_state, self.output, self.new_state)
+            self.output = self.wrapper.Predict(self.get_vector(input), self.hidden_state, self.new_state)
             self.hidden_state = self.module.FloatVector(self.new_state)  # copy new state back to hidden state
         else:
             self.output = self.wrapper.Predict(self.get_vector(input))

@@ -1,3 +1,8 @@
+## 2.5.4 *
+- Publish 13 new audio models trained using Azure ML
+- Add ONNX importer support for ConstantOfShape
+- Add a -mean option to audio test runs to output mean prediction score
+
 ## 2.5.3
 - Fixed build break in C++ tutorial on Windows
 

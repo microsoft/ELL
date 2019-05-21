@@ -22,7 +22,7 @@ def add_logging_args(arg_parser):
 
 
 class Log:
-    def __init__(self, verbosity, logfile, logmode, format):
+    def __init__(self, verbosity, logfile, logmode, format="%(message)s"):
         """ create new Log object.  See https://docs.python.org/3/library/logging.html#logrecord-attributes for
         information on possible format strings """
         logging.basicConfig(level=verbosity, format=format)
@@ -136,5 +136,5 @@ def setup(args=None, format="%(message)s"):
 def get():
     global _logger
     if _logger is None:
-        raise Exception("logger.setup(...) has not been called, please fix your main entry point")
+        _logger = setup(args=None, format="%(threadName)s [%(asctime)s] %(message)s")
     return _logger

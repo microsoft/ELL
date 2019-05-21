@@ -76,7 +76,7 @@ def make_training_list(wav_files, max_files_per_directory, bad_list=None):
 
     bad = []
     if bad_list:
-        if not os.path.isfile(bad_list):
+        if os.path.isfile(bad_list):
             bad_list = os.path.join(wav_files, bad_list)
             if not os.path.isfile(bad_list):
                 print("Bad list {} not found".format(bad_list))

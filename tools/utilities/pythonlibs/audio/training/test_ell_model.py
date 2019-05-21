@@ -11,6 +11,7 @@
 
 # evaluate accuracy of model against the given testing dataset.
 import argparse
+import json
 import os
 import sys
 import time
@@ -63,7 +64,7 @@ class AudioModelTester:
         self.reset = reset
         self.best_time = None
 
-    def get_prediction(self, name, transform, predictor):
+    def get_prediction(self, name, transform, predictor, prediction_algorithm="max"):
         """
         Get the best prediction from the the given transform using the given predictor.
         The transform represents a single test row or test file so we know already it represents
@@ -76,6 +77,8 @@ class AudioModelTester:
         label = None
         if self.reset:
             predictor.reset()
+        sum_prediction = None
+        count = 0
 
         while not eof:
             feature_data = transform.read()
@@ -83,7 +86,12 @@ class AudioModelTester:
                 eof = True
             else:
                 predictor.total_time = 0
-                _, probability, label = predictor.predict(feature_data)
+                _, probability, label, output = predictor.predict(feature_data)
+                if sum_prediction is None:
+                    sum_prediction = output
+                else:
+                    sum_prediction += output
+                count += 1
                 elapsed = predictor.total_time * 1000
                 if elapsed != 0:  # hmmm, sometimes python time.time() lies?
                     if self.best_time is None or elapsed < self.best_time:
@@ -93,6 +101,12 @@ class AudioModelTester:
                 if probability is not None and probability > best_probability:
                     best_probability = probability
                     best_prediction = label
+
+        if prediction_algorithm == "mean" and count > 0:
+            prediction = np.argmax(sum_prediction)
+            best_probability = sum_prediction[prediction] / count
+            if predictor.categories and prediction < len(predictor.categories):
+                best_prediction = predictor.categories[prediction]
 
         return (best_prediction, best_probability, label, elapsed)
 
@@ -119,7 +133,7 @@ class AudioModelTester:
         return prediction == expected
 
     def run_test(self, featurizer_model, classifier_model, list_file, max_tests, dataset, categories, sample_rate,
-                 auto_scale, output_file):
+                 auto_scale, output_file, algorithm="max", window_size=0):
         """
         Run the test using the given input models (featurizer and classifier) which may or may not be compiled.
         The test set is defined by a list_file or a dataset.  The list file lists .wav files which we will featurize
@@ -128,7 +142,9 @@ class AudioModelTester:
         audio sample rate in Hertz -- all input audio is resampled at this rate before featurization.
         """
         predictor = classifier.AudioClassifier(classifier_model, categories, THRESHOLD, SMOOTHING)
-        transform = featurizer.AudioTransform(featurizer_model, predictor.input_size)
+        if window_size == 0:
+            window_size = predictor.input_size
+        transform = featurizer.AudioTransform(featurizer_model, window_size)
 
         if not self.silent:
             self.logger.info("Evaluation with transform input size {}, output size {}".format(
@@ -139,7 +155,7 @@ class AudioModelTester:
         if transform.using_map != predictor.using_map:
             raise Exception("cannot mix .ell and compiled models")
 
-        failed_tests = []
+        results = []
 
         if list_file:
             with open(list_file, "r") as fp:
@@ -160,9 +176,9 @@ class AudioModelTester:
                 reader = wav_reader.WavReader(sample_rate, 1, auto_scale)
                 reader.open(wav_file, transform.input_size, None)
                 transform.open(reader)
-                prediction, confidence, _, elapsed = self.get_prediction(name, transform, predictor)
-                if not self.process_prediction(name, prediction, expected, confidence):
-                    failed_tests += [name]
+                prediction, confidence, _, elapsed = self.get_prediction(name, transform, predictor, algorithm)
+                self.process_prediction(name, prediction, expected, confidence)
+                results += [prediction]
                 if self.best_time is None or elapsed < self.best_time:
                     self.best_time = elapsed
 
@@ -196,9 +212,7 @@ class AudioModelTester:
 
         self.logger.info("Saving '{}'".format(output_file))
         with open(output_file, "w") as f:
-            for line in failed_tests:
-                f.write(line)
-                f.write('\n')
+            json.dump(results, f)
 
         self.logger.info("Test completed in {:.2f} seconds".format(seconds))
         self.logger.info("{} passed, {} failed, pass rate of {:.2f} %".format(
@@ -224,12 +238,16 @@ if __name__ == "__main__":
     parser.add_argument("--categories", "-cat", help="specify path to categories file", required=True)
     parser.add_argument("--sample_rate", "-s", help="specify audio sample rate (default 16000)", default=16000,
                         type=int)
+    parser.add_argument("--window_size", "-ws", help="specify classifier window size", default=0,
+                        type=int)
     parser.add_argument("--reset", "-r", help="do a GRU reset between each test file", action="store_true")
     parser.add_argument("--max_tests", type=int, help="maximum number of words chosen at random from each word list",
                         default=None)
     parser.add_argument("--auto_scale", help="Whether to auto-scale audio input to range [-1, 1] (default false).",
                         action='store_true')
-    parser.add_argument("--output", help="Name of text file to contain list of failed tests.", default="failed.txt")
+    parser.add_argument("--output", help="Name of text file to contain list of test results.", default="results.json")
+    parser.add_argument("--prediction_algorithm", "-pa", help="Specify prediction algorithm (max or mean).",
+                        default="max")
 
     logger.add_logging_args(parser)
     args = parser.parse_args()
@@ -247,4 +265,4 @@ if __name__ == "__main__":
 
     test = AudioModelTester(args.reset)
     test.run_test(args.featurizer, args.classifier, args.list_file, args.max_tests, args.dataset, args.categories,
-                  sample_rate, args.auto_scale, args.output)
+                  sample_rate, args.auto_scale, args.output, args.prediction_algorithm, args.window_size)
