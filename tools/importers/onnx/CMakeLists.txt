@@ -22,4 +22,5 @@ if(${PYTHON_ENABLED} AND ${ONNX})
     #copy libs
     copy_newer_files(${module_name} importer_lib "${CMAKE_CURRENT_BINARY_DIR}/lib/")
 
+    add_subdirectory(test)
 endif()  # PYTHON_ENABLED

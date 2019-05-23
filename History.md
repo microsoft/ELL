@@ -1,4 +1,5 @@
 ## 2.5.4 *
+- Add support for ONNX GlobalAveragePooling
 - Publish 13 new audio models trained using Azure ML
 - Add ONNX importer support for ConstantOfShape
 - Add a -mean option to audio test runs to output mean prediction score

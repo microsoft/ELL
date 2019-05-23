@@ -1386,6 +1386,7 @@ class ReceptiveFieldConverter(OnnxNodeConverter):
 
     def get_attributes(self, attrs: Attributes):
         attributes = {}
+        # bugbug: need to support auto_pad
         # bugbug: need to support rectangular kernel shape and strides
         if 'kernel_shape' in attrs:
             self.kernel_shape = attrs['kernel_shape']
@@ -1417,11 +1418,11 @@ class ReceptiveFieldConverter(OnnxNodeConverter):
         """
         node = self.node
 
-        k_row, k_col = self.kernel_shape, self.kernel_shape
+        k_row, k_col = 1, 1
         if isinstance(self.kernel_shape, list):
             k_row, k_col = self.kernel_shape[0], self.kernel_shape[1]
 
-        p_row, p_col = self.padding, self.padding
+        p_row, p_col = 0, 0
         if isinstance(self.padding, list):
             p_row, p_col = self.padding[0], self.padding[1]
 
@@ -1429,7 +1430,7 @@ class ReceptiveFieldConverter(OnnxNodeConverter):
         if isinstance(self.dilations, list):
              d_row, d_col = self.dilations[0], self.dilations[1]
 
-        s_row, s_col = self.strides, self.strides
+        s_row, s_col = 1, 1
         if isinstance(self.strides, list):
             s_row, s_col = self.strides[0], self.strides[1]
 
@@ -1457,6 +1458,7 @@ class OnnxMaxPoolingConverter(ReceptiveFieldConverter):
     def __init__(self, converter):
         super(OnnxMaxPoolingConverter, self).__init__(converter)
         self.op_type = "MaxPooling"
+        # bugbug: need to support auto_pad, ceil_mode
 
 
 class OnnxAveragePoolingConverter(ReceptiveFieldConverter):
@@ -1464,6 +1466,24 @@ class OnnxAveragePoolingConverter(ReceptiveFieldConverter):
         super(OnnxAveragePoolingConverter, self).__init__(converter)
         self.op_type = "AveragePooling"
 
+
+class OnnxGlobalAveragePoolConverter(OnnxAveragePoolingConverter):
+    def __init__(self, converter):
+        super(OnnxGlobalAveragePoolConverter, self).__init__(converter)
+        self.op_type = "AveragePooling"
+
+    def get_attributes(self, attrs: Attributes):
+        attributes = {}
+        # GlobalAveragePool consumes an input tensor X and applies average pooling across the values in the same channel.
+        # This is equivalent to AveragePool with kernel size equal to the spatial dimension of input tensor.
+        input_shapes = self.get_input_shapes()
+        shape = list(input_shapes[0][0])
+        shape.pop(0)  # remove channels
+        self.kernel_shape = shape
+        attributes['size'] = self.kernel_shape[0]  # bugbug: need to support non-rectangular kernels.
+        attributes['stride'] = 1
+        attributes['padding'] = 0
+        return attributes
 
 class OnnxConvolutionConverter(ReceptiveFieldConverter):
     def __init__(self, converter):
@@ -1524,7 +1544,7 @@ ONNX_OP_TYPE_TO_CONVERTER_MAP  = {
     "Flatten"                 : OnnxFlattenConverter,
     "Gather"                  : OnnxGatherConverter,
     "Gemm"                    : OnnxGemmConverter,
-    "GlobalAveragePool"       : OnnxMaxPoolingConverter,
+    "GlobalAveragePool"       : OnnxGlobalAveragePoolConverter,
     "Greater"                 : OnnxPassthroughConverter,
     "GRU"                     : OnnxGRUConverter,
     "HardSigmoid"             : OnnxHardSigmoidConverter,
@@ -1607,13 +1627,14 @@ class OnnxConverter:
             order = self.get_order(tensor.shape)
         return self.model.add_tensor(id, tensor, order)
 
-
     def load_model(self, path):
         """ Return a list of ONNX nodes """
-        self.model = common.importer.ImporterModel()
-
         graph = self._load_onnx(path)
+        return self.set_graph(graph)
+
+    def set_graph(self, graph):
         #self.nodes  = utils.ONNX(self.graph).parse_onnx_model()
+        self.model = common.importer.ImporterModel()
 
         input_tensors = {
             t.name: numpy_helper.to_array(t) for t in graph.initializer

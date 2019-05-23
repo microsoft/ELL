@@ -15,6 +15,8 @@ FloatTensor, \
 FloatVector, \
 FloatVectorVector, \
 HingeLoss, \
+Int8Vector, \
+IntVector, \
 LogLoss, \
 SquaredLoss, \
 TensorShape
