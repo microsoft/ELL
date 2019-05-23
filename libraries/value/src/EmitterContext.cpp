@@ -461,6 +461,12 @@ namespace value
         return *GetContext().Call(SqrtFunctionDeclaration, { v.GetValue() });
     }
 
+    Scalar Square(const Scalar x)
+    {
+        auto y = x.Copy();
+        return x * y;
+    }
+
     Vector Tanh(Vector v)
     {
         return *GetContext().Call(TanhFunctionDeclaration, { v.GetValue() });

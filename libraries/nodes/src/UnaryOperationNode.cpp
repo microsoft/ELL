@@ -99,7 +99,7 @@ namespace nodes
                         v = Sign(v);
                         break;
                     case UnaryOperationType::square:
-                        v = v * v;
+                        v = Square(v);
                         break;
                     case UnaryOperationType::log:
                         v = Log(v);

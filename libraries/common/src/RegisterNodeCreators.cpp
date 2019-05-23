@@ -125,6 +125,8 @@ namespace common
         builder.RegisterNodeCreator<nodes::TypeCastNode<int, double>, const model::PortElements<int>&>();
 
         builder.RegisterNodeCreator<nodes::UnaryOperationNode<bool>, const model::PortElements<bool>&, nodes::UnaryOperationType>();
+        builder.RegisterNodeCreator<nodes::UnaryOperationNode<int>, const model::PortElements<int>&, nodes::UnaryOperationType>();
+        builder.RegisterNodeCreator<nodes::UnaryOperationNode<float>, const model::PortElements<float>&, nodes::UnaryOperationType>();
         builder.RegisterNodeCreator<nodes::UnaryOperationNode<double>, const model::PortElements<double>&, nodes::UnaryOperationType>();
 
         builder.RegisterNodeCreator<nodes::ValueSelectorNode<bool>, const model::PortElements<bool>&, const model::PortElements<bool>&, const model::PortElements<bool>&>();

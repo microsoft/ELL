@@ -285,6 +285,9 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, bool>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::TypeCastNode<double, int64_t>>();
+
+        context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<bool>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::UnaryOperationNode<int>>();
     }
 
     void RegisterMapTypes(SerializationContext& context)

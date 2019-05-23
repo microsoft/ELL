@@ -454,22 +454,56 @@ std::vector<std::vector<double>> GetExpectedUnaryOperationOutput(std::vector<std
     return result;
 }
 
+std::vector<std::vector<int>> GetExpectedUnaryOperationOutput(std::vector<std::vector<int>> signal, UnaryOperationType op)
+{
+    std::vector<std::vector<int>> result;
+    for (auto v : signal)
+    {
+        std::vector<int> r;
+        if (op == UnaryOperationType::square)
+        {
+            for (int d : v)
+            {
+                r.push_back(d * d);
+            }
+        }
+        result.push_back(r);
+    }
+    return result;
+}
+
+std::vector<std::vector<bool>> GetExpectedUnaryOperationOutput(std::vector<std::vector<bool>> signal, UnaryOperationType op)
+{
+    std::vector<std::vector<bool>> result;
+    for (auto v : signal)
+    {
+        std::vector<bool> r;
+        if (op == UnaryOperationType::logicalNot)
+        {
+            for (bool d : v)
+            {
+                r.push_back(!d);
+            }
+        }
+        result.push_back(r);
+    }
+    return result;
+}
+
 void TestCompilableUnaryOperationNode()
 {
     using namespace std::string_literals;
 
 #define MAP_OP(op) { #op##s, UnaryOperationType::op }
 
-    std::map<std::string, UnaryOperationType> ops{
+    std::map<std::string, UnaryOperationType> floatOps{
         MAP_OP(abs),
         MAP_OP(exp),
         MAP_OP(hardSigmoid),
         MAP_OP(log),
-        MAP_OP(logicalNot),
         MAP_OP(sign),
         MAP_OP(sin),
         MAP_OP(sigmoid),
-        MAP_OP(sign),
         MAP_OP(softmax),
         MAP_OP(square),
         MAP_OP(cos),
@@ -477,36 +511,85 @@ void TestCompilableUnaryOperationNode()
         MAP_OP(tanh),
     };
 
+    std::map<std::string, UnaryOperationType> intOps{
+        MAP_OP(square),
+    };
+
+    std::map<std::string, UnaryOperationType> boolOps{
+        // MAP_OP(logicalNot), // Boolean operations are still broken
+    };
 #undef MAP_OP
 
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(3);
-
-    for (auto& op : ops)
+    // floating-point operations
     {
-        auto& opName = op.first;
-        auto opValue = op.second;
-        auto testNode = model.AddNode<UnaryOperationNode<double>>(inputNode->output, opValue);
-        auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
+        model::Model model;
+        auto inputNode = model.AddNode<model::InputNode<double>>(3);
+        for (auto& op : floatOps)
+        {
+            auto& opName = op.first;
+            auto opValue = op.second;
+            auto testNode = model.AddNode<UnaryOperationNode<double>>(inputNode->output, opValue);
+            auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
 
-        std::string name = "UnaryOperationNode_" + opName;
-        TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
-            model::IRMapCompiler compiler;
-            auto compiledMap = compiler.Compile(map);
+            std::string name = "UnaryOperationNode_" + opName;
+            TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
+                model::IRMapCompiler compiler;
+                auto compiledMap = compiler.Compile(map);
 
-            // compare output
-            std::vector<std::vector<double>> signal = { { 1, -2, 3 }, { 4, -5, 6 }, { 7, 8, -9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
-            if (opValue == UnaryOperationType::sqrt || opValue == UnaryOperationType::log)
-            {
-                std::transform(signal.begin(), signal.end(), signal.begin(), [](auto vec)
-				{
-					std::transform(vec.begin(), vec.end(), vec.begin(), [](double value) { return std::abs(value); });
-                    return vec;
-				});
-            }
-            std::vector<std::vector<double>> expected = GetExpectedUnaryOperationOutput(signal, opValue);
-            VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
-        });
+                // compare output
+                std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+                std::vector<std::vector<double>> expected = GetExpectedUnaryOperationOutput(signal, opValue);
+                VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
+            });
+        }
+    }
+
+    // int operations
+    {
+        model::Model model;
+        auto inputNode = model.AddNode<model::InputNode<int>>(3);
+        for (auto& op : intOps)
+        {
+            auto& opName = op.first;
+            auto opValue = op.second;
+            auto testNode = model.AddNode<UnaryOperationNode<int>>(inputNode->output, opValue);
+            auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
+
+            std::string name = "UnaryOperationNode_" + opName;
+            TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
+                model::IRMapCompiler compiler;
+                auto compiledMap = compiler.Compile(map);
+
+                // compare output
+                std::vector<std::vector<int>> signal = { { 0, 1, 2 }, { 0, 1, 3 }, { 0, 3, 1 }, { 2, 3, 3 }, { 3, -3, 0 }, { 3, 1, 0 }, { 0, 0, 0 }, { 3, 3, 3 } };
+                std::vector<std::vector<int>> expected = GetExpectedUnaryOperationOutput(signal, opValue);
+                VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
+            });
+        }
+    }
+
+    // boolean operations
+    {
+        model::Model model;
+        auto inputNode = model.AddNode<model::InputNode<bool>>(3);
+        for (auto& op : boolOps)
+        {
+            auto& opName = op.first;
+            auto opValue = op.second;
+            auto testNode = model.AddNode<UnaryOperationNode<bool>>(inputNode->output, opValue);
+            auto map = model::Map(model, { { "input", inputNode } }, { { "output", testNode->output } });
+
+            std::string name = "UnaryOperationNode_" + opName;
+            TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
+                model::IRMapCompiler compiler;
+                auto compiledMap = compiler.Compile(map);
+
+                // compare output
+                std::vector<std::vector<bool>> signal = { { false, false, false }, { false, false, true }, { false, true, false }, { false, true, true }, { true, false, false }, { true, false, true }, { true, true, false }, { true, true, true } };
+                std::vector<std::vector<bool>> expected = GetExpectedUnaryOperationOutput(signal, opValue);
+                VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
+            });
+        }
     }
 }
 

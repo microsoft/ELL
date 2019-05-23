@@ -481,6 +481,7 @@ namespace value
     Scalar Floor(Scalar s);
     Scalar Ceil(Scalar s);
     Scalar Sign(Scalar s);
+    Scalar Square(Scalar s);
     Scalar LogicalNot(Scalar v);
 
     Vector Abs(Vector v);
