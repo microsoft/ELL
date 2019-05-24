@@ -58,11 +58,10 @@ namespace utilities
         DimensionVector() = default;
         DimensionVector(const std::vector<int>& elements) :
             _data(elements.begin(), elements.end()) {}
-
         DimensionVector(const std::initializer_list<int>& elements) :
             _data(elements.begin(), elements.end()) {}
-
         DimensionVector(const std::vector<size_t>& elements);
+        DimensionVector(const std::initializer_list<size_t>& elements);
 
         std::vector<int> _data;
     };
@@ -138,6 +137,12 @@ namespace utilities
         MemoryShape(const std::vector<size_t>& shape) :
             DimensionVector(shape) {}
 
+        /// <summary> Constructor from a list of unsigned integers </summary>
+        ///
+        /// <param name="shape"> The size per dimension of the shape </param>
+        MemoryShape(const std::initializer_list<size_t>& shape) :
+            DimensionVector(shape) {}
+
         /// <summary> Get the total number of elements. </summary>
         int NumElements() const;
 
@@ -178,6 +183,12 @@ namespace utilities
         ///
         /// <param name="coordinates"> The coordinates </param>
         MemoryCoordinates(const std::vector<size_t>& coordinates) :
+            DimensionVector(coordinates) {}
+
+        /// <summary> Constructor from a list of unsigned integers </summary>
+        ///
+        /// <param name="coordinates"> The coordinates </param>
+        MemoryCoordinates(const std::initializer_list<size_t>& coordinates) :
             DimensionVector(coordinates) {}
 
         /// <summary> Gets the name of this type (for serialization). </summary>
@@ -377,6 +388,12 @@ namespace utilities
         /// <returns> The offset to the first active entry (from the beginning of memory) </returns>
         size_t GetFirstEntryOffset() const;
 
+        /// <summary> Gets the physical coordinates that point to the element at a given offset from the beginning of memory. </summary>
+        /// This is the inverse operation from GetEntryOffset.
+        /// This function doesn't do any bounds-checking on the output. If the layout includes padding, the coordinates may be negative
+        /// or outside the active memory bounds.
+        MemoryCoordinates GetPhysicalCoordinatesFromOffset(size_t index) const;
+
         /// <summary> Transforms the given logic coordinates into a physical set of indices for the current layout. </summary>
         MemoryCoordinates GetPhysicalCoordinates(const MemoryCoordinates& logicalCoordinates) const;
 
@@ -431,6 +448,12 @@ namespace utilities
         ///
         /// <returns> A `MemoryShape` object containing the offset to the active part of memory for that dimension. </returns>
         int GetLogicalDimensionOffset(size_t index) const;
+
+        /// <summary> Gets the physical coordinates that point to the element at a given offset from the beginning of memory. </summary>
+        /// This is the inverse operation from GetEntryOffset.
+        /// This function doesn't do any bounds-checking on the output. If the layout includes padding, the coordinates may be negative
+        /// or outside the active memory bounds.
+        MemoryCoordinates GetLogicalCoordinatesFromOffset(size_t index) const;
 
         /// <summary>
         /// Returns the cumulative increments in the logical coordinates for this layout. This is the distance in memory
@@ -586,6 +609,12 @@ namespace utilities
 
     /// <summary> Represents channel-major 3D tensor order </summary>
     constexpr std::array<int, 3> ChannelMajorTensorOrder{ 2, 0, 1 };
+
+    /// <summary> Writes a `DimensionOrder` to an output stream </summary>
+    std::ostream& operator<<(std::ostream& out, const utilities::DimensionOrder& order);
+
+    /// <summary> Writes a `MemoryCoordinates` to an output stream </summary>
+    std::ostream& operator<<(std::ostream& out, const utilities::MemoryCoordinates& order);
 
     /// <summary> Writes a `MemoryShape`'s dimensions to an output stream </summary>
     std::ostream& operator<<(std::ostream& out, const utilities::MemoryShape& shape);

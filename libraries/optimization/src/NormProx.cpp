@@ -18,15 +18,7 @@ namespace optimization
     void L1Prox(math::ColumnVectorReference<double> v, double beta)
     {
         auto transformation = [beta](double x) {
-            if (x < -beta)
-            {
-                return x + beta;
-            }
-            if (x > beta)
-            {
-                return x - beta;
-            }
-            return 0.0;
+            return x - std::copysign(std::min(beta, std::abs(x)), x);
         };
         v.Transform(transformation);
     }

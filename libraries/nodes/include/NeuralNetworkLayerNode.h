@@ -238,7 +238,7 @@ namespace nodes
         math::IntegerTriplet dataSizeArray = dataBufferSize;
         model::MemoryShape stride{ { static_cast<int>(dataSizeArray[0]), static_cast<int>(dataSizeArray[1]), static_cast<int>(dataSizeArray[2]) } };
         model::MemoryShape offset{ static_cast<int>(padding), static_cast<int>(padding), 0 };
-        model::MemoryShape size({});
+        model::MemoryShape size{};
         size.Resize(stride.NumDimensions());
         for (int dimensionIndex = 0; dimensionIndex < offset.NumDimensions(); ++dimensionIndex)
         {

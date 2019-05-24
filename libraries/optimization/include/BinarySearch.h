@@ -51,6 +51,9 @@ namespace optimization
         /// <summary> Returns an argument whose value is greater or equal to the target value. </summary>
         const Interval& GetCurrentSearchIntervalValues() const { return _searchIntervalValues; }
 
+        /// <summary> Returns the target value interval. </summary>
+        const Interval& GetTargetInterval() const { return _targetInterval; }
+
         /// <summary> Returns true if a point in the interval was found. </summary>
         bool IsSuccessful() const { return _isSuccessful; }
 

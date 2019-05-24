@@ -40,14 +40,14 @@ namespace utilities
         /// <param name="target"> The node on the target end the link. </param>
         /// <param name="label"> An optional link label. </param>
         /// <param name="category"> An optional category. </param>
-        GraphLink& GetOrCreateLink(GraphNode& source, GraphNode& target, const std::string& label, const std::string& category);
+        GraphLink& GetOrCreateLink(GraphNode& source, GraphNode& target, const std::string& label = "", const std::string& category = "");
 
         /// <summary> This method is how you find a node by it's id. </summary>
         /// <returns> The node with given id or nullptr if node is not defined in this graph. </returns>
         GraphNode* GetNode(const std::string& id);
 
         /// <summary> DGML graphs can also contain groups of nodes.  You build a group by adding links from this group node to it's children
-        /// with links that have the category 'contains'.</summary>
+        /// with links that have the category 'contains'. </summary>
         GraphNode& GetOrCreateGroup(const std::string& id, const std::string& label);
 
         /// <summary> Serialize the graph in DOT Language format. </summary>
@@ -77,14 +77,15 @@ namespace utilities
     private:
         friend class Graph;
         friend class GraphLink;
-        /// <summary> Create a new GraphNode - see Graph::GetOrCreateNode</summary>
+
+        /// <summary> Create a new GraphNode - see Graph::GetOrCreateNode </summary>
         GraphNode(std::string id, std::string label, bool isGroup = false);
 
     public:
         GraphNode();
-        GraphNode(GraphNode&& other);
-        GraphNode(const GraphNode& other);
-        GraphNode& operator=(GraphNode& other);
+        GraphNode(GraphNode&& other) = default;
+        GraphNode(const GraphNode& other) = default;
+        GraphNode& operator=(GraphNode& other) = default;
 
         /// <summary> Get the unique Id of this node </summary>
         const std::string& GetId() { return _id; }
@@ -114,7 +115,7 @@ namespace utilities
         bool _isGroup = false;
     };
 
-    /// <summary> Represents a directed link between two nodes in the Graph</summary>
+    /// <summary> Represents a directed link between two nodes in the Graph </summary>
     class GraphLink
     {
     private:
@@ -125,42 +126,57 @@ namespace utilities
     public:
         GraphLink();
         GraphLink(GraphLink&& other);
-        GraphLink(const GraphLink& other);
-        GraphLink& operator=(GraphLink& other);
+        GraphLink(const GraphLink& other) = default;
+        GraphLink& operator=(GraphLink& other) = default;
 
-        /// <summary> Get the node at the Source end of this link</summary>
+        /// <summary> Get the node at the Source end of this link </summary>
         GraphNode& GetSource() { return _source; }
-        /// <summary> Get the node at the Target end of this link</summary>
+
+        /// <summary> Get the node at the Target end of this link </summary>
         GraphNode& GetTarget() { return _target; }
-        /// <summary> Get the optional Category defined on this link</summary>
+
+        /// <summary> Get the optional Category defined on this link </summary>
         std::string GetCategory() { return _category; }
+
         /// <summary> Get the optional Label defined on this link</summary>
         std::string GetLabel() { return _label; }
+
+        /// <summary> Get the properties and associated values defined on this link </summary>
+        std::map<std::string, std::string>& GetProperties() { return _properties; }
+
+        /// <summary> Set a property and associated values defined on this link </summary>
+        const std::string& GetProperty(const std::string& name);
+
+        /// <summary> Set a property and associated values defined on this link </summary>
+        void SetProperty(const std::string& name, const std::string& value);
 
     private:
         GraphNode _source;
         GraphNode _target;
+        std::map<std::string, std::string> _properties;
         std::string _label;
         std::string _category;
     };
 
     /// <summary> A GraphStyleSetter represents a conditional setter of a given property of a node.
     /// These can be used in a GraphStyle and can be used to style a whole set of nodes that
-    /// match the GraphStyleCondition.</summary>
+    /// match the GraphStyleCondition. </summary>
     class GraphStyleSetter
     {
     public:
-        /// <summary> Create a new GraphStyleSetter</summary>
+        /// <summary> Create a new GraphStyleSetter </summary>
         /// <param name="propertyName"> The property being conditionally set on the node. </param>
         /// <param name="value"> The value of the property. </param>
         /// <param name="expression"> An expression to compute the value of the property. </param>
         GraphStyleSetter(std::string propertyName, std::string value, std::string expression);
 
-        /// <summary> Get the name of the property being acted on by this style setter</summary>
+        /// <summary> Get the name of the property being acted on by this style setter </summary>
         const std::string& GetProperty() { return _property; }
-        /// <summary> Get the property value</summary>
+
+        /// <summary> Get the property value </summary>
         const std::string& GetValue() { return _value; }
-        /// <summary> Get the expression value</summary>
+
+        /// <summary> Get the expression value </summary>
         const std::string& GetExpression() { return _expression; }
 
     private:
@@ -175,11 +191,11 @@ namespace utilities
     class GraphStyleCondition
     {
     public:
-        /// <summary> Create a new GraphStyleCondition</summary>
+        /// <summary> Create a new GraphStyleCondition </summary>
         /// <param name="expression"> The expression. </param>
         GraphStyleCondition(std::string expression);
         GraphStyleCondition(const GraphStyleCondition& other);
-        /// <summary> Get the value of the expression</summary>
+        /// <summary> Get the value of the expression </summary>
         const std::string& GetExpression() { return _expression; }
 
     private:
@@ -187,25 +203,30 @@ namespace utilities
     };
 
     /// <summary> A GraphStyle can style nodes or links selected by the given GraphStyleCondition, by applying all the
-    /// setters to those matching nodes/links</summary>
+    /// setters to those matching nodes/links </summary>
     class GraphStyle
     {
     public:
-        /// <summary> Create a new GraphStyle</summary>
+        /// <summary> Create a new GraphStyle </summary>
         /// <param name="targetType"> Must be 'node' or 'link'. </param>
         /// <param name="groupLabel"> The display name of this style for the legend. </param>
         /// <param name="valueLabel"> The second display name of this style. </param>
         /// <param name="condition"> The conditional expression that selects matching nodes or links. </param>
         GraphStyle(std::string targetType, std::string groupLabel, std::string valueLabel, GraphStyleCondition condition);
-        /// <summary> Get the target type defined on this style</summary>
+
+        /// <summary> Get the target type defined on this style </summary>
         const std::string& GetTargetType() { return _targetType; }
-        /// <summary> Get the group label defined on this style</summary>
+
+        /// <summary> Get the group label defined on this style </summary>
         const std::string& GetGroupLabel() { return _groupLabel; }
-        /// <summary> Get the value label defined style</summary>
+
+        /// <summary> Get the value label defined style </summary>
         const std::string& GetValueLabel() { return _valueLabel; }
-        /// <summary> Get the conditional expression defined on this style</summary>
+
+        /// <summary> Get the conditional expression defined on this style </summary>
         GraphStyleCondition GetCondition() { return _condition; }
-        /// <summary> Get the the editable list of setters in this GraphStyle</summary>
+
+        /// <summary> Get the the editable list of setters in this GraphStyle </summary>
         std::vector<GraphStyleSetter>& GetSetters() { return _setters; }
 
     private:
@@ -216,23 +237,27 @@ namespace utilities
         std::vector<GraphStyleSetter> _setters;
     };
 
-    /// <summary> A GraphProperty is like metadata, it defines the types of properties that can be defined on a node or link</summary>
+    /// <summary> A GraphProperty is like metadata, it defines the types of properties that can be defined on a node or link </summary>
     class GraphProperty
     {
     public:
-        /// <summary> Create a new GraphProperty</summary>
+        /// <summary> Create a new GraphProperty </summary>
         /// <param name="id"> The unique id of this property. </param>
         /// <param name="label"> The display name of this property. </param>
         /// <param name="description"> The long description of this property. </param>
         /// <param name="dataType"> The data type of this property, (int, double, float, string, bool, color). </param>
         GraphProperty(std::string id, std::string label, std::string description, std::string dataType);
-        /// <summary> Get the id defined on this property</summary>
+
+        /// <summary> Get the id defined on this property </summary>
         const std::string& GetId() { return _id; }
-        /// <summary> Get the label defined on this property</summary>
+
+        /// <summary> Get the label defined on this property </summary>
         const std::string& GetLabel() { return _label; }
-        /// <summary> Get the description defined on this property</summary>
+
+        /// <summary> Get the description defined on this property </summary>
         const std::string& GetDescription() { return _description; }
-        /// <summary> Get the data type defined on this property</summary>
+
+        /// <summary> Get the data type defined on this property </summary>
         const std::string& GetDataType() { return _dataType; }
 
     private:

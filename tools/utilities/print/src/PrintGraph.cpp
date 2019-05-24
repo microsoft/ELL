@@ -32,7 +32,25 @@ using namespace ell::nodes;
 
 namespace ell
 {
-extern std::string PaddingSchemeToString(ell::predictors::neural::PaddingScheme scheme);
+
+std::string GetNodeLabel(std::string typeName)
+{
+    // Get rid of 'Node<...>' or 'Layer<...>' at end
+    auto baseType = Split(typeName, '<')[0];
+
+    // Look for 'Node' at end
+    auto pos = baseType.find("Node");
+    if (pos != std::string::npos && pos == (baseType.size() - 4))
+    {
+        baseType = baseType.substr(0, pos);
+    }
+    pos = baseType.find("Layer");
+    if (pos != std::string::npos && pos == (baseType.size() - 5))
+    {
+        baseType = baseType.substr(0, pos);
+    }
+    return baseType;
+}
 
 std::string PrintActiveSize(const Port* port)
 {
@@ -51,6 +69,30 @@ std::string PrintActiveSize(const Port* port)
         }
     }
     return shape;
+}
+
+std::string GetNodeColor(const Node& node)
+{
+    static std::map<std::string, std::string> nodeTypeToColorMap{
+        { "Convolutional", "lightyellow" },
+        { "Input", "white" },
+        { "ReorderData", "lightcoral" },
+        { "BatchNormalization", "papayawhip" },
+        { "Scaling", "papayawhip" },
+        { "Bias", "papayawhip" },
+        { "Activation", "plum" },
+        { "Pooling", "powderblue" },
+        { "BinaryOperation", "snow2" },
+    };
+
+    std::string typeName = node.GetRuntimeTypeName();
+    auto label = GetNodeLabel(typeName);
+    auto it = nodeTypeToColorMap.find(label);
+    if (it != nodeTypeToColorMap.end())
+    {
+        return it->second;
+    }
+    return "white";
 }
 
 std::string ToShortString(BinaryOperationType op)
@@ -216,6 +258,11 @@ std::vector<NameValue> InspectNodeProperties(const Node& node)
         result.push_back(NameValue{ "type", typeName }); // float or double
     }
 
+    auto color = GetNodeColor(node);
+    if (!color.empty())
+    {
+        result.push_back(NameValue{ "fillcolor", color });
+    }
     return result;
 }
 
@@ -262,6 +309,7 @@ void PrintGraph(const Model& model, const std::string& outputFormat, std::ostrea
         }
         else
         {
+            std::string outputShape = "";
             std::string linkLabel;
             std::vector<NameValue> result = InspectNodeProperties(node);
             for (auto ptr = result.begin(), end = result.end(); ptr != end; ptr++)
@@ -280,14 +328,28 @@ void PrintGraph(const Model& model, const std::string& outputFormat, std::ostrea
                     linkLabel = nv.value;
                 }
             }
-            auto dependencies = node.GetDependentNodes();
-            for (auto ptr = dependencies.begin(), end = dependencies.end(); ptr != end; ptr++)
+
+            auto outputs = node.GetOutputPorts();
+            for(auto output: outputs)
             {
-                const Node* upstream = *ptr;
-                if (upstream != nullptr)
+                auto outputName = output->GetName();
+                auto dependencies = output->GetReferences();
+                for(auto dependentInput: dependencies)
                 {
-                    GraphNode& nextNode = graph.GetOrCreateNode(to_string(upstream->GetId()), "");
-                    graph.GetOrCreateLink(childNode, nextNode, linkLabel, "");
+                    auto inputName = dependentInput->GetName();
+                    auto dependentNode = dependentInput->GetNode();
+
+                    auto label = GetNodeLabel(dependentNode->GetRuntimeTypeName());
+                    GraphNode& nextNode = graph.GetOrCreateNode(to_string(dependentNode->GetId()), label);
+                    auto& link = graph.GetOrCreateLink(childNode, nextNode);
+
+                    // dot graph properties
+                    link.SetProperty("sametail", outputName);
+                    link.SetProperty("samehead", inputName);
+                    if (!outputShape.empty())
+                    {
+                        link.SetProperty("label", outputShape);
+                    }
                 }
             }
         }

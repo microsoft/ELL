@@ -17,292 +17,283 @@
 
 #include <dsp/include/UnrolledConvolution.h>
 
+#include <math/include/Vector.h>
+
 #include <utilities/include/Files.h>
 
 #include <algorithm>
 #include <cmath>
 #include <map>
 
-using namespace ell;
+namespace ell
+{
 
 // Utilities
 namespace
 {
-// TODO: remove this eventually
-using MultiClassDataset = ell::data::AutoSupervisedMultiClassDataset;
-using BinaryDataset = ell::data::AutoSupervisedDataset;
+    // TODO: remove this eventually
+    using MultiClassDataset = ell::data::AutoSupervisedMultiClassDataset;
+    using BinaryDataset = ell::data::AutoSupervisedDataset;
 
-void ThrowIfEmpty(const UnlabeledDataContainer& dataset)
-{
-    if (dataset.Size() == 0)
+    void ThrowIfEmpty(const UnlabeledDataContainer& dataset)
     {
-        throw utilities::InputException(utilities::InputExceptionErrors::badData, "Empty dataset");
-    }
-}
-
-template <typename T1, typename T2>
-void ThrowIfNotSameSize(const std::vector<T1>& a, const std::vector<T2>& b)
-{
-    if (a.size() != b.size())
-    {
-        throw utilities::InputException(utilities::InputExceptionErrors::badData, "Sizes don't match");
-    }
-}
-
-template <typename T1, typename T2>
-void ThrowIfNotSameSize(const math::RowVector<T1>& a, const math::RowVector<T2>& b)
-{
-    if (a.Size() != b.Size())
-    {
-        throw utilities::InputException(utilities::InputExceptionErrors::badData, "Sizes don't match");
-    }
-}
-
-template <typename T1, typename T2>
-math::RowVector<T1> CastVector(const math::RowVector<T2>& v)
-{
-    auto size = v.Size();
-    math::RowVector<T1> result(size);
-    for (size_t i = 0; i < size; ++i)
-    {
-        result[i] = v[i];
-    }
-    return result;
-}
-
-template <typename T1, typename T2>
-std::vector<T1>& operator+=(std::vector<T1>& v, const std::vector<T2>& other)
-{
-    ThrowIfNotSameSize(v, other);
-    for (size_t i = 0; i < other.size(); ++i)
-    {
-        v[i] += static_cast<T1>(other[i]);
-    }
-    return v;
-}
-
-template <typename T1, typename T2>
-std::vector<T1>& operator-=(std::vector<T1>& v, const std::vector<T2>& other)
-{
-    ThrowIfNotSameSize(v, other);
-    for (size_t i = 0; i < other.size(); ++i)
-    {
-        v[i] -= static_cast<T1>(other[i]);
-    }
-    return v;
-}
-
-template <typename T1, typename T2>
-std::vector<T1>& operator*=(std::vector<T1>& v, const std::vector<T2>& other)
-{
-    ThrowIfNotSameSize(v, other);
-    for (size_t i = 0; i < other.size(); ++i)
-    {
-        v[i] *= static_cast<T1>(other[i]);
-    }
-    return v;
-}
-
-template <typename T1, typename T2>
-math::RowVector<T1>& operator*=(math::RowVector<T1>& v, const math::RowVector<T2>& other)
-{
-    ThrowIfNotSameSize(v, other);
-    for (size_t i = 0; i < other.Size(); ++i)
-    {
-        v[i] *= static_cast<T1>(other[i]);
-    }
-    return v;
-}
-
-template <typename T1, typename T2>
-std::vector<T1>& operator/=(std::vector<T1>& v, const std::vector<T2>& other)
-{
-    ThrowIfNotSameSize(v, other);
-    for (size_t i = 0; i < other.size(); ++i)
-    {
-        auto rhs = other[i] == 0 ? 1.0 : other[i];
-        v[i] /= static_cast<T1>(rhs);
-    }
-    return v;
-}
-
-template <typename T1, typename T2>
-std::vector<T1>& operator/=(std::vector<T1>& v, T2 denom)
-{
-    denom = denom == 0 ? 1.0 : denom;
-
-    for (size_t i = 0; i < v.size(); ++i)
-    {
-        v[i] /= static_cast<T1>(denom);
-    }
-    return v;
-}
-
-template <typename T1, typename T2>
-math::RowVector<T1>& operator/=(math::RowVector<T1>& v, const math::RowVector<T2>& other)
-{
-    ThrowIfNotSameSize(v, other);
-    for (size_t i = 0; i < other.Size(); ++i)
-    {
-        auto rhs = other[i] == 0 ? 1.0 : other[i];
-        v[i] /= static_cast<T1>(rhs);
-    }
-    return v;
-}
-
-template <typename T1, typename T2>
-math::RowVector<T1>& operator/=(math::RowVector<T1>& v, T2 denom)
-{
-    denom = denom == 0 ? 1.0 : denom;
-    v.Transform([denom](auto x) { return x / denom; });
-    return v;
-}
-
-template <typename T>
-std::vector<T> operator-(std::vector<T>& a, const std::vector<T>& b)
-{
-    ThrowIfNotSameSize(a, b);
-    auto v = a;
-    v -= b;
-    return v;
-}
-
-template <typename T>
-math::RowVector<T> operator-(math::RowVector<T>& a, const math::RowVector<T>& b)
-{
-    ThrowIfNotSameSize(a, b);
-    auto v = a;
-    v -= b;
-    return v;
-}
-
-template <typename T>
-std::vector<T> operator*(const std::vector<T>& a, const std::vector<T>& b)
-{
-    ThrowIfNotSameSize(a, b);
-    std::vector<T> v = a;
-    v *= b;
-    return v;
-}
-
-template <typename T>
-math::RowVector<T> operator*(const math::RowVector<T>& a, const math::RowVector<T>& b)
-{
-    ThrowIfNotSameSize(a, b);
-    auto v = a;
-    v *= b;
-    return v;
-}
-
-template <typename T>
-std::vector<T> operator/(const std::vector<T>& a, double denom)
-{
-    auto v = a;
-    v /= denom;
-    return v;
-}
-
-template <typename T>
-math::RowVector<T> operator/(const math::RowVector<T>& a, double denom)
-{
-    auto v = a;
-    v /= denom;
-    return v;
-}
-
-template <typename T>
-std::vector<T> sqrt(const std::vector<T>& a)
-{
-    std::vector<T> result(a.size());
-    std::transform(a.begin(), a.end(), result.begin(), [](const T& value) {
-        return std::sqrt(value);
-    });
-    return result;
-}
-
-template <typename T>
-math::RowVector<T> sqrt(const math::RowVector<T>& a)
-{
-    auto result = a;
-    result.Transform([](auto x) { return std::sqrt(x); });
-    return result;
-}
-
-template <typename ElementType>
-math::ChannelColumnRowTensor<ElementType> GetImageTensor(const std::vector<ElementType>& imageFeatures, int numRows, int numColumns, int numChannels)
-{
-    math::ChannelColumnRowTensor<ElementType> result(numRows, numColumns, numChannels, imageFeatures);
-    return result;
-}
-
-BinaryDataset LoadBinaryDataset(std::string filename)
-{
-    if (!utilities::IsFileReadable(filename))
-    {
-        throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotFound, "Dataset file not readable: " + filename);
-    }
-    auto stream = utilities::OpenIfstream(filename);
-    auto dataset = common::GetDataset(stream);
-    return dataset;
-}
-
-BinaryLabelDataContainer FromDataset(const BinaryDataset& dataset)
-{
-    BinaryLabelDataContainer result;
-    auto size = dataset.NumExamples();
-    for (size_t i = 0; i < size; ++i)
-    {
-        const auto& example = dataset[i];
-        auto dataVector = example.GetDataVector().ToArray();
-        math::RowVector<float> newData(dataVector.size());
-        for (size_t j = 0; j < dataVector.size(); ++j)
+        if (dataset.Size() == 0)
         {
-            newData[j] = dataVector[j];
+            throw utilities::InputException(utilities::InputExceptionErrors::badData, "Empty dataset");
+        }
+    }
+
+    template <typename T1, typename T2>
+    void ThrowIfNotSameSize(const std::vector<T1>& a, const std::vector<T2>& b)
+    {
+        if (a.size() != b.size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::badData, "Sizes don't match");
+        }
+    }
+
+    template <typename T1, typename T2>
+    void ThrowIfNotSameSize(const math::RowVector<T1>& a, const math::RowVector<T2>& b)
+    {
+        if (a.Size() != b.Size())
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::badData, "Sizes don't match");
+        }
+    }
+
+    template <typename T1, typename T2>
+    std::vector<T1>& operator+=(std::vector<T1>& v, const std::vector<T2>& other)
+    {
+        ThrowIfNotSameSize(v, other);
+        for (size_t i = 0; i < other.size(); ++i)
+        {
+            v[i] += static_cast<T1>(other[i]);
+        }
+        return v;
+    }
+
+    template <typename T1, typename T2>
+    std::vector<T1>& operator-=(std::vector<T1>& v, const std::vector<T2>& other)
+    {
+        ThrowIfNotSameSize(v, other);
+        for (size_t i = 0; i < other.size(); ++i)
+        {
+            v[i] -= static_cast<T1>(other[i]);
+        }
+        return v;
+    }
+
+    template <typename T1, typename T2>
+    std::vector<T1>& operator*=(std::vector<T1>& v, const std::vector<T2>& other)
+    {
+        ThrowIfNotSameSize(v, other);
+        for (size_t i = 0; i < other.size(); ++i)
+        {
+            v[i] *= static_cast<T1>(other[i]);
+        }
+        return v;
+    }
+
+    template <typename T1, typename T2>
+    math::RowVector<T1>& operator*=(math::RowVector<T1>& v, const math::RowVector<T2>& other)
+    {
+        ThrowIfNotSameSize(v, other);
+        for (size_t i = 0; i < other.Size(); ++i)
+        {
+            v[i] *= static_cast<T1>(other[i]);
+        }
+        return v;
+    }
+
+    template <typename T1, typename T2>
+    std::vector<T1>& operator/=(std::vector<T1>& v, const std::vector<T2>& other)
+    {
+        ThrowIfNotSameSize(v, other);
+        for (size_t i = 0; i < other.size(); ++i)
+        {
+            auto rhs = other[i] == 0 ? 1.0 : other[i];
+            v[i] /= static_cast<T1>(rhs);
+        }
+        return v;
+    }
+
+    template <typename T1, typename T2>
+    std::vector<T1>& operator/=(std::vector<T1>& v, T2 denom)
+    {
+        denom = denom == 0 ? 1.0 : denom;
+
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            v[i] /= static_cast<T1>(denom);
+        }
+        return v;
+    }
+
+    template <typename T1, typename T2>
+    math::RowVector<T1>& operator/=(math::RowVector<T1>& v, const math::RowVector<T2>& other)
+    {
+        ThrowIfNotSameSize(v, other);
+        for (size_t i = 0; i < other.Size(); ++i)
+        {
+            auto rhs = other[i] == 0 ? 1.0 : other[i];
+            v[i] /= static_cast<T1>(rhs);
+        }
+        return v;
+    }
+
+    template <typename T1, typename T2>
+    math::RowVector<T1>& operator/=(math::RowVector<T1>& v, T2 denom)
+    {
+        denom = denom == 0 ? 1.0 : denom;
+        v.Transform([denom](auto x) { return x / denom; });
+        return v;
+    }
+
+    template <typename T>
+    std::vector<T> operator-(std::vector<T>& a, const std::vector<T>& b)
+    {
+        ThrowIfNotSameSize(a, b);
+        auto v = a;
+        v -= b;
+        return v;
+    }
+
+    template <typename T>
+    math::RowVector<T> operator-(math::RowVector<T>& a, const math::RowVector<T>& b)
+    {
+        ThrowIfNotSameSize(a, b);
+        auto v = a;
+        v -= b;
+        return v;
+    }
+
+    template <typename T>
+    std::vector<T> operator*(const std::vector<T>& a, const std::vector<T>& b)
+    {
+        ThrowIfNotSameSize(a, b);
+        std::vector<T> v = a;
+        v *= b;
+        return v;
+    }
+
+    template <typename T>
+    math::RowVector<T> operator*(const math::RowVector<T>& a, const math::RowVector<T>& b)
+    {
+        ThrowIfNotSameSize(a, b);
+        auto v = a;
+        v *= b;
+        return v;
+    }
+
+    template <typename T>
+    std::vector<T> operator/(const std::vector<T>& a, double denom)
+    {
+        auto v = a;
+        v /= denom;
+        return v;
+    }
+
+    template <typename T>
+    math::RowVector<T> operator/(const math::RowVector<T>& a, double denom)
+    {
+        auto v = a;
+        v /= denom;
+        return v;
+    }
+
+    template <typename T>
+    std::vector<T> sqrt(const std::vector<T>& a)
+    {
+        std::vector<T> result(a.size());
+        std::transform(a.begin(), a.end(), result.begin(), [](const T& value) {
+            return std::sqrt(value);
+        });
+        return result;
+    }
+
+    template <typename T>
+    math::RowVector<T> sqrt(const math::RowVector<T>& a)
+    {
+        auto result = a;
+        result.Transform([](auto x) { return std::sqrt(x); });
+        return result;
+    }
+
+    template <typename ElementType>
+    math::ChannelColumnRowTensor<ElementType> GetImageTensor(const std::vector<ElementType>& imageFeatures, int numRows, int numColumns, int numChannels)
+    {
+        math::ChannelColumnRowTensor<ElementType> result(numRows, numColumns, numChannels, imageFeatures);
+        return result;
+    }
+
+    BinaryDataset LoadBinaryDataset(std::string filename)
+    {
+        if (!utilities::IsFileReadable(filename))
+        {
+            throw utilities::SystemException(utilities::SystemExceptionErrors::fileNotFound, "Dataset file not readable: " + filename);
+        }
+        auto stream = utilities::OpenIfstream(filename);
+        auto dataset = common::GetDataset(stream);
+        return dataset;
+    }
+
+    BinaryLabelDataContainer FromDataset(const BinaryDataset& dataset)
+    {
+        BinaryLabelDataContainer result;
+        auto size = dataset.NumExamples();
+        for (size_t i = 0; i < size; ++i)
+        {
+            const auto& example = dataset[i];
+            auto dataVector = example.GetDataVector().ToArray();
+            math::RowVector<float> newData(dataVector.size());
+            for (size_t j = 0; j < dataVector.size(); ++j)
+            {
+                newData[j] = dataVector[j];
+            }
+
+            BinaryExample newExample{ newData, example.GetMetadata().label };
+            result.push_back(newExample);
+        }
+        return result;
+    }
+
+    void VerifyAmountRead(std::istream& stream, int amount)
+    {
+        if (stream.gcount() != amount)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
+        }
+    }
+
+    int32_t ReadPortableInt32(std::istream& stream)
+    {
+        uint32_t in = 0;
+        stream.read(reinterpret_cast<char*>(&in), sizeof(in));
+        uint8_t data[sizeof(in)] = {};
+        memcpy(&data, &in, sizeof(data));
+
+        return ((uint32_t)data[3] << 0) | ((uint32_t)data[2] << 8) | ((uint32_t)data[1] << 16) | ((uint32_t)data[0] << 24);
+    }
+
+    std::string GetDataFormat(std::string datasetFilename, std::string formatString)
+    {
+        if (formatString.empty())
+        {
+            auto ext = utilities::GetFileExtension(datasetFilename, true);
+            if (ext == "bin")
+            {
+                return "cifar";
+            }
+            else if (ext == "")
+            {
+                return "mnist";
+            }
+
+            return "gsdf";
         }
 
-        BinaryExample newExample{ newData, example.GetMetadata().label };
-        result.push_back(newExample);
+        return formatString;
     }
-    return result;
-}
-
-void VerifyAmountRead(std::istream& stream, int amount)
-{
-    if (stream.gcount() != amount)
-    {
-        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument);
-    }
-}
-
-int32_t ReadPortableInt32(std::istream& stream)
-{
-    uint32_t in = 0;
-    stream.read(reinterpret_cast<char*>(&in), sizeof(in));
-    uint8_t data[sizeof(in)] = {};
-    memcpy(&data, &in, sizeof(data));
-
-    return ((uint32_t)data[3] << 0) | ((uint32_t)data[2] << 8) | ((uint32_t)data[1] << 16) | ((uint32_t)data[0] << 24);
-}
-
-std::string GetDataFormat(std::string datasetFilename, std::string formatString)
-{
-    if (formatString.empty())
-    {
-        auto ext = utilities::GetFileExtension(datasetFilename, true);
-        if (ext == "bin")
-        {
-            return "cifar";
-        }
-        else if (ext == "")
-        {
-            return "mnist";
-        }
-
-        return "gsdf";
-    }
-
-    return formatString;
-}
 } // namespace
 
 // Prototypes
@@ -664,6 +655,45 @@ VectorLabelDataContainer CreateVectorLabelDataContainer(const UnlabeledDataConta
     return dataset;
 }
 
+VectorLabelDataContainer CreateSubBlockVectorLabelDataContainer(const VectorLabelDataContainer& originalDataset, int inputBlockSize, int outputBlockSize, int index)
+{
+    VectorLabelDataContainer dataset;
+    auto size = originalDataset.Size();
+    for (size_t i = 0; i < size; ++i)
+    {
+        const auto features = originalDataset[i].input;
+        const auto labels = originalDataset[i].output;
+        const auto d = features.Size() / inputBlockSize;
+        const auto d2 = features.Size() / outputBlockSize;
+        math::RowVector<float> blockInput(inputBlockSize); // == filtersize (e.g., 9)
+        math::RowVector<float> blockOutput(outputBlockSize);
+        for (int j = 0; j < inputBlockSize; ++j)
+        {
+            blockInput[j] = features[index + j * d];
+        }
+        for (int j = 0; j < outputBlockSize; ++j)
+        {
+            blockOutput[j] = labels[index + j * d2];
+        }
+        // dataset.emplace_back(VectorLabelExample{ math::RowVector<float>(features.GetSubVector(index * inputBlockSize, inputBlockSize)), math::RowVector<float>(labels.GetSubVector(index * outputBlockSize, outputBlockSize)) });
+        dataset.emplace_back(VectorLabelExample{ blockInput, blockOutput });
+    }
+    return dataset;
+}
+
+VectorLabelDataContainer CreateSingleOutputVectorLabelDataContainer(const VectorLabelDataContainer& originalDataset, int index)
+{
+    VectorLabelDataContainer dataset;
+    auto size = originalDataset.Size();
+    for (size_t i = 0; i < size; ++i)
+    {
+        const auto features = originalDataset[i].input;
+        const auto labels = originalDataset[i].output;
+        dataset.emplace_back(VectorLabelExample{ features, { labels[index] } });
+    }
+    return dataset;
+}
+
 UnlabeledDataContainer GetDatasetInputs(const BinaryLabelDataContainer& dataset)
 {
     return GetDatasetInputs<BinaryLabelDataContainer>(dataset);
@@ -744,3 +774,4 @@ double GetModelAccuracy(const MultiClassDataContainer& dataset, const UnlabeledD
     }
     return static_cast<double>(pos_count) / size;
 }
+} // namespace ell

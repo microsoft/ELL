@@ -66,6 +66,11 @@ namespace model
         /// <returns> The name of this port </returns>
         std::string GetName() const { return _name; }
 
+        /// <summary> Returns the name of this port, including the node ID </summary>
+        ///
+        /// <returns> The name of this port </returns>
+        std::string GetFullName() const;
+
         /// <summary> Maps from C++ type to PortType enum </summary>
         ///
         /// <typeparam name="ValueType"> The C++ type </typeparam>

@@ -7,9 +7,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "Common.h"
+
+#include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <numeric>
 #include <random>
+#include <string>
+#include <vector>
 
 namespace ell
 {
@@ -68,13 +74,6 @@ namespace optimization
 } // namespace ell
 
 #pragma region implementation
-
-#include "Common.h"
-
-#include <algorithm>
-#include <numeric>
-#include <random>
-#include <vector>
 
 namespace ell
 {

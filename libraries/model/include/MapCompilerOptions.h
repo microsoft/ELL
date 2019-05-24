@@ -34,7 +34,7 @@ namespace model
         std::string mapFunctionName = "predict";
         std::string sourceFunctionName;
         std::string sinkFunctionName;
-        bool verifyJittedModule = false;
+        bool verifyJittedModule = true;
         bool profile = false;
 
         // per-node options

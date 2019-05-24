@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     TestTransformData.h (finetune_test)
+//  File:     TestModelOutputDataCache.h (finetune_test)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,10 +9,9 @@
 #pragma once
 
 // Main driver function
-void TestTransformData();
+void TestModelOutputDataCache();
 
 // Individual tests
-void TestRemovePadding();
-void TestTransformDataWithModel();
-void TestTransformDataWithSubmodel();
-void TestTransformDataWithCachedSubmodel();
+void TestModelOutputDataCache_CreateAndPopulate();
+void TestModelOutputDataCache_FindNearestCachedOutput();
+void TestModelOutputDataCache_TransformWithCache();

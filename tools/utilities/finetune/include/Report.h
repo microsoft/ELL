@@ -8,18 +8,19 @@
 
 #pragma once
 
+#include "DataStatistics.h"
 #include "DataUtils.h"
 
-#include <model/include/Model.h>
-#include <model/include/OutputPort.h>
-
-// trainers / optimization
 #include <optimization/include/SDCAOptimizer.h>
 
 #include <ostream>
+#include <string>
 #include <vector>
 
+namespace ell
+{
 struct FineTuneArguments;
+struct FineTuningLayerResult;
 
 class Report
 {
@@ -33,16 +34,27 @@ public:
     Report(std::ostream& stream, ReportFormat format);
     ~Report();
 
+    // Parameters
     void WriteParameters(const FineTuneArguments& args);
-    void WriteOptimizationParameters(const ell::optimization::SDCAOptimizerParameters& params);
-    void WriteLayerOptimizationInfo(std::string nodeType, std::string id1, std::string id2, const ell::optimization::SDCASolutionInfo& info);
-    void WriteLayerError(std::string nodeType, std::string id1, std::string id2, double error);
-    void WriteModelAccuracy(ell::model::Model& model, const ell::model::OutputPortBase& modelOutput, std::string modelName, const std::vector<const MultiClassDataContainer*>& datasets, const std::vector<std::string>& datasetNames);
+
+    // Per-layer info
+    void WriteLayerOptimizationResult(const FineTuningLayerResult& layerInfo);
+
+    // Overall result info
+    void WriteModelAccuracy(std::string modelName, std::string datasetName, double accuracy);
+    void WriteModelSparsity(std::string modelName, const Sparsity& sparsity);
     void WriteTiming(std::string tag, int milliseconds);
 
 private:
+    void WriteLayerOptimizationInfo(std::string nodeType, std::string nodeId, const ell::optimization::SDCASolutionInfo& info);
+    void WriteLayerRegularizationParameters(std::string nodeType, std::string nodeId, double l2Regularization, double l1Regularization);
+    void WriteLayerStatistics(std::string nodeType, std::string nodeId, std::string tag, std::string statsType, const DataStatistics& statistics);
+    void WriteLayerActivationStatistics(std::string nodeType, std::string nodeId, const DataStatistics& originalStatistics, const std::optional<DataStatistics>& unnormalizedFineTunedStatistics, const std::optional<DataStatistics>& fineTunedStatistics);
+    void WriteLayerTiming(std::string nodeType, std::string nodeId, int transformTime, int optimizationTime);
+
     template <typename ValueType>
     void WriteKeyValue(std::string key, const ValueType& value);
+    void Flush();
 
     std::ostream& _stream;
 };
@@ -78,3 +90,4 @@ private:
 //   TestAccuracy:    0.32
 //   TotalTime:       82643
 //
+} // namespace ell

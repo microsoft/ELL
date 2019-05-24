@@ -165,7 +165,8 @@ std::string Graph::ValidDotIdentifier(const std::string& value)
 
 void Graph::SaveDot(std::ostream& fout)
 {
-    fout << "digraph network_graph {";
+    fout << "digraph network_graph {\n";
+    fout << "node [shape=box style=\"rounded, filled\"];\n";
 
     for (auto ptr = _nodes.begin(), end = _nodes.end(); ptr != end; ptr++)
     {
@@ -184,11 +185,32 @@ void Graph::SaveDot(std::ostream& fout)
     {
         GraphLink link = ptr->second;
         fout << ValidDotIdentifier(link.GetSource().GetId()) << " -> " << ValidDotIdentifier(link.GetTarget().GetId());
+        fout << "[";
+        bool first = true;
         if (!link.GetLabel().empty())
         {
-            fout << " [ label=\"" << EscapeAttribute(link.GetLabel()) << "\" ]";
+            fout << "label=\"" << EscapeAttribute(link.GetLabel()) << "\"";
+            first = false;
         }
-        fout << ";\n";
+
+        auto link_properties = link.GetProperties();
+        if (!link_properties.empty())
+        {
+            for (auto iter = link_properties.begin(), lastProperty = link_properties.end(); iter != lastProperty; iter++)
+            {
+                if (!first)
+                {
+                    fout << ", ";
+                }
+                else
+                {
+                    first = false;
+                }
+                auto pair = *iter;
+                fout << pair.first << "=\"" << EscapeAttribute(pair.second) << "\"";
+            }
+            fout << "];\n";
+        }
     }
 
     fout << "}";
@@ -283,21 +305,6 @@ GraphNode::GraphNode(std::string id, std::string label, bool isGroup)
     _isGroup = isGroup;
 }
 
-GraphNode::GraphNode(const GraphNode& other) :
-    _id(other._id),
-    _label(other._label),
-    _isGroup(other._isGroup)
-{
-}
-
-GraphNode& GraphNode::operator=(GraphNode& other)
-{
-    this->_id = other.GetId();
-    this->_label = other.GetLabel();
-    this->_isGroup = other.GetIsGroup();
-    return *this;
-}
-
 const std::string& GraphNode::GetProperty(const std::string& name)
 {
     return _properties[name];
@@ -348,24 +355,15 @@ GraphLink::GraphLink(GraphNode& source, GraphNode& target, std::string label, st
 {
 }
 
-GraphLink::GraphLink(const GraphLink& other) :
-    _source(other._source),
-    _target(other._target),
-    _label(other._label),
-    _category(other._category)
+const std::string& GraphLink::GetProperty(const std::string& name)
 {
+    return _properties[name];
 }
 
-GraphLink& GraphLink::operator=(GraphLink& other)
+void GraphLink::SetProperty(const std::string& name, const std::string& value)
 {
-    this->_source = other.GetSource();
-    this->_target = other.GetTarget();
-    this->_label = other.GetLabel();
-    this->_category = other.GetCategory();
-    return *this;
+    _properties[name] = value;
 }
 
 GraphLink::GraphLink() = default;
 GraphNode::GraphNode() = default;
-GraphLink::GraphLink(GraphLink&& other) = default;
-GraphNode::GraphNode(GraphNode&& other) = default;

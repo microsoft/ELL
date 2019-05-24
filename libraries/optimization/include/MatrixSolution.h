@@ -7,11 +7,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "Common.h"
 #include "Expression.h"
 #include "IndexedContainer.h"
 #include "OptimizationExample.h"
 
 #include <math/include/Matrix.h>
+#include <math/include/MatrixOperations.h>
 #include <math/include/Vector.h>
 #include <math/include/VectorOperations.h>
 
@@ -24,17 +26,27 @@ namespace optimization
     class MatrixSolution : public Scalable
     {
     public:
+        using ElementType = IOElementType;
         using InputType = math::ConstRowVectorReference<IOElementType>;
         using OutputType = math::ConstRowVectorReference<IOElementType>;
         using AuxiliaryDoubleType = math::RowVector<double>;
         using ExampleType = Example<InputType, OutputType>;
         using DatasetType = IndexedContainer<ExampleType>;
+        using WeightsType = math::ColumnMatrix<double>;
+        static constexpr bool IsBiased = isBiased;
+
+        /// <summary> Solutions are expected to have a ParameterType. Empty here because this solution type doesn't need any parameters. </summary>
+        struct ParametersType
+        {};
 
         /// <summary> Resize the solution to match the sizes of an input and an output. </summary>
         void Resize(const InputType& inputExample, const OutputType& outputExample);
 
         /// <summary> Resets the solution to zero. </summary>
         void Reset();
+
+        /// <summary> Sets the solution parameters. This solution type doesn't have any parameters, so it does nothing. </summary>
+        void SetParameters(const ParametersType& parameters) {}
 
         /// <summary> Returns the matrix. </summary>
         math::ConstColumnMatrixReference<double> GetMatrix() const { return _weights; }
@@ -51,6 +63,12 @@ namespace optimization
         /// <summary> Returns the bias. </summary>
         template <bool B = isBiased, typename Concept = std::enable_if_t<B>>
         const math::RowVector<double>& GetBias() const
+        {
+            return _bias;
+        }
+
+        template <bool B = isBiased, typename Concept = std::enable_if_t<B>>
+        math::RowVector<double>& GetBias()
         {
             return _bias;
         }
@@ -80,13 +98,14 @@ namespace optimization
         void InitializeAuxiliaryVariable(AuxiliaryDoubleType& aux);
 
     private:
-        math::ColumnMatrix<double> _weights = { 0, 0 };
-
         struct Nothing
         {};
 
         // if the solution is biased, allocate a bias term
-        std::conditional_t<isBiased, math::RowVector<double>, Nothing> _bias = {};
+        using BiasType = std::conditional_t<isBiased, math::RowVector<double>, Nothing>;
+
+        WeightsType _weights = { 0, 0 };
+        BiasType _bias = {};
 
         // if the IO element type is not double, allocate a double row vector
         static constexpr bool isDouble = std::is_same_v<IOElementType, double>;
@@ -113,11 +132,6 @@ namespace optimization
 
 #pragma region implementation
 
-#include "Common.h"
-
-#include <math/include/MatrixOperations.h>
-#include <math/include/VectorOperations.h>
-
 namespace ell
 {
 namespace optimization
@@ -125,7 +139,7 @@ namespace optimization
     template <typename IOElementType, bool isBiased>
     void MatrixSolution<IOElementType, isBiased>::Resize(const InputType& inputExample, const OutputType& outputExample)
     {
-        math::ColumnMatrix<double> matrix(inputExample.Size(), outputExample.Size());
+        WeightsType matrix(inputExample.Size(), outputExample.Size());
         _weights.Swap(matrix);
 
         if constexpr (!isDouble)

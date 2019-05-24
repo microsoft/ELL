@@ -40,30 +40,35 @@ namespace optimization
         double exponentialSearchBase = 2.0; // base of the exponential search, must be greater than 1.0; 2.0 means that the interval doubles with each iteration
     };
 
+    template <typename SolutionType>
+    struct SparseSolution
+    {
+        SolutionType solution;
+        SDCASolutionInfo info;
+        double beta;
+        double density;
+    };
+
     /// <summary> Returns a solution with a specified level of density/sparsity. </summary>
     /// <param name="examples"> A shared pointer to a set of examples. </param>
     /// <param name="lossFunction"> A loss function. </param>
     /// <param name="parameters"> An instance of GetSparseSolutionParameters. </param>
     template <typename SolutionType, typename LossFunctionType>
-    SolutionType GetSparseSolution(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, GetSparseSolutionParameters parameters);
+    SparseSolution<SolutionType> GetSparseSolution(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, GetSparseSolutionParameters parameters);
 } // namespace optimization
 } // namespace ell
 
 #pragma region implementation
-
-#include <memory>
 
 namespace ell
 {
 namespace optimization
 {
     template <typename SolutionType, typename LossFunctionType>
-    SolutionType GetSparseSolution(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, GetSparseSolutionParameters parameters)
+    SparseSolution<SolutionType> GetSparseSolution(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, GetSparseSolutionParameters parameters)
     {
         // create optimizer
-        auto optimizer = SDCAOptimizer<VectorSolution<double, true>, LossFunctionType, ElasticNetRegularizer>(examples, parameters.SDCARandomSeedString);
-        optimizer.SetLossFunction(lossFunction);
-        optimizer.SetParameters(parameters.SDCAParameters);
+        auto optimizer = MakeSDCAOptimizer<SolutionType>(examples, lossFunction, ElasticNetRegularizer{}, parameters.SDCAParameters, parameters.SDCARandomSeedString);
 
         // SDCA epoch budget (leave some for the final call to the optimizer)
         size_t epochBudget = parameters.maxEpochs - parameters.SDCAMaxEpochsPerCall;
@@ -119,7 +124,9 @@ namespace optimization
         optimizer.SetRegularizer(ElasticNetRegularizer{ bestBeta });
         optimizer.Update(parameters.SDCAMaxEpochsPerCall, parameters.SDCAEarlyExitDualityGap);
 
-        return optimizer.GetSolution();
+        const auto& vector = optimizer.GetSolution().GetVector();
+        double density = vector.Norm0() / vector.Size();
+        return { optimizer.GetSolution(), optimizer.GetSolutionInfo(), bestBeta, density };
     }
 } // namespace optimization
 } // namespace ell

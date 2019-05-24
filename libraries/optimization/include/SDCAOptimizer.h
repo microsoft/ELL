@@ -7,12 +7,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <math/include/Vector.h>
+#include "Common.h"
+#include "Expression.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <numeric>
 #include <random>
 #include <string>
+#include <vector>
 
 namespace ell
 {
@@ -47,6 +51,7 @@ namespace optimization
     public:
         using ExampleType = typename SolutionType::ExampleType;
         using DatasetType = typename SolutionType::DatasetType;
+        using Solution = SolutionType;
 
         /// <summary> Constructs an instance of SDCAOptimizer and initializes it with loss, regularizer, and parameters. </summary>
         ///
@@ -56,6 +61,16 @@ namespace optimization
         /// <param name="parameters"> Trainer parameters. </param>
         /// <param name="randomSeedString"> Arbitrary nonempty string used to seed the random number generator. </param>
         SDCAOptimizer(std::shared_ptr<const DatasetType> examples, LossFunctionType lossFunction, RegularizerType regularizer, SDCAOptimizerParameters parameters, std::string randomSeedString = "abc123");
+
+        /// <summary> Constructs an instance of SDCAOptimizer and initializes it with loss, regularizer, and parameters. </summary>
+        ///
+        /// <param name="examples"> The set of examples. </param>
+        /// <param name="lossFunction"> The loss function. </param>
+        /// <param name="regularizer"> The regularizer. </param>
+        /// <param name="parameters"> Trainer parameters. </param>
+        /// <param name="solutionParameters"> Solution parameters. </param>
+        /// <param name="randomSeedString"> Arbitrary nonempty string used to seed the random number generator. </param>
+        SDCAOptimizer(std::shared_ptr<const DatasetType> examples, LossFunctionType lossFunction, RegularizerType regularizer, SDCAOptimizerParameters parameters, typename SolutionType::ParametersType solutionParameters, std::string randomSeedString = "abc123");
 
         /// <summary> Constructs an instance of SDCAOptimizer (requires initialization before first use). </summary>
         ///
@@ -107,6 +122,7 @@ namespace optimization
 
         SolutionType _w;
         SolutionType _v;
+        typename SolutionType::ParametersType _solutionParameters;
 
         mutable SDCASolutionInfo _solutionInfo;
         mutable bool _areObjectivesValid = false;
@@ -121,28 +137,40 @@ namespace optimization
     /// <summary> Convenience function for constructing an SDCA optimizer. </summary>
     template <typename SolutionType, typename LossFunctionType, typename RegularizerType>
     SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType> MakeSDCAOptimizer(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, RegularizerType regularizer, SDCAOptimizerParameters parameters, std::string randomSeedString = "abc123");
+
+    /// <summary> Convenience function for constructing an SDCA optimizer. </summary>
+    template <typename SolutionType, typename LossFunctionType, typename RegularizerType>
+    SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType> MakeSDCAOptimizer(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, RegularizerType regularizer, SDCAOptimizerParameters parameters, typename SolutionType::ParametersType solutionParameters, std::string randomSeedString = "abc123");
 } // namespace optimization
 } // namespace ell
 
 #pragma region implementation
 
-#include "Common.h"
-#include "Expression.h"
-
-#include <algorithm>
-#include <memory>
-#include <numeric>
-#include <random>
-#include <vector>
-
 namespace ell
 {
 namespace optimization
 {
+    template <typename SolutionType>
+    double GetSparsity(const SolutionType& solution)
+    {
+        const auto& vec = solution.GetVector();
+        return 1.0 - (vec.Norm0() / vec.Size());
+    }
+
     template <typename SolutionType, typename LossFunctionType, typename RegularizerType>
     SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType>::SDCAOptimizer(std::shared_ptr<const DatasetType> examples, LossFunctionType lossFunction, RegularizerType regularizer, SDCAOptimizerParameters parameters, std::string randomSeedString) :
         _lossFunction(std::move(lossFunction)),
         _regularizer(std::move(regularizer))
+    {
+        OneTimeSetup(examples, randomSeedString);
+        SetParameters(parameters);
+    }
+
+    template <typename SolutionType, typename LossFunctionType, typename RegularizerType>
+    SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType>::SDCAOptimizer(std::shared_ptr<const DatasetType> examples, LossFunctionType lossFunction, RegularizerType regularizer, SDCAOptimizerParameters parameters, typename SolutionType::ParametersType solutionParameters, std::string randomSeedString) :
+        _lossFunction(std::move(lossFunction)),
+        _regularizer(std::move(regularizer)),
+        _solutionParameters(std::move(solutionParameters))
     {
         OneTimeSetup(examples, randomSeedString);
         SetParameters(parameters);
@@ -268,6 +296,8 @@ namespace optimization
         auto firstExample = examples->Get(0);
         _w.Resize(firstExample.input, firstExample.output);
         _v.Resize(firstExample.input, firstExample.output);
+        _w.SetParameters(_solutionParameters);
+        _v.SetParameters(_solutionParameters);
         size_t numExamples = examples->Size();
         _exampleInfo.resize(numExamples);
 
@@ -301,32 +331,43 @@ namespace optimization
     void SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType>::Step(ExampleType example, ExampleInfo& exampleInfo)
     {
         const double tolerance = 1.0e-8;
-
-        auto& dual = exampleInfo.dual;
-
         auto lipschitz = exampleInfo.norm2Squared * _normalizedInverseLambda;
         if (lipschitz < tolerance)
         {
             return;
         }
 
-        auto prediction = example.input * _w;
+        // p = ((input * w) / lipschitz) + dual
+        auto prediction = example.input * _w; // ## perf: creates new vector
         prediction /= lipschitz;
-        prediction += dual;
+        prediction += exampleInfo.dual;
 
-        auto newDual = _lossFunction.ConjugateProx(1.0 / lipschitz, prediction, example.output);
-        dual -= newDual;
-        dual *= _normalizedInverseLambda;
+        // dual' = ConjProx(1/lipschitz, prediction, output)
+        // dual'' = (dual - dual') * (1/(lambda*N))    ---- lambda == L2 regularization parameter
+        auto newDual = _lossFunction.ConjugateProx(1.0 / lipschitz, prediction, example.output); // ## perf: creates new vector
+        exampleInfo.dual -= newDual;
+        exampleInfo.dual *= _normalizedInverseLambda;
 
-        _v += Transpose(example.input) * dual;
-        _regularizer.ConjugateGradient(_v, _w);
-        exampleInfo.dual = newDual;
+        // _v' = _v + (input.T * dual'')
+        _v += Transpose(example.input) * exampleInfo.dual;
+
+        // L2: _w = _v
+        _regularizer.ConjugateGradient(_v, _w); // ## perf: L2 regularizer implements this as "_w = _v" (a matrix and a vector copy)
+
+        // dual = dual'
+        exampleInfo.dual = newDual; // ## perf: vector copy
     }
 
     template <typename SolutionType, typename LossFunctionType, typename RegularizerType>
     SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType> MakeSDCAOptimizer(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, RegularizerType regularizer, SDCAOptimizerParameters parameters, std::string randomSeedString)
     {
         return SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType>(examples, lossFunction, regularizer, parameters, randomSeedString);
+    }
+
+    template <typename SolutionType, typename LossFunctionType, typename RegularizerType>
+    SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType> MakeSDCAOptimizer(std::shared_ptr<const typename SolutionType::DatasetType> examples, LossFunctionType lossFunction, RegularizerType regularizer, SDCAOptimizerParameters parameters, typename SolutionType::ParametersType solutionParameters, std::string randomSeedString)
+    {
+        return SDCAOptimizer<SolutionType, LossFunctionType, RegularizerType>(examples, lossFunction, regularizer, parameters, solutionParameters, randomSeedString);
     }
 } // namespace optimization
 } // namespace ell

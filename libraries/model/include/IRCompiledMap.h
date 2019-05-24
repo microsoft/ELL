@@ -44,6 +44,9 @@ namespace model
         IRCompiledMap(IRCompiledMap&& other);
         IRCompiledMap& operator=(const IRCompiledMap&) = delete;
 
+        /// <summary> Clone the compiled model </summary>
+        IRCompiledMap Clone();
+
         /// <summary> Output the compiled model to the given file </summary>
         ///
         /// <param name="filePath"> The file to write to </param>

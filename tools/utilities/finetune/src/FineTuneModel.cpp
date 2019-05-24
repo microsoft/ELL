@@ -9,8 +9,10 @@
 #include "FineTuneModel.h"
 #include "DataUtils.h"
 #include "FineTuneArguments.h"
+#include "ModelOutputDataCache.h"
 #include "ModelUtils.h"
 #include "OptimizationUtils.h"
+#include "Report.h"
 #include "TransformData.h"
 
 #include <common/include/LoadModel.h>
@@ -27,86 +29,177 @@
 #include <utilities/include/MillisecondTimer.h>
 
 #include <algorithm>
-#include <iostream>
 #include <string>
 #include <utility>
 
-using namespace ell;
+namespace ell
+{
 using namespace ell::model;
 
 // Prototypes
-const OutputPortBase& GetSpecifiedOutput(model::Model& model, const FineTuneArguments& args);
+FineTuneNodeAction GetNodeAction(const Node& node, const FineTuneArguments& args, bool didModifyAnyNodes);
+const FineTuneOptimizationParameters& GetParametersForNodeAction(const FineTuneProblemParameters& parameters, FineTuneNodeAction action);
 
-bool ShouldConsiderLayer(const Node& node, const FineTuneArguments& args);
-FineTuningLayerResult RetrainLayer(ModelTransformer& transformer, const Node& node, MultiClassDataContainer& trainingData, const FineTuneOptimizationParameters& optimizerParameters);
+FineTuningLayerResult FineTuneLayer(ModelTransformer& transformer, const Node& node, MultiClassDataContainer& trainingData, const FineTuneProblemParameters& optimizerParameters, ModelOutputDataCache& dataCache);
+FineTuningLayerResult SparsifyLayer(ModelTransformer& transformer, const Node& node, MultiClassDataContainer& trainingData, const FineTuneProblemParameters& optimizerParameters, ModelOutputDataCache& dataCache);
 
-FineTuningLayerResult RetrainFullyConnectedLayer(ModelTransformer& transformer, const Node& node, MultiClassDataContainer& trainingData, const FineTuneOptimizationParameters& optimizerParameters);
-
-FineTuningLayerResult RetrainConvolutionalLayer(ModelTransformer& transformer, const Node& node, MultiClassDataContainer& trainingData, const FineTuneOptimizationParameters& optimizerParameters);
-
-template <typename ElementType>
-FineTuningLayerResult RetrainFullyConnectedLayer(ModelTransformer& transformer, const Node& node, MultiClassDataContainer& trainingData, const FineTuneOptimizationParameters& optimizerParameters);
+FineTuningLayerResult RetrainLayer(ModelTransformer& transformer, const Node& node, FineTuneNodeAction action, MultiClassDataContainer& trainingData, const FineTuneProblemParameters& optimizerParameters, ModelOutputDataCache& dataCache);
 
 template <typename ElementType>
-FineTuningLayerResult RetrainConvolutionalLayer(ModelTransformer& transformer, const Node& node, MultiClassDataContainer& trainingData, const FineTuneOptimizationParameters& optimizerParameters);
+FineTuningLayerResult RetrainLayer(ModelTransformer& transformer, const Node& node, FineTuneNodeAction action, MultiClassDataContainer& trainingData, const FineTuneProblemParameters& optimizerParameters, ModelOutputDataCache& dataCache);
 
 template <typename ElementType>
-void WriteModelOutputComparison(model::Model& model, const model::OutputPort<ElementType>& output1, const model::OutputPort<ElementType>& output2, const UnlabeledDataContainer& dataset, Report& report);
+FineTuningLayerResult RetrainFullyConnectedLayer(ModelTransformer& transformer, const Node& node, FineTuneNodeAction action, MultiClassDataContainer& trainingData, const FineTuneProblemParameters& optimizerParameters, ModelOutputDataCache& dataCache);
+
+template <typename ElementType>
+FineTuningLayerResult RetrainConvolutionalLayer(ModelTransformer& transformer, const Node& node, FineTuneNodeAction action, MultiClassDataContainer& trainingData, const FineTuneProblemParameters& optimizerParameters, ModelOutputDataCache& dataCache);
+
+template <typename ElementType>
+const OutputPort<ElementType>& GetFeaturesPort(const UnlabeledDataContainer& imageFeatures, const OutputPort<ElementType>& rawFeatureOutput, bool normalize);
+
+template <typename ElementType>
+DataStatistics GetWeightsStatistics(const WeightsAndBias<ElementType>& weightsAndBias);
+
+template <typename ElementType>
+DataStatistics GetWeightsStatistics(const ell::math::RowMatrix<ElementType>& weights);
+
+template <typename ElementType>
+DataStatistics GetWeightsStatistics(const typename predictors::neural::ConvolutionalLayer<ElementType>::TensorType& weights);
+
+template <typename DatasetType>
+void ConvertDatasetImages(DatasetType& dataset, const FineTuneArguments& args);
 
 // Implementation
+#define ADD_TO_STRING_ENTRY(NAMESPACE, OPERATOR) \
+    case NAMESPACE::OPERATOR:                    \
+        return #OPERATOR;
+#define BEGIN_FROM_STRING if (false)
+#define ADD_FROM_STRING_ENTRY(NAMESPACE, OPERATOR) else if (name == #OPERATOR) return NAMESPACE::OPERATOR
+
+std::string ToString(FineTuneNodeAction action)
+{
+    switch (action)
+    {
+        ADD_TO_STRING_ENTRY(FineTuneNodeAction, copy);
+        ADD_TO_STRING_ENTRY(FineTuneNodeAction, finetune);
+        ADD_TO_STRING_ENTRY(FineTuneNodeAction, sparsify);
+        ADD_TO_STRING_ENTRY(FineTuneNodeAction, reoptimize);
+        ADD_TO_STRING_ENTRY(FineTuneNodeAction, none);
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Unknown node action type");
+    }
+}
+
 template <typename ElementType>
-void VerifyConvolutionalWeightsMatrix(const math::RowMatrix<ElementType>& weights, int filterSize, int numInputChannels, int numOutputChannels)
+void VerifyConvolutionalWeightsMatrix(const math::RowMatrix<ElementType>& weights, int filterSize, int numInputChannels, int numOutputChannels, bool isSpatialConvolution)
 {
     // matrix is f x (k*k*d)
     if (static_cast<int>(weights.NumRows()) != numOutputChannels)
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Convolution weights matrix: wrong number of rows");
     }
-    if (static_cast<int>(weights.NumColumns()) != filterSize * filterSize * numInputChannels)
+    if (static_cast<int>(weights.NumColumns()) != filterSize * filterSize * (isSpatialConvolution ? 1 : numInputChannels))
     {
         throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Convolution weights matrix: wrong number of columns");
     }
 }
 
-Model LoadInputModel(const FineTuneArguments& args)
+void VerifySubmodel(const OutputPortBase& submodelInput, const OutputPortBase& submodelOutput)
 {
-    auto map = common::LoadMap(args.mapLoadArguments);
-    auto result = map.GetModel().ShallowCopy();
-
-    // #### TODO: set default convolution method to "unrolled"
-    return result;
-}
-
-const OutputPortBase& GetInputModelTargetOutput(model::Model& model, const FineTuneArguments& args)
-{
-    const auto& output = GetSpecifiedOutput(model, args);
-    const auto& newOutput = RemoveSourceAndSinkNodes(model, output);
-    return newOutput;
-}
-
-const OutputPortBase& GetSpecifiedOutput(model::Model& model, const FineTuneArguments& args)
-{
-    if (args.targetPortElements.empty())
+    // Make sure submodelOutput is dependent on submodelInput
+    bool ok = false;
+    submodelOutput.GetNode()->GetModel()->VisitSubmodel(&submodelOutput, [&ok, &submodelInput](const Node& node) {
+        for (auto port : node.GetInputPorts())
+        {
+            if (&port->GetReferencedPort() == &submodelInput)
+            {
+                ok = true;
+            }
+        }
+    });
+    if (!ok)
     {
-        auto outputNode = GetOutputNode(model);
-        return outputNode->GetOutputPort();
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Invalid submodel, port " + submodelOutput.GetFullName() + " doesn't depend on " + submodelInput.GetFullName());
     }
+}
 
-    auto targetElementsProxy = model::ParsePortElementsProxy(args.targetPortElements);
-    auto targetElements = model::ProxyToPortElements(model, targetElementsProxy);
-    if (targetElements.IsFullPortOutput())
+template <typename ElementType, typename ParametersType>
+struct NodeTypeFromParametersType
+{};
+
+template <typename ElementType>
+struct NodeTypeFromParametersType<ElementType, FullyConnectedParameters>
+{
+    using NodeType = ell::nodes::FullyConnectedLayerNode<ElementType>;
+};
+
+template <typename ElementType>
+struct NodeTypeFromParametersType<ElementType, ConvolutionalParameters>
+{
+    using NodeType = ell::nodes::ConvolutionalLayerNode<ElementType>;
+};
+
+template <typename ElementType, typename LayerParametersType>
+const typename NodeTypeFromParametersType<ElementType, LayerParametersType>::NodeType* GetNearestFineTunableNodeForParams(const ell::model::OutputPortBase& output)
+{
+    if constexpr (std::is_same_v<LayerParametersType, ConvolutionalParameters>)
     {
-        return *(targetElements.GetRanges()[0].ReferencedPort());
+        return GetNearestConvolutionalLayerNode<ElementType>(output);
+    }
+    else if constexpr (std::is_same_v<LayerParametersType, FullyConnectedParameters>)
+    {
+        return GetNearestFullyConnectedLayerNode<ElementType>(output);
     }
     else
     {
-        throw utilities::InputException(utilities::InputExceptionErrors::badData, "Only full port outputs supported");
+        throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
     }
 }
 
 BinaryLabelDataContainer GetBinaryTrainingDataset(const FineTuneArguments& args)
 {
     return LoadBinaryLabelDataContainer(args.trainDataArguments.inputDataFilename);
+}
+
+MultiClassDataContainer GetMultiClassTrainingDataset(const FineTuneArguments& args)
+{
+    auto datasetFilename = args.trainDataArguments.inputDataFilename;
+    if (datasetFilename.empty())
+    {
+        return {};
+    }
+
+    auto dataFormat = args.dataFormat;
+    auto maxRows = args.maxTrainingRows;
+    auto dataset = LoadMultiClassDataContainer(datasetFilename, dataFormat, maxRows);
+    ConvertDatasetImages(dataset, args);
+    return dataset;
+}
+
+BinaryLabelDataContainer GetBinaryTestDataset(const FineTuneArguments& args)
+{
+    auto datasetFilename = args.testDataArguments.inputDataFilename;
+    if (datasetFilename.empty())
+    {
+        return {};
+    }
+
+    return LoadBinaryLabelDataContainer(args.testDataArguments.inputDataFilename);
+}
+
+MultiClassDataContainer GetMultiClassTestDataset(const FineTuneArguments& args)
+{
+    auto datasetFilename = args.testDataArguments.inputDataFilename;
+    if (datasetFilename.empty())
+    {
+        return {};
+    }
+
+    auto dataFormat = args.dataFormat;
+    auto maxRows = args.maxTestingRows;
+    auto dataset = LoadMultiClassDataContainer(datasetFilename, dataFormat, maxRows);
+    ConvertDatasetImages(dataset, args);
+    return dataset;
 }
 
 template <typename DatasetType>
@@ -135,45 +228,10 @@ void ConvertDatasetImages(DatasetType& dataset, const FineTuneArguments& args)
     }
 }
 
-MultiClassDataContainer GetMultiClassTrainingDataset(const FineTuneArguments& args)
-{
-    auto datasetFilename = args.trainDataArguments.inputDataFilename;
-    if (datasetFilename.empty())
-    {
-        return {};
-    }
-
-    auto dataFormat = args.dataFormat;
-    auto maxRows = args.maxTrainingRows;
-    auto dataset = LoadMultiClassDataContainer(datasetFilename, dataFormat, maxRows);
-    ConvertDatasetImages(dataset, args);
-    return dataset;
-}
-
-BinaryLabelDataContainer GetBinaryTestDataset(const FineTuneArguments& args)
-{
-    return LoadBinaryLabelDataContainer(args.testDataArguments.inputDataFilename);
-}
-
-MultiClassDataContainer GetMultiClassTestDataset(const FineTuneArguments& args)
-{
-    auto datasetFilename = args.testDataArguments.inputDataFilename;
-    if (datasetFilename.empty())
-    {
-        return {};
-    }
-
-    auto dataFormat = args.dataFormat;
-    auto maxRows = args.maxTestingRows;
-    auto dataset = LoadMultiClassDataContainer(datasetFilename, dataFormat, maxRows);
-    ConvertDatasetImages(dataset, args);
-    return dataset;
-}
-
-FineTuningOutput FineTuneNodesInSubmodel(Model& model,
-                                         const OutputPortBase& submodelOutput,
+FineTuningResult FineTuneNodesInSubmodel(const Submodel& submodel,
                                          MultiClassDataContainer& trainingData,
-                                         const FineTuneArguments& args)
+                                         const FineTuneArguments& args,
+                                         std::function<void(const FineTuningLayerResult&)> layerCallback)
 {
     TransformContext context;
     ModelTransformer transformer;
@@ -181,316 +239,464 @@ FineTuningOutput FineTuneNodesInSubmodel(Model& model,
     std::chrono::milliseconds::rep dataTransformTime = 0;
     std::chrono::milliseconds::rep optimizationTime = 0;
     std::vector<FineTuningLayerResult> layerResults;
-    int skipCount = args.numNodesToSkip;
-    Submodel submodel({ &submodelOutput });
-    auto resultSubmodel = transformer.TransformSubmodelOnto(submodel, {}, context, [&skipCount, &layerResults, &dataTransformTime, &optimizationTime, &trainingData, &args](const Node& node, ModelTransformer& transformer) {
-        if (ShouldConsiderLayer(node, args))
+
+    ModelOutputDataCache dataCache(args.maxCacheEntries);
+
+    bool didModifyAnyNodes = false;
+    auto problemParams = args.GetFineTuneProblemParameters();
+    auto resultSubmodel = transformer.TransformSubmodel(submodel, context, [&problemParams, &didModifyAnyNodes, &layerResults, &dataTransformTime, &optimizationTime, &dataCache, &trainingData, &args, &layerCallback](const Node& node, ModelTransformer& transformer) {
+        FineTuningLayerResult retrainingResult;
+        auto action = GetNodeAction(node, args, didModifyAnyNodes);
+
+        if (action != FineTuneNodeAction::none)
         {
-            if (skipCount > 0)
-            {
-                transformer.CopyNode(node);
-                --skipCount;
-            }
-            else
-            {
-                auto retrainingResult = RetrainLayer(transformer, node, trainingData, args.GetOptimizerParameters());
-                dataTransformTime += retrainingResult.dataTransformTime;
-                optimizationTime += retrainingResult.optimizationTime;
-                layerResults.push_back(retrainingResult);
-            }
+            using namespace logging;
+            Log() << "Action for node " << node.GetId() << ": " << ToString(action) << std::endl;
+        }
+
+        switch (action)
+        {
+        case FineTuneNodeAction::finetune:
+            retrainingResult = FineTuneLayer(transformer, node, trainingData, problemParams, dataCache);
+            didModifyAnyNodes = true;
+            break;
+        case FineTuneNodeAction::sparsify:
+            retrainingResult = SparsifyLayer(transformer, node, trainingData, problemParams, dataCache);
+            didModifyAnyNodes = true;
+            break;
+        default:
+            transformer.CopyNode(node);
+            return;
+        }
+        dataTransformTime += retrainingResult.dataTransformTime;
+        optimizationTime += retrainingResult.optimizationTime;
+        if (layerCallback)
+        {
+            layerCallback(retrainingResult);
+        }
+        layerResults.push_back(retrainingResult);
+    });
+
+    return { layerResults, resultSubmodel, dataTransformTime, optimizationTime };
+}
+
+TargetNodeType GetConvNodeTargetType(const Node& node)
+{
+    auto convType = GetConvolutionalNodeType(&node);
+    switch (convType)
+    {
+    case ConvolutionalNodeType::full:
+        return TargetNodeType::fullConvolution;
+    case ConvolutionalNodeType::pointwise:
+        return TargetNodeType::pointwiseConvolution;
+    case ConvolutionalNodeType::spatial:
+        return TargetNodeType::spatialConvolution;
+    }
+    return TargetNodeType::none;
+}
+
+TargetNodeType GetNodeTargetType(const Node& node)
+{
+    if (IsConvolutionalLayerNode(&node))
+    {
+        return GetConvNodeTargetType(node);
+    }
+    else if (IsFullyConnectedLayerNode(&node))
+    {
+        return TargetNodeType::fullyConnected;
+    }
+    return TargetNodeType::none;
+}
+
+FineTuneNodeAction GetNodeAction(const Node& node, const FineTuneArguments& args, bool didModifyAnyNodes)
+{
+    if (!IsFullyConnectedLayerNode(&node) && !IsConvolutionalLayerNode(&node))
+    {
+        return FineTuneNodeAction::none;
+    }
+
+    if (args.SkipNode(node.GetId().ToString()))
+    {
+        using namespace logging;
+        Log() << "Skipping node " << node.GetId() << EOL;
+        return didModifyAnyNodes ? FineTuneNodeAction::finetune : FineTuneNodeAction::copy;
+    }
+
+    if ((args.fineTuneFullyConnectedNodes && IsFullyConnectedLayerNode(&node)) ||
+        (args.fineTuneConvolutionalNodes && IsConvolutionalLayerNode(&node)))
+    {
+        auto nodeTargetType = GetNodeTargetType(node);
+        auto sparsifyTargets = args.sparsifyTargets;
+        if (sparsifyTargets & nodeTargetType)
+        {
+            return FineTuneNodeAction::sparsify;
         }
         else
         {
-            transformer.CopyNode(node);
+            return FineTuneNodeAction::finetune;
         }
-    });
+    }
 
-    return { resultSubmodel, layerResults, dataTransformTime, optimizationTime };
+    return FineTuneNodeAction::none;
 }
 
-bool ShouldConsiderLayer(const Node& node, const FineTuneArguments& args)
+bool ShouldSparsifyNode(const Node& node, const FineTuneArguments& args)
 {
-    return (args.fineTuneFullyConnectedNodes && IsFullyConnectedLayerNode(&node)) || (args.fineTuneConvolutionalNodes && IsConvolutionalLayerNode(&node));
+    auto nodeTargetType = GetNodeTargetType(node);
+    if (nodeTargetType == TargetNodeType::none)
+    {
+        return false;
+    }
+    auto sparsifyTargets = args.sparsifyTargets;
+    return sparsifyTargets & nodeTargetType;
+}
+
+const FineTuneOptimizationParameters& GetParametersForNodeAction(const FineTuneProblemParameters& parameters, FineTuneNodeAction action)
+{
+    switch (action)
+    {
+    case FineTuneNodeAction::finetune:
+        return parameters.fineTuneParameters;
+    case FineTuneNodeAction::sparsify:
+        return parameters.sparsifyParameters;
+    case FineTuneNodeAction::reoptimize:
+        return parameters.reoptimizeParameters;
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Unsupported action type");
+    }
+}
+
+FineTuningLayerResult FineTuneLayer(ModelTransformer& transformer,
+                                    const Node& node,
+                                    MultiClassDataContainer& trainingData,
+                                    const FineTuneProblemParameters& optimizerParameters,
+                                    ModelOutputDataCache& dataCache)
+{
+    return RetrainLayer(transformer, node, FineTuneNodeAction::finetune, trainingData, optimizerParameters, dataCache);
+}
+
+FineTuningLayerResult SparsifyLayer(ModelTransformer& transformer,
+                                    const Node& node,
+                                    MultiClassDataContainer& trainingData,
+                                    const FineTuneProblemParameters& optimizerParameters,
+                                    ModelOutputDataCache& dataCache)
+{
+    return RetrainLayer(transformer, node, FineTuneNodeAction::sparsify, trainingData, optimizerParameters, dataCache);
 }
 
 FineTuningLayerResult RetrainLayer(ModelTransformer& transformer,
                                    const Node& node,
+                                   FineTuneNodeAction action,
                                    MultiClassDataContainer& trainingData,
-                                   const FineTuneOptimizationParameters& optimizerParameters)
+                                   const FineTuneProblemParameters& optimizerParameters,
+                                   ModelOutputDataCache& dataCache)
+{
+    if (node.NumOutputPorts() != 1)
+    {
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Unsupported node type");
+    }
+
+    switch (node.GetOutputPort(0)->GetType())
+    {
+    case model::Port::PortType::smallReal:
+        return RetrainLayer<float>(transformer, node, action, trainingData, optimizerParameters, dataCache);
+        break;
+
+    case model::Port::PortType::real:
+        return RetrainLayer<double>(transformer, node, action, trainingData, optimizerParameters, dataCache);
+        break;
+
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Unsupported port type");
+    }
+}
+
+template <typename ElementType>
+FineTuningLayerResult RetrainLayer(ModelTransformer& transformer, const Node& node, FineTuneNodeAction action, MultiClassDataContainer& trainingData, const FineTuneProblemParameters& optimizerParameters, ModelOutputDataCache& dataCache)
 {
     if (IsFullyConnectedLayerNode(&node)) // TODO: replace with submodel-matcher
     {
-        return RetrainFullyConnectedLayer(transformer, node, trainingData, optimizerParameters);
+        return RetrainFullyConnectedLayer<ElementType>(transformer, node, action, trainingData, optimizerParameters, dataCache);
     }
     else if (IsConvolutionalLayerNode(&node)) // TODO: replace with submodel-matcher
     {
-        return RetrainConvolutionalLayer(transformer, node, trainingData, optimizerParameters);
+        return RetrainConvolutionalLayer<ElementType>(transformer, node, action, trainingData, optimizerParameters, dataCache);
     }
     else
     {
-        throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempting to return unsupported layer type");
+        throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "attempting to retrain an unsupported layer type");
     }
 }
 
-FineTuningLayerResult RetrainFullyConnectedLayer(ModelTransformer& transformer, const Node& node, MultiClassDataContainer& trainingData, const FineTuneOptimizationParameters& optimizerParameters)
-{
-    switch (node.GetOutputPort(0)->GetType())
-    {
-    case model::Port::PortType::smallReal:
-        return RetrainFullyConnectedLayer<float>(transformer, node, trainingData, optimizerParameters);
-        break;
-
-    case model::Port::PortType::real:
-        return RetrainFullyConnectedLayer<double>(transformer, node, trainingData, optimizerParameters);
-        break;
-
-    default:
-        throw utilities::InputException(utilities::InputExceptionErrors::badData, "Unsupported port type");
-    }
-}
-
-FineTuningLayerResult RetrainConvolutionalLayer(ModelTransformer& transformer, const Node& node, MultiClassDataContainer& trainingData, const FineTuneOptimizationParameters& optimizerParameters)
-{
-    switch (node.GetOutputPort(0)->GetType())
-    {
-    case model::Port::PortType::smallReal:
-        return RetrainConvolutionalLayer<float>(transformer, node, trainingData, optimizerParameters);
-        break;
-
-    case model::Port::PortType::real:
-        return RetrainConvolutionalLayer<double>(transformer, node, trainingData, optimizerParameters);
-        break;
-
-    default:
-        throw utilities::InputException(utilities::InputExceptionErrors::badData, "Unsupported port type");
-    }
-}
-
-// Need to pass in training params
 template <typename ElementType>
-FineTuningLayerResult RetrainFullyConnectedLayer(ModelTransformer& transformer, const Node& node, MultiClassDataContainer& trainingData, const FineTuneOptimizationParameters& optimizerParameters)
+FineTuningLayerResult RetrainFullyConnectedLayer(ModelTransformer& transformer, const Node& node, FineTuneNodeAction action, MultiClassDataContainer& trainingData, const FineTuneProblemParameters& optimizerParameters, ModelOutputDataCache& dataCache)
 {
-    // TODO: get input of submodel to retrain
-
     auto fcNode = dynamic_cast<const nodes::FullyConnectedLayerNode<ElementType>*>(&node);
     const auto& fcOutput = fcNode->output;
 
-    auto& model = transformer.GetModel();
     const auto& destination = transformer.GetCorrespondingOutputs(fcNode->input.GetReferencedPort());
-    const auto& fineTunedOutput = ApproximateSubmodelWithFullyConnectedLayer(trainingData, model, fcOutput, destination, optimizerParameters);
+    FullyConnectedParameters fcParams;
+    auto fineTunedOutput = ApproximateSubmodelWithNewLayer(trainingData, fcParams, fcOutput, destination, action, optimizerParameters, dataCache);
     transformer.MapNodeOutput(fcOutput, *fineTunedOutput.fineTunedOutput);
     return fineTunedOutput;
 }
 
-// Need to pass in training params
 template <typename ElementType>
-FineTuningLayerResult RetrainConvolutionalLayer(ModelTransformer& transformer, const Node& node, MultiClassDataContainer& trainingData, const FineTuneOptimizationParameters& optimizerParameters)
+FineTuningLayerResult RetrainConvolutionalLayer(ModelTransformer& transformer, const Node& node, FineTuneNodeAction action, MultiClassDataContainer& trainingData, const FineTuneProblemParameters& optimizerParameters, ModelOutputDataCache& dataCache)
 {
     // TODO: get input of submodel to retrain
-
+    auto convolutionType = GetConvolutionalNodeType(&node);
     auto convNode = dynamic_cast<const nodes::ConvolutionalLayerNode<ElementType>*>(&node);
     const auto& convOutput = convNode->output;
     const auto& convLayer = convNode->GetLayer();
     const auto filterSize = static_cast<int>(convLayer.GetConvolutionalParameters().receptiveField);
     const auto stride = static_cast<int>(convLayer.GetConvolutionalParameters().stride);
-    const auto inputPadding = convLayer.GetLayerParameters().inputPaddingParameters.paddingSize;
-    const auto outputPadding = convLayer.GetLayerParameters().outputPaddingParameters.paddingSize;
+    const auto inputPadding = static_cast<int>(convLayer.GetLayerParameters().inputPaddingParameters.paddingSize);
+    const auto outputPadding = static_cast<int>(convLayer.GetLayerParameters().outputPaddingParameters.paddingSize);
+    const bool isSpatialConvolution = convolutionType == ConvolutionalNodeType::spatial;
 
-    auto& model = transformer.GetModel();
     const auto& destination = transformer.GetCorrespondingOutputs(convNode->input.GetReferencedPort());
-    const auto& fineTunedOutput = ApproximateSubmodelWithConvolutionalLayer(trainingData, filterSize, stride, inputPadding, outputPadding, model, convOutput, destination, optimizerParameters);
+    ConvolutionalParameters convParams{ filterSize, stride, isSpatialConvolution, inputPadding, outputPadding };
+    auto fineTunedOutput = ApproximateSubmodelWithNewLayer(trainingData, convParams, convOutput, destination, action, optimizerParameters, dataCache);
     transformer.MapNodeOutput(convOutput, *fineTunedOutput.fineTunedOutput);
     return fineTunedOutput;
 }
 
-template <typename ElementType>
-FineTuningLayerResult ApproximateSubmodelWithFullyConnectedLayer(const MultiClassDataContainer& imageData,
-                                                                 Model& model,
-                                                                 const OutputPort<ElementType>& submodelOutput,
-                                                                 const OutputPort<ElementType>& destination,
-                                                                 const FineTuneOptimizationParameters& optimizerParameters)
+// TODO: rename this function to imply we're running an optimization
+template <typename ElementType, typename LayerParametersType>
+FineTuningLayerResult ApproximateSubmodelWithNewLayer(const MultiClassDataContainer& imageData,
+                                                      const LayerParametersType& layerParams,
+                                                      const OutputPort<ElementType>& submodelOutput,
+                                                      const OutputPort<ElementType>& destination,
+                                                      FineTuneNodeAction action,
+                                                      const FineTuneProblemParameters& problemParameters,
+                                                      ModelOutputDataCache& dataCache)
 {
+    using namespace logging;
+
+    // Gets the nearest convolutional or fully-connected node (probaby the one with submodelOutput as its output)
+    auto node = GetNearestFineTunableNodeForParams<ElementType, LayerParametersType>(submodelOutput);
+    if (node == nullptr)
+    {
+        throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Can't find original layer being fine-tuned");
+    }
+
+    auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    Log() << "[" << std::put_time(std::localtime(&now), "%F %T") << "] Replacing node " << node->GetId() << " with fine-tuned version" << EOL;
+    Log() << "Action: " << ToString(action) << std::endl;
+
     // Create a dataset from features -> labels
     utilities::MillisecondTimer dataTransformTimer;
-    auto retrainingDataset = GetFullyConnectedFineTuningDataset(imageData, model, submodelOutput, destination, optimizerParameters.normalizeInputs, optimizerParameters.normalizeOutputs);
+    auto retrainingDataset = GetFineTuningDataset(imageData, layerParams, submodelOutput, destination, problemParameters.normalizeInputs, problemParameters.normalizeOutputs, dataCache);
     dataTransformTimer.Stop();
+    auto dataTransformTime = dataTransformTimer.Elapsed();
+
+    bool isSpatialConvolution = IsConvolutionalLayerNode(node) && GetConvolutionalNodeType(node) == ConvolutionalNodeType::spatial;
 
     // Run SDCA to find weights that map data1->data2
     utilities::MillisecondTimer optTimer;
-    auto solution = TrainVectorPredictor(std::move(retrainingDataset.dataset), optimizerParameters);
-    auto weightsAndBias = GetWeightsAndBias<ElementType>(solution.predictor);
+    auto optimizerParameters = GetParametersForNodeAction(problemParameters, action);
+    auto solution = TrainVectorPredictor(retrainingDataset.dataset, optimizerParameters, isSpatialConvolution);
+    if (action == FineTuneNodeAction::sparsify && optimizerParameters.reoptimizeSparseWeights)
+    {
+        // TODO: record info about both phases (sparsify and reoptimize)
+        auto reoptimizeParameters = GetParametersForNodeAction(problemParameters, FineTuneNodeAction::reoptimize);
+        solution = ReoptimizeSparsePredictor(solution, retrainingDataset.dataset, reoptimizeParameters, isSpatialConvolution);
+    }
+
     optTimer.Stop();
-
-    // Add retrained fully connected and bias nodes
-    const auto& rawFineTunedOutput = AppendFineTunedFullyConnectedNodes(model, *retrainingDataset.normalizedFeaturesOutput, weightsAndBias);
-
     auto optimizationTime = optTimer.Elapsed();
-    auto dataTransformTime = dataTransformTimer.Elapsed();
-    return FineTuningLayerResult{ &submodelOutput, &rawFineTunedOutput, solution.info, dataTransformTime, optimizationTime };
+
+    Log() << "Optimization done: duality gap = " << solution.info.info.DualityGap() << std::endl;
+
+    FineTuningStats stats;
+    stats.originalActivationStatistics = retrainingDataset.labelStats;
+    stats.originalWeightsStatistics = retrainingDataset.labelStats;
+    stats.originalWeightsStatistics = GetWeightsStatistics<ElementType>(node->GetLayer().GetWeights());
+
+    // Sparsity-inducing optimization failed, re-run optimizer with just L2 (a 'finetune' action)
+    if (solution.info.info.DualityGap() > optimizerParameters.requiredPrecision && optimizerParameters.requiredPrecision != 0)
+    {
+        Log() << "Optimization failed: duality gap = " << solution.info.info.DualityGap() << std::endl;
+
+        // record info about the failed attempt's solution (weights stats, solution.info.info, solution.l2Regularization, and solution.l1Regularization)
+        auto failedWeightsAndBias = GetWeightsAndBias<ElementType>(solution.predictor);
+        stats.failedWeightsStatistics = GetWeightsStatistics(failedWeightsAndBias);
+
+        auto fineTuneOnlyParameters = optimizerParameters;
+        fineTuneOnlyParameters.sparsityTarget = 0; // "none"
+        fineTuneOnlyParameters.l1Regularization = 0; // "none"
+        utilities::MillisecondTimer optTimer;
+        solution = TrainVectorPredictor(std::move(retrainingDataset.dataset), optimizerParameters, isSpatialConvolution);
+        optTimer.Stop();
+        optimizationTime += optTimer.Elapsed();
+
+        // if the L2-only optimization also failed to converge, punt and return the original layer
+        if (solution.info.info.DualityGap() > optimizerParameters.requiredPrecision && optimizerParameters.requiredPrecision != 0)
+        {
+            // Get original weights statistics
+            stats.finalWeightsStatistics = GetWeightsStatistics<ElementType>(node->GetLayer().GetWeights());
+
+            // Copy original node
+            ModelTransformer transformer;
+            TransformContext context;
+            auto newSubmodel = transformer.CopySubmodelOnto(Submodel{ std::vector<const InputPortBase*>{ &node->input }, std::vector<const OutputPortBase*>{ &submodelOutput } },
+                                                            std::vector<const OutputPortBase*>{ &destination },
+                                                            context);
+            return FineTuningLayerResult{ false,
+                                          &submodelOutput,
+                                          newSubmodel.GetOutputs()[0],
+                                          solution.info,
+                                          stats,
+                                          dataTransformTime,
+                                          optimizationTime };
+        }
+    }
+
+    auto weightsAndBias = GetWeightsAndBias<ElementType>(solution.predictor);
+    if constexpr (std::is_same_v<LayerParametersType, ConvolutionalParameters>)
+    {
+        // Sanity check for convolutional nodes -- destination is where we're going to graft the new submodel, so it must have the same number of channels as the input to the convolution
+        const auto numChannels = destination.GetMemoryLayout().GetActiveSize()[2];
+        const auto numFilters = submodelOutput.GetMemoryLayout().GetActiveSize()[2];
+        VerifyConvolutionalWeightsMatrix(weightsAndBias.weights, layerParams.filterSize, numChannels, numFilters, isSpatialConvolution);
+    }
+
+    // Add retrained convolutional and bias nodes
+    const auto& rawFineTunedOutput = AppendFineTunedNodes(*retrainingDataset.normalizedFeaturesOutput, layerParams, weightsAndBias);
+    auto output = std::cref(rawFineTunedOutput);
+    if (problemParameters.normalizeOutputs)
+    {
+        // We need to normalize the new output to match original output
+        // which means we need to run data through the model and get the stats at rawFineTunedOutput
+        // then change it to match the original output's stats
+
+        Submodel rawFineTunedDataSubmodel{ { static_cast<const OutputPortBase*>(&rawFineTunedOutput) } };
+        auto imageFeatures = GetDatasetInputs(imageData);
+        auto rawFineTunedOutputData = TransformDataWithSubmodel(imageFeatures, rawFineTunedDataSubmodel, dataCache, true);
+        const int outputChannelDim = 2;
+        stats.rawFineTunedActivationStatistics = GetDataStatistics(rawFineTunedOutputData, rawFineTunedOutput.GetMemoryLayout(), outputChannelDim);
+        output = Unnormalize(rawFineTunedOutput, retrainingDataset.labelStats, stats.rawFineTunedActivationStatistics.value());
+    }
+
+    stats.finalWeightsStatistics = GetWeightsStatistics(weightsAndBias);
+    {
+        Submodel resultSubmodel{ { static_cast<const OutputPortBase*>(&(output.get())) } };
+        auto imageFeatures = GetDatasetInputs(imageData);
+        auto fineTunedOutput = TransformDataWithSubmodel(imageFeatures, resultSubmodel, dataCache, true);
+        stats.fineTunedActivationStatistics = GetDataStatistics(fineTunedOutput);
+    }
+
+    return FineTuningLayerResult{ true,
+                                  &submodelOutput,
+                                  &(output.get()),
+                                  solution.info,
+                                  stats,
+                                  dataTransformTime,
+                                  optimizationTime };
 }
 
 template <typename ElementType>
-FineTuningDataset<ElementType> GetFullyConnectedFineTuningDataset(const MultiClassDataContainer& imageData,
-                                                                  Model& model,
-                                                                  const OutputPort<ElementType>& submodelOutput,
-                                                                  const OutputPort<ElementType>& destination,
-                                                                  bool normalizeInputs,
-                                                                  bool normalizeOutputs)
+FineTuningDataset<ElementType> GetFineTuningDataset(const MultiClassDataContainer& imageData,
+                                                    const FullyConnectedParameters& fcParams,
+                                                    const OutputPort<ElementType>& fullyConnectedOutput,
+                                                    const OutputPort<ElementType>& destination,
+                                                    bool normalizeInputs,
+                                                    bool normalizeOutputs,
+                                                    ModelOutputDataCache& dataCache)
 {
     auto imageFeatures = GetDatasetInputs(imageData);
+    const auto& featuresOutput = GetFeaturesPort(imageFeatures, destination, normalizeInputs);
 
-    // Get statistics of "features" and "labels" so we can normalize them for training
-    auto rawFeatures = TransformDataWithModel(imageFeatures, model, destination);
-    UnlabeledDataContainer trainingFeatures;
-    const OutputPort<ElementType>* normalizedFeaturesOutput = nullptr;
-    normalizedFeaturesOutput = &destination;
-    trainingFeatures = rawFeatures;
+    auto trainingFeatures = TransformDataWithModel(imageFeatures, featuresOutput);
 
-    auto rawLabels = TransformDataWithModel(imageFeatures, model, submodelOutput);
-    UnlabeledDataContainer trainingLabels;
-    trainingLabels = rawLabels;
+    auto rawLabels = TransformDataWithModel(imageFeatures, fullyConnectedOutput);
+    auto labelStats = GetDataStatistics(rawLabels);
+    UnlabeledDataContainer trainingLabels = normalizeOutputs ? GetNormalizedData(rawLabels, labelStats) : rawLabels;
 
     // Create a dataset from features -> labels
     auto retrainingDataset = CreateVectorLabelDataContainer(trainingFeatures, trainingLabels);
-
-    return { retrainingDataset, normalizedFeaturesOutput };
+    return { retrainingDataset, labelStats, &featuresOutput };
 }
 
-// TODO: rename this function to imply we're running an optimization
+// TODO: Rename this function to make it clear we're adding nodes to the model (if normalizeInputs is true)
+// --- maybe have calling function add the normalization and then call this with its output
 template <typename ElementType>
-FineTuningLayerResult ApproximateSubmodelWithConvolutionalLayer(const MultiClassDataContainer& imageData,
-                                                                int filterSize,
-                                                                int stride,
-                                                                int inputPadding,
-                                                                int outputPadding,
-                                                                Model& model,
-                                                                const OutputPort<ElementType>& submodelOutput,
-                                                                const OutputPort<ElementType>& destination,
-                                                                const FineTuneOptimizationParameters& optimizerParameters)
+FineTuningDataset<ElementType> GetFineTuningDataset(const MultiClassDataContainer& imageData,
+                                                    const ConvolutionalParameters& convParams,
+                                                    const OutputPort<ElementType>& convolutionOutput,
+                                                    const OutputPort<ElementType>& destination,
+                                                    bool normalizeInputs,
+                                                    bool normalizeOutputs,
+                                                    ModelOutputDataCache& dataCache)
 {
-    const auto numChannels = destination.GetMemoryLayout().GetActiveSize()[2];
-    const auto numFilters = submodelOutput.GetMemoryLayout().GetActiveSize()[2];
-
-    utilities::MillisecondTimer dataTransformTimer;
-    auto retrainingDataset = GetConvolutionalFineTuningDataset(imageData, filterSize, stride, model, submodelOutput, destination, optimizerParameters.normalizeInputs, optimizerParameters.normalizeOutputs);
-    dataTransformTimer.Stop();
-
-    // Run SDCA to find weights that map data1->data2
-    utilities::MillisecondTimer optTimer;
-    auto solution = TrainVectorPredictor(std::move(retrainingDataset.dataset), optimizerParameters);
-    auto weightsAndBias = GetWeightsAndBias<ElementType>(solution.predictor);
-    optTimer.Stop();
-    VerifyConvolutionalWeightsMatrix(weightsAndBias.weights, filterSize, numChannels, numFilters);
-
-    // Add retrained convolutional and bias nodes
-    const auto& rawFineTunedOutput = AppendFineTunedConvolutionalNodes(model, *retrainingDataset.normalizedFeaturesOutput, filterSize, stride, inputPadding, outputPadding, weightsAndBias);
-
-    auto optimizationTime = optTimer.Elapsed();
-    auto dataTransformTime = dataTransformTimer.Elapsed();
-    return FineTuningLayerResult{ &submodelOutput, &rawFineTunedOutput, solution.info, dataTransformTime, optimizationTime };
-}
-
-// Rename this function to make it clear we're adding nodes to the model
-template <typename ElementType>
-FineTuningDataset<ElementType> GetConvolutionalFineTuningDataset(const MultiClassDataContainer& imageData,
-                                                                 int filterSize,
-                                                                 int stride,
-                                                                 Model& model,
-                                                                 const OutputPort<ElementType>& submodelOutput,
-                                                                 const OutputPort<ElementType>& destination,
-                                                                 bool normalizeInputs,
-                                                                 bool normalizeOutputs)
-{
-    auto imageFeatures = GetDatasetInputs(imageData);
-
-    // Get statistics of "features" and "labels" so we can normalize them for training
-    auto rawFeatures = TransformDataWithModel(imageFeatures, model, destination);
-    UnlabeledDataContainer imageFeatureData;
-    const OutputPort<ElementType>* normalizedFeaturesOutput = nullptr;
-    normalizedFeaturesOutput = &destination;
-    imageFeatureData = rawFeatures;
-
-    auto rawLabels = TransformDataWithModel(imageFeatures, model, submodelOutput);
-    UnlabeledDataContainer imageLabelData;
-    imageLabelData = rawLabels;
-
+    // TODO: fix this to work with depthwise-separable convolutions
     const auto numRows = destination.GetMemoryLayout().GetExtent()[0];
     const auto numColumns = destination.GetMemoryLayout().GetExtent()[1];
     const auto numChannels = destination.GetMemoryLayout().GetExtent()[2];
-    const auto numOutputRows = submodelOutput.GetMemoryLayout().GetActiveSize()[0];
-    const auto numOutputColumns = submodelOutput.GetMemoryLayout().GetActiveSize()[1];
-    const auto numFilters = submodelOutput.GetMemoryLayout().GetActiveSize()[2];
+    const auto numOutputRows = convolutionOutput.GetMemoryLayout().GetActiveSize()[0];
+    const auto numOutputColumns = convolutionOutput.GetMemoryLayout().GetActiveSize()[1];
+    const int outputChannelDim = 2;
+    const auto numFilters = convolutionOutput.GetMemoryLayout().GetActiveSize()[outputChannelDim];
 
-    UnlabeledDataContainer trainingFeatures = GetUnrolledImageDataset(imageFeatureData, numRows, numColumns, numChannels, filterSize, stride);
+    auto imageFeatures = GetDatasetInputs(imageData);
+    const auto& featuresOutput = GetFeaturesPort(imageFeatures, destination, normalizeInputs);
+
+    Submodel transformSubmodel1{ { &featuresOutput } };
+    auto imageFeatureData = TransformDataWithSubmodel(imageFeatures, transformSubmodel1, dataCache, true); // acutally should be false
+
+    Submodel transformSubmodel2{ { &convolutionOutput } };
+    auto rawLabels = TransformDataWithSubmodel(imageFeatures, transformSubmodel2, dataCache, true);
+
+    auto rawLabelStats = GetDataStatistics(rawLabels, convolutionOutput.GetMemoryLayout(), outputChannelDim);
+    UnlabeledDataContainer imageLabelData = normalizeOutputs ? GetNormalizedData(rawLabels, rawLabelStats, convolutionOutput.GetMemoryLayout(), outputChannelDim) : rawLabels;
+    UnlabeledDataContainer trainingFeatures = GetUnrolledImageDataset(imageFeatureData, numRows, numColumns, numChannels, convParams.filterSize, convParams.stride);
     UnlabeledDataContainer trainingLabels = GetImageMatrixDataset(imageLabelData, numOutputRows, numOutputColumns, numFilters);
 
     // Create a dataset from features -> labels
     auto retrainingDataset = CreateVectorLabelDataContainer(trainingFeatures, trainingLabels);
-    return { retrainingDataset, normalizedFeaturesOutput };
+    return { retrainingDataset, rawLabelStats, &featuresOutput };
 }
 
-void WriteLayerOptimizationResult(const model::OutputPortBase& output1, const model::OutputPortBase& output2, const optimization::SDCASolutionInfo& optimizationInfo, Report& report)
+template <typename ElementType>
+const OutputPort<ElementType>& GetFeaturesPort(const UnlabeledDataContainer& imageFeatures, const OutputPort<ElementType>& rawFeatureOutput, bool normalize)
 {
-    std::string nodeType = "";
-    if (IsConvolutionalLayerNode(output1.GetNode()))
-        nodeType = "Convolutional";
-    else if (IsFullyConnectedLayerNode(output1.GetNode()))
-        nodeType = "FullyConnected";
-
-    auto nodeId1 = output1.GetNode()->GetId().ToString();
-    auto nodeId2 = output2.GetNode()->GetId().ToString();
-    report.WriteLayerOptimizationInfo(nodeType, nodeId1, nodeId2, optimizationInfo);
-}
-
-void WriteModelOutputComparison(model::Model& model, const model::OutputPortBase& output1, const model::OutputPortBase& output2, const UnlabeledDataContainer& dataset, Report& report)
-{
-    if (output1.GetType() != output2.GetType())
+    if (normalize)
     {
-        throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Original and fine-tuned outputs have different types");
+        auto rawFeatures = TransformDataWithModel(imageFeatures, rawFeatureOutput);
+        auto featureStats = GetDataStatistics(rawFeatures);
+        return Normalize(rawFeatureOutput, featureStats);
     }
-
-    switch (output1.GetType())
+    else
     {
-    case model::Port::PortType::smallReal:
-        WriteModelOutputComparison(model, static_cast<const OutputPort<float>&>(output1), static_cast<const OutputPort<float>&>(output2), dataset, report);
-        break;
-
-    case model::Port::PortType::real:
-        WriteModelOutputComparison(model, static_cast<const OutputPort<double>&>(output1), static_cast<const OutputPort<double>&>(output2), dataset, report);
-        break;
-
-    default:
-        throw utilities::InputException(utilities::InputExceptionErrors::badData, "Unsupported port type");
+        // no normalization
+        return rawFeatureOutput;
     }
 }
 
 template <typename ElementType>
-void WriteModelOutputComparison(model::Model& model, const model::OutputPort<ElementType>& output1, const model::OutputPort<ElementType>& output2, const UnlabeledDataContainer& dataset, Report& report)
+DataStatistics GetWeightsStatistics(const WeightsAndBias<ElementType>& weightsAndBias)
 {
-    auto outputData1 = TransformDataWithModel(dataset, model, output1);
-    auto outputData2 = TransformDataWithModel(dataset, model, output2);
-
-    double err = 0;
-    auto size = outputData1.Size();
-    for (size_t i = 0; i < size; ++i)
-    {
-        auto vec1 = outputData1[i];
-        auto vec2 = outputData2[i];
-        vec1 -= vec2;
-        err += vec1.Norm2();
-    }
-    err /= size;
-
-    std::string nodeType = "";
-    if (IsConvolutionalLayerNode(output1.GetNode()))
-        nodeType = "Convolutional";
-    else if (IsFullyConnectedLayerNode(output1.GetNode()))
-        nodeType = "FullyConnected";
-
-    auto nodeId1 = output1.GetNode()->GetId().ToString();
-    auto nodeId2 = output2.GetNode()->GetId().ToString();
-    report.WriteLayerError(nodeType, nodeId1, nodeId2, err);
+    return GetWeightsStatistics(weightsAndBias.weights);
 }
 
-template void WriteModelOutputComparison(model::Model& model, const model::OutputPort<float>& output1, const model::OutputPort<float>& output2, const UnlabeledDataContainer& dataset, Report& report);
-template void WriteModelOutputComparison(model::Model& model, const model::OutputPort<double>& output1, const model::OutputPort<double>& output2, const UnlabeledDataContainer& dataset, Report& report);
+template <typename ElementType>
+DataStatistics GetWeightsStatistics(const ell::math::RowMatrix<ElementType>& weights)
+{
+    UnlabeledDataContainer container;
+    for (size_t i = 0; i < weights.NumRows(); ++i)
+    {
+        container.Add(CastVector<float>(weights.GetRow(i)));
+    }
+
+    return GetScalarDataStatistics(container);
+}
+
+template <typename ElementType>
+DataStatistics GetWeightsStatistics(const typename predictors::neural::ConvolutionalLayer<ElementType>::TensorType& weights)
+{
+    UnlabeledDataContainer container;
+    container.Add(CastVector<float>(math::RowVector<ElementType>(weights.ToArray())));
+    return GetScalarDataStatistics(container);
+}
+} // namespace ell

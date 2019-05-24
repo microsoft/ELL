@@ -14,11 +14,11 @@
 
 #include <string>
 
-MultiClassDataContainer LoadSmallMNISTDataContainer();
-MultiClassDataContainer LoadTrivialConvDataContainer();
-MultiClassDataContainer LoadTrivialConvDataContainer2();
+ell::MultiClassDataContainer LoadSmallMNISTDataContainer();
+ell::MultiClassDataContainer LoadTrivialConvDataContainer();
+ell::MultiClassDataContainer LoadTrivialConvDataContainer2();
 
-UnlabeledDataContainer GetSimpleStatsDataset();
+ell::UnlabeledDataContainer GetSimpleStatsDataset();
 ell::math::RowVector<double> GetSimpleStatsDatasetMean();
 ell::math::RowVector<double> GetSimpleStatsDatasetStdDev();
 double GetSimpleStatsDatasetScalarMean();

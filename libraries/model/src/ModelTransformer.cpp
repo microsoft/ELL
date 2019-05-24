@@ -343,7 +343,7 @@ namespace model
     }
 
     // Transforms the submodel by visiting its nodes in execution order (visit all inputs to a node before visiting that node)
-    Submodel ModelTransformer::TransformSubmodelOnto(const Submodel& submodel, Model& destModel, const std::vector<const OutputPortBase*>& onto, const TransformContext& context, const NodeTransformFunction& transformFunction)
+    Submodel ModelTransformer::TransformSubmodelOnto(const Submodel& submodel, const Model& destModel, const std::vector<const OutputPortBase*>& onto, const TransformContext& context, const NodeTransformFunction& transformFunction)
     {
         _context = context;
         _model = destModel.ShallowCopy();
@@ -454,7 +454,7 @@ namespace model
 
     Submodel ModelTransformer::TransformSubmodel(const Submodel& submodel, const TransformContext& context, const NodeTransformFunction& transformFunction)
     {
-        return TransformSubmodelOnto(submodel, {}, context, transformFunction);
+        return TransformSubmodelOnto(submodel, submodel.GetModel(), {}, context, transformFunction);
     }
 
     void ModelTransformer::ResetContext()

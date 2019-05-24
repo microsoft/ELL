@@ -55,6 +55,8 @@ void TestCombineOutputMap();
 void TestMultiOutputMap();
 void TestMultiSourceSinkMap();
 void TestCompiledMapMove();
+void TestCompiledMapClone();
+void TestCompiledMapParallelClone();
 
 #pragma region implementation
 

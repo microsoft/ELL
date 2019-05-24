@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     TestTransformData.h (finetune_test)
+//  File:     TestPredictorUtils.h (finetune_test)
 //  Authors:  Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,10 +9,7 @@
 #pragma once
 
 // Main driver function
-void TestTransformData();
+void TestPredictorUtils();
 
 // Individual tests
-void TestRemovePadding();
-void TestTransformDataWithModel();
-void TestTransformDataWithSubmodel();
-void TestTransformDataWithCachedSubmodel();
+void TestGetWeightsAndBias();

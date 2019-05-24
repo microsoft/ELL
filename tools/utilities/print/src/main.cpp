@@ -46,7 +46,6 @@ bool IsNeuralNetworkPredictorNode(const ell::model::Node* node)
 
 int main(int argc, char* argv[])
 {
-    int rc = 0;
     try
     {
         // create a command line parser
@@ -110,6 +109,16 @@ int main(int argc, char* argv[])
             {
                 model = map.GetModel().ShallowCopy();
             }
+
+            if (printArguments.compile)
+            {
+                model::MapCompilerOptions settings = mapCompilerArguments.GetMapCompilerOptions("model");
+                auto optimizerOptions = mapCompilerArguments.GetModelOptimizerOptions();
+
+                model::IRMapCompiler compiler(settings, optimizerOptions);
+                auto compiledMap = compiler.Compile(map);
+                model = compiledMap.GetModel().ShallowCopy();
+            }
         }
 
         // print model
@@ -127,7 +136,7 @@ int main(int argc, char* argv[])
     catch (const utilities::CommandLineParserPrintHelpException& exception)
     {
         std::cout << exception.GetHelpText() << std::endl;
-        rc = 0;
+        return 0;
     }
     catch (const utilities::CommandLineParserErrorException& exception)
     {
@@ -136,29 +145,28 @@ int main(int argc, char* argv[])
         {
             std::cerr << error.GetMessage() << std::endl;
         }
-        rc = 1;
+        return 1;
     }
     catch (utilities::LogicException& exception)
     {
         std::cerr << "runtime error: " << exception.GetMessage() << std::endl;
-        rc = 1;
+        return 1;
     }
     catch (utilities::InputException& exception)
     {
         std::cerr << "input error: " << exception.GetMessage() << std::endl;
-        rc = 1;
+        return 1;
     }
     catch (std::exception& exception)
     {
         std::cerr << "unknown error: " << exception.what() << std::endl;
-        rc = 1;
+        return 1;
     }
     catch (...)
     {
         std::cerr << "unknown exception" << std::endl;
-        rc = 1;
+        return 1;
     }
 
-    // the end
-    return rc;
+    return 0;
 }

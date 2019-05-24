@@ -18,3 +18,7 @@ void TestIsConvolutionalLayerNode();
 
 void TestAppendSinkNode();
 void TestAppendOutputWithSink();
+
+void TestFindNearestCommonAncestor();
+void TestIsCompleteAncestor();
+void TestGetCompleteAncestors();

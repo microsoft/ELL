@@ -41,6 +41,18 @@ namespace model
     class OutputNodeBase;
     class TransformContext;
 
+    enum class InputMethod
+    {
+        InputNode,
+        SourceNode
+    };
+
+    enum class OutputMethod
+    {
+        OutputNode,
+        SinkNode
+    };
+
     /// <summary> Class that wraps a model and its designated outputs </summary>
     class Map : public utilities::IArchivable
     {

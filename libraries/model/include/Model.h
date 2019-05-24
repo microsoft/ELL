@@ -257,15 +257,6 @@ namespace model
         void VisitSubmodel(const std::vector<const InputPortBase*>& inputs, const std::vector<const OutputPortBase*>& outputs, Visitor&& visitor) const;
 
         /// <summary>
-        /// Visits all the nodes in the model in reverse dependency order. No nodes will be visited until all
-        /// its outputs have first been visited.
-        /// </summary>
-        ///
-        /// <param name="visitor"> The visitor functor to use. The type signature should be of the form `void visitor(const Node&)`. </param>
-        template <typename Visitor>
-        void ReverseVisit(Visitor&& visitor) const;
-
-        /// <summary>
         /// Gets an iterator over all the nodes in the model in dependency order. No nodes will be visited until all
         /// its inputs have first been visited.
         /// </summary>
@@ -660,14 +651,6 @@ namespace model
             visitor(*iter.Get());
             iter.Next();
         }
-    }
-
-    // Visits the entire model in reverse
-    template <typename Visitor>
-    void Model::ReverseVisit(Visitor&& visitor) const
-    {
-        auto iter = GetReverseNodeIterator();
-        VisitIteratedNodes(iter, visitor);
     }
 } // namespace model
 } // namespace ell

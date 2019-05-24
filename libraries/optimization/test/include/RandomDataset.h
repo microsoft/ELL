@@ -23,6 +23,9 @@ using namespace ell::optimization;
 template <typename ElementType, typename VectorExampleType, typename IndexedContainerExampleType>
 std::shared_ptr<VectorIndexedContainer<VectorExampleType, IndexedContainerExampleType>> GetRandomDataset(size_t count, size_t randomVectorSize, std::default_random_engine& randomEngine, size_t numConstantFeatures = 0);
 
+template <typename ElementType, typename VectorExampleType, typename IndexedContainerExampleType>
+std::shared_ptr<VectorIndexedContainer<VectorExampleType, IndexedContainerExampleType>> GetRandomDataset(size_t count, size_t inputSize, size_t outputSize, std::default_random_engine& randomEngine, size_t numConstantFeatures = 0);
+
 using VectorExampleType = Example<math::RowVector<double>, double>;
 using ContainerExampleType = Example<math::ConstRowVectorReference<double>, double>;
 
@@ -46,8 +49,8 @@ using VectorRefVectorRefExampleType = Example<math::ConstRowVectorReference<T>, 
 
 using namespace ell;
 
-template <typename ElementType, typename ExampleType>
-ExampleType GetRandomExample(size_t randomVectorSize, std::default_random_engine& randomEngine, size_t numConstantFeatures = 0)
+template <typename ElementType, typename VectorType>
+VectorType GetRandomVector(size_t randomVectorSize, std::default_random_engine& randomEngine, size_t numConstantFeatures = 0)
 {
     // allocate vector
     math::RowVector<ElementType> vector(randomVectorSize + numConstantFeatures);
@@ -57,11 +60,24 @@ ExampleType GetRandomExample(size_t randomVectorSize, std::default_random_engine
     // generate random values
     std::normal_distribution<double> normal(0, 200);
     vectorView.Generate([&]() { return static_cast<ElementType>(normal(randomEngine)); });
+    return vector;
+}
 
+template <typename ElementType, typename ExampleType>
+ExampleType GetRandomExample(size_t randomVectorSize, std::default_random_engine& randomEngine, size_t numConstantFeatures = 0)
+{
+    auto input = GetRandomVector<ElementType, math::RowVector<ElementType>>(randomVectorSize, randomEngine, numConstantFeatures);
     ElementType output = randomEngine() % 2 == 0 ? static_cast<ElementType>(-1) : static_cast<ElementType>(1);
-
     using OutputType = typename ExampleType::OutputType;
-    return ExampleType{ std::move(vector), OutputType{ output } };
+    return ExampleType{ input, OutputType{ output } };
+}
+
+template <typename ElementType, typename ExampleType>
+ExampleType GetRandomExample(size_t inputSize, size_t outputSize, std::default_random_engine& randomEngine, size_t numConstantFeatures)
+{
+    auto input = GetRandomVector<ElementType, math::RowVector<ElementType>>(inputSize, randomEngine, numConstantFeatures);
+    auto output = GetRandomVector<ElementType, math::RowVector<ElementType>>(outputSize, randomEngine);
+    return { input, output };
 }
 
 template <typename ElementType, typename VectorExampleType, typename IndexedContainerExampleType>
@@ -72,6 +88,18 @@ std::shared_ptr<VectorIndexedContainer<VectorExampleType, IndexedContainerExampl
     for (size_t i = 0; i < count; ++i)
     {
         exampleSet->push_back(GetRandomExample<ElementType, VectorExampleType>(randomVectorSize, randomEngine, numConstantFeatures));
+    }
+    return exampleSet;
+}
+
+template <typename ElementType, typename VectorExampleType, typename IndexedContainerExampleType>
+std::shared_ptr<VectorIndexedContainer<VectorExampleType, IndexedContainerExampleType>> GetRandomDataset(size_t count, size_t inputSize, size_t outputSize, std::default_random_engine& randomEngine, size_t numConstantFeatures)
+{
+    auto exampleSet = std::make_shared<VectorIndexedContainer<VectorExampleType, IndexedContainerExampleType>>();
+    exampleSet->reserve(count);
+    for (size_t i = 0; i < count; ++i)
+    {
+        exampleSet->push_back(GetRandomExample<ElementType, VectorExampleType>(inputSize, outputSize, randomEngine, numConstantFeatures));
     }
     return exampleSet;
 }

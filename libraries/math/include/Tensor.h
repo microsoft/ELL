@@ -339,6 +339,15 @@ namespace math
         /// <returns> True if contiguous, false if not. </returns>
         bool IsContiguous() const;
 
+        /// <summary>
+        /// Visits elements of the tensor by repeatedly calling a visitor function.
+        /// </summary>
+        ///
+        /// <typeparam name="VisitorType"> Type of lambda or functor to use as a visitor. </typeparam>
+        /// <param name="visitor"> The visitor function. </param>
+        template <typename VisitorType>
+        void Visit(VisitorType visitor) const;
+
         /// @}
 
         /// \name Comparison Functions
@@ -1306,6 +1315,17 @@ namespace math
     bool ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::IsContiguous() const
     {
         return GetSize0() == GetIncrement1() && GetSize0() * GetSize1() == GetIncrement2();
+    }
+
+    template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>
+    template <typename VisitorType>
+    void ConstTensorReference<ElementType, dimension0, dimension1, dimension2>::Visit(VisitorType visitor) const
+    {
+        for (size_t i = 0; i < this->NumPrimarySlices(); ++i)
+        {
+            auto slice = GetPrimarySlice(i);
+            slice.Visit(visitor);
+        }
     }
 
     template <typename ElementType, Dimension dimension0, Dimension dimension1, Dimension dimension2>

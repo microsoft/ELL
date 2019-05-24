@@ -31,6 +31,9 @@ namespace optimization
         using ExampleType = Example<InputType, OutputType>;
         using DatasetType = IndexedContainer<ExampleType>;
 
+        /// <summary> Solutions are expected to have a ParameterType. Empty here because this solution type doesn't need any parameters. </summary>
+        struct ParametersType {};
+        
         /// <summary> Default constructor. </summary>
         VectorSolution() = default;
 
@@ -43,6 +46,9 @@ namespace optimization
 
         /// <summary> Resets the solution to zero. </summary>
         void Reset();
+
+        /// <summary> Sets the solution parameters. This solution type doesn't have any parameters, so it does nothing. </summary>
+        void SetParameters(const ParametersType& parameters) {}
 
         /// <summary> Returns a reference to the vector. </summary>
         math::ColumnVectorReference<double> GetVector() { return _weights; }

@@ -105,6 +105,11 @@ namespace predictors
             /// <returns> The name of this type. </returns>
             std::string GetRuntimeTypeName() const override { return GetTypeName(); }
 
+            /// <summary> Checks if this layer represents a depthwise-separable convolution. </summary>
+            ///
+            /// <returns> `true` if this layer represents a depthwise-separable convolution. </returns>
+            bool IsDepthwiseSeparable() const;
+
         protected:
             void WriteToArchive(utilities::Archiver& archiver) const override;
             void ReadFromArchive(utilities::Unarchiver& archiver) override;
@@ -117,7 +122,6 @@ namespace predictors
             void InitializeIOMatrices();
             void Validate() const;
             void CalculateConvolutionMethod();
-            bool IsDepthwiseSeparable() const;
             void ComputeSimpleMethod();
             void ComputeUnrolledMethod();
             void ComputeWinogradMethod();

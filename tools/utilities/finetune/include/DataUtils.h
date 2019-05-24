@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+namespace ell
+{
 template <typename T>
 class VectorContainer : public ell::optimization::IndexedContainer<T>
 {
@@ -92,6 +94,12 @@ MultiClassDataContainer LoadMnistDataContainer(std::string filename, int maxRows
 /// <summary> Combine two unlabeled datasets (one containing "features" and one containing "labels") into a labeled dataset. </summary>
 VectorLabelDataContainer CreateVectorLabelDataContainer(const UnlabeledDataContainer& features, const UnlabeledDataContainer& labels);
 
+/// <summary> Create a subset of an input dataset, where the inputs and outputs are contiguous blocks of the input dataset's inputs and outputs. </summary>
+VectorLabelDataContainer CreateSubBlockVectorLabelDataContainer(const VectorLabelDataContainer& dataset, int inputBlockSize, int outputBlockSize, int index);
+
+/// <summary> Create a subset of an input dataset, where the output is a single element of the source dataset's output vector. </summary>
+VectorLabelDataContainer CreateSingleOutputVectorLabelDataContainer(const VectorLabelDataContainer& dataset, int index);
+
 // Split off the inputs/features from a dataset
 UnlabeledDataContainer GetDatasetInputs(const BinaryLabelDataContainer& dataset);
 UnlabeledDataContainer GetDatasetInputs(const MultiClassDataContainer& dataset);
@@ -119,3 +127,16 @@ double GetModelAccuracy(const BinaryLabelDataContainer& dataset, const Unlabeled
 
 /// <summary> Compute the prediction accuracy (fraction of correct classifications) from a labeled dataset and a corresponding dataset of predicted labels. </summary>
 double GetModelAccuracy(const MultiClassDataContainer& dataset, const UnlabeledDataContainer& predictions);
+
+template <typename T1, typename T2>
+ell::math::RowVector<T1> CastVector(const ell::math::ConstRowVectorReference<T2>& v)
+{
+    auto size = v.Size();
+    ell::math::RowVector<T1> result(size);
+    for (size_t i = 0; i < size; ++i)
+    {
+        result[i] = v[i];
+    }
+    return result;
+}
+} // namespace ell

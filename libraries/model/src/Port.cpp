@@ -59,6 +59,11 @@ namespace model
         return Port::PortType::boolean;
     }
 
+    std::string Port::GetFullName() const
+    {
+        return GetNode()->GetId().ToString() + "." + GetName();
+    }
+
     std::string Port::GetVariableName(const std::string& defaultName) const
     {
         // Find a friendly name in the node's metadata.  If the user bothered to name the node in
@@ -73,11 +78,11 @@ namespace model
                 name = defaultName;
             }
         }
-        else 
+        else
         {
             name = defaultName;
         }
-        // If this port has an interesting non-default name then append it. This can happen 
+        // If this port has an interesting non-default name then append it. This can happen
         // in the case where a node has multiple ports with interesting names.
         if (this->_name != Node::defaultOutputPortName && this->_name != Node::defaultInputPortName)
         {

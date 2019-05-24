@@ -8,144 +8,240 @@
 
 #include "OptimizationUtils.h"
 
-#include <optimization/include/ElasticNetRegularizer.h>
-#include <optimization/include/L2Regularizer.h>
-#include <optimization/include/MatrixSolution.h>
 #include <optimization/include/MultivariateLoss.h>
-#include <optimization/include/SDCAOptimizer.h>
 #include <optimization/include/SquareLoss.h>
 
+#include <utilities/include/Exception.h>
 #include <utilities/include/Logger.h>
 
-#include <cmath>
-#include <ios>
-#include <limits>
+#include <iostream>
 
-using namespace ell;
-using namespace logging;
-
-// Prototypes
-template <typename SolutionType, typename LossType, typename DatasetType>
-OptimizerResult<SolutionType> TrainPredictor(std::shared_ptr<DatasetType> examples, LossType loss, const FineTuneOptimizationParameters& optimizerParameters);
-
-template <typename SolutionType, typename LossType, typename DatasetType, typename RegularizerType>
-OptimizerResult<SolutionType> TrainPredictor(std::shared_ptr<DatasetType> examples, LossType loss, RegularizerType regularizer, const FineTuneOptimizationParameters& optimizerParameters);
-
-template <typename OptimizerType>
-void RunOptimizer(OptimizerType& optimizer, int maxEpochs, double desiredPrecision);
-
-template <typename ElementType>
-WeightsAndBias<ElementType> GetWeightsAndBias(const ScalarPredictor& predictor)
+namespace ell
 {
-    auto predictorWeights = predictor.GetVector();
-    auto predictorBias = predictor.GetBias();
-    WeightsAndBias<ElementType> result;
-    result.weights = math::RowMatrix<ElementType>(1, predictorWeights.Size());
-    result.bias = math::ColumnVector<ElementType>(1);
+using namespace ell::logging;
 
-    // Set the weights matrix and bias from the predictors.
-    // Each row in the weights is the learned weights from that predictor.
-    // Each element in the bias is the learned bias from that predictor.
-    for (size_t j = 0; j < predictorWeights.Size(); ++j)
+#define ADD_TO_STRING_ENTRY(NAMESPACE, OPERATOR) \
+    case NAMESPACE::OPERATOR:                    \
+        return #OPERATOR;
+#define BEGIN_FROM_STRING if (false)
+#define ADD_FROM_STRING_ENTRY(NAMESPACE, OPERATOR) else if (name == #OPERATOR) return NAMESPACE::OPERATOR
+
+std::string ToString(LossFunction loss)
+{
+    switch (loss)
     {
-        result.weights(0, j) = predictorWeights[j];
+        ADD_TO_STRING_ENTRY(LossFunction, square);
+        ADD_TO_STRING_ENTRY(LossFunction, logistic);
+        ADD_TO_STRING_ENTRY(LossFunction, hinge);
+        ADD_TO_STRING_ENTRY(LossFunction, smoothedHinge);
+        ADD_TO_STRING_ENTRY(LossFunction, huber);
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Unknown loss function type");
     }
-    result.bias[0] = predictorBias;
-    return result;
 }
 
-template <typename ElementType>
-WeightsAndBias<ElementType> GetWeightsAndBias(const VectorPredictor& predictor)
+std::string ToString(SparsifyMethod method)
 {
-    auto predictorWeights = predictor.GetMatrix().Transpose();
-    auto predictorBias = predictor.GetBias();
-    WeightsAndBias<ElementType> result;
-    result.weights = math::RowMatrix<ElementType>(predictorWeights.NumRows(), predictorWeights.NumColumns());
-    result.bias = math::ColumnVector<ElementType>(predictorWeights.NumRows());
-
-    // Set the weights matrix and bias from the predictors.
-    // Each row in the weights is the learned weights from that predictor.
-    // Each element in the bias is the learned bias from that predictor.
-    for (size_t i = 0; i < predictorWeights.NumRows(); ++i)
+    switch (method)
     {
-        for (size_t j = 0; j < predictorWeights.NumColumns(); ++j)
-        {
-            result.weights(i, j) = predictorWeights(i, j);
-        }
-        result.bias[i] = predictorBias[i];
+        ADD_TO_STRING_ENTRY(SparsifyMethod, l1);
+        ADD_TO_STRING_ENTRY(SparsifyMethod, threshold);
+        ADD_TO_STRING_ENTRY(SparsifyMethod, random);
+    default:
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Unknown sparsification method");
     }
-    return result;
-}
-
-void PrintSDCAPredictorInfoHeader()
-{
-    Log() << "\tPrimal Objective";
-    Log() << "\tDual Objective";
-    Log() << "\tDuality gap";
-    Log() << EOL;
-}
-
-void PrintSDCAOptimizerInfoValues(const optimization::SDCASolutionInfo& info)
-{
-    auto originalPrecision = Log().precision(6);
-    auto originalFlags = Log().setf(std::ios::fixed);
-
-    Log() << "\t" << info.primalObjective;
-    Log() << "\t\t" << info.dualObjective;
-    Log() << "\t" << info.DualityGap() << EOL;
-
-    Log().setf(originalFlags);
-    Log().precision(originalPrecision);
 }
 
 ScalarOptimizerResult TrainScalarPredictor(BinaryLabelDataContainer dataset, const FineTuneOptimizationParameters& optimizerParameters)
 {
     using SolutionType = ScalarPredictor;
-
     auto examples = std::make_shared<BinaryLabelDataContainer>(std::move(dataset));
-    optimization::SquareLoss loss; // or: LogLoss loss?
-    return TrainPredictor<SolutionType>(examples, loss, optimizerParameters);
+
+    switch (optimizerParameters.lossFunction)
+    {
+    case LossFunction::hinge:
+    {
+        optimization::HingeLoss loss;
+        return TrainPredictor<SolutionType>(examples, loss, optimizerParameters);
+    }
+    case LossFunction::huber:
+    {
+        optimization::HuberLoss loss;
+        return TrainPredictor<SolutionType>(examples, loss, optimizerParameters);
+    }
+    case LossFunction::logistic:
+    {
+        optimization::LogisticLoss loss;
+        return TrainPredictor<SolutionType>(examples, loss, optimizerParameters);
+    }
+    case LossFunction::smoothedHinge:
+    {
+        optimization::SmoothedHingeLoss loss;
+        return TrainPredictor<SolutionType>(examples, loss, optimizerParameters);
+    }
+    case LossFunction::square:
+    {
+        optimization::SquareLoss loss;
+        return TrainPredictor<SolutionType>(examples, loss, optimizerParameters);
+    }
+    default:
+        throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Unknown loss function type");
+    }
+}
+
+// TODO: rename this function to something without "train" or "predictor" in its name
+VectorOptimizerResult TrainVectorPredictor(VectorLabelDataContainer dataset,
+                                           const FineTuneOptimizationParameters& optimizerParameters,
+                                           bool isSpatialConvolution)
+{
+    using namespace logging;
+
+    if (dataset.Size() < 1)
+    {
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Dataset doesn't have any entries");
+    }
+
+    if (!isSpatialConvolution && !optimizerParameters.optimizeFiltersIndependently)
+    {
+        // Dataset: N rows from k*k*d -> d'
+        return TrainVectorPredictor(dataset, optimizerParameters);
+    }
+    // else
+    // {
+    //     return TrainIndependentPredictors(dataset, optimizerParameters, isSpatialConvolution);
+    // }
+
+    // optimize spatial convolutions one-at-a-time
+    FineTuneOptimizationParameters spatialParameters = optimizerParameters;
+
+    // The input dataset consists of N rows from k*k*d -> d'.
+    // We need to split it into d' datasets from k*k*d -> 1.
+    auto in0 = math::RowVector<float>(dataset.Get(0).input);
+    const auto& out0 = dataset.Get(0).output;
+    const auto outputChannels = out0.Size(); // # output (and input) channels
+    const auto filterSizeSq = in0.Size() / outputChannels;
+
+    // In the case of spatial convolutions, for each output channel, we are just recovering
+    // a k x k spatial filter.
+    if (isSpatialConvolution)
+    {
+        in0.Resize(filterSizeSq); // # spatial elements in a filter (e.g., 9 for a 3x3 filter)
+    }
+
+    // TODO: in both the "independent channel" and "spatial filter" cases, we really are optimizing to find a scalar result.
+    VectorLabelSolution resultSolution;
+    resultSolution.Resize(in0, out0);
+
+    Log() << "Optimizing " << outputChannels << " output channels independently\n";
+
+    SolutionInfo solutionInfo;
+    for (size_t i = 0; i < outputChannels; ++i)
+    {
+        // For each output channel, create a tiny dataset that goes from the pixels under a filter support -> output value
+        VectorLabelDataContainer channelDataset;
+
+        if (isSpatialConvolution)
+        {
+            channelDataset = CreateSubBlockVectorLabelDataContainer(dataset, filterSizeSq, 1, i);
+        }
+        else
+        {
+            channelDataset = CreateSingleOutputVectorLabelDataContainer(dataset, i);
+        }
+
+        auto channelResult = TrainVectorPredictor(channelDataset, spatialParameters);
+
+        resultSolution.GetBias()[i] = channelResult.predictor.GetBias()[0];
+        resultSolution.GetMatrix().GetColumn(i).CopyFrom(channelResult.predictor.GetMatrix().GetColumn(0));
+
+        // For now, just keep the last solution info result.
+        // TODO: in the "trainFiltersIndependently" case, we should
+        // keep some kind of summary thing instead.
+        solutionInfo = channelResult.info;
+    }
+
+    return { resultSolution, solutionInfo, {} };
 }
 
 VectorOptimizerResult TrainVectorPredictor(VectorLabelDataContainer dataset, const FineTuneOptimizationParameters& optimizerParameters)
 {
     using SolutionType = VectorPredictor;
     auto examples = std::make_shared<VectorLabelDataContainer>(std::move(dataset));
-    optimization::MultivariateLoss<optimization::SquareLoss> loss;
-    return TrainPredictor<SolutionType>(examples, loss, optimizerParameters);
-}
 
-template <typename SolutionType, typename LossType, typename DatasetType>
-OptimizerResult<SolutionType> TrainPredictor(std::shared_ptr<DatasetType> examples, LossType loss, const FineTuneOptimizationParameters& optimizerParameters)
-{
-    if (optimizerParameters.l1Regularization > 0.0)
+    switch (optimizerParameters.lossFunction)
     {
-        ell::optimization::ElasticNetRegularizer regularizer{ optimizerParameters.l1Regularization.value_or(0.0) };
-        return TrainPredictor<SolutionType>(examples, loss, regularizer, optimizerParameters);
-    }
-    else
+    case LossFunction::hinge:
     {
-        ell::optimization::L2Regularizer regularizer;
-        return TrainPredictor<SolutionType>(examples, loss, regularizer, optimizerParameters);
+        optimization::MultivariateLoss<optimization::HingeLoss> loss;
+        return TrainPredictor<SolutionType>(examples, loss, optimizerParameters);
+    }
+    case LossFunction::huber:
+    {
+        optimization::MultivariateLoss<optimization::HuberLoss> loss;
+        return TrainPredictor<SolutionType>(examples, loss, optimizerParameters);
+    }
+    case LossFunction::logistic:
+    {
+        optimization::MultivariateLoss<optimization::LogisticLoss> loss;
+        return TrainPredictor<SolutionType>(examples, loss, optimizerParameters);
+    }
+    case LossFunction::smoothedHinge:
+    {
+        optimization::MultivariateLoss<optimization::SmoothedHingeLoss> loss;
+        return TrainPredictor<SolutionType>(examples, loss, optimizerParameters);
+    }
+    case LossFunction::square:
+    {
+        optimization::MultivariateLoss<optimization::SquareLoss> loss;
+        return TrainPredictor<SolutionType>(examples, loss, optimizerParameters);
+    }
+    default:
+        throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Unknown loss function type");
     }
 }
 
-template <typename SolutionType, typename LossType, typename DatasetType, typename RegularizerType>
-OptimizerResult<SolutionType> TrainPredictor(std::shared_ptr<DatasetType> examples, LossType loss, RegularizerType regularizer, const FineTuneOptimizationParameters& optimizerParameters)
+VectorOptimizerResult ReoptimizeSparsePredictor(VectorOptimizerResult& sparseSolution,
+                                                VectorLabelDataContainer dataset,
+                                                const FineTuneOptimizationParameters& optimizerParameters,
+                                                bool isSpatialConvolution)
 {
-    auto optimizer = optimization::MakeSDCAOptimizer<SolutionType>(examples, loss, regularizer, optimizerParameters.optimizerParameters, optimizerParameters.randomSeed);
-    RunOptimizer(optimizer, optimizerParameters.maxEpochs, optimizerParameters.desiredPrecision);
-    return { optimizer.GetSolution(), optimizer.GetSolutionInfo() };
-}
+    if (isSpatialConvolution || optimizerParameters.optimizeFiltersIndependently)
+    {
+        throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Can't reoptimize spatial or independent-channel solutions");
+    }
 
-template <typename OptimizerType>
-void RunOptimizer(OptimizerType& optimizer, int maxEpochs, double desiredPrecision)
-{
-    optimizer.Update(maxEpochs, desiredPrecision);
-}
+    using SolutionType = VectorPredictor;
+    auto examples = std::make_shared<VectorLabelDataContainer>(std::move(dataset));
 
-// Explicit instantiations
-template WeightsAndBias<float> GetWeightsAndBias(const ScalarPredictor& predictor);
-template WeightsAndBias<double> GetWeightsAndBias(const ScalarPredictor& predictor);
-template WeightsAndBias<float> GetWeightsAndBias(const VectorPredictor& predictor);
-template WeightsAndBias<double> GetWeightsAndBias(const VectorPredictor& predictor);
+    switch (optimizerParameters.lossFunction)
+    {
+    case LossFunction::hinge:
+    {
+        optimization::MultivariateLoss<optimization::HingeLoss> loss;
+        return ReoptimizeSparsePredictor<SolutionType>(sparseSolution, examples, loss, optimizerParameters);
+    }
+    case LossFunction::huber:
+    {
+        optimization::MultivariateLoss<optimization::HuberLoss> loss;
+        return ReoptimizeSparsePredictor<SolutionType>(sparseSolution, examples, loss, optimizerParameters);
+    }
+    case LossFunction::logistic:
+    {
+        optimization::MultivariateLoss<optimization::LogisticLoss> loss;
+        return ReoptimizeSparsePredictor<SolutionType>(sparseSolution, examples, loss, optimizerParameters);
+    }
+    case LossFunction::smoothedHinge:
+    {
+        optimization::MultivariateLoss<optimization::SmoothedHingeLoss> loss;
+        return ReoptimizeSparsePredictor<SolutionType>(sparseSolution, examples, loss, optimizerParameters);
+    }
+    case LossFunction::square:
+    {
+        optimization::MultivariateLoss<optimization::SquareLoss> loss;
+        return ReoptimizeSparsePredictor<SolutionType>(sparseSolution, examples, loss, optimizerParameters);
+    }
+    default:
+        throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Unknown loss function type");
+    }
+}
+} // namespace ell

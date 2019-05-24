@@ -100,6 +100,12 @@ namespace utilities
         std::transform(elements.begin(), elements.end(), _data.begin(), [](size_t x) { return static_cast<int>(x); });
     }
 
+    DimensionVector::DimensionVector(const std::initializer_list<size_t>& elements) :
+        _data(elements.size())
+    {
+        std::transform(elements.begin(), elements.end(), _data.begin(), [](size_t x) { return static_cast<int>(x); });
+    }
+
     //
     // DimensionOrder
     //
@@ -321,6 +327,21 @@ namespace utilities
         return GetEntryOffset(firstEntry);
     }
 
+    MemoryCoordinates MemoryLayout::GetPhysicalCoordinatesFromOffset(size_t index) const
+    {
+        const auto numDim = NumDimensions();
+        std::vector<int> result(numDim);
+        int offset = index;
+        for(int d = 0; d < numDim; ++d)
+        {
+            const int thisExtent = GetCumulativeIncrement(d);
+            const int x = offset / thisExtent;
+            result[d] = x - GetOffset(d);
+            offset = (offset % thisExtent);
+        }
+        return result;
+    }
+    
     MemoryCoordinates MemoryLayout::GetLogicalCoordinates(const MemoryCoordinates& physicalCoordinates) const
     {
         if (NumDimensions() != physicalCoordinates.NumDimensions())
@@ -350,6 +371,11 @@ namespace utilities
     size_t MemoryLayout::GetLogicalEntryOffset(const MemoryCoordinates& logicalCoordinates) const
     {
         return GetEntryOffset(GetPhysicalCoordinates(logicalCoordinates));
+    }
+
+    MemoryCoordinates MemoryLayout::GetLogicalCoordinatesFromOffset(size_t index) const
+    {
+        return GetLogicalCoordinates(GetPhysicalCoordinatesFromOffset(index));
     }
 
     MemoryCoordinates MemoryLayout::GetPhysicalCoordinates(const MemoryCoordinates& logicalCoordinates) const
@@ -600,6 +626,42 @@ namespace utilities
     bool operator!=(const MemoryLayout& layout1, const MemoryLayout& layout2)
     {
         return !MemoryLayoutsEqual(layout1, layout2);
+    }
+
+    std::ostream& operator<<(std::ostream& out, const utilities::DimensionOrder& order)
+    {
+        if (order.NumDimensions() == 0)
+        {
+            out << "{}";
+        }
+        else
+        {
+            out << order[0];
+            auto numDimensions = order.NumDimensions();
+            for (int index = 1; index < numDimensions; ++index)
+            {
+                out << ", " << order[index];
+            }
+        }
+        return out;
+    }
+
+    std::ostream& operator<<(std::ostream& out, const utilities::MemoryCoordinates& coords)
+    {
+        if (coords.NumDimensions() == 0)
+        {
+            out << "{}";
+        }
+        else
+        {
+            out << coords[0];
+            auto numDimensions = coords.NumDimensions();
+            for (int index = 1; index < numDimensions; ++index)
+            {
+                out << ", " << coords[index];
+            }
+        }
+        return out;
     }
 
     std::ostream& operator<<(std::ostream& out, const utilities::MemoryShape& shape)

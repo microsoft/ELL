@@ -46,6 +46,9 @@ void TestIRCompiler()
     TestSimpleMap(false);
     TestSimpleMap(true);
     TestCompiledMapMove();
+    TestCompiledMapClone();
+    TestCompiledMapParallelClone();
+
     TestBinaryScalar();
     TestBinaryVector(true);
     TestBinaryVector(false);

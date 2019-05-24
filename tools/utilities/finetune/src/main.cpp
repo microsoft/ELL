@@ -6,77 +6,56 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "DataStatistics.h"
+#include "FineTuneArguments.h"
 #include "FineTuneModel.h"
 #include "ModelUtils.h"
 #include "Report.h"
 #include "TransformData.h"
 
+#include <model/include/OutputPort.h>
+#include <model/include/Submodel.h>
+
 #include <utilities/include/CommandLineParser.h>
-#include <utilities/include/Exception.h>
 #include <utilities/include/MillisecondTimer.h>
 #include <utilities/include/OutputStreamImpostor.h>
 
 #include <iostream>
+#include <stdexcept>
 
-using namespace ell;
-
+namespace ell
+{
 // Prototypes
 void Run(const FineTuneArguments& args);
-void PrintOriginalModels(std::ostream& logStream, model::Model& model, const model::OutputPortBase& modelOutput);
-void PrintFineTunedModels(std::ostream& logStream, model::Model& model, const model::OutputPortBase& fineTunedOutput);
-void PrintModelEvaluation(std::ostream& logStream, model::Model& model, const model::OutputPortBase& modelOutput, const MultiClassDataContainer& trainingData, const MultiClassDataContainer& testData);
-void SaveModel(const ell::model::Model& model,
-               const ell::model::OutputPortBase& output,
-               const FineTuneArguments& args);
+void PrintOriginalModels(std::ostream& logStream, const model::OutputPortBase& modelOutput);
+void PrintFineTunedModels(std::ostream& logStream, const model::OutputPortBase& fineTunedOutput);
+void PrintModelEvaluation(std::ostream& logStream, const model::OutputPortBase& modelOutput, const MultiClassDataContainer& trainingData, const MultiClassDataContainer& testData);
+void SaveModel(const model::OutputPortBase& output, const FineTuneArguments& args);
 
+//
 // Implementation
-int main(int argc, char* argv[])
-{
-    try
-    {
-        auto args = ParseCommandLine(argc, argv);
-        Run(args);
-    }
-    catch (const utilities::CommandLineParserPrintHelpException& exception)
-    {
-        std::cout << exception.GetHelpText() << std::endl;
-        return 0;
-    }
-    catch (const utilities::CommandLineParserErrorException& exception)
-    {
-        std::cerr << "Command line parse error:" << std::endl;
-        for (const auto& error : exception.GetParseErrors())
-        {
-            std::cerr << error.GetMessage() << std::endl;
-        }
-        return 1;
-    }
-    catch (const utilities::Exception& exception)
-    {
-        std::cerr << "exception: " << exception.GetMessage() << std::endl;
-        return 1;
-    }
+//
 
-    return 0;
-}
-
+// This function does all the work --- it's called by main() right after parsing the command-line arguments
 void Run(const FineTuneArguments& args)
 {
     utilities::MillisecondTimer totalTimer;
     auto& logStream = std::cout;
-    auto reportStream = args.GetReportStream();
-    Report report(reportStream, Report::ReportFormat::text);
 
     utilities::MillisecondTimer loadModelTimer;
 
-    auto model = LoadInputModel(args);
-    const auto& modelOutput = GetInputModelTargetOutput(model, args);
+    const auto& modelOutput = args.GetInputModelTargetOutput();
     loadModelTimer.Stop();
 
-    if (args.print)
+    if (args.printModel)
     {
-        PrintOriginalModels(logStream, model, modelOutput);
+        PrintOriginalModels(logStream, modelOutput);
     }
+
+    // Create report
+    auto reportStream = args.GetReportStream();
+    Report report(reportStream, Report::ReportFormat::text);
+    report.WriteParameters(args);
 
     // Load datasets
     utilities::MillisecondTimer loadDatasetTimer;
@@ -85,7 +64,7 @@ void Run(const FineTuneArguments& args)
     loadDatasetTimer.Stop();
     if (args.testOnly)
     {
-        PrintModelEvaluation(logStream, model, modelOutput, trainingData, testData);
+        PrintModelEvaluation(logStream, modelOutput, trainingData, testData);
         return;
     }
 
@@ -97,29 +76,30 @@ void Run(const FineTuneArguments& args)
             logStream << "Test dataset size: " << testData.Size() << std::endl;
     }
 
-    // Fine-tune the model and save it
     utilities::MillisecondTimer fineTuningTotalTimer;
-    auto fineTunedOutputs = FineTuneNodesInSubmodel(model, modelOutput, trainingData, args);
+
+    // Fine-tune the model and return the output of the new model
+    auto fineTunedOutputs = FineTuneNodesInSubmodel(model::Submodel({ &modelOutput }), trainingData, args, [&report](const FineTuningLayerResult& layerResult) {
+        report.WriteLayerOptimizationResult(layerResult);
+    });
     const auto& fineTunedOutput = *fineTunedOutputs.fineTunedSubmodel.GetOutputs()[0];
     fineTuningTotalTimer.Stop();
 
-    if (args.print)
+    if (args.printModel)
     {
-        PrintFineTunedModels(logStream, model, fineTunedOutput);
+        PrintFineTunedModels(logStream, fineTunedOutput);
     }
-    SaveModel(model, fineTunedOutput, args);
-
-    // Write out report
-    report.WriteParameters(args);
-    for (auto layerInfo : fineTunedOutputs.layerResults)
-    {
-        WriteLayerOptimizationResult(*layerInfo.originalOutput, *layerInfo.fineTunedOutput, layerInfo.optimizationInfo, report);
-    }
+    SaveModel(fineTunedOutput, args);
 
     utilities::MillisecondTimer evalModelTimer;
-    report.WriteModelAccuracy(model, modelOutput, "Original", { &trainingData, &testData }, { "Train", "Test" });
-    report.WriteModelAccuracy(model, fineTunedOutput, "FineTuned", { &trainingData, &testData }, { "Train", "Test" });
+    report.WriteModelAccuracy("Original", "Train", GetModelAccuracy(modelOutput, trainingData));
+    report.WriteModelAccuracy("Original", "Test", GetModelAccuracy(modelOutput, testData));
+    report.WriteModelAccuracy("FineTuned", "Train", GetModelAccuracy(fineTunedOutput, trainingData));
+    report.WriteModelAccuracy("FineTuned", "Test", GetModelAccuracy(fineTunedOutput, testData));
     evalModelTimer.Stop();
+
+    report.WriteModelSparsity("Original", GetSubmodelWeightsSparsity(model::Submodel{ { &modelOutput } }));
+    report.WriteModelSparsity("FineTuned", GetSubmodelWeightsSparsity(model::Submodel{ { &fineTunedOutput } }));
 
     report.WriteTiming("LoadModelTime", loadModelTimer.Elapsed());
     report.WriteTiming("LoadDatasetsTime", loadDatasetTimer.Elapsed());
@@ -130,44 +110,67 @@ void Run(const FineTuneArguments& args)
     report.WriteTiming("TotalTime", totalTimer.Elapsed());
 }
 
-void PrintModelEvaluation(std::ostream& logStream, model::Model& model, const model::OutputPortBase& modelOutput, const MultiClassDataContainer& trainingData, const MultiClassDataContainer& testData)
+void PrintModelEvaluation(std::ostream& logStream, const model::OutputPortBase& modelOutput, const MultiClassDataContainer& trainingData, const MultiClassDataContainer& testData)
 {
     if (!trainingData.IsEmpty())
     {
         logStream << "Training dataset size: " << trainingData.Size() << std::endl;
-        auto originalTrainingAccuracy = GetModelAccuracy(model, modelOutput, trainingData);
+        auto originalTrainingAccuracy = GetModelAccuracy(modelOutput, trainingData);
         logStream << "Original model accuracy (on train set): " << originalTrainingAccuracy << std::endl;
     }
 
     if (!testData.IsEmpty())
     {
         logStream << "Test dataset size: " << testData.Size() << std::endl;
-        auto originalTestAccuracy = GetModelAccuracy(model, modelOutput, testData);
+        auto originalTestAccuracy = GetModelAccuracy(modelOutput, testData);
         logStream << "Original model accuracy (on test set): " << originalTestAccuracy << std::endl;
     }
 }
 
-void PrintOriginalModels(std::ostream& logStream, model::Model& model, const model::OutputPortBase& modelOutput)
+void PrintOriginalModels(std::ostream& logStream, const model::OutputPortBase& modelOutput)
 {
+    auto model = modelOutput.GetNode()->GetModel();
     logStream << "Original model:" << std::endl;
-    model.Print(logStream);
+    model->Print(logStream);
     logStream << "Model to process:" << std::endl;
-    model.PrintSubset(logStream, &modelOutput);
+    model->PrintSubset(logStream, &modelOutput);
 }
 
-void PrintFineTunedModels(std::ostream& logStream, model::Model& model, const model::OutputPortBase& fineTunedOutput)
+void PrintFineTunedModels(std::ostream& logStream, const model::OutputPortBase& fineTunedOutput)
 {
+    auto model = fineTunedOutput.GetNode()->GetModel();
     logStream << "Full model after fine-tuning:" << std::endl;
-    model.Print(logStream);
+    model->Print(logStream);
 
     logStream << "Fine-tuned model:" << std::endl;
-    model.PrintSubset(logStream, &fineTunedOutput);
+    model->PrintSubset(logStream, &fineTunedOutput);
 }
 
-void SaveModel(const model::Model& model, const model::OutputPortBase& output, const FineTuneArguments& args)
+void SaveModel(const model::OutputPortBase& output, const FineTuneArguments& args)
 {
     if (!args.mapSaveArguments.outputMapFilename.empty())
     {
-        SaveModel(model, output, args.mapSaveArguments.outputMapFilename);
+        SaveModel(output, args.mapSaveArguments.outputMapFilename);
     }
+}
+} // namespace ell
+
+//
+// Main entry point
+//
+using namespace ell;
+int main(int argc, char* argv[])
+{
+    try
+    {
+        auto args = ParsedFineTuneArguments::ParseCommandLine(argc, argv);
+        Run(args);
+    }
+    catch (const std::exception& exception)
+    {
+        std::cerr << "exception: " << exception.what() << std::endl;
+        return 1;
+    }
+
+    return 0;
 }

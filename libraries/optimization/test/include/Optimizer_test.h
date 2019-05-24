@@ -180,13 +180,13 @@ void TestGetSparseSolution(LossFunctionType lossFunction, double regularizationP
 
     auto examples = GetClassificationDataset(count, marginMean, inputVariance, targetSolution, randomEngine);
 
-    auto trainedSolution1 = GetSparseSolution<VectorSolution<double, true>>(examples, lossFunction, { { 0.7, 0.75 }, { regularizationParameter } });
+    auto trainedSolution1 = GetSparseSolution<VectorSolution<double, true>>(examples, lossFunction, { { 0.7, 0.75 }, { regularizationParameter } }).solution;
     double nonZeroFraction1 = trainedSolution1.GetVector().Norm0() / trainedSolution1.GetVector().Size();
 
-    auto trainedSolution2 = GetSparseSolution<VectorSolution<double, true>>(examples, lossFunction, { { 0.45, 0.5 }, { regularizationParameter } });
+    auto trainedSolution2 = GetSparseSolution<VectorSolution<double, true>>(examples, lossFunction, { { 0.45, 0.5 }, { regularizationParameter } }).solution;
     double nonZeroFraction2 = trainedSolution2.GetVector().Norm0() / trainedSolution2.GetVector().Size();
 
-    auto trainedSolution3 = GetSparseSolution<VectorSolution<double, true>>(examples, lossFunction, { { 0.2, 0.25 }, { regularizationParameter } });
+    auto trainedSolution3 = GetSparseSolution<VectorSolution<double, true>>(examples, lossFunction, { { 0.2, 0.25 }, { regularizationParameter } }).solution;
     double nonZeroFraction3 = trainedSolution3.GetVector().Norm0() / trainedSolution3.GetVector().Size();
 
     testing::ProcessTest("TestGetSparseSolution",

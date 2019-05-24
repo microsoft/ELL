@@ -154,7 +154,7 @@ namespace model
         ///
         /// <returns> The resulting (transformed) submodel. </returns>
         Submodel TransformSubmodelOnto(const Submodel& submodel,
-                                       Model& destModel,
+                                       const Model& destModel,
                                        const std::vector<const OutputPortBase*>& onto,
                                        const TransformContext& context,
                                        const NodeTransformFunction& transformFunction);

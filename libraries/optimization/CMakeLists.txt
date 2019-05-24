@@ -24,6 +24,7 @@ set(include
     include/Interval.h
     include/L2Regularizer.h
     include/LogisticLoss.h
+    include/MaskedMatrixSolution.h
     include/MatrixDataset.h
     include/MatrixSolution.h
     include/MaxRegularizer.h

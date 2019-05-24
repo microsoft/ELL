@@ -17,7 +17,6 @@ namespace utilities
 {
     namespace logging
     {
-
         bool& ShouldFlush()
         {
             static bool shouldFlush = false;
@@ -54,7 +53,6 @@ namespace utilities
                 return nullHandle;
             }
         }
-
     } // namespace logging
 } // namespace utilities
 } // namespace ell

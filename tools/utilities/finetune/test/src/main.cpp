@@ -6,7 +6,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "TestDataStatistics.h"
 #include "TestDataUtils.h"
+#include "TestModelOutputDataCache.h"
 #include "TestModelUtils.h"
 #include "TestOptimizationUtils.h"
 #include "TestTransformData.h"
@@ -17,10 +19,12 @@ using namespace ell;
 
 int main(int argc, char* argv[])
 {
+    TestDataStatistics();
     TestDataUtils();
     TestModelUtils();
     TestOptimizationUtils();
     TestTransformData();
+    TestModelOutputDataCache();
 
     return testing::GetExitCode();
 }

@@ -49,6 +49,18 @@ namespace model
     {
     }
 
+
+    IRCompiledMap IRCompiledMap::Clone()
+    {
+        EnsureExecutionEngine();
+
+        Map newMap(*this);
+        IRCompiledMap result(std::move(newMap), GetFunctionName(), GetMapCompilerOptions(), _module, _verifyJittedModule);
+        result.SetContext(GetContext());
+        result.FinishJitting();
+        return result;
+    }
+
     bool IRCompiledMap::IsValid() const
     {
         return _module.IsValid() && !_moduleName.empty();

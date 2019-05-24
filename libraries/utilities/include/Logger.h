@@ -10,6 +10,10 @@
 
 #include "OutputStreamImpostor.h"
 
+#include <functional>
+#include <optional>
+#include <ostream>
+
 namespace ell
 {
 namespace utilities

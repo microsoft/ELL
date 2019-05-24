@@ -169,6 +169,15 @@ namespace math
         /// <param name="other"> [in,out] The other ConstVectorReference. </param>
         void Swap(ConstVectorReference<ElementType, orientation>& other);
 
+        /// <summary>
+        /// Visits elements of the vector by repeatedly calling a visitor function.
+        /// </summary>
+        ///
+        /// <typeparam name="VisitorType"> Type of lambda or functor to use as a visitor. </typeparam>
+        /// <param name="visitor"> The visitor function. </param>
+        template <typename VisitorType>
+        void Visit(VisitorType visitor) const;
+
         /// \name Comparison Functions
         /// @{
 
@@ -372,12 +381,12 @@ namespace math
         /// <summary> Copy Constructor. </summary>
         ///
         /// <param name="other"> The vector being copied. </param>
-        Vector(ConstVectorReference<ElementType, orientation>& other);
+        Vector(const ConstVectorReference<ElementType, orientation>& other);
 
         /// <summary> Copies a vector of the opposite orientation. </summary>
         ///
         /// <param name="other"> The vector being copied. </param>
-        Vector(ConstVectorReference<ElementType, TransposeVectorOrientation<orientation>::value>& other);
+        Vector(const ConstVectorReference<ElementType, TransposeVectorOrientation<orientation>::value>& other);
 
         /// <summary> Assignment operator. </summary>
         ///
@@ -625,6 +634,20 @@ namespace math
     }
 
     template <typename ElementType, VectorOrientation orientation>
+    template <typename VisitorType>
+    void ConstVectorReference<ElementType, orientation>::Visit(VisitorType visitor) const
+    {
+        const ElementType* data = this->GetConstDataPointer();
+        const ElementType* end = data + this->Size() * this->GetIncrement();
+
+        while (data < end)
+        {
+            visitor(*data);
+            data += this->GetIncrement();
+        }
+    }
+
+    template <typename ElementType, VectorOrientation orientation>
     bool ConstVectorReference<ElementType, orientation>::IsEqual(ConstVectorReference<ElementType, orientation> other, ElementType tolerance) const
     {
         if (this->Size() != other.Size())
@@ -773,11 +796,18 @@ namespace math
     void VectorReference<ElementType, orientation>::Transform(TransformationType transformation)
     {
         ElementType* pData = this->GetDataPointer();
-        const ElementType* pEnd = pData + this->Size() * this->GetIncrement();
-        while (pData < pEnd)
+        ElementType* pEnd = pData + this->Size() * this->GetIncrement();
+        if (this->IsContiguous())
         {
-            *pData = transformation(*pData);
-            pData += this->GetIncrement();
+            std::transform(pData, pEnd, pData, transformation);
+        }
+        else
+        {
+            while (pData < pEnd)
+            {
+                *pData = transformation(*pData);
+                pData += this->GetIncrement();
+            }
         }
     }
 
@@ -841,7 +871,7 @@ namespace math
     }
 
     template <typename ElementType, VectorOrientation orientation>
-    Vector<ElementType, orientation>::Vector(ConstVectorReference<ElementType, orientation>& other) :
+    Vector<ElementType, orientation>::Vector(const ConstVectorReference<ElementType, orientation>& other) :
         VectorReference<ElementType, orientation>(nullptr, other.Size(), 1),
         _data(other.Size())
     {
@@ -850,7 +880,7 @@ namespace math
     }
 
     template <typename ElementType, VectorOrientation orientation>
-    Vector<ElementType, orientation>::Vector(ConstVectorReference<ElementType, TransposeVectorOrientation<orientation>::value>& other) :
+    Vector<ElementType, orientation>::Vector(const ConstVectorReference<ElementType, TransposeVectorOrientation<orientation>::value>& other) :
         VectorReference<ElementType, orientation>(nullptr, other.Size(), 1),
         _data(other.Size())
     {

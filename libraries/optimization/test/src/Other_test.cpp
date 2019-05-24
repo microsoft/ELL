@@ -28,6 +28,22 @@
 using namespace ell;
 using namespace ell::optimization;
 
+void L1ProxReference(math::ColumnVectorReference<double> v, double beta)
+{
+    auto transformation = [beta](double x) {
+        if (x < -beta)
+        {
+            return x + beta;
+        }
+        if (x > beta)
+        {
+            return x - beta;
+        }
+        return 0.0;
+    };
+    v.Transform(transformation);
+}
+
 void TestL1Prox()
 {
     math::ColumnVector<double> v{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
@@ -38,6 +54,7 @@ void TestL1Prox()
     math::ColumnVector<double> v3{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
     math::ColumnVector<double> v4{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
     math::ColumnVector<double> v5{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
+    math::ColumnVector<double> v6{ 1, 2, 3, -1, -2, -3, 0.5, -0.5 };
 
     L1Prox(v1, 0.4);
     math::ColumnVector<double> r1{ 0.6, 1.6, 2.6, -0.6, -1.6, -2.6, 0.1, -0.1 };
@@ -52,7 +69,10 @@ void TestL1Prox()
     math::ColumnVector<double> r4{ 0, 0, 0.5, 0, 0, -0.5, 0, 0 };
 
     L1Prox(v5, 3.0);
-    math::ColumnVector<double> r5(8);
+    math::ColumnVector<double> r5{ 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    L1ProxReference(v6, 0.4);
+    const auto& r6 = r1;
 
     const double tolerance = 1.0e-9;
 
@@ -61,8 +81,9 @@ void TestL1Prox()
     bool test3 = v3.IsEqual(r3, tolerance);
     bool test4 = v4.IsEqual(r4, tolerance);
     bool test5 = v5.IsEqual(r5, tolerance);
+    bool test6 = v6.IsEqual(r6, tolerance);
 
-    testing::ProcessTest("TestL1Prox", test1 && test2 && test3 && test4 && test5);
+    testing::ProcessTest("TestL1Prox", test1 && test2 && test3 && test4 && test5 && test6);
 }
 
 void TestLInfinityProx()

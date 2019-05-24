@@ -11,9 +11,9 @@
 #include <model_testing/include/ModelTestUtilities.h>
 
 #include <model/include/CompilableNode.h>
-#include <model/include/InputNode.h>
 #include <model/include/IRCompiledMap.h>
 #include <model/include/IRMapCompiler.h>
+#include <model/include/InputNode.h>
 #include <model/include/Map.h>
 #include <model/include/Model.h>
 
@@ -44,13 +44,19 @@
 #include <predictors/include/ProtoNNPredictor.h>
 
 #include <utilities/include/Logger.h>
+#include <utilities/include/RandomEngines.h>
 
 #include <testing/include/testing.h>
 
 #include <algorithm>
+#include <chrono>
+#include <future>
 #include <iostream>
+#include <memory>
 #include <ostream>
+#include <random>
 #include <string>
+#include <thread>
 #include <vector>
 
 using namespace ell;
@@ -339,6 +345,78 @@ void TestCompiledMapMove()
 
     // compare output
     VerifyCompiledOutput(map, compiledMap2, signal, " moved compiled map");
+}
+
+void TestCompiledMapClone()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(3);
+    auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", accumNode->output } });
+    model::IRMapCompiler compiler1;
+    auto compiledMap1 = compiler1.Compile(map);
+
+    PrintIR(compiledMap1);
+    testing::ProcessTest("Testing IsValid of original map", testing::IsEqual(compiledMap1.IsValid(), true));
+
+    // compare output
+    std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+    VerifyCompiledOutput(map, compiledMap1, signal, " original compiled map");
+
+    auto compiledMap2 = compiledMap1.Clone();
+    auto map2 = model::Map(model, { { "input", inputNode } }, { { "output", accumNode->output } });
+    testing::ProcessTest("Testing IsValid of cloned-from map", testing::IsEqual(compiledMap1.IsValid(), true));
+    testing::ProcessTest("Testing IsValid of cloned-to map", testing::IsEqual(compiledMap2.IsValid(), true));
+
+    // compare output
+    VerifyCompiledOutput(map2, compiledMap2, signal, " cloned compiled map");
+}
+
+void TestCompiledMapParallelClone()
+{
+    model::Model model;
+    auto inputNode = model.AddNode<model::InputNode<double>>(3);
+    auto accumNode = model.AddNode<nodes::AccumulatorNode<double>>(inputNode->output);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", accumNode->output } });
+    std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
+
+    // get original map output as gold standard
+    std::vector<std::vector<double>> expected;
+    for (const auto& input : signal)
+    {
+        map.SetInputValue(0, input);
+        expected.push_back(map.ComputeOutput<double>(0));
+    }
+
+    model::IRMapCompiler compiler;
+    std::vector<std::pair<int, std::unique_ptr<model::IRCompiledMap>>> compiledMaps;
+    compiledMaps.push_back({ 0, std::make_unique<model::IRCompiledMap>(compiler.Compile(map)) });
+    const int numParallelComputations = 100;
+    for (int i = 1; i < numParallelComputations; ++i)
+    {
+        compiledMaps.push_back({ i, std::make_unique<model::IRCompiledMap>(compiledMaps.front().second->Clone()) });
+    }
+
+    std::vector<std::future<bool>> futures;
+    for (const auto& mapRef : compiledMaps)
+    {
+        futures.push_back(std::async(std::launch::async,
+                                     [&](int index, model::IRCompiledMap* map) {
+                                         auto engine = utilities::GetRandomEngine("123");
+                                         std::uniform_int_distribution<int> dist(0, 500);
+                                         std::this_thread::sleep_for(std::chrono::milliseconds(dist(engine)));
+                                         VerifyMapOutput(*map, signal, expected, "Parallel map test");
+                                         return true;
+                                     },
+                                     mapRef.first,
+                                     mapRef.second.get()));
+    }
+
+    // wait on futures
+    for (auto& fut : futures)
+    {
+        [[maybe_unused]] auto x = fut.get();
+    }
 }
 
 typedef void (*MapPredictFunction)(void* context, double*, double*);

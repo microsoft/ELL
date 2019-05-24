@@ -240,6 +240,15 @@ namespace math
         /// <returns> True if contiguous, false if not. </returns>
         bool IsContiguous() const { return this->GetIncrement() == this->GetMajorSize(); }
 
+        /// <summary>
+        /// Visits elements of the tensor by repeatedly calling a visitor function.
+        /// </summary>
+        ///
+        /// <typeparam name="VisitorType"> Type of lambda or functor to use as a visitor. </typeparam>
+        /// <param name="visitor"> The visitor function. </param>
+        template <typename VisitorType>
+        void Visit(VisitorType visitor) const;
+
         /// @}
 
         /// \name Comparison Functions
@@ -558,7 +567,7 @@ namespace math
         /// <summary> Copy Constructor. </summary>
         ///
         /// <param name="other"> The matrix being copied. </param>
-        Matrix(ConstMatrixReference<ElementType, layout>& other);
+        Matrix(ConstMatrixReference<ElementType, layout> other);
 
         /// <summary> Copy Constructor. </summary>
         ///
@@ -771,6 +780,16 @@ namespace math
     }
 
     template <typename ElementType, MatrixLayout layout>
+    template <typename VisitorType>
+    void ConstMatrixReference<ElementType, layout>::Visit(VisitorType visitor) const
+    {
+        for (size_t i = 0; i < this->GetMinorSize(); ++i)
+        {
+            GetMajorVector(i).Visit(visitor);
+        }
+    }
+
+    template <typename ElementType, MatrixLayout layout>
     void ConstMatrixReference<ElementType, layout>::Swap(ConstMatrixReference<ElementType, layout>& other)
     {
         MatrixBase<ElementType, layout>::Swap(other);
@@ -918,9 +937,18 @@ namespace math
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Matrix dimensions are not the same.");
         }
 
-        for (size_t i = 0; i < other.GetMinorSize(); ++i)
+        if (IsContiguous() && other.IsContiguous())
         {
-            GetMajorVector(i).CopyFrom(other.GetMajorVector(i));
+            auto otherData = other.GetConstDataPointer();
+            auto data = GetDataPointer();
+            std::copy(otherData, otherData + this->Size(), data);
+        }
+        else
+        {
+            for (size_t i = 0; i < other.GetMinorSize(); ++i)
+            {
+                GetMajorVector(i).CopyFrom(other.GetMajorVector(i));
+            }
         }
     }
 
@@ -1087,7 +1115,7 @@ namespace math
     }
 
     template <typename ElementType, MatrixLayout layout>
-    Matrix<ElementType, layout>::Matrix(ConstMatrixReference<ElementType, layout>& other) :
+    Matrix<ElementType, layout>::Matrix(ConstMatrixReference<ElementType, layout> other) :
         MatrixReference<ElementType, layout>(nullptr, other.NumRows(), other.NumColumns()),
         _data(other.NumRows() * other.NumColumns())
     {

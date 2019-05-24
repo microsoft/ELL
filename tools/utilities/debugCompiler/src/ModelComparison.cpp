@@ -721,7 +721,7 @@ void ModelComparison::CreateGraph(const model::Model& model)
                         std::string id = to_string(upstream->GetId());
                         std::string typeName = upstream->GetRuntimeTypeName();
                         GraphNode& nextNode = _graph.GetOrCreateNode(id, typeName);
-                        _graph.GetOrCreateLink(childNode, nextNode, "", "");
+                        _graph.GetOrCreateLink(childNode, nextNode);
                     }
                 }
             }
