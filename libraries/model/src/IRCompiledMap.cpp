@@ -30,11 +30,12 @@ namespace model
     using utilities::Boolean;
 
     IRCompiledMap::IRCompiledMap(IRCompiledMap&& other) :
-        CompiledMap(std::move(other), other._functionName, other._compilerOptions),
+        CompiledMap(std::move(other)),
         _module(other._module),
         _moduleName(std::move(other._moduleName)),
         _executionEngine(std::move(other._executionEngine)),
         _verifyJittedModule(other._verifyJittedModule),
+        _context(other._context),
         _computeFunctionDefined(false)
     {
     }
