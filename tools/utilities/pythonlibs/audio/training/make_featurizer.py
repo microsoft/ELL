@@ -72,8 +72,8 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
         last_node = builder.AddFFTNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")))
 
     if not filterbank_nfft:
-        # default is to just use the output size of the fft node.
-        filterbank_nfft = last_node.GetOutputPort("output").Size()
+        # default is to just use the size of the fft.
+        filterbank_nfft = nfft
 
     if power_spec:
         fft_size = last_node.GetOutputPort("output").Size()
