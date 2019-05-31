@@ -76,7 +76,7 @@ class AudioUnitTest(unittest.TestCase):
         cmd = buildtools.EllBuildTools(find_ell.get_ell_root())
         cmake = ["cmake", ".."]
         if os.name == 'nt':
-            cmake = ["cmake", "-G", "Visual Studio 15 2017 Win64", ".."]
+            cmake = ["cmake", "-G", "Visual Studio 15 2017 Win64", "-Thost=x64", ".."]
         cmd.run(cmake, print_output=True)
 
         make = ["make"]

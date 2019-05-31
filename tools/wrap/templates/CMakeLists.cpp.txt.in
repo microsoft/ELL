@@ -16,7 +16,7 @@
 #
 #   Windows 64 bit:
 #     mkdir build && cd build
-#     VS 2017: cmake -G "Visual Studio 15 2017 Win64" ..
+#     VS 2017: cmake -G "Visual Studio 15 2017 Win64" -Thost=x64 ..
 #     Build the generated .sln in Release, or run cmake --build . --config=Release
 #
 

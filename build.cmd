@@ -66,8 +66,8 @@ if ERRORLEVEL 1 goto :nodelete
 
 if "!DEBUG!"=="1" dir "%VCToolsInstallDir%\bin\Hostx86\x86\"
 cd build
-echo cmake -G "!CMakeGenerator!" !STRICT! !NOPYTHON! -DCNTK=%CNTK% -DONNX=%ONNX% "-DTEST_MODELS_REPO=!TEST_MODELS_REPO!" ..
-cmake -G "!CMakeGenerator!" "!STRICT!" "!NOPYTHON!" -DCNTK=%CNTK% -DONNX=%ONNX% "-DTEST_MODELS_REPO=!TEST_MODELS_REPO!" ..
+echo cmake -G "!CMakeGenerator!" -Thost=x64 !STRICT! !NOPYTHON! -DCNTK=%CNTK% -DONNX=%ONNX% "-DTEST_MODELS_REPO=!TEST_MODELS_REPO!" ..
+cmake -G "!CMakeGenerator!" -Thost=x64 "!STRICT!" "!NOPYTHON!" -DCNTK=%CNTK% -DONNX=%ONNX% "-DTEST_MODELS_REPO=!TEST_MODELS_REPO!" ..
 goto :buildit
 
 :buildit

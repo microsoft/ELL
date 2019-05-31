@@ -123,7 +123,7 @@ class PretrainedModel:
             if not os.path.exists('include'):
                 shutil.copytree(os.path.join(pkg_dir, 'include'), 'include')
             if _is_windows(target):
-                _buildtools.run(['cmake', '-G', 'Visual Studio 15 2017 Win64', '-DPROCESSOR_HINT=haswell', '.'],
+                _buildtools.run(['cmake', '-G', 'Visual Studio 15 2017 Win64', '-Thost=x64', '-DPROCESSOR_HINT=haswell', '.'],
                                 shell=True)
                 _buildtools.run(['cmake', '--build', '.', '--config', 'Release'], shell=True)
             else:

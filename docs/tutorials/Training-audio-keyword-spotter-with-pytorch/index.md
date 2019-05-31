@@ -148,7 +148,7 @@ You will do this a lot so it might be handy to create a little batch or shell sc
 ```batch
 mkdir build
 cd build
-cmake -G "Visual Studio 15 2017 Win64" ..
+cmake -G "Visual Studio 15 2017 Win64" -Thost=x64 ..
 cmake --build . --config Release
 cd ..
 ```

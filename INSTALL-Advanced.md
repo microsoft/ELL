@@ -14,7 +14,7 @@ git clone https://github.com/xianyi/OpenBLAS
 cd OpenBLAS
 mkdir build
 cd build
-cmake -G "Visual Studio 15 2017 Win64" ..
+cmake -G "Visual Studio 15 2017 Win64" -Thost=x64 ..
 cmake --build . --config Release
 ```
 Then from an `Administrator` command prompt run the following install comamnd, from the above build folder:
@@ -79,6 +79,6 @@ Advanced users can compile OpenCV with CUDA support. To do so, clone the OpenCV 
     set PYTHON3_NUMPY_INCLUDE_DIRS=d:\Continuum\Anaconda2.7\envs\py35\lib\site-packages\numpy\core\include
     set PYTHON3_PACKAGES_PATH=d:\Continuum\Anaconda2.7\envs\py35\lib\site-packages
 
-    cmake  -G "Visual Studio 15 2017 Win64" -D CMAKE_BUILD_TYPE=Release -D WITH_CUDA=1  -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF ..
+    cmake  -G "Visual Studio 15 2017 Win64" -Thost=x64 -D CMAKE_BUILD_TYPE=Release -D WITH_CUDA=1  -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF ..
     if ERRORLEVEL 1 goto :eof
     cmake --build . --config Release
