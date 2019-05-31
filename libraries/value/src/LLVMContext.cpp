@@ -553,6 +553,7 @@ namespace value
 
         auto int8Type = llvm::Type::getInt8Ty(fn.GetLLVMContext());
         auto llvmType = ValueTypeToLLVMType(irEmitter, { type, 0 });
+        assert(!llvmType->isPointerTy());
         auto allocatedVariable = fn.Variable(llvmType, layout.GetMemorySize(), Variable::VariableFlags::hasInitValue);
 
         irEmitter.MemorySet(allocatedVariable, irEmitter.Zero(int8Type), irEmitter.Literal(static_cast<int64_t>(layout.GetMemorySize() * irEmitter.SizeOf(llvmType))));
@@ -793,7 +794,9 @@ namespace value
             }
             else
             {
-                throw LogicException(LogicExceptionErrors::illegalState);
+                auto emittableDestination = EnsureEmittable(destination);
+                CopyDataImpl(source, emittableDestination);
+                destination.SetData(emittableDestination);
             }
         }
         else
@@ -834,11 +837,12 @@ namespace value
                 {
                     if (destination.PointerLevel() == source.PointerLevel())
                     {
+                        auto llvmType = srcValue->getType()->getContainedType(0);
+                        auto primSize = irEmitter.SizeOf(llvmType);
+                        auto memorySize = irEmitter.Literal(static_cast<int64_t>(layout.GetMemorySize() * primSize));
                         irEmitter.MemoryCopy(srcValue,
                                              destValue,
-                                             irEmitter.Literal(
-                                                 static_cast<int64_t>(
-                                                     layout.GetMemorySize() * irEmitter.SizeOf(srcValue->getType()))));
+                                             memorySize);
                     }
                     else
                     {
