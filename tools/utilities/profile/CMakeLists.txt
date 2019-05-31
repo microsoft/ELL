@@ -156,8 +156,11 @@ set_property(TARGET make_profiler PROPERTY FOLDER "tools/utilities")
 set(make_profiler_test_model "unrolled_64x64x4x8")
 set(make_profiler_test_model_file "${CMAKE_BINARY_DIR}/${make_profiler_test_model}.ell")
 set(make_profiler_test_directory "${CMAKE_BINARY_DIR}/${make_profiler_test_model}_test_profiler")
-
-add_test(NAME make_profiler_test
+set(test_src ${make_profiler_test_script})
+set(test_name make_profiler_test)
+add_custom_target(${test_name} ALL DEPENDS ${test_src} SOURCES ${test_src})
+add_dependencies(${test_name} ${tool_name} make_profiler)
+add_test(NAME ${test_name}
   WORKING_DIRECTORY ${GLOBAL_BIN_DIR}
   COMMAND ${CMAKE_COMMAND}
     -D BUILD_DIR=${CMAKE_BINARY_DIR}
