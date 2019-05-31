@@ -6,7 +6,7 @@ if(${PYTHON_ENABLED})
 
     set(module_name "importers_common")
 
-    set(common_src converters.py 
+    set(common_src converters.py
         importer.py
         memory_shapes.py)
 
@@ -19,4 +19,6 @@ if(${PYTHON_ENABLED})
 
     add_subdirectory(test)
 
+    # run flake8
+    flake8(${module_name})
 endif()  # PYTHON_ENABLED

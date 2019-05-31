@@ -8,14 +8,10 @@
 #
 ####################################################################################################
 
-import logging
-import typing
-
 import numpy as np
 
 import ell
 
-_logger = logging.getLogger(__name__)
 
 def get_ell_shape(shape: tuple, order: str, padding: int = 0):
     """
@@ -23,16 +19,16 @@ def get_ell_shape(shape: tuple, order: str, padding: int = 0):
     """
     if order == "channel_row_column":
         channels = shape[0]
-        rows = shape[1] + 2*padding
-        columns = shape[2] + 2*padding
+        rows = shape[1] + 2 * padding
+        columns = shape[2] + 2 * padding
     elif order == "channel":
         channels = shape[0]
-        rows = 1 + 2*padding
-        columns = 1 + 2*padding
-    elif order == "row_column":        
+        rows = 1 + 2 * padding
+        columns = 1 + 2 * padding
+    elif order == "row_column":
         channels = 1
-        rows = shape[0] + 2*padding
-        columns = shape[1] + 2*padding
+        rows = shape[0] + 2 * padding
+        columns = shape[1] + 2 * padding
     else:
         raise NotImplementedError(
             "Unsupported input shape order: {}".format(order))
@@ -58,14 +54,15 @@ def get_ell_port_memory_layout(shape: tuple, order: str, padding: int = 0):
         columns = 1
     else:
         raise NotImplementedError("Unsupported input shape order: {}".format(order))
-    
-    return ell.model.PortMemoryLayout([rows, columns, channels], [rows + 2 * padding, columns + 2 * padding, channels], [padding, padding, 0])
+
+    return ell.model.PortMemoryLayout([rows, columns, channels], [rows + 2 * padding, columns + 2 * padding, channels],
+                                      [padding, padding, 0])
 
 
 def get_tensor_in_ell_order(tensor: np.array, order: str):
     """
     Returns a numpy array in ELL order
-    """ 
+    """
     original_tensor = tensor
     original_shape = original_tensor.shape
     if order == "filter_channel_row_column":
@@ -73,7 +70,7 @@ def get_tensor_in_ell_order(tensor: np.array, order: str):
         ordered_weights = ordered_weights.ravel().astype(np.float).reshape(
             original_shape[0] * original_shape[2], original_shape[3], original_shape[1])
     elif order == "channel_row_column":
-        ordered_weights = np.moveaxis(original_tensor, 0, -1) 
+        ordered_weights = np.moveaxis(original_tensor, 0, -1)
         ordered_weights = ordered_weights.ravel().astype(np.float).reshape(
             original_shape[1], original_shape[2], original_shape[0])
     elif order == "column_row":
@@ -92,9 +89,9 @@ def get_tensor_in_ell_order(tensor: np.array, order: str):
         ordered_weights = np.moveaxis(original_tensor, 0, -1)
         ordered_weights = np.moveaxis(ordered_weights, 2, 0)
         ordered_weights = ordered_weights.ravel().astype(np.float).reshape(
-        original_shape[3] * original_shape[1], original_shape[2], original_shape[0])
+            original_shape[3] * original_shape[1], original_shape[2], original_shape[0])
     else:
         raise NotImplementedError(
-            "Unsupported tensor order {}, for {}".format(order, uid))
+            "Unsupported tensor order {}".format(order))
 
     return ordered_weights

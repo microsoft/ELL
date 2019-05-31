@@ -13,42 +13,29 @@ script_path = os.path.dirname(os.path.abspath(__file__))
 
 SkipFullModelTests = False
 
-import getopt
-import configparser
-import inspect
-import json
-import logging
-import math
 import os
-import re
-import struct
-import time
-import traceback
 import unittest
 import sys
 
 import numpy as np
-_logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
 sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs/vision'))
 sys.path.append(os.path.join(script_path, '../../common/test'))
 sys.path.append(os.path.join(script_path, '../..'))
 sys.path.append(os.path.join(script_path, '..'))
-from cntk.initializer import glorot_uniform, he_normal
-from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
+
+from cntk.layers import Convolution, MaxPooling, Dense
 from cntk import constant, param_relu, load_model
-import cntk.layers.blocks
 from cntk.ops import *
 from itertools import product
 from download_helper import *
 
 import find_ell
 import ell
+import logger
 import common_importer_test
 import cntk_to_ell
-import ziptools
 import lib.cntk_converters as cntk_converters
 import lib.cntk_layers as cntk_layers
 import lib.cntk_utilities as cntk_utilities
@@ -105,7 +92,7 @@ def compare_predictor_output(modelFile, labels, modelTestInput=None,
                  original model.
 
     """
-
+    _logger = logger.get()
     z = load_model(modelFile)
     modelLayers = cntk_utilities.get_model_layers(z)
 
@@ -129,7 +116,7 @@ def compare_predictor_output(modelFile, labels, modelTestInput=None,
         modelTestInput = np.random.uniform(
             low=0, high=255, size=(
                 inputShape.rows, inputShape.columns, inputShape.channels)
-                ).astype(np.float_)
+        ).astype(np.float_)
 
     ellTestInput = modelTestInput.ravel()  # rows, columns, channels
     ellResults = predictor.Predict(ellTestInput)
@@ -143,8 +130,8 @@ def compare_predictor_output(modelFile, labels, modelTestInput=None,
         _logger.info("\nRunning original CNTK model...")
 
         _, out = z.forward(
-           {z.arguments[0]: [cntkTestInput],
-            z.arguments[1]: [list(range(len(labels)))]})
+            {z.arguments[0]: [cntkTestInput],
+             z.arguments[1]: [list(range(len(labels)))]})
         for output in z.outputs:
             if (output.shape == (len(labels),)):
                 out = out[output]
@@ -174,6 +161,7 @@ def compare_predictor_output(modelFile, labels, modelTestInput=None,
             orderedCntkModelResults, ellResults, 5,
             ('prediction outputs do not match! (for partial model ' +
                 modelFile + ')'))
+
 
 class CntkLayersTestCase(common_importer_test.EllImporterTestBase):
     def verify_compiled(self, predictor, input, expectedOutput, module_name,
@@ -259,7 +247,7 @@ class CntkLayersTestCase(common_importer_test.EllImporterTestBase):
         reshape and reorder values appropriately and that the equivalent ELL
         layer produces comparable output
         """
-
+        _logger = logger.get()
         x = input((2, 15, 15))
         count = 0
         inputValues = np.random.uniform(
@@ -280,8 +268,8 @@ class CntkLayersTestCase(common_importer_test.EllImporterTestBase):
             outputShape = cntkResults.shape
 
             padding = int((pool_size - 1) / 2)
-            rows = int(inputValues.shape[1] + 2*padding)
-            columns = int(inputValues.shape[2] + 2*padding)
+            rows = int(inputValues.shape[1] + 2 * padding)
+            columns = int(inputValues.shape[2] + 2 * padding)
             channels = int(inputValues.shape[0])
 
             # Create the equivalent ELL predictor
@@ -608,8 +596,8 @@ class CntkXorModelTestCase(common_importer_test.EllImporterTestBase):
         ell_map.Save("xor_test.map")
 
         # create a map and save to file
-        ell_map = ell.neural.utilities.ell_map_from_predictor(predictor,
-            step_interval_msec=500, lag_threshold_msec=750, function_prefix="XorTest")
+        ell_map = ell.neural.utilities.ell_map_from_predictor(
+            predictor, step_interval_msec=500, lag_threshold_msec=750, function_prefix="XorTest")
         ell_map.Save("xor_test_steppable.map")
 
 
@@ -617,8 +605,8 @@ class CntkToEllFullModelTestBase(common_importer_test.EllImporterTestBase):
     CATEGORIES_URL = 'models/ILSVRC2012/categories.txt'
     MODEL_URLS = [
         'models/ILSVRC2012/d_I160x160x3CMCMCMCMCMCMC1AS/d_I160x160x3CMCMCMCMCMCMC1AS.cntk.zip'
-        #'models/ILSVRC2012/BrazilianGuava/BrazilianGuava.cntk.zip',
-        #'models/ILSVRC2012/Coconut/Coconut.cntk.zip'
+        # 'models/ILSVRC2012/BrazilianGuava/BrazilianGuava.cntk.zip',
+        # 'models/ILSVRC2012/Coconut/Coconut.cntk.zip'
     ]
 
     def setUp(self):
@@ -626,7 +614,7 @@ class CntkToEllFullModelTestBase(common_importer_test.EllImporterTestBase):
         base_model_uri = self.get_test_model_repo()
         if SkipFullModelTests:
             self.skipTest('Full model tests are being skipped')
-                
+
         filename = os.path.basename(self.CATEGORIES_URL)
         self.label_file = download_file(base_model_uri + self.CATEGORIES_URL)
 
@@ -639,11 +627,12 @@ class CntkToEllFullModelTestBase(common_importer_test.EllImporterTestBase):
             zip_name = os.path.basename(url)
             filename = os.path.splitext(zip_name)[0]
             filename = download_and_extract_model(url, model_extension=".cntk")
-            self.model_names += [ os.path.splitext(filename)[0] ]
+            self.model_names += [os.path.splitext(filename)[0]]
 
 
 class CntkModelsTestCase(CntkToEllFullModelTestBase):
     def test_import(self):
+        _logger = logger.get()
         "Tests the importing of CNTK models to ELL"
         for modelName in self.model_names:
             args = [modelName + '.cntk']
@@ -677,8 +666,8 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
                 modelName + ') do not match!'))
         return ellMapFromArchiveResults
 
-
     def model_test_impl(self, modelName):
+        _logger = logger.get()
         with self.subTest(modelName=modelName):
             _logger.info('Testing {0}.cntk vs ELL ({0})'.format(modelName))
             # Load the cntk model
@@ -693,13 +682,14 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             ellMapFromArchive = ell.model.Map(modelName + '.ell')
 
             inputShape = ellMap.GetInputShape()
-            outputShape = ellMap.GetOutputShape()
+            # outputShape = ellMap.GetOutputShape()
 
             # Compile the live map
             # Note: for testing purposes, callback functions assume the "model" namespace
             compiler_options = ell.model.MapCompilerOptions()
             compiler_options.useBlas = False
-            ellCompiledMap = ellMap.Compile('host', 'model', 'predict', compilerOptions=compiler_options, dtype=np.float32)
+            ellCompiledMap = ellMap.Compile('host', 'model', 'predict', compilerOptions=compiler_options,
+                                            dtype=np.float32)
 
             # Compile the unarchived map
             # Note: for testing purposes, callback functions assume the "model" namespace
@@ -707,9 +697,8 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
                 'host', 'model', 'predict', compilerOptions=compiler_options, dtype=np.float32)
 
             cntkInput = np.random.uniform(
-                high=255, size=(
-                    inputShape.channels, inputShape.rows, inputShape.columns)
-                ).astype(np.float)
+                high=255, size=(inputShape.channels, inputShape.rows, inputShape.columns)
+            ).astype(np.float)
             ellOrderedInput = cntk_converters.\
                 get_vector_from_cntk_array(cntkInput)
             cntkInput = np.ascontiguousarray(cntkInput)
@@ -748,8 +737,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             _logger.info('Comparing unarchived map output (reference)')
             sys.stdout.flush()
 
-            ellMapFromArchiveResults = self.compute_ell_map(ellMapFromArchive,
-                ellOrderedInput, cntkResults, modelName)
+            self.compute_ell_map(ellMapFromArchive, ellOrderedInput, cntkResults, modelName)
 
             _logger.info('Comparing map output (compiled)')
             sys.stdout.flush()
@@ -781,9 +769,10 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
 
 class CntkFullModelTest(CntkToEllFullModelTestBase):
     def setUp(self):
-        super(CntkFullModelTest,self).setUp()
+        super(CntkFullModelTest, self).setUp()
         self.labels = self.load_labels(self.label_file)
         self.method_index = 0
+        self._logger = logger.get()
 
     def reset(self):
         self.cntk_model = None
@@ -796,10 +785,10 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
 
     def print_top_result(self):
         prompt = ""
-        flat = None 
+        flat = None
         if self.data is not None:
             prompt = "cntk picks: "
-            flat = self.data.ravel()            
+            flat = self.data.ravel()
         if self.ell_data is not None:
             prompt = "ell picks:"
             flat = self.ell_data.ravel()
@@ -808,7 +797,7 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
             flat = self.compiled_data.ravel()
 
         if flat is not None and len(flat) == len(self.labels):
-            _logger.info("%s %s" % (prompt, self.get_label(np.argmax(flat))))
+            self._logger.info("%s %s" % (prompt, self.get_label(np.argmax(flat))))
 
     def test_models(self):
         """Takes random input and passes it through a full CNTK model and
@@ -845,10 +834,9 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
         self.data = self.get_input_data()
 
         if len(self.cntk_model.arguments) > 1:
-            output = np.zeros(self.cntk_model.arguments[1].shape, dtype=np.float32)
             predictions = self.cntk_model.eval({
                 self.cntk_model.arguments[0]: [self.data],
-                self.cntk_model.arguments[1]: [list(range(len(self.categories)))] })
+                self.cntk_model.arguments[1]: [list(range(len(self.categories)))]})
         else:
             predictions = self.cntk_model.eval({
                 self.cntk_model.arguments[0]: [self.data]})
@@ -916,9 +904,9 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
 
         # Compare compiled results
         np.testing.assert_array_almost_equal(
-                expectedOutput, compiledResults, decimal=4, err_msg=(
-                    'results for {} layer do not match ELL compiled output!'
-                ).format(module_name))
+            expectedOutput, compiledResults, decimal=4, err_msg=(
+                'results for {} layer do not match ELL compiled output!'
+            ).format(module_name))
 
     def load_labels(self, fileName):
         with open(fileName) as f:

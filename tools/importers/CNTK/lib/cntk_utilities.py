@@ -9,17 +9,18 @@
 ####################################################################################################
 
 """Internal utilities for the CNTK importer"""
+import os
+import sys
 
-import logging
-
-from cntk import parameter, constant, load_model
 from cntk.layers.typing import *
 from cntk.ops import *
 import cntk.logging.graph as graph
 
 import ell
+script_path = os.path.dirname(__file__)
+sys.path.append(os.path.join(script_path, '../../../utilities/pythonlibs'))
+import logger
 
-_logger = logging.getLogger(__name__)
 
 def op_name_equals(node, name):
     result = False
@@ -27,6 +28,7 @@ def op_name_equals(node, name):
         result = (node.op_name == name)
 
     return result
+
 
 def find_parameter_by_name(parameters, name, index=0):
     for p in parameters:
@@ -46,33 +48,37 @@ def find_parameter_by_name(parameters, name, index=0):
     # Parameter is missing, so return None.
     return None
 
+
 def find_node_by_op_name(parameters, name):
     for p in parameters:
         if (p.op_name == name):
             return p
     return None
 
+
 def get_ell_activation_type(nodes):
     """Returns an ell.neural.ActivationType from the list of nodes"""
-    if (find_node_by_op_name(nodes, 'ReLU') != None):
+    if find_node_by_op_name(nodes, 'ReLU') is not None:
         return ell.neural.ActivationType.relu
-    elif (find_node_by_op_name(nodes, 'Sigmoid') != None):
+    elif find_node_by_op_name(nodes, 'Sigmoid') is not None:
         return ell.neural.ActivationType.sigmoid
-    elif (find_node_by_op_name(nodes, 'LeakyReLU') != None):
+    elif find_node_by_op_name(nodes, 'LeakyReLU') is not None:
         return ell.neural.ActivationType.leaky
 
     return None
 
+
 def get_cntk_activation_op(nodes):
     """Returns an ell.neural.ActivationType from the list of nodes"""
-    if (find_node_by_op_name(nodes, 'ReLU') != None):
+    if find_node_by_op_name(nodes, 'ReLU') is not None:
         return relu
-    elif (find_node_by_op_name(nodes, 'Sigmoid') != None):
+    elif find_node_by_op_name(nodes, 'Sigmoid') is not None:
         return sigmoid
-    elif (find_node_by_op_name(nodes, 'LeakyReLU') != None):
+    elif find_node_by_op_name(nodes, 'LeakyReLU') is not None:
         return leaky_relu
 
     return None
+
 
 def get_cntk_activation_name(nodes):
     """Returns an ell.neural.ActivationType from the list of nodes"""
@@ -81,18 +87,19 @@ def get_cntk_activation_name(nodes):
             return name
     return None
 
+
 def is_softmax_activation(nodes):
     """Returns True is the nodes contain a softmax activation"""
-    return (find_node_by_op_name(nodes, 'SoftMax') != None)
+    return find_node_by_op_name(nodes, 'SoftMax') is not None
 
 
 def ell_activation_type_to_string(type):
     """Returns the string representation of an ell.neural.ActivationType"""
-    if (type == ell.neural.ActivationType.relu):
+    if type == ell.neural.ActivationType.relu:
         return 'ReLU'
-    elif (type == ell.neural.ActivationType.sigmoid):
+    elif type == ell.neural.ActivationType.sigmoid:
         return 'Sigmoid'
-    elif (type == ell.neural.ActivationType.leaky):
+    elif type == ell.neural.ActivationType.leaky:
         return 'LeakyReLU'
 
     return ""
@@ -112,7 +119,8 @@ def get_shape(inputShape):
         rows = inputShape[1]
         columns = inputShape[2]
     elif (len(inputShape) == 1):
-        # If the input shape is a vector, make it a tensor with 1 row, 1 column and number of channels equal to the length of the vector
+        # If the input shape is a vector, make it a tensor with 1 row, 1 column and number of channels equal to the
+        # length of the vector
         channels = inputShape[0]
         rows = 1
         columns = 1
@@ -133,7 +141,8 @@ def get_adjusted_shape(inputShape, paddingParameters):
         rows += 2 * paddingParameters.paddingSize
         columns += 2 * paddingParameters.paddingSize
     elif (len(inputShape) == 1):
-        # If the input shape is a vector, make it a tensor with 1 row, 1 column and number of channels equal to the length of the vector
+        # If the input shape is a vector, make it a tensor with 1 row, 1 column and number of channels equal to the
+        # length of the vector
         channels = inputShape[0]
         rows = 1
         columns = 1
@@ -155,7 +164,7 @@ def get_model_layers(root):
         if node.uid in visited:
             continue
 
-        from cntk import cntk_py
+        from cntk import cntk_py  # noqa 401
         try:
             # Function node
             stack = list(node.root_function.inputs) + stack
@@ -168,7 +177,7 @@ def get_model_layers(root):
             except AttributeError:
                 pass
         # Add function nodes but skip Variable nodes
-        if (not isinstance(node, Variable)) and (not node.uid in visited):
+        if not isinstance(node, Variable) and node.uid not in visited:
             layers.append(node)
             visited.add(node.uid)
 
@@ -189,18 +198,19 @@ def plot_model(root, output_file="model.svg"):
     """
 
     text = graph.plot(root, output_file)
-    _logger.info(text)
+    logger.get().info(text)
 
 ###############################################################################
 # Code above this belongs to the legacy importer and will be removed
 # once importing Nodes comes online.
 ###############################################################################
 
+
 class Utilities:
     """
     Utility class for processing CNTK models.
     """
-    @staticmethod    
+    @staticmethod
     def get_model_nodes(root):
         """Returns a list of the high-level nodes (i.e. function blocks) that make up the CNTK model """
         stack = [root.root_function]  # node
@@ -211,8 +221,8 @@ class Utilities:
             node = stack.pop(0)
             if node.uid in visited:
                 continue
-            
-            from cntk import cntk_py
+
+            from cntk import cntk_py  # noqa 401
             try:
                 node = node.root_function
                 # Function node
@@ -228,19 +238,19 @@ class Utilities:
 
             # Add function nodes but skip Variable nodes. Only function nodes are
             # needed since they represent operations.
-            if (not isinstance(node, Variable)) and (not node.uid in visited):
+            if not isinstance(node, Variable) and node.uid not in visited:
                 nodes.append(node)
                 visited.add(node.uid)
                 # Also add input variables
                 for i in node.inputs:
                     if i.is_input:
                         i.op_name = "Input"
-                        nodes.append(i)                
+                        nodes.append(i)
 
-        nodes.reverse()        
+        nodes.reverse()
         return nodes
 
-    @staticmethod    
+    @staticmethod
     def find_parameter_by_name(parameters, name, index=0):
         for p in parameters:
             if (p.name == name):
@@ -255,7 +265,7 @@ class Utilities:
         # Parameter is missing, so return None.
         return None
 
-    @staticmethod    
+    @staticmethod
     def find_parameter_index_by_name(parameters, name, index=0):
         for i in range(len(parameters)):
             if (parameters[i].name == name):
@@ -274,7 +284,7 @@ class Utilities:
         # Parameter is missing, so return 0.
         return 0
 
-    @staticmethod    
+    @staticmethod
     def get_uid(obj):
         """
         Returns uid of a cntk node if one exists
@@ -284,22 +294,22 @@ class Utilities:
         else:
             return ""
 
-    @staticmethod    
-    def get_padding_for_layer_with_sliding_window(cntk_attributes, 
-        window_size = 3, scheme = ell.neural.PaddingScheme.zeros):
+    @staticmethod
+    def get_padding_for_layer_with_sliding_window(cntk_attributes,
+                                                  window_size=3, scheme=ell.neural.PaddingScheme.zeros):
         """
         Returns padding for a cntk node that uses sliding windows like
         Convolution and Pooling
         """
-        if ('autoPadding' in cntk_attributes):
-            if (cntk_attributes['autoPadding'][1] == True):
+        if 'autoPadding' in cntk_attributes:
+            if cntk_attributes['autoPadding'][1]:
                 padding = int((window_size - 1) / 2)
             else:
                 padding = cntk_attributes['upperPad'][0]
         else:
             padding = cntk_attributes['upperPad'][0]
-        return {"size": padding, "scheme": scheme}    
-    
+        return {"size": padding, "scheme": scheme}
+
     @staticmethod
     def op_name_equals(node, name):
         """
@@ -312,7 +322,7 @@ class Utilities:
 
         return result
 
-    @staticmethod    
+    @staticmethod
     def get_ell_activation_type(nodes):
         """
         Returns an ell.neural.ActivationType from the list of nodes
@@ -326,7 +336,7 @@ class Utilities:
 
         return None
 
-    @staticmethod    
+    @staticmethod
     def plot_model(root, output_file="model.svg"):
         """Plots the CNTK model starting from the root node to an output image
 
@@ -337,9 +347,9 @@ class Utilities:
             pip install pydot_ng
         """
         graph.plot(root, output_file)
-        _logger.info("Model graph plotted to: {}".format(output_file))
+        logger.get().info("Model graph plotted to: {}".format(output_file))
 
-    @staticmethod    
+    @staticmethod
     def dump(obj):
         """
         For debugging purposes

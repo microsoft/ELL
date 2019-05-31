@@ -9,13 +9,13 @@ if(${PYTHON_ENABLED} AND ${ONNX})
     set(importer_src onnx_to_ell.py onnx_import.py)
 
     set(importer_lib lib/onnx_converters.py)
-        
+
     source_group("lib" FILES ${importer_lib})
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src} ${importer_lib})
     add_dependencies(${module_name} pythonlibs)
 
     set_property(TARGET ${module_name} PROPERTY FOLDER "tools/importers")
-    
+
     #copy files
     copy_newer_files(${module_name} importer_src)
 
@@ -23,4 +23,7 @@ if(${PYTHON_ENABLED} AND ${ONNX})
     copy_newer_files(${module_name} importer_lib "${CMAKE_CURRENT_BINARY_DIR}/lib/")
 
     add_subdirectory(test)
+
+    # run flake8
+    flake8(${module_name})
 endif()  # PYTHON_ENABLED

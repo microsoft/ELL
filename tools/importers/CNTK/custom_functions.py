@@ -15,8 +15,8 @@ import cntk as C
 
 
 class Sign(UserFunction):
-    """Custom sign function using the straight through estimator as gradient. This is implemented without a numpy intermediate
-       representation, giving a much faster run time.
+    """Custom sign function using the straight through estimator as gradient. This is implemented without a numpy
+    intermediate representation, giving a much faster run time.
     """
     # initialize by creating new userfunction and assigning function and grad inputs and functions
 
@@ -59,7 +59,8 @@ class Sign(UserFunction):
         _, output_values = self.action.forward({self.actionArg: argument}, self.action.outputs, device=device,
                                                as_numpy=False)
         # first return argument is what to store in state, in our case, we need to keep the inputs to forward to compute
-        # the straight through estimator gradient. Second output is simply selecting the proper output from output_values.
+        # the straight through estimator gradient. Second output is simply selecting the proper output from
+        # output_values.
         return argument.deep_clone(), output_values[self.action.output]
 
     # define what should happend when our function has backward performed on it
@@ -83,8 +84,9 @@ class Sign(UserFunction):
 
 
 class pySign(UserFunction):
-    """ A different implementation of sign with the straight through estimator for backprop. Has identical outputs but uses numpy instead
-        of CNTK intrinsics. This makes it much easier to write but slower for training since data has to be copied between CPU and GPU.
+    """ A different implementation of sign with the straight through estimator for backprop. Has identical outputs but
+    uses numpy instead of CNTK intrinsics. This makes it much easier to write but slower for training since data has to
+    be copied between CPU and GPU.
     """
 
     def __init__(self, arg, name='pySign'):
@@ -122,11 +124,11 @@ def bit_map_as_numpy_array(bit_map, input):
 
 
 class MultibitKernel(UserFunction):
-    """ Similar to CustomSign, Multibit binarizes an input using straight through estimator gradients. However, Multibit also supports a
-        bit_map argument that specifies how many bits to binarize to. Bit_map is a tensor the shape of the input that has a bit value for
-        each input value. Although the bit_map will be uniform in most cases, it does support varying bit widths. The kernel variant
-        of Multibit computes a scaler for each bit for each kernel. Should only be used on weight values. For activations, use the regular
-        Multibit version.
+    """ Similar to CustomSign, Multibit binarizes an input using straight through estimator gradients. However,
+        Multibit also supports a bit_map argument that specifies how many bits to binarize to. Bit_map is a tensor
+        the shape of the input that has a bit value for each input value. Although the bit_map will be uniform in most
+        cases, it does support varying bit widths. The kernel variant of Multibit computes a scaler for each bit for
+        each kernel. Should only be used on weight values. For activations, use the regular Multibit version.
     """
     # initialize by creating new userfunction and assigning function and grad inputs and functions
 
@@ -147,22 +149,23 @@ class MultibitKernel(UserFunction):
         multiIn = C.input(shape=arg1.shape, dynamic_axes=arg1.dynamic_axes)
         bit_map = C.constant(self.bit_map)
         max_bits = self.bit_map.max()
-        shape = multiIn.shape
-        reformed = C.reshape(multiIn, (-1,))
         # lets compute the means we need
-        # carry over represents the remaining value that needs to binarized. For a single bit, this is just the input. For more bits,
-        # it is the difference between the previous bits approximation and the true value.
+        # carry over represents the remaining value that needs to binarized. For a single bit, this is just the input.
+        # For more bits, it is the difference between the previous bits approximation and the true value.
         carry_over = multiIn
         approx = C.element_times(multiIn, 0)
-        # iterate through the maximum number of bits specified by the bit maps, basically compute each level of binarization
+        # iterate through the maximum number of bits specified by the bit maps, basically compute each level of
+        # binarization
         for i in range(max_bits):
             # determine which values of the input should be binarized to i bits or more
             hot_vals = C.greater(bit_map, i)
             # select only the values which we need to binarize
             valid_vals = C.element_select(hot_vals, carry_over, 0)
-            # compute mean on a per kernel basis, reshaping is done to allow for sum reduction along only axis 0 (the kernels)
+            # compute mean on a per kernel basis, reshaping is done to allow for sum reduction along only axis 0
+            # (the kernels)
             mean = C.element_divide(C.reduce_sum(C.reshape(C.abs(
-                valid_vals), (valid_vals.shape[0], -1)), axis=1), C.reduce_sum(C.reshape(hot_vals, (hot_vals.shape[0], -1)), axis=1))
+                valid_vals), (valid_vals.shape[0], -1)), axis=1),
+                C.reduce_sum(C.reshape(hot_vals, (hot_vals.shape[0], -1)), axis=1))
             # reshape the mean to match the dimensionality of the input
             mean = C.reshape(mean, (mean.shape[0], mean.shape[1], 1, 1))
             # binarize the carry over
@@ -201,14 +204,16 @@ class MultibitKernel(UserFunction):
         _, output_values = self.action.forward({self.actionArg: argument}, self.action.outputs, device=device,
                                                as_numpy=False)
         # first return argument is what to store in state, in our case, we need to keep the inputs to forward to compute
-        # the straight through estimator gradient. Second output is simply selecting the proper output from output_values.
+        # the straight through estimator gradient. Second output is simply selecting the proper output from
+        # output_values.
         return argument.deep_clone(), output_values[self.action.output]
 
     # define what should happend when our function has backward performed on it
     def backward(self, state, root_gradients):
         # first extract the value passed by the state, in this case the argument to forward.
         val = state
-        # now perform a forward on our gradient function to compute the proper outputs. Map val to gradArg and the # root gradient to gradRoot to properly set up the binary gradient inputs.
+        # now perform a forward on our gradient function to compute the proper outputs. Map val to gradArg and the
+        # root gradient to gradRoot to properly set up the binary gradient inputs.
         _, output_values = self.grad.forward({self.gradArg: val, self.gradRoot: root_gradients},
                                              self.grad.outputs, device=state.device(), as_numpy=False)
         # return the proper output
@@ -242,8 +247,6 @@ class Multibit(UserFunction):
         multiIn = C.input(shape=arg1.shape, dynamic_axes=arg1.dynamic_axes)
         bit_map = C.constant(self.bit_map)
         max_bits = self.bit_map.max()
-        shape = multiIn.shape
-        reformed = C.reshape(multiIn, (-1,))
         carry_over = multiIn
         approx = C.element_times(multiIn, 0)
         for i in range(max_bits):
@@ -266,7 +269,6 @@ class Multibit(UserFunction):
         gradIn = C.input(shape=arg.shape, dynamic_axes=arg.dynamic_axes)
         # create an input variable for the gradient passed from the next stage
         gradRoot = C.input(shape=arg.shape, dynamic_axes=arg.dynamic_axes)
-        #gradOut =  C.input(shape=arg.shape, dynamic_axes=arg.dynamic_axes)
 
         signGrad = C.abs(gradIn)
         # new idea, bound of clipping should be a function of the bit map since higher bits can represent higher numbers
@@ -286,14 +288,16 @@ class Multibit(UserFunction):
         _, output_values = self.action.forward({self.actionArg: argument}, self.action.outputs, device=device,
                                                as_numpy=False)
         # first return argument is what to store in state, in our case, we need to keep the inputs to forward to compute
-        # the straight through estimator gradient. Second output is simply selecting the proper output from output_values.
+        # the straight through estimator gradient. Second output is simply selecting the proper output from
+        # output_values.
         return argument.deep_clone(), output_values[self.action.output]
 
     # define what should happend when our function has backward performed on it
     def backward(self, state, root_gradients):
         # first extract the value passed by the state, in this case the argument to forward.
         val = state
-        # now perform a forward on our gradient function to compute the proper outputs. Map val to gradArg and the # root gradient to gradRoot to properly set up the binary gradient inputs.
+        # now perform a forward on our gradient function to compute the proper outputs. Map val to gradArg and the
+        # root gradient to gradRoot to properly set up the binary gradient inputs.
         _, output_values = self.grad.forward({self.gradArg: val, self.gradRoot: root_gradients},
                                              self.grad.outputs, device=state.device(), as_numpy=False)
         # return the proper output
@@ -376,7 +380,7 @@ def BinaryConvolution(filter_shape,
     """ The definition for a binary convolution layer
         arguments:
             filter_shape: tuple indicating filter size
-            num_filters: number of filters to use 
+            num_filters: number of filters to use
             channels: number of incoming channels
             init: type of initialization to use for weights
             pad: set to True apply padding on rows and columns

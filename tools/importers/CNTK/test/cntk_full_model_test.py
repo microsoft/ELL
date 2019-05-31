@@ -8,29 +8,24 @@
 #
 ####################################################################################################
 import sys
-import logging
 import math
 import os
 
 import cntk
 import numpy as np
 import cv2
-import math
 import argparse
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(script_path, '../..'))
 sys.path.append(os.path.join(script_path, ".."))
-import cntk_to_ell
-from custom_functions import CustomSign, BinaryConvolution
 import ell
-import lib.cntk_converters as cntk_converters
-import lib.cntk_layers as cntk_layers
-import lib.cntk_utilities as cntk_utilities
-from custom_functions import BinaryConvolution, CustomSign
+import logger
 
-logging.basicConfig(level=logging.INFO, format="%(message)s")
-_logger = logging.getLogger(__name__)
+import cntk_utilities
+import cntk_layers
+import cntk_converters
+
 
 class FullModelTest:
     def __init__(self, args):
@@ -46,13 +41,15 @@ class FullModelTest:
         self.labels = self.load_labels(args.label_file)
         self.report = None
         self.layer_index = 1
-        self.layers = args.layers # whether to test the whole model or layer by layer
+        self.layers = args.layers  # whether to test the whole model or layer by layer
+        self.logger = logger.get()
 
     def compare_arrays(self, a, b, msg, precision=1e-4):
         a = a.astype(dtype=np.float32).ravel()
         b = b.astype(dtype=np.float32).ravel()
 
-        if len(a) != len(b): raise Exception("Arrays are not the same size. Output dimensions are different!")
+        if len(a) != len(b):
+            raise Exception("Arrays are not the same size. Output dimensions are different!")
 
         min_diff = abs(min(a) - min(b))
         max_diff = abs(max(a) - max(b))
@@ -61,29 +58,28 @@ class FullModelTest:
         mean_diff = abs(np.mean(a) - np.mean(b))
 
         if not np.allclose(a, b, atol=precision):
-            _logger.info("  " + msg)
+            self.logger.info("  " + msg)
 
         if min_diff > precision:
-            _logger.info("    min %f versus %f, diff is %.10f" % (min(a), min(b), min_diff))
+            self.logger.info("    min %f versus %f, diff is %.10f" % (min(a), min(b), min_diff))
 
         if max_diff > precision:
-            _logger.info("    max %f versus %f, diff is %.10f" % (max(a), max(b), max_diff))
+            self.logger.info("    max %f versus %f, diff is %.10f" % (max(a), max(b), max_diff))
 
         if mean_diff > precision:
-            _logger.info("    mean %f versus %f, diff is %.10f" % (np.mean(a), np.mean(b), mean_diff))
+            self.logger.info("    mean %f versus %f, diff is %.10f" % (np.mean(a), np.mean(b), mean_diff))
 
         if std_dev_diff > precision:
-            _logger.info("    stddev %f versus %f, diff is %.10f" % (np.std(a), np.std(b), std_dev_diff))
+            self.logger.info("    stddev %f versus %f, diff is %.10f" % (np.std(a), np.std(b), std_dev_diff))
 
         if largest_diff > precision:
-            _logger.info("    largest individual diff=%.10f" % (largest_diff))
+            self.logger.info("    largest individual diff=%.10f" % (largest_diff))
 
     def load_image(self, filename):
         image = cv2.imread(filename)
-        if (type(image) == type(None)):
+        if image is None:
             raise Exception('image from %s failed to load' % (filename))
         return image
-
 
     def resize_image(self, image, newSize):
         # Shape: [rows, cols, channels]
@@ -105,34 +101,34 @@ class FullModelTest:
 
     def prepare_image_for_predictor(self, image):
         """Crops, resizes image to outputshape. Returns image as numpy array in in BGR order."""
-        input_size = (self.input_shape[1], self.input_shape[2]) # remember cntk shapes are (channel,rows,columns)
+        input_size = (self.input_shape[1], self.input_shape[2])  # remember cntk shapes are (channel,rows,columns)
         if self.input_shape[0] == 1:
-            image = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
         resized = self.resize_image(image, input_size)
         resized = resized.astype(np.float).ravel()
         return resized
 
     def print_top_result(self):
-        if type(self.data) != type(None):
-            _logger.info("cntk picks: %s" % (self.get_label(np.argmax(self.data))))
-        if type(self.ell_data) != type(None):
-            _logger.info("ell picks: %s" % (self.get_label(np.argmax(self.ell_data))))
-        if type(self.compiled_data) != type(None):
-            _logger.info("ell compiled picks: %s" % (self.get_label(np.argmax(self.compiled_data))))
+        if self.data is None:
+            self.logger.info("cntk picks: %s" % (self.get_label(np.argmax(self.data))))
+        if self.ell_data is None:
+            self.logger.info("ell picks: %s" % (self.get_label(np.argmax(self.ell_data))))
+        if self.compiled_data is None:
+            self.logger.info("ell compiled picks: %s" % (self.get_label(np.argmax(self.compiled_data))))
 
     def run(self):
         self.report = open("report.md", "w")
         self.report.write("# Comparison Results\n")
-        self.report.write("**model**: %s\n\n" %(self.model_file))
-        if self.image_file != None:
+        self.report.write("**model**: %s\n\n" % (self.model_file))
+        if self.image_file is not None:
             self.image = self.load_image(self.image_file)
-            self.report.write("**image**: %s\n\n" %(self.image_file))
+            self.report.write("**image**: %s\n\n" % (self.image_file))
 
         self.cntk_model = cntk.load_model(self.model_file)
         modelLayers = cntk_utilities.get_model_layers(self.cntk_model)
         # Get the relevant CNTK layers that we will convert to ELL
         layersToConvert = cntk_layers.get_filtered_layers_list(modelLayers)
-        _logger.info("----------------------------------------------------------------------------------")
+        self.logger.info("----------------------------------------------------------------------------------")
         if self.layers:
             for layer in layersToConvert:
                 self.compare_layer(layer)
@@ -173,18 +169,19 @@ class FullModelTest:
         # Create an ELL neural network predictor from the layers
         predictor = ell.neural.NeuralNetworkPredictor(ellLayers)
         shape = predictor.GetInputShape()
-        self.input_shape = (shape.channels,shape.rows,shape.columns) # to CNTK (channel, rows, coumns) order
+        self.input_shape = (shape.channels, shape.rows, shape.columns)  # to CNTK (channel, rows, columns) order
         self.data = self.get_input_data()
 
         if (len(self.cntk_model.arguments) > 1):
             output = np.zeros(self.cntk_model.arguments[1].shape).astype(np.float32)
-            predictions = self.cntk_model.eval({self.cntk_model.arguments[0]:[self.data],self.cntk_model .arguments[1]:output})
+            predictions = self.cntk_model.eval(
+                {self.cntk_model.arguments[0]: [self.data], self.cntk_model.arguments[1]: output})
         else:
-            predictions = self.cntk_model.eval({self.cntk_model.arguments[0]:[self.data.ravel()]})
+            predictions = self.cntk_model.eval({self.cntk_model.arguments[0]: [self.data.ravel()]})
 
         size = 0
         output = None
-        if isinstance(predictions,dict):
+        if isinstance(predictions, dict):
             for key in self.cntk_model.outputs:
                 shape = key.shape
                 if len(shape) > 0:
@@ -196,24 +193,25 @@ class FullModelTest:
             output = predictions[0]
 
         self.verify_ell("Softmax", predictor, self.data, output)
-        self.data = output # make this the input to the next layer.
+        self.data = output  # make this the input to the next layer.
         self.save_layer_outputs("Softmax")
 
     def get_input_data(self):
-        data = self.data # from previous layer
-        if (type(data) == type(None)):
-            if (type(self.image) != type(None)):
-                data = self.prepare_image_for_predictor(self.image).astype(dtype=np.float32).reshape((self.input_shape[1],self.input_shape[2],self.input_shape[0]))
-                data = np.transpose(data, (2, 0, 1)) # to match CNTK (channel, rows, coumns) order
+        data = self.data  # from previous layer
+        if data is None:
+            if self.image is not None:
+                data = self.prepare_image_for_predictor(self.image).astype(dtype=np.float32)
+                data = data.reshape((self.input_shape[1], self.input_shape[2], self.input_shape[0]))
+                data = np.transpose(data, (2, 0, 1))  # to match CNTK (channel, rows, coumns) order
             else:
-                # then just use a range of numbers as input.
-                data = ((np.random.rand(self.input_shape[0] * self.input_shape[1] * self.input_shape[2]) * 10) - 5).astype(np.float32) # Random input from -5 to 5
+                # then just use a range of numbers as input, tandom input from -5 to 5
+                data = ((np.random.rand(self.input_shape[0] * self.input_shape[1] * self.input_shape[2]) * 10) - 5)
                 data = np.reshape(data, self.input_shape).astype(dtype=np.float32)
                 data = self.normalize(data)
         return data
 
     def compare_layer(self, layer):
-        _logger.info("Comparing layer " + str(layer))
+        self.logger.info("Comparing layer " + str(layer))
 
         if self.input_shape is None:
             for node_input in layer.layer.inputs:
@@ -224,7 +222,7 @@ class FullModelTest:
                         # hmmm, strange 1D input, let's assume it is a square image...
                         size = self.input_shape[0]
                         w = int(math.sqrt(size))
-                        self.input_shape = (1,int(size/w),w) # channels,rows,cols
+                        self.input_shape = (1, int(size / w), w)  # channels,rows,cols
                     break
 
         self.data = self.get_input_data()
@@ -234,8 +232,8 @@ class FullModelTest:
         clone = layer.clone_cntk_layer(feature)
         output = clone(self.data)[0]
         predictor = self.get_predictor(layer)
-        self.verify_ell(layer.op_name, predictor,self.data, output)
-        self.data = output # make this the input to the next layer.
+        self.verify_ell(layer.op_name, predictor, self.data, output)
+        self.data = output  # make this the input to the next layer.
         self.save_layer_outputs(layer.op_name)
 
     def get_predictor(self, layer):
@@ -244,11 +242,10 @@ class FullModelTest:
         # remove output_padding from because CNTK doesn't have output padding.
         layer.layer.ell_outputPaddingParameters = ell.neural.PaddingParameters(ell.neural.PaddingScheme.zeros, 0)
         layer.layer.ell_outputShape = cntk_utilities.get_adjusted_shape(
-                layer.layer.output.shape, layer.layer.ell_outputPaddingParameters)
+            layer.layer.output.shape, layer.layer.ell_outputPaddingParameters)
         layer.process(ell_layers)
         # Create an ELL neural network predictor from the relevant CNTK layers
         return ell.neural.NeuralNetworkPredictor(ell_layers)
-
 
     def verify_ell(self, op_name, predictor, data, expected):
         # now compare this with the equivalent ELL layer, both reference and compiled.
@@ -256,14 +253,14 @@ class FullModelTest:
         if len(data.shape) == 1:
             ellTestInput = data.ravel().astype(dtype=np.float)
         else:
-            ellTestInput =  np.transpose(data, (1, 2, 0)).ravel().astype(dtype=np.float)
+            ellTestInput = np.transpose(data, (1, 2, 0)).ravel().astype(dtype=np.float)
         ellResults = predictor.Predict(ellTestInput)
         ellArray = np.array(ellResults)
         self.ell_data = ellArray
         output_shape = predictor.GetOutputShape()
         out2 = np.reshape(ellArray, (output_shape.rows, output_shape.columns, output_shape.channels))
         if len(data.shape) == 3:
-            out2 = np.transpose(out2, (2, 0, 1)) # to match CNTK output
+            out2 = np.transpose(out2, (2, 0, 1))  # to match CNTK output
 
         # now compare these results.
         self.compare_arrays(expected, out2.astype(dtype=np.float32), 'Results for %s layer do not match!' % (op_name))
@@ -277,15 +274,19 @@ class FullModelTest:
         # Note: for testing purposes, callback functions assume the "model" namespace
         compiler_options = ell.model.MapCompilerOptions()
         compiler_options.useBlas = False
-        compiled = map.Compile("host", "model", "test" + str(self.method_index), compilerOptions=compiler_options, dtype=np.float32)
+        compiled = map.Compile("host", "model", "test" + str(self.method_index), compilerOptions=compiler_options,
+                               dtype=np.float32)
 
         self.method_index += 1
         compiledResults = compiled.Compute(input, dtype=np.float32)
-        ca = np.array(compiledResults) # convert back to numpy
+        ca = np.array(compiledResults)  # convert back to numpy
         self.compiled_data = ca
         expectedFloats = expectedOutput.astype(dtype=np.float32)
         # Compare compiled results
-        self.compare_arrays(expectedFloats, ca, 'results for %s layer do not match ELL compiled output !' % (module_name), precision)
+        self.compare_arrays(
+            expectedFloats, ca,
+            "results for %s layer do not match ELL compiled output !".format(module_name),
+            precision)
 
     def load_labels(self, fileName):
         labels = []
@@ -299,7 +300,7 @@ class FullModelTest:
         return ""
 
 
-def main(argv):
+def main():
     arg_parser = argparse.ArgumentParser(
         "Tests a given cntk model and compares results from CNTK, ELL, and compiled ELL implementations of that model\n"
         "Example:\n"
@@ -310,11 +311,10 @@ def main(argv):
     arg_parser.add_argument("model_file", help="path to a CNTK model file, or a zip archive of a CNTK model file")
     arg_parser.add_argument("--image", help="path to a image file to use as input (default is random data)")
     arg_parser.add_argument("--layers", help="turns on layer-by-layer testing", action="store_true")
-    args = arg_parser.parse_args(argv)
+    args = arg_parser.parse_args()
     test = FullModelTest(args)
     test.run()
 
+
 if __name__ == '__main__':
-    args = sys.argv
-    args.pop(0)
-    main(args)
+    main()

@@ -8,19 +8,17 @@
 #
 ####################################################################################################
 
-import itertools
 import os
 import sys
-import logging
-from enum import Enum, auto
 import typing
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__))))
 
 import ell
+import logger
+_logger = logger.get()
 from converters import *
 
-_logger = logging.getLogger(__name__)
 
 # The standard Importer operation label to converter map.
 # Importer nodes with matching operation string are converted
@@ -82,7 +80,8 @@ operation_map = {
     "Tanh": ConvertTanh,
     "VAD": ConvertVAD,
     "Cast": ConvertTypeCast,
-    }
+}
+
 
 class ImporterModel:
     """
@@ -102,13 +101,14 @@ class ImporterModel:
     def add_node(self, name: str, node: ImporterNode) -> None:
         self.nodes[name] = node
 
+
 class ImporterEngine:
     """
     The common class for doing an import to ELL. The ImporterEngine converts
     an ImporterModel to ELL nodes or (currently, layers).
     """
     def __init__(self, operation_map: typing.Mapping[str, typing.Sequence[typing.Any]] = operation_map,
-        step_interval_msec=None, lag_threshold_msec=None):
+                 step_interval_msec=None, lag_threshold_msec=None):
         """
         Initializes the engine with an appropriate operation to converter mapping.
         See `operation_map` comments for more information.
@@ -220,7 +220,7 @@ class ImporterEngine:
 
         _logger.info("Converting intermediate importer nodes to ELL nodes....")
         for node_to_import in ordered_nodes:
-            converted = self.convert_importer_node_to_ell_nodes(node_to_import)
+            self.convert_importer_node_to_ell_nodes(node_to_import)
         _logger.info("Done.")
 
         # Quick workaround to create the map's output node. The last node in
@@ -239,13 +239,17 @@ class ImporterEngine:
                 "{}OutputCallback".format(function_prefix))
 
         output_node = self.ell_model_builder.AddOutputNode(
-            self.ell_model, ell.model.PortMemoryLayout(ell_output_shape), ell.nodes.PortElements(last_ell_node.GetOutputPort("output")))
+            self.ell_model, ell.model.PortMemoryLayout(ell_output_shape), ell.nodes.PortElements(
+                last_ell_node.GetOutputPort("output")))
         output_node.CopyMetadataFrom(last_ell_node)
         self.lookup_table.add_ell_output(output_node)
 
         # Create the map
-        output_list = [ell.nodes.PortElements(e.GetOutputPort("output")) for e in self.lookup_table.get_ell_outputs()]
-        self.final_ell_map = ell.model.Map(self.ell_model, ell.nodes.InputNodeList(self.lookup_table.get_ell_inputs()), ell.nodes.PortElementsList(output_list))
+        all_outputs = self.lookup_table.get_ell_outputs()
+        output_list = [ell.nodes.PortElements(e.GetOutputPort("output")) for e in all_outputs]
+        self.final_ell_map = ell.model.Map(self.ell_model, ell.nodes.InputNodeList(
+            self.lookup_table.get_ell_inputs()),
+            ell.nodes.PortElementsList(output_list))
 
         # Print out the nodes and where they came from
         self.final_mapping = self.get_node_group_mapping(self.final_ell_map.GetModel())
@@ -258,11 +262,12 @@ class ImporterEngine:
             if len(text) > max_len:
                 max_len = len(text)
             source_names[group_id] = text
-        
+
         for group_id in self.final_mapping.keys():
             source_name = source_names[group_id]
             indent = "    " + (" " * (max_len - len(source_name)))
-            ell_nodes = ["{}({})".format(ell_node.GetRuntimeTypeName(), ell_node.GetId()) for ell_node in self.final_mapping[group_id]]
+            ell_nodes = ["{}({})".format(ell_node.GetRuntimeTypeName(), ell_node.GetId())
+                         for ell_node in self.final_mapping[group_id]]
             _logger.info("{}{} -> {}".format(indent, source_name, ", ".join(ell_nodes)))
         _logger.info("")
         return self.final_ell_map
@@ -315,15 +320,16 @@ class ImporterEngine:
         _logger.debug("Importing node {}".format(node_to_import.id))
 
         # Convert a block.
-        for i in range(len(converters)):                
-            conversion_parameters = {"lookup_table": self.lookup_table,
-                                    "first_in_block": i == 0,
-                                    "last_in_block": i == (len(converters) - 1),
-                                    "builder": self.ell_model_builder,
-                                    "model": self.ell_model,
-                                    "step_interval_msec": self.step_interval_msec,
-                                    "lag_threshold_msec": self.lag_threshold_msec,
-                                    }
+        for i in range(len(converters)):
+            conversion_parameters = {
+                "lookup_table": self.lookup_table,
+                "first_in_block": i == 0,
+                "last_in_block": i == (len(converters) - 1),
+                "builder": self.ell_model_builder,
+                "model": self.ell_model,
+                "step_interval_msec": self.step_interval_msec,
+                "lag_threshold_msec": self.lag_threshold_msec,
+            }
             converters[i].convert_node(conversion_parameters)
 
         return
@@ -357,7 +363,8 @@ class ImporterEngine:
 
         result = []
         for current_node in ordered_nodes:
-            if current_node.operation_type != "Input" or any(current_node.outputs[0] in node.inputs for node in ordered_nodes):
+            if current_node.operation_type != "Input" or any(current_node.outputs[0] in node.inputs
+                                                             for node in ordered_nodes):
                 result.append(current_node)
 
         return result
@@ -411,9 +418,9 @@ class ImporterEngine:
             padding = self.get_padding_for_node(nodes[key], nodes)
             if padding:
                 nodes[key].output_padding = padding
-                
-    
-    def get_importer_node_to_ell_mapping(self) -> (typing.Sequence[ImporterNode], typing.Mapping[str, typing.Sequence[ell.nodes.Node]]):
+
+    def get_importer_node_to_ell_mapping(self) \
+            -> (typing.Sequence[ImporterNode], typing.Mapping[str, typing.Sequence[ell.nodes.Node]]):
         """
         Returns a tuple containing:
             (ordered input nodes, mapping of input node id to ell nodes)

@@ -9,11 +9,11 @@ if(${PYTHON_ENABLED} AND ${CNTK})
     set(importer_src cntk_to_ell.py
         cntk_import.py
         custom_functions.py)
-        
+
     set(importer_lib lib/cntk_converters.py
         lib/cntk_layers.py
         lib/cntk_utilities.py)
-        
+
     source_group("lib" FILES ${importer_lib})
 
     add_custom_target(${module_name} DEPENDS SOURCES ${importer_src} ${importer_lib})
@@ -26,4 +26,7 @@ if(${PYTHON_ENABLED} AND ${CNTK})
     copy_newer_files(${module_name} importer_lib "${CMAKE_CURRENT_BINARY_DIR}/lib/")
 
     add_subdirectory(test)
+
+    # run flake8
+    flake8(${module_name})
 endif()  # PYTHON_ENABLED

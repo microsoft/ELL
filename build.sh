@@ -26,8 +26,8 @@ if printf '%s\n%s\n' "$(gcc --version | head -n1 | cut -d" " -f4 | awk '{print $
     exit 1
 fi
 
-if [[ ! -f "/usr/bin/llvm-config-6.0" ]]; then
-    echo "LLVM version 6.0 needs to be installed"
+if [[ ! -f "/usr/bin/llvm-config-8" ]]; then
+    echo "LLVM version 8 needs to be installed"
     echo "See INSTALL-Ubuntu.md for information on how to install llvm"
     exit 1
 fi

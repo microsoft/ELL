@@ -8,15 +8,15 @@
 #
 ####################################################################################################
 
-import logging
-from enum import Enum, auto
 import typing
 
 import numpy as np
 import ell
+import logger
 import common.memory_shapes as memory_shapes
 
-_logger = logging.getLogger(__name__)
+_logger = logger.get()
+
 
 class ImporterNode:
     """
@@ -26,22 +26,22 @@ class ImporterNode:
     """
 
     def __init__(self, id: str,
-        operation_type: str,
-        inputs: typing.Sequence[str] = [],
-        outputs: typing.Sequence[str] = [],
-        weights: typing.Mapping[str, typing.Any] = {},
-        attributes: typing.Mapping[str, typing.Any] = {},
-        padding: typing.Mapping[str, typing.Any] = {},
-        input_shapes: typing.Sequence[typing.Any] = [],
-        output_shapes: typing.Sequence[typing.Any] = [],
-        metadata: typing.Mapping[str, str] = {}):
+                 operation_type: str,
+                 inputs: typing.Sequence[str] = [],
+                 outputs: typing.Sequence[str] = [],
+                 weights: typing.Mapping[str, typing.Any] = {},
+                 attributes: typing.Mapping[str, typing.Any] = {},
+                 padding: typing.Mapping[str, typing.Any] = {},
+                 input_shapes: typing.Sequence[typing.Any] = [],
+                 output_shapes: typing.Sequence[typing.Any] = [],
+                 metadata: typing.Mapping[str, str] = {}):
         """
         id: unique identifier for this node
         operation_type: string name of the operation type to be imported.
             This will get mapped to an ELL operation via the operation_map.
         inputs: array of strings representing where the input comes from.
             The string is the 'id' of another ImporterNode.
-        outputs: array of strings representing the output tensors.        
+        outputs: array of strings representing the output tensors.
             The string is the 'id' of another ImporterNode.
         weights: dictionary of weight parameter labels to weight names e.g. a
             convolutional node may have {'weights': 'w123', 'bias': 'b832'}.
@@ -55,7 +55,7 @@ class ImporterNode:
                 [chris] why isn't this just a type of attribute?
         input_shapes: array of tuples representing input shapes and ordering
                 e.g. ((3,64,64), "channel_row_column").
-            The ImporterEngine will take care of reshaping everything to 
+            The ImporterEngine will take care of reshaping everything to
             match the order required by ELL.
         output_shapes: array of tuples representing output shapes and ordering
                 e.g. ((32,8,8), "channel_row_column").
@@ -74,17 +74,19 @@ class ImporterNode:
         self.metadata = metadata
 
     def __repr__(self):
-        attrs = dict((k,self.attributes[k]) for k in self.attributes)
+        attrs = dict((k, self.attributes[k]) for k in self.attributes)
         if "tensor" in attrs:
             attrs["tensor"] = "..."
         _print_line = ""
-        _print_line += "{} {}: {} -> {}, attributes {}\n".format(self.operation_type, self.id, self.inputs, self.outputs, attrs)
+        _print_line += "{} {}: {} -> {}, attributes {}\n".format(self.operation_type, self.id, self.inputs,
+                                                                 self.outputs, attrs)
         _print_line += "    input_shape {}\n".format(self.input_shapes)
         _print_line += "    output_shape {}\n".format(self.output_shapes)
         _print_line += "    padding {}\n".format(self.padding)
         _print_line += "    output_padding {}\n".format(self.output_padding)
         _print_line += "    weights {}\n".format(self.weights.keys())
         return _print_line
+
 
 class LookupTable:
     """
@@ -127,7 +129,8 @@ class LookupTable:
             self.importer_id_to_ell_ids[importer_node.id].append(ell_node_id)
         else:
             self.importer_id_to_ell_ids[importer_node.id] = [ell_node_id]
-        _logger.debug("ImporterNode {} -> intermediate ELL nodes {}".format(importer_node.id, self.importer_id_to_ell_ids[importer_node.id]))
+        _logger.debug("ImporterNode {} -> intermediate ELL nodes {}".format(
+            importer_node.id, self.importer_id_to_ell_ids[importer_node.id]))
         # Add output id to owner mapping.
         for output_id in importer_node.outputs:
             self.set_owning_node_for_output(output_id, ell_node)
@@ -136,13 +139,12 @@ class LookupTable:
             ell_node.SetMetadataValue("GroupId", importer_node.id)
             # Also use this as the node's friendly name (by default)
             ell_node.SetMetadataValue("name", importer_node.id)
-        
-        # concatenate any importer_node metadata provided by importer 
-        if importer_node.metadata != None:
+
+        # concatenate any importer_node metadata provided by importer
+        if importer_node.metadata is not None:
             for key in importer_node.metadata:
                 value = importer_node.metadata[key]
                 ell_node.SetMetadataValue(key, value)
-
 
         # Add owning id mapping
         self.ell_id_to_owning_importer_node[ell_node_id] = importer_node
@@ -181,7 +183,7 @@ class LookupTable:
         """
         Returns a numpy array in ELL order
         """
-        if not uid in self.tensors:
+        if uid not in self.tensors:
             raise Exception("Required tensor {} not found".format(uid))
         original_tensor, order = self.tensors[uid]
 
@@ -222,7 +224,7 @@ class LookupTable:
         value, order = self.tensors[uid]
         return (value.shape, order)
 
-    def get_port_elements_for_input(self, importer_node: ImporterNode, input_index = 0) -> ell.nodes.PortElements:
+    def get_port_elements_for_input(self, importer_node: ImporterNode, input_index=0) -> ell.nodes.PortElements:
         """
         Returns an ell.nodes.PortElements for the corresponding ImporterNode.
         """
@@ -237,11 +239,12 @@ class LookupTable:
             if owning_node is None:
                 owning_node_id = self.output_id_to_ell_ids[importer_node.inputs[input_index]]
                 owning_node = self.ell_id_to_ell_nodes[owning_node_id]
-        except BaseException as exception:
+        except BaseException:
             raise Exception("Cannot get input port elements for {}, missing ELL owning node".format(importer_node.id))
         return self.get_output_port_elements_for_node(owning_node)
 
-    def get_port_elements_and_memory_layout_for_input(self, importer_node: ImporterNode, input_index = 0) -> (ell.nodes.PortElements, ell.model.PortMemoryLayout):
+    def get_port_elements_and_memory_layout_for_input(self, importer_node: ImporterNode, input_index=0) \
+            -> (ell.nodes.PortElements, ell.model.PortMemoryLayout):
         """
         Returns an (ell.nodes.PortElements, ell.nodes.PortMemoryLayout) for the corresponding input of the ImporterNode.
         """
@@ -252,19 +255,19 @@ class LookupTable:
             output_shape = owning_importer_node.output_shapes[0]
             port_elements = self.get_port_elements_for_input(importer_node, input_index)
             port_memory_layout = memory_shapes.get_ell_port_memory_layout(output_shape[0], output_shape[1], padding)
-        except BaseException as exception:
-            raise Exception("Could not get PortMemoryElements or PortMemoryLayout for importer node {}, input {}".format(importer_node.id, input_index))
+        except BaseException:
+            raise Exception("Could not get PortMemoryElements or PortMemoryLayout for importer node {}, input {}"
+                            .format(importer_node.id, input_index))
         return (port_elements, port_memory_layout)
 
-    def get_output_port_elements_for_node(self, ell_node: ell.nodes.Node,
-        output_label: str = "output"):
+    def get_output_port_elements_for_node(self, ell_node: ell.nodes.Node, output_label: str = "output"):
         """
         Returns an ell.nodes.PortElements for the corresponding ELL node's
         output port that corresponds to 'output_label'.
         """
         try:
             output_link = ell_node.GetOutputPort(output_label)
-        except BaseException as exception:
+        except BaseException:
             raise Exception("Cannot get output port {} for {}".format(output_label, ell_node.GetId()))
         return ell.nodes.PortElements(output_link)
 
@@ -275,7 +278,7 @@ class LookupTable:
         try:
             ell_node_id = self.output_id_to_ell_ids[output_id]
             ell_node = self.ell_id_to_ell_nodes[ell_node_id]
-        except BaseException as exception:
+        except BaseException:
             raise Exception("Cannot find owning ELL node for output {}".format(output_id))
         return ell_node
 
@@ -286,7 +289,7 @@ class LookupTable:
         try:
             ell_node_id = self.output_id_to_ell_ids[output_id]
             importer_node = self.ell_id_to_owning_importer_node[ell_node_id]
-        except BaseException as exception:
+        except BaseException:
             raise Exception("Cannot find originating ImporterNode node for output {}".format(output_id))
         return importer_node
 
@@ -308,6 +311,7 @@ class LookupTable:
 
     def get_ell_outputs(self):
         return self.output_ell_nodes
+
 
 class ConvertBase:
     """
@@ -333,16 +337,18 @@ class ConvertBase:
         for w in self.required_weights:
             if w not in self.importer_node.weights:
                 if not self.optional:
-                    raise Exception("Missing required weight '{}' on node {}_{}".format(w, self.importer_node.operation_type, self.importer_node.id))
+                    raise Exception("Missing required weight '{}' on node {}_{}".format(
+                        w, self.importer_node.operation_type, self.importer_node.id))
                 return False
         for attr in self.required_attributes:
             if attr not in self.importer_node.attributes:
                 if not self.optional:
-                    raise Exception("Missing required attribute {} on node {}_{}".format(attr, self.importer_node.operation_type, self.importer_node.id))
+                    raise Exception("Missing required attribute {} on node {}_{}".format(
+                        attr, self.importer_node.operation_type, self.importer_node.id))
                 return False
         return True
 
-    def get_input_parameters(self, first_in_block = True, input_index = 0):
+    def get_input_parameters(self, first_in_block=True, input_index=0):
         """
         Return the input shape and padding parameters as a tuple.
         first_in_block - indicates whether this will be the first ell
@@ -360,7 +366,7 @@ class ConvertBase:
         ell_padding_parameter = ell.neural.PaddingParameters(self.importer_node.padding["scheme"], padding)
         return (ell_shape, ell_padding_parameter)
 
-    def get_output_parameters(self, last_in_block = True, output_index = 0):
+    def get_output_parameters(self, last_in_block=True, output_index=0):
         """
         Return the output shape and padding parameters as a tuple.
         last_in_block - indicates whether this will be the last ell
@@ -381,8 +387,9 @@ class ConvertBase:
         """
         input_shape, input_padding = self.get_input_parameters(conversion_parameters["first_in_block"])
         output_shape, output_padding = self.get_output_parameters(conversion_parameters["last_in_block"])
-        
-        return ell.neural.LayerParameters(input_shape, input_padding, output_shape, output_padding, ell.nodes.PortType.smallReal)
+
+        return ell.neural.LayerParameters(input_shape, input_padding, output_shape, output_padding,
+                                          ell.nodes.PortType.smallReal)
 
     def get_ell_shape(self, shape: tuple, order: str, padding: int = 0):
         """
@@ -429,6 +436,7 @@ class ConvertBase:
         """
         return None
 
+
 class ConvertActivation(ConvertBase):
     """
     Converter for Activation
@@ -469,6 +477,7 @@ class ConvertActivation(ConvertBase):
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
+
 class OptionalConvertActivation(ConvertActivation):
     """
     Optional converter for Activation
@@ -476,6 +485,7 @@ class OptionalConvertActivation(ConvertActivation):
     def __init__(self, node: ImporterNode):
         super().__init__(node)
         self.optional = True
+
 
 class ConvertAveragePooling(ConvertBase):
     """
@@ -497,8 +507,7 @@ class ConvertAveragePooling(ConvertBase):
             attributes["size"], attributes["stride"])
 
         # Create the ELL pooling layer
-        return ell.neural.PoolingLayer(layer_parameters,
-            pooling_parameters, ell.neural.PoolingType.mean)
+        return ell.neural.PoolingLayer(layer_parameters, pooling_parameters, ell.neural.PoolingType.mean)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -539,7 +548,8 @@ class ConvertBatchNormalization(ConvertBase):
         variance_vector = self.get_ell_vector(
             self.importer_node.weights["variance"][0], conversion_parameters)
 
-        return ell.neural.BatchNormalizationLayer(layer_parameters,
+        return ell.neural.BatchNormalizationLayer(
+            layer_parameters,
             mean_vector, variance_vector, self.epsilon,
             ell.neural.EpsilonSummand.variance)
 
@@ -559,6 +569,7 @@ class ConvertBatchNormalization(ConvertBase):
         ell_node = builder.AddBatchNormalizationLayerNode(model, input_port_elements, batch_normalization_layer)
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
+
 
 class ConvertBias(ConvertBase):
     """
@@ -596,6 +607,7 @@ class ConvertBias(ConvertBase):
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
+
 class OptionalConvertBias(ConvertBias):
     """
     Optional converter for Bias
@@ -603,6 +615,7 @@ class OptionalConvertBias(ConvertBias):
     def __init__(self, node: ImporterNode):
         super().__init__(node)
         self.optional = True
+
 
 class ConvertBinaryConvolution(ConvertBase):
     """
@@ -655,7 +668,8 @@ class ConvertBinaryConvolution(ConvertBase):
             input_memory_layout = memory_shapes.get_ell_port_memory_layout(shape_entry[0], shape_entry[1], 0)
             output_memory_layout = memory_shapes.get_ell_port_memory_layout(shape_entry[0], shape_entry[1], padding)
             # Create the reorder node
-            reorder_node = builder.AddReorderDataNode(model, port_elements, input_memory_layout, output_memory_layout, [0, 1, 2])
+            reorder_node = builder.AddReorderDataNode(model, port_elements, input_memory_layout, output_memory_layout,
+                                                      [0, 1, 2])
             # Register the mapping
             lookup_table.add_imported_ell_node(self.importer_node, reorder_node)
             input_port_elements = lookup_table.get_output_port_elements_for_node(reorder_node)
@@ -689,7 +703,7 @@ class ConvertConvolution(ConvertBase):
             attributes["size"], attributes["stride"], 0, 1)
 
         return ell.neural.ConvolutionalLayer(layer_parameters,
-            convolutional_parameters, weights)
+                                             convolutional_parameters, weights)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -716,7 +730,8 @@ class ConvertConvolution(ConvertBase):
             input_memory_layout = memory_shapes.get_ell_port_memory_layout(shape_entry[0], shape_entry[1], 0)
             output_memory_layout = memory_shapes.get_ell_port_memory_layout(shape_entry[0], shape_entry[1], padding)
             # Create the reorder node
-            reorder_node = builder.AddReorderDataNode(model, port_elements, input_memory_layout, output_memory_layout, [0, 1, 2])
+            reorder_node = builder.AddReorderDataNode(model, port_elements, input_memory_layout, output_memory_layout,
+                                                      [0, 1, 2])
             # Register the mapping
             lookup_table.add_imported_ell_node(self.importer_node, reorder_node)
             input_port_elements = lookup_table.get_output_port_elements_for_node(reorder_node)
@@ -811,7 +826,7 @@ class ConvertGRU(ConvertBase):
     """
     def __init__(self, node: ImporterNode):
         super().__init__(node)
-        self.required_weights = ["input_weights", "hidden_weights", "input_bias", "hidden_bias" ]
+        self.required_weights = ["input_weights", "hidden_weights", "input_bias", "hidden_bias"]
         self.required_attributes = ["hidden_size", "activation", "recurrent_activation"]
 
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -819,7 +834,6 @@ class ConvertGRU(ConvertBase):
         Return the appropriate ELL layer
         """
         raise Exception("No corresponding ELL layer for GRU. Use node instead.")
-        
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -832,7 +846,6 @@ class ConvertGRU(ConvertBase):
 
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
-        layer_parameters = self.get_layer_parameters(conversion_parameters)
 
         # create constant nodes for the weights
         input_weights = self.get_ell_tensor(
@@ -855,7 +868,8 @@ class ConvertGRU(ConvertBase):
 
         # Get the port elements for the reset trigger
         if len(self.importer_node.inputs) > 1:
-            reset_port_elements, reset_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(self.importer_node, 1)
+            reset_port_elements, reset_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(
+                self.importer_node, 1)
         else:
             # Create a constant node as the trigger. The trigger fires on value change,
             # so will never fire in this case.
@@ -863,11 +877,12 @@ class ConvertGRU(ConvertBase):
             reset_port_elements = ell.nodes.PortElements(reset_node.GetOutputPort("output"))
 
         # Add the GRUNode to the model
-        ell_node = builder.AddGRUNode(model, input_port_elements, reset_port_elements, hidden_size,
-            ell.nodes.PortElements(input_weights_node.GetOutputPort("output")), 
-            ell.nodes.PortElements(hidden_weights_node.GetOutputPort("output")), 
-            ell.nodes.PortElements(input_bias_node.GetOutputPort("output")), 
-            ell.nodes.PortElements(hidden_bias.GetOutputPort("output")), 
+        ell_node = builder.AddGRUNode(
+            model, input_port_elements, reset_port_elements, hidden_size,
+            ell.nodes.PortElements(input_weights_node.GetOutputPort("output")),
+            ell.nodes.PortElements(hidden_weights_node.GetOutputPort("output")),
+            ell.nodes.PortElements(input_bias_node.GetOutputPort("output")),
+            ell.nodes.PortElements(hidden_bias.GetOutputPort("output")),
             activation, recurrentActivation)
 
         # Register the mapping
@@ -921,7 +936,7 @@ class ConvertInput(ConvertBase):
                 model, ell.nodes.PortElements(clock_node.GetOutputPort("output")),
                 ell.nodes.PortType.smallReal, ell_shape,
                 "{}InputCallback".format(function_prefix))
-            
+
             original_input_node = input_node
             input_node = source_node
         else:
@@ -931,7 +946,7 @@ class ConvertInput(ConvertBase):
 
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, input_node)
-        
+
         if step_interval_msec is not None:
             lookup_table.add_imported_ell_node(self.importer_node, clock_node)
             lookup_table.add_imported_ell_node(self.importer_node, source_node)
@@ -946,7 +961,8 @@ class ConvertInput(ConvertBase):
             port_elements = lookup_table.get_output_port_elements_for_node(input_node)
             input_memory_layout = memory_shapes.get_ell_port_memory_layout(shape_entry[0], shape_entry[1], 0)
             output_memory_layout = memory_shapes.get_ell_port_memory_layout(shape_entry[0], shape_entry[1], padding)
-            reorder_node = builder.AddReorderDataNode(model, port_elements, input_memory_layout, output_memory_layout, [0, 1, 2])
+            reorder_node = builder.AddReorderDataNode(model, port_elements, input_memory_layout, output_memory_layout,
+                                                      [0, 1, 2])
             # Register the mapping
             lookup_table.add_imported_ell_node(self.importer_node, reorder_node)
 
@@ -1005,7 +1021,7 @@ class ConvertLSTM(ConvertBase):
     """
     def __init__(self, node: ImporterNode):
         super().__init__(node)
-        self.required_weights = ["input_weights", "hidden_weights", "input_bias", "hidden_bias" ]
+        self.required_weights = ["input_weights", "hidden_weights", "input_bias", "hidden_bias"]
         self.required_attributes = ["hidden_size", "activation", "recurrent_activation"]
 
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
@@ -1013,7 +1029,6 @@ class ConvertLSTM(ConvertBase):
         Return the appropriate ELL layer
         """
         raise Exception("No corresponding ELL layer for GRU. Use node instead.")
-        
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -1026,7 +1041,6 @@ class ConvertLSTM(ConvertBase):
 
         # Get the port elements from the input
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
-        layer_parameters = self.get_layer_parameters(conversion_parameters)
 
         # create constant nodes for the weights
         input_weights = self.get_ell_tensor(
@@ -1049,7 +1063,8 @@ class ConvertLSTM(ConvertBase):
 
         # Get the port elements for the reset trigger
         if len(self.importer_node.inputs) > 1:
-            reset_port_elements, reset_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(self.importer_node, 1)
+            reset_port_elements, reset_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(
+                self.importer_node, 1)
         else:
             # Create a constant node as the trigger. The trigger fires on value change,
             # so will never fire in this case.
@@ -1057,11 +1072,12 @@ class ConvertLSTM(ConvertBase):
             reset_port_elements = ell.nodes.PortElements(reset_node.GetOutputPort("output"))
 
         # Add the GRUNode to the model
-        ell_node = builder.AddLSTMNode(model, input_port_elements, reset_port_elements, hidden_size,
-            ell.nodes.PortElements(input_weights_node.GetOutputPort("output")), 
-            ell.nodes.PortElements(hidden_weights_node.GetOutputPort("output")), 
-            ell.nodes.PortElements(input_bias_node.GetOutputPort("output")), 
-            ell.nodes.PortElements(hidden_bias.GetOutputPort("output")), 
+        ell_node = builder.AddLSTMNode(
+            model, input_port_elements, reset_port_elements, hidden_size,
+            ell.nodes.PortElements(input_weights_node.GetOutputPort("output")),
+            ell.nodes.PortElements(hidden_weights_node.GetOutputPort("output")),
+            ell.nodes.PortElements(input_bias_node.GetOutputPort("output")),
+            ell.nodes.PortElements(hidden_bias.GetOutputPort("output")),
             activation, recurrentActivation)
 
         # Register the mapping
@@ -1089,7 +1105,7 @@ class ConvertMaxPooling(ConvertBase):
 
         # Create the ELL pooling layer
         return ell.neural.PoolingLayer(layer_parameters,
-            pooling_parameters, ell.neural.PoolingType.max)
+                                       pooling_parameters, ell.neural.PoolingType.max)
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -1174,7 +1190,8 @@ class ConvertPassthrough(ConvertBase):
         lookup_table = conversion_parameters["lookup_table"]
         # Set owner of this output to be the Passthrough node's input node
         if len(self.importer_node.inputs) == 0:
-            raise Exception("### Passthrough node {}({}) has no inputs".format(self.importer_node.operation_type, self.importer_node.id))
+            raise Exception("### Passthrough node {}({}) has no inputs".format(self.importer_node.operation_type,
+                                                                               self.importer_node.id))
         input_owner = lookup_table.get_owning_node_for_output(self.importer_node.inputs[0])
         lookup_table.add_imported_ell_node(self.importer_node, input_owner, set_group_id=False)
 
@@ -1203,7 +1220,7 @@ class ConvertBinaryOperation(ConvertBase):
         input_layout = input_elements.GetMemoryLayout()
         if not input_layout == memory_layout:
             if np.product(list(input_layout.size)) != np.product(list(memory_layout.size)):
-                 raise Exception("Binary operation {} does not yet support broadcasting".format(self.operator))
+                raise Exception("Binary operation {} does not yet support broadcasting".format(self.operator))
             return self.add_reinterpret_node(builder, model, input_elements, memory_layout)
         return (input_elements, None)
 
@@ -1229,18 +1246,21 @@ class ConvertBinaryOperation(ConvertBase):
             self.importer_node.output_padding["size"])
 
         # see if the shapes match
-        input1_port_elements, _ = self.reinterpret_input(builder, model, input1_port_elements, input1_port_memory_layout)
-        input2_port_elements, _ = self.reinterpret_input(builder, model, input2_port_elements, input2_port_memory_layout)
+        input1_port_elements, _ = self.reinterpret_input(builder, model, input1_port_elements,
+                                                         input1_port_memory_layout)
+        input2_port_elements, _ = self.reinterpret_input(builder, model, input2_port_elements,
+                                                         input2_port_memory_layout)
 
         # Add the BinaryOperationNode to the model.
         ell_node = builder.AddBinaryOperationNode(
             model,
-            input1_port_elements, 
-            input2_port_elements,             
+            input1_port_elements,
+            input2_port_elements,
             self.operator)
 
         output_elements = ell.nodes.PortElements(ell_node.GetOutputPort("output"))
-        output_port_elements, new_output_node = self.reinterpret_input(builder, model, output_elements, output_port_memory_layout)
+        output_port_elements, new_output_node = self.reinterpret_input(builder, model, output_elements,
+                                                                       output_port_memory_layout)
         if new_output_node is not None:
             ell_node = new_output_node
 
@@ -1357,14 +1377,14 @@ class ConvertRegion(ConvertBase):
         attributes = self.importer_node.attributes
 
         region_detection_parameters = ell.neural.RegionDetectionParameters(
-                attributes["width"],
-                attributes["height"],
-                attributes["numBoxesPerCell"],
-                attributes["numClasses"],
-                attributes["numAnchors"],
-                attributes["applySoftmax"]
-            )
-        
+            attributes["width"],
+            attributes["height"],
+            attributes["numBoxesPerCell"],
+            attributes["numClasses"],
+            attributes["numAnchors"],
+            attributes["applySoftmax"]
+        )
+
         return ell.neural.FullyConnectedLayer(
             layer_parameters, region_detection_parameters)
 
@@ -1431,6 +1451,7 @@ class OptionalConvertScaling(ConvertScaling):
         super().__init__(node)
         self.optional = True
 
+
 class ConvertSoftmax(ConvertBase):
     """
     Converter for Softmax
@@ -1491,7 +1512,7 @@ class ConvertUnaryOperation(ConvertBase):
         lookup_table = conversion_parameters["lookup_table"]
 
         input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
-            
+
         # Add the UnaryOperationNode to the model.
         ell_node = builder.AddUnaryOperationNode(model, input_port_elements, self.operator)
         # Register the mapping
@@ -1505,12 +1526,14 @@ class ConvertSigmoid(ConvertUnaryOperation):
     def __init__(self, node: ImporterNode):
         super().__init__(node, ell.nodes.UnaryOperationType.sigmoid)
 
+
 class ConvertSign(ConvertUnaryOperation):
     """
     Converter for Sign operation
     """
     def __init__(self, node: ImporterNode):
         super().__init__(node, ell.nodes.UnaryOperationType.sign)
+
 
 class ConvertHardSigmoid(ConvertUnaryOperation):
     """
@@ -1608,7 +1631,6 @@ class ConvertSplice(ConvertBase):
         model = conversion_parameters["model"]
         builder = conversion_parameters["builder"]
         lookup_table = conversion_parameters["lookup_table"]
-        first_in_block = conversion_parameters["first_in_block"]
         last_in_block = conversion_parameters["last_in_block"]
 
         pre_order = [0, 1, 2]
@@ -1617,19 +1639,20 @@ class ConvertSplice(ConvertBase):
             # When output from nodes are concatenated together in the
             # order (channel, row, column), they effectively stack in the
             # channel dimension.
-            pre_order = [2,0,1]
+            pre_order = [2, 0, 1]
         elif self.importer_node.attributes["dimension_to_stack"] == "row":
             # When output from nodes are concatenated together in the
             # order (row, column, channel), they effectively stack in the
             # row dimension.
-            pre_order = [0,1,2]
+            pre_order = [0, 1, 2]
         elif self.importer_node.attributes["dimension_to_stack"] == "column":
             # When output from nodes are concatenated together in the
             # order (column, row, channel), they effectively stack in the
             # column dimension.
-            pre_order = [1,0,2]
+            pre_order = [1, 0, 2]
         else:
-            raise Exception("Splice does not yet support stacking along dimension {}, just row, column or channel".format(self.required_attributes["dimension_to_stack"]))
+            raise Exception("Splice does not yet support stacking along dimension {}, just row, column or channel"
+                            .format(self.required_attributes["dimension_to_stack"]))
         # NOTE: The ReorderDataNodes that are inserted can be removed by the
         # optimizer if they're redundant
 
@@ -1644,7 +1667,8 @@ class ConvertSplice(ConvertBase):
             # Take the active region of inputs
             port_elements, input_port_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(
                 self.importer_node, input_index)
-            reorder_node = builder.AddReorderDataNode(model, input_port_elements, input_port_memory_layout, input_port_memory_layout, pre_order)
+            reorder_node = builder.AddReorderDataNode(model, input_port_elements, input_port_memory_layout,
+                                                      input_port_memory_layout, pre_order)
             reorder_nodes.append(reorder_node)
             # Register the mapping
             lookup_table.add_imported_ell_node(self.importer_node, reorder_node)
@@ -1664,13 +1688,16 @@ class ConvertSplice(ConvertBase):
         port_elements = lookup_table.get_output_port_elements_for_node(splice_node)
         padding_size = output_padding.paddingSize
 
-        reorderedPortMemoryLayout = ell.model.PortMemoryLayout([reordered_output_shape.rows, reordered_output_shape.columns, reordered_output_shape.channels],
-                                                               [reordered_output_shape.rows, reordered_output_shape.columns, reordered_output_shape.channels],
-                                                               [0, 0, 0], pre_order)
-        outputPortMemoryLayout = ell.model.PortMemoryLayout([output_shape.rows, output_shape.columns, output_shape.channels],
-                                                            [output_shape.rows - 2*padding_size, output_shape.columns - 2*padding_size, output_shape.channels],
-                                                            [padding_size, padding_size, 0], post_order)
-        final_reorder_node = builder.AddReorderDataNode(model, port_elements, reorderedPortMemoryLayout, outputPortMemoryLayout, post_order, 0)
+        reorderedPortMemoryLayout = ell.model.PortMemoryLayout(
+            [reordered_output_shape.rows, reordered_output_shape.columns, reordered_output_shape.channels],
+            [reordered_output_shape.rows, reordered_output_shape.columns, reordered_output_shape.channels],
+            [0, 0, 0], pre_order)
+        outputPortMemoryLayout = ell.model.PortMemoryLayout(
+            [output_shape.rows, output_shape.columns, output_shape.channels],
+            [output_shape.rows - 2 * padding_size, output_shape.columns - 2 * padding_size, output_shape.channels],
+            [padding_size, padding_size, 0], post_order)
+        final_reorder_node = builder.AddReorderDataNode(model, port_elements, reorderedPortMemoryLayout,
+                                                        outputPortMemoryLayout, post_order, 0)
 
         # Register the mapping
         lookup_table.add_imported_ell_node(self.importer_node, final_reorder_node)
@@ -1702,6 +1729,7 @@ class ConvertReshape(ConvertBase):
         input_owner = lookup_table.get_owning_node_for_output(self.importer_node.inputs[0])
         lookup_table.add_imported_ell_node(self.importer_node, input_owner, set_group_id=False)
 
+
 class ConvertConstant(ConvertBase):
     """
     Converter for Constant nodes
@@ -1709,7 +1737,7 @@ class ConvertConstant(ConvertBase):
     def __init__(self, node: ImporterNode):
         super().__init__(node)
         self.required_weights = []
-        self.required_attributes = [ 'tensor' ]
+        self.required_attributes = ['tensor']
 
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -1747,7 +1775,8 @@ class ConvertVAD(ConvertBase):
     def __init__(self, node: ImporterNode):
         super().__init__(node)
         self.required_weights = []
-        self.required_attributes = ["sampleRate", "frameDuration", "tauUp", "tauDown", "largeInput", "gainAtt", "thresholdUp", "thresholdDown", "levelThreshold"]
+        self.required_attributes = ["sampleRate", "frameDuration", "tauUp", "tauDown", "largeInput", "gainAtt",
+                                    "thresholdUp", "thresholdDown", "levelThreshold"]
 
     def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -1774,9 +1803,11 @@ class ConvertVAD(ConvertBase):
         threshold_down = self.importer_node.attributes["thresholdDown"]
         level_threshold = self.importer_node.attributes["levelThreshold"]
 
+        input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
         # Create the VAD node
-        ell_node = builder.AddVoiceActivityDetectorNode(model, input_port_elements, 
-            sample_rate, frame_duration, tau_up, tau_down, large_input, gain_att, 
+        ell_node = builder.AddVoiceActivityDetectorNode(
+            model, input_port_elements,
+            sample_rate, frame_duration, tau_up, tau_down, large_input, gain_att,
             threshold_up, threshold_down, level_threshold)
 
         # Register the mapping

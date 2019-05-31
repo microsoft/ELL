@@ -14,28 +14,27 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import os
-import argparse
-from typing import Text
 import sys
-import logging
 import time
 
 import numpy as np
 
 import onnx
-from onnx import  ModelProto, helper, numpy_helper, ValueInfoProto, AttributeProto, GraphProto, NodeProto, TensorProto, TensorShapeProto
-from typing import Any, Text, Iterable, List, Dict, Sequence, Optional, Tuple, Union
+from onnx import ModelProto, numpy_helper, ValueInfoProto, AttributeProto, NodeProto, TensorProto  # noqa 401
+from typing import Any, Text, Iterable, Dict, Tuple  # noqa 401
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../utilities/pythonlibs'))
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
-import find_ell
+import find_ell  # noqa 401
 import ell
+import logger
 import common.importer
 import common.converters
 
-_logger = logging.getLogger(__name__)
+_logger = logger.get()
 AttributeValue = Any
+
 
 class Attributes(Dict[Text, Any]):
     @staticmethod
@@ -69,7 +68,10 @@ class Attributes(Dict[Text, Any]):
         else:
             raise ValueError("Unsupported ONNX attribute: {}".format(onnx_arg))
 
-class OnnxConverter: pass # forward declaration for typing
+
+class OnnxConverter:
+    pass  # forward declaration for typing
+
 
 class OnnxNodeConverter(object):
     """
@@ -84,8 +86,11 @@ class OnnxNodeConverter(object):
         """
         Used for diagnostics
         """
-        _logger.info("{}.{}, inputs {} -> outputs {}".format(self.node.op_type, self.node.name, self.node.inputs, self.node.outputs))
-        _logger.info("    weights: {}".format("".join(["({}: {}{},order='{}')".format(w, self.node.weights[w][0], self.node.weights[w][1].shape, self.node.weights[w][2]) for w in self.node.weights.keys()])))
+        _logger.info("{}.{}, inputs {} -> outputs {}".format(self.node.op_type, self.node.name, self.node.inputs,
+                                                             self.node.outputs))
+        _logger.info("    weights: {}".format("".join(["({}: {}{},order='{}')".format(
+            w, self.node.weights[w][0], self.node.weights[w][1].shape, self.node.weights[w][2])
+            for w in self.node.weights.keys()])))
         _logger.info("    attributes: {}".format(self.node.attribute))
         _logger.info("    padding: {}".format(self.node.padding))
 
@@ -96,23 +101,24 @@ class OnnxNodeConverter(object):
             # bugbug: what if there is more than one output?
             name = onnx_node.output[0]
 
-        node = common.converters.ImporterNode( id = name,
-                                        operation_type = self.op_type,
-                                        inputs = list(id for id in onnx_node.input if id != ''),
-                                        outputs = list(id for id in onnx_node.output if id != ''),
-                                        metadata = { "op_type": self.op_type, "name": name }
-                                        )
+        node = common.converters.ImporterNode(
+            id=name,
+            operation_type=self.op_type,
+            inputs=list(id for id in onnx_node.input if id != ''),
+            outputs=list(id for id in onnx_node.output if id != ''),
+            metadata={"op_type": self.op_type, "name": name}
+        )
         self.node = node
 
         # assuming onnx_node is of type: NodeProto, this performs some common conversion operations
-        onnx_attributes      = Attributes.from_onnx(onnx_node.attribute)
-        node.attributes      = self.get_attributes(onnx_attributes)
+        onnx_attributes = Attributes.from_onnx(onnx_node.attribute)
+        node.attributes = self.get_attributes(onnx_attributes)
         node.onnx_attributes = onnx_attributes,
-        node.onnx_node       = onnx_node
-        node.input_shapes    = self.get_input_shapes()
-        node.output_shapes   = self.get_output_shapes()
-        node.padding         = self.get_padding()
-        node.weights         = self.get_weights()
+        node.onnx_node = onnx_node
+        node.input_shapes = self.get_input_shapes()
+        node.output_shapes = self.get_output_shapes()
+        node.padding = self.get_padding()
+        node.weights = self.get_weights()
         return node
 
     def get_attributes(self, attrs: Attributes):
@@ -132,13 +138,13 @@ class OnnxNodeConverter(object):
         size - size of padding
         scheme - padding scheme to use, see ell.neural.PaddingScheme
         """
-        pad = 0 # default padding
+        pad = 0  # default padding
         if 'padding' in self.node.attributes:
             pad = self.node.attributes['padding']
 
         return {"size": pad, "scheme": ell.neural.PaddingScheme.zeros}
 
-    #===================== helpers ==========================
+    # ===================== helpers ==========================
     def is_tensor(self, id: str):
         return self.converter.is_tensor(id)
 
@@ -200,15 +206,15 @@ class OnnxNodeConverter(object):
         tensor = weight[1]
         tensor_shape = tensor.shape
         if not transpose:
-            real_shape = (input_shape[0],input_shape[1],input_shape[2],tensor_shape[1])
+            real_shape = (input_shape[0], input_shape[1], input_shape[2], tensor_shape[1])
             tensor = np.array(tensor).reshape(real_shape)
-            tensor = np.moveaxis(tensor,0,2) # move channel so it is row,col,channel,filter
-            tensor = tensor.reshape(tensor_shape) # ok, now back to the row-col shape.
+            tensor = np.moveaxis(tensor, 0, 2)  # move channel so it is row,col,channel,filter
+            tensor = tensor.reshape(tensor_shape)  # ok, now back to the row-col shape.
         else:
-            real_shape = (tensor_shape[0],input_shape[0],input_shape[1],input_shape[2])
+            real_shape = (tensor_shape[0], input_shape[0], input_shape[1], input_shape[2])
             tensor = np.array(tensor).reshape(real_shape)
-            tensor = np.moveaxis(tensor,1,-1) # move channel so it is filter,row,col,channel
-            tensor = tensor.reshape(tensor_shape) # ok, now back to the row-col shape.
+            tensor = np.moveaxis(tensor, 1, -1)  # move channel so it is filter,row,col,channel
+            tensor = tensor.reshape(tensor_shape)  # ok, now back to the row-col shape.
             tensor = tensor.T
         # and since we are modifying this tensor, we need to update the version in the master list
         self.add_tensor(weight[0], tensor)
@@ -222,7 +228,7 @@ class OnnxNodeConverter(object):
         for i, x in enumerate(node.inputs):
             if not self.is_tensor(x):
                 inputs += [x]
-                input_shapes += [ node.input_shapes[i] ]
+                input_shapes += [node.input_shapes[i]]
         node.inputs = inputs
         node.input_shapes = input_shapes
 
@@ -240,17 +246,18 @@ class OnnxInputConverter(OnnxNodeConverter):
 
         # translate the ValueInfoProto to get input node info
         shape = self.get_tensor_type(input.type.tensor_type)
-        node = common.converters.ImporterNode(input.name,
-            operation_type = self.op_type,
-            outputs = [name],
-            input_shapes =  [],
-            output_shapes = [shape]
+        node = common.converters.ImporterNode(
+            input.name,
+            operation_type=self.op_type,
+            outputs=[name],
+            input_shapes=[],
+            output_shapes=[shape]
         )
         return node
 
     def get_tensor_type(self, tensor_type: TensorProto):
         # return common importer tensor type tuple derrived from ONNX TensorProto
-        type = tensor_type.elem_type # todo: tensor type should include element type info
+        # todo: tensor type should include element type info
         shape = [d.dim_value for d in tensor_type.shape.dim]
         if len(shape) == 4:
             # then this is likely a 'batch' dimension which we don't care about.
@@ -323,6 +330,7 @@ class OnnxPlusConverter(OnnxNodeConverter):
             return [self.node.input_shapes[1]]
         return [self.node.input_shapes[0]]
 
+
 class OnnxSubtractConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Subtract")
@@ -336,7 +344,7 @@ class OnnxSubtractConverter(OnnxNodeConverter):
                 # since this is a constant, we can support a simple broadcast operation here to make ELL happy.
                 a = np.zeros(self.node.output_shapes[0][0]).astype(tensor.dtype)
                 tensor = np.array(tensor) + a
-                self.add_tensor(t[0], tensor) # publish this new version
+                self.add_tensor(t[0], tensor)  # publish this new version
         return node
 
     def get_attributes(self, attrs: Attributes):
@@ -352,6 +360,7 @@ class OnnxSubtractConverter(OnnxNodeConverter):
             # first input is a constant, so our output shape is probably the second input
             return [self.node.input_shapes[1]]
         return [self.node.input_shapes[0]]
+
 
 class OnnxReLuConverter(OnnxNodeConverter):
     def __init__(self, converter):
@@ -386,12 +395,12 @@ class OnnxMulConverter(OnnxNodeConverter):
             raise Exception("ElementwiseMul requires 2 inputs")
         # output shape depends on behavior of broadcasting.
         if input_shapes[0] == input_shapes[1]:
-            return [ input_shapes[0] ]
+            return [input_shapes[0]]
         else:
             # use numpy to compute broadcast result
             a = np.zeros(input_shapes[0][0])
             b = np.zeros(input_shapes[1][0])
-            c = np.matmul(a,b)
+            c = np.matmul(a, b)
             s = c.shape
             return [(s, self.get_order(s))]
 
@@ -415,7 +424,7 @@ class OnnxConstantConverter(OnnxNodeConverter):
         s = self.node.attributes["tensor"].shape
         if s == ():
             s = (1,)
-        return [ (s, self.get_order(s)) ]
+        return [(s, self.get_order(s))]
 
 
 class OnnxBiasConverter(OnnxNodeConverter):
@@ -424,6 +433,7 @@ class OnnxBiasConverter(OnnxNodeConverter):
 
     def get_weights(self):
         tensors = self.get_input_tensors()
+        weights = {}
         weights['bias'] = tensors[0]
         return weights
 
@@ -447,7 +457,7 @@ class OnnxSkipConverter(OnnxNodeConverter):
 
 class OnnxIdentityConverter(OnnxNodeConverter):
     def __init__(self, converter):
-        super().init(converter, "Passthrough") # Identity is a just a passthrough node
+        super().init(converter, "Passthrough")  # Identity is a just a passthrough node
         # it has to be Passthrough and not Skip because the input has to be renamed in the process
         # so that we can satisfy dependencies that are expecting this node.id to be available.
 
@@ -483,7 +493,7 @@ class OnnxAtenConverter(OnnxNodeConverter):
                     arg2_is_one = True
                 if arg3.onnx_node.op_type == "ConstantFill" and arg3.attributes["value"] == -1:
                     arg3_is_minus_one = True
-        except Exception as _:
+        except Exception:
             return False
 
         if op_is_greater and operand_is_zero and arg2_is_one and arg3_is_minus_one:
@@ -502,6 +512,7 @@ class OnnxAtenConverter(OnnxNodeConverter):
         self.node.input_shapes = [self.node.input_shapes[0]]
 
         return node
+
 
 class OnnxConstantFillConverter(OnnxNodeConverter):
     def __init__(self, converter):
@@ -535,7 +546,7 @@ class OnnxConstantFillConverter(OnnxNodeConverter):
         node = super().convert(node)
         if self.is_constant_input(node):
             self.node.operation_type = "Skip"
-            self.constant_fill(node) # do it!
+            self.constant_fill(node)  # do it!
         return node
 
     def get_output_shapes(self):
@@ -550,7 +561,7 @@ class OnnxConstantFillConverter(OnnxNodeConverter):
         return [(shape, self.get_order(shape))]
 
     def constant_fill(self, node):
-        if node.attributes["input_as_shape"] :
+        if node.attributes["input_as_shape"]:
             t = self.get_input_tensors()[0][1]
             shape = tuple(t)
             t = np.zeros(shape)
@@ -576,7 +587,8 @@ class OnnxTransposeConverter(OnnxNodeConverter):
         input_tensors = self.get_input_tensors()
 
         if len(node.inputs) != 1:
-            raise Exception("Unsupported transpose of multiple inputs on node {}_{}".format(node.operation_type, node.id))
+            raise Exception("Unsupported transpose of multiple inputs on node {}_{}".format(
+                node.operation_type, node.id))
 
         t = input_tensors[0][1]
         axes = node.attributes['perm']
@@ -645,6 +657,7 @@ class OnnxUnsqueezeConverter(OnnxNodeConverter):
         self.node.output_shapes = [(s, self.get_order(s))]
         return node
 
+
 class OnnxSqueezeConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Passthrough")
@@ -684,6 +697,7 @@ class OnnxSqueezeConverter(OnnxNodeConverter):
         self.add_tensor(node.id, tensor)
         return node
 
+
 class OnnxGatherConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Passthrough")
@@ -715,11 +729,10 @@ class OnnxGatherConverter(OnnxNodeConverter):
         output_shape = tuple(list(indices_shape) + [input_shape[-1]])
 
         if self.is_constant_input(self.node):
-            t = self.gather_tensor(self.node) # actually do it...
+            t = self.gather_tensor(self.node)  # actually do it...
             return [(t.shape, self.get_order(t.shape))]
 
         return [(output_shape, self.get_order(output_shape))]
-
 
     def gather_tensor(self, node):
         # turn the node into a constant tensor and the node will be skipped.
@@ -773,7 +786,7 @@ class OnnxFlattenConverter(OnnxNodeConverter):
         s = list(input_shape[0])
         d_axis = s[axis]
         lower = s[:axis]
-        upper = s[axis+1:]
+        upper = s[axis + 1:]
         x = np.product(lower)
         y = d_axis * np.product(upper)
         s = (int(x), int(y))
@@ -786,7 +799,7 @@ class OnnxShapeConverter(OnnxNodeConverter):
 
     def get_output_shapes(self):
         input_shape = self.node.input_shapes[0][0]
-        output_shape = self.add_tensor(self.node.outputs[0], np.array(input_shape))
+        self.add_tensor(self.node.outputs[0], np.array(input_shape))
         # Since this shape is known now, it can also be treated as a constant.
         return [(input_shape, self.get_order(input_shape))]
 
@@ -797,7 +810,7 @@ class OnnxConstantOfShapeConverter(OnnxNodeConverter):
 
     def get_output_shapes(self):
         input_shape = self.get_tensor(self.node.inputs[0])[0]
-        output_shape = self.add_tensor(self.node.outputs[0], np.zeros(input_shape))
+        self.add_tensor(self.node.outputs[0], np.zeros(input_shape))
         # Since this shape is known now, it can also be treated as a constant.
         return [(input_shape, self.get_order(input_shape))]
 
@@ -816,30 +829,33 @@ class OnnxSliceConverter(OnnxNodeConverter):
     def slice_tensor(self, node):
         input_tensors = self.get_input_tensors()
         if len(input_tensors) > 1:
-            raise Exception("Unsupported slice of multiple inputs on node {}_{}".format(node.operation_type, node.id))
+            raise Exception("Unsupported slice of multiple inputs on node {}_{}".format(
+                node.operation_type, node.id))
         axes = node.attributes["axes"]
         if len(axes) > 1:
-            raise Exception("Unsupported slice of multiple axes at once on node {}_{}".format(node.operation_type, node.id))
+            raise Exception("Unsupported slice of multiple axes at once on node {}_{}".format(
+                node.operation_type, node.id))
         tensor = input_tensors[0][1]
         axis = axes[0]
         starts = node.attributes["starts"][0]
         ends = node.attributes["ends"][0]
         # chop the tensor t and add it to the global list of tensors
         if axis == 0:
-            tensor = tensor[starts:ends,]
+            tensor = tensor[starts:ends, ]
         elif axis == 1:
-            tensor =tensor[:,starts:ends,]
+            tensor = tensor[:, starts:ends, ]
         elif axis == 2:
-            tensor = tensor[:,:,starts:ends,]
+            tensor = tensor[:, :, starts:ends, ]
         elif axis == 3:
-            tensor = tensor[:,:,:,starts:ends,]
+            tensor = tensor[:, :, :, starts:ends, ]
         else:
-            raise Exception("Unsupported slice of {} dimensiontal tensor in node {}_{}".format(axis, node.operation_type, node.id))
+            raise Exception("Unsupported slice of {} dimensiontal tensor in node {}_{}".format(
+                axis, node.operation_type, node.id))
 
         # turn the node into a constant tensor and the node will be skipped.
         self.add_tensor(node.id, tensor)
         shape = tensor.shape
-        node.output_shapes = [ (shape, self.get_order(shape)) ]
+        node.output_shapes = [(shape, self.get_order(shape))]
         return node
 
     def get_attributes(self, attrs: Attributes):
@@ -860,7 +876,7 @@ class OnnxLSTMConverter(OnnxNodeConverter):
             "hidden_size": attrs["hidden_size"],
             # pytorch has fixed activation types
             "activation": ell.neural.ActivationType.tanh,
-            "recurrent_activation":  ell.neural.ActivationType.sigmoid
+            "recurrent_activation": ell.neural.ActivationType.sigmoid
         }
         return attributes
 
@@ -883,14 +899,15 @@ class OnnxLSTMConverter(OnnxNodeConverter):
         result = {}
 
         if len(tensors) < 3:
-            raise Exception("Expecting 2 weight tensors and a bias tensor on LSTM node but found {}".format(len(tensors)))
+            raise Exception("Expecting 2 weight tensors and a bias tensor on LSTM node but found {}".format(
+                len(tensors)))
 
         # stacked set of (input, forget, cell, output) weights to be applied to the input
         stacked_input_weights = self.reform_weights(tensors[0][1], axis=1)
         # stacked set of (input, forget, cell, output) weights to be applied to the hidden state
         stacked_hidden_weights = self.reform_weights(tensors[1][1], axis=1)
         # the stacked bias comes in as one tensor which we have to then split
-        bias_weights = tensors[2][1].reshape((2, units*4))
+        bias_weights = tensors[2][1].reshape((2, units * 4))
         # stacked set of (input, forget, cell, output) input biases
         stacked_input_bias = self.reform_weights(bias_weights[0], axis=0)
         # stacked set of (input, forget, cell, output) hidden biases
@@ -918,6 +935,7 @@ class OnnxLSTMConverter(OnnxNodeConverter):
 
         return result
 
+
 class OnnxGRUConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "GRU")
@@ -927,7 +945,7 @@ class OnnxGRUConverter(OnnxNodeConverter):
             "hidden_size": attrs["hidden_size"],
             # pytorch has fixed activation types
             "activation": ell.neural.ActivationType.tanh,
-            "recurrent_activation":  ell.neural.ActivationType.sigmoid
+            "recurrent_activation": ell.neural.ActivationType.sigmoid
         }
         return attributes
 
@@ -954,7 +972,7 @@ class OnnxGRUConverter(OnnxNodeConverter):
         # stacked set of update, reset, hidden weights to be applied to the hidden state
         stacked_hidden_weights = tensors[1][1]
         # the stacked bias comes in as one tensor which we have to then split
-        bias_weights = tensors[2][1].reshape((2, units*3))
+        bias_weights = tensors[2][1].reshape((2, units * 3))
         # stacked set of update, reset, hidden input biases
         stacked_input_bias = bias_weights[0]
         # stacked set of update, reset, hidden hidden biases
@@ -990,7 +1008,6 @@ class OnnxBatchNormalizationConverter(OnnxNodeConverter):
         super().init(converter, "BatchNormalization")
 
     def get_weights(self):
-        input_node = self.get_node(self.node.inputs[0])
         weights = {}
         tensors = self.get_input_tensors()
         weights['scale'] = tensors[0]
@@ -1035,7 +1052,7 @@ class OnnxConcatConverter(OnnxNodeConverter):
             input_shapes += [n.output_shapes[0]]
 
         if len(inputs) == 0:
-            return [((1,),"channel")]
+            return [((1,), "channel")]
 
         if len(input_shapes) == 1:
             return [input_shapes[0]]
@@ -1045,13 +1062,11 @@ class OnnxConcatConverter(OnnxNodeConverter):
         # and what the heck does this mean?  So we return the longest dimension and hope for the best...
         same_shapes = True
         max_dim = input_shapes[0][0]
-        max_index = 0
         for i, shape in enumerate(input_shapes):
             dim = shape[0]
             if len(dim) > len(max_dim):
                 same_shapes = False
                 max_dim = dim
-                max_index = i
 
         if not same_shapes:
             # then ignore this node, it is not really a Concat.
@@ -1061,7 +1076,7 @@ class OnnxConcatConverter(OnnxNodeConverter):
 
         # get each input node's output channel to be added together
         for shape in input_shapes:
-            dim = shape[0] # extract shape info from the tuple
+            dim = shape[0]  # extract shape info from the tuple
             if len(dim) == 0:
                 # ignore inputs that have no dimensions (happens with some odd Constants)
                 continue
@@ -1104,7 +1119,8 @@ class OnnxConcatConverter(OnnxNodeConverter):
         result = np.concatenate(add, axis)
         self.add_tensor(node.id, result)
         s = result.shape
-        node.output_shapes = [ (s, self.get_order(s)) ]
+        node.output_shapes = [(s, self.get_order(s))]
+
 
 class OnnxSoftmaxConverter(OnnxNodeConverter):
     def __init__(self, converter):
@@ -1115,41 +1131,51 @@ class OnnxSoftmaxConverter(OnnxNodeConverter):
         # onnx has an "axis" attribute, does this matter?
         return attributes
 
+
 class OnnxSigmoidConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Sigmoid")
+
 
 class OnnxAbsConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Abs")
 
+
 class OnnxHardSigmoidConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "HardSigmoid")
+
 
 class OnnxSqrtConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Sqrt")
 
+
 class OnnxCosConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Cos")
+
 
 class OnnxSinConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Sin")
 
+
 class OnnxTanhConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Tanh")
+
 
 class OnnxExpConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Exp")
 
+
 class OnnxLogConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Log")
+
 
 class OnnxReshapeConverter(OnnxNodeConverter):
     def __init__(self, converter):
@@ -1174,7 +1200,7 @@ class OnnxMatMulConverter(OnnxNodeConverter):
         super().init(converter, "FullyConnected")
 
     def get_attributes(self, attrs: Attributes):
-        attributes = { "transpose": False }
+        attributes = {"transpose": False}
         return attributes
 
     def get_2d_shape(self, shape):
@@ -1185,10 +1211,8 @@ class OnnxMatMulConverter(OnnxNodeConverter):
         elif len(shape) == 3:
             raise Exception("3d shape not supported yet")
 
-
     def get_output_shapes(self):
         # now compute the output size
-        channel = 0
         if len(self.node.input_shapes) > 2:
             # third input is the output shape
             return [self.node.input_shapes[2]]
@@ -1198,7 +1222,7 @@ class OnnxMatMulConverter(OnnxNodeConverter):
             m2, p = self.get_2d_shape(self.node.input_shapes[1][0])
 
             if m1 == m2:
-                pass # good
+                pass  # good
             elif m1 == p:
                 # hmmm, then we need to transpose our weights...
                 self.node.attributes["transpose"] = True
@@ -1206,10 +1230,11 @@ class OnnxMatMulConverter(OnnxNodeConverter):
             else:
                 raise Exception("incompatible sizes in MatMul operation ({},{}) x ({},{})".format(n, m1, m2, p))
 
-            result = (n,p)
+            result = (n, p)
 
         else:
-            raise Exception("FullyConnected node is expecting two inputs, but we have {}".format(len(self.node.input_shapes)))
+            raise Exception("FullyConnected node is expecting two inputs, but we have {}".format(
+                len(self.node.input_shapes)))
 
         return [(result, self.get_order(result))]
 
@@ -1230,31 +1255,31 @@ class OnnxMatMulConverter(OnnxNodeConverter):
             tensor = weights[1]
             tensor_shape = tensor.shape
             tensor_len = len(tensor_shape)
-            transpose = self.node.attributes["transpose"]
-            if tensor_len == 2 :
+            if tensor_len == 2:
 
                 if len(input_shape) == 3:
                     tensor = self.reshape_3d_into_2d_tensor()
-                    tensor_shape= tensor.shape
+                    tensor_shape = tensor.shape
 
                 elif "transpose" in self.node.attributes:
                     # then the weights need to be transposed.
                     tensor = tensor.T
                     tensor_shape = tensor.shape
-                    self.add_tensor(weights[0], tensor) # re-register the transposed tensor.
+                    self.add_tensor(weights[0], tensor)  # re-register the transposed tensor.
 
                 # Now, ELL flattens the input shape and the FullyConnectedLayerNode multiples in the opposite order
                 # from what you'd expect doing "weight * input", not "input * weight" so we may need to transpose here
                 # again to account for this.
                 input_shape = (np.product(input_shape), 1)
-                if tensor_shape[1] == input_shape[0]: # make sure we have m*n and n*k.
+                if tensor_shape[1] == input_shape[0]:  # make sure we have m*n and n*k.
                     pass
                 elif tensor_shape[0] == input_shape[0]:
                     # then the weights need to be transposed.
                     tensor = tensor.T
-                    self.add_tensor(weights[0], tensor) # re-register the transformed version.
+                    self.add_tensor(weights[0], tensor)  # re-register the transformed version.
                 else:
-                    raise Exception("Cannot multiply matrices of incompatible shapes {} x {}".format(tensor_shape, input_shape))
+                    raise Exception("Cannot multiply matrices of incompatible shapes {} x {}".format(
+                        tensor_shape, input_shape))
 
                 weights = (weights[0], tensor, self.get_order(tensor.shape))
 
@@ -1299,11 +1324,11 @@ class OnnxGemmConverter(OnnxNodeConverter):
 
     def get_output_shapes(self):
         # now compute the output size
-        channel = 0
         if len(self.node.input_shapes) > 2:
             # third input is the output shape
             return [self.node.input_shapes[2]]
 
+        attributes = self.node.attributes
         if len(self.node.input_shapes) == 2:
             n, m1 = self.node.input_shapes[0][0]
             if attributes["transA"]:
@@ -1314,15 +1339,16 @@ class OnnxGemmConverter(OnnxNodeConverter):
                 m2, p = p, m2
 
             if m1 == m2:
-                result = (n,p)
+                result = (n, p)
             elif n == p:
                 # hmmm, then we still need to transpose...
-                self.attributes["transB"] = True
+                attributes["transB"] = True
                 m2, p = p, m2
-                result = (n,p)
+                result = (n, p)
 
         else:
-            raise Exception("Gemm operation is expecting two inputs, but we have {}".format(len(self.node.input_shapes)))
+            raise Exception("Gemm operation is expecting two inputs, but we have {}".format(
+                len(self.node.input_shapes)))
 
         return [(result, self.get_order(result))]
 
@@ -1344,7 +1370,7 @@ class OnnxGemmConverter(OnnxNodeConverter):
             tensor_shape = tensor.shape
             tensor_len = len(tensor_shape)
             transpose = self.node.attributes["transB"]
-            if tensor_len == 2 :
+            if tensor_len == 2:
                 if len(input_shape) == 3:
                     tensor = self.reshape_3d_into_2d_tensor(input_shape, weights, transpose)
                     tensor_shape = tensor.shape
@@ -1356,14 +1382,15 @@ class OnnxGemmConverter(OnnxNodeConverter):
                 # from what you'd expect doing "weight * input", not "input * weight" so we may need to transpose here
                 # again to account for this.
                 input_shape = (np.product(input_shape), 1)
-                if tensor_shape[1] == input_shape[0]: # make sure we have m*n and n*k.
+                if tensor_shape[1] == input_shape[0]:  # make sure we have m*n and n*k.
                     pass
                 elif tensor_shape[0] == input_shape[0]:
                     # then the weights need to be transposed.
                     tensor = tensor.T
-                    self.add_tensor(weights[0], tensor) # re-register the transformed version.
+                    self.add_tensor(weights[0], tensor)  # re-register the transformed version.
                 else:
-                    raise Exception("Cannot multiply matrices of incompatible shapes {} x {}".format(tensor_shape, input_shape))
+                    raise Exception("Cannot multiply matrices of incompatible shapes {} x {}".format(
+                        tensor_shape, input_shape))
 
                 weights = (weights[0], tensor, self.get_order(tensor.shape))
 
@@ -1391,19 +1418,27 @@ class ReceptiveFieldConverter(OnnxNodeConverter):
         if 'kernel_shape' in attrs:
             self.kernel_shape = attrs['kernel_shape']
             attributes['size'] = self.kernel_shape[0]
+            if not all(y == self.kernel_shape[0] for y in self.kernel_shape):
+                raise Exception("Receptive field kernel shape {} is not supported".format(self.kernel_shape))
         if 'strides' in attrs:
             self.strides = attrs['strides']
             attributes['stride'] = self.strides[0]
+            if not all(y == self.strides[0] for y in self.strides):
+                raise Exception("Receptive field stride {} is not supported".format(self.strides))
         if 'pads' in attrs:
             self.padding = attrs['pads']
             attributes['padding'] = self.padding[0]
+            if not all(y == self.padding[0] for y in self.padding):
+                raise Exception("Receptive field padding {} is not supported".format(self.padding))
         if 'dilations' in attrs:
             self.dilations = attrs['dilations']
             attributes['dilation'] = self.dilations[0]
+            if not all(y == self.dilations[0] for y in self.dilations):
+                raise Exception("Receptive field dilations {} is not supported".format(self.dilations))
         return attributes
 
     def get_padding(self):
-        pad = 0 # default padding
+        pad = 0  # default padding
         if 'padding' in self.node.attributes:
             pad = self.node.attributes['padding']
 
@@ -1428,20 +1463,20 @@ class ReceptiveFieldConverter(OnnxNodeConverter):
 
         d_row, d_col = 1, 1
         if isinstance(self.dilations, list):
-             d_row, d_col = self.dilations[0], self.dilations[1]
+            d_row, d_col = self.dilations[0], self.dilations[1]
 
         s_row, s_col = 1, 1
         if isinstance(self.strides, list):
             s_row, s_col = self.strides[0], self.strides[1]
 
-        input_shape = node.input_shapes[0][0] # get shape tuple from list of shapes
+        input_shape = node.input_shapes[0][0]  # get shape tuple from list of shapes
         channel, row, col = input_shape
         f = self.get_number_of_output_channels()
         if f is not None:
             channel = f
 
-        out_row = (row + 2*p_row - d_row*(k_row - 1) - 1)/s_row + 1
-        out_col = (col + 2*p_col - d_col*(k_col - 1) - 1)/s_col + 1
+        out_row = (row + 2 * p_row - d_row * (k_row - 1) - 1) / s_row + 1
+        out_col = (col + 2 * p_col - d_col * (k_col - 1) - 1) / s_col + 1
 
         shape = (channel, int(out_row), int(out_col))
 
@@ -1474,8 +1509,8 @@ class OnnxGlobalAveragePoolConverter(OnnxAveragePoolingConverter):
 
     def get_attributes(self, attrs: Attributes):
         attributes = {}
-        # GlobalAveragePool consumes an input tensor X and applies average pooling across the values in the same channel.
-        # This is equivalent to AveragePool with kernel size equal to the spatial dimension of input tensor.
+        # GlobalAveragePool consumes an input tensor X and applies average pooling across the values in the same
+        # channel.  This is equivalent to AveragePool with kernel size equal to the spatial dimension of input tensor.
         input_shapes = self.get_input_shapes()
         shape = list(input_shapes[0][0])
         shape.pop(0)  # remove channels
@@ -1484,6 +1519,7 @@ class OnnxGlobalAveragePoolConverter(OnnxAveragePoolingConverter):
         attributes['stride'] = 1
         attributes['padding'] = 0
         return attributes
+
 
 class OnnxConvolutionConverter(ReceptiveFieldConverter):
     def __init__(self, converter):
@@ -1525,58 +1561,58 @@ class OnnxConvolutionConverter(ReceptiveFieldConverter):
         return None
 
 
-ONNX_OP_TYPE_TO_CONVERTER_MAP  = {
-    "Abs"                     : OnnxAbsConverter,
-    "Add"                     : OnnxPlusConverter,
-    "ATen"                    : OnnxAtenConverter,
-    "AveragePool"             : OnnxAveragePoolingConverter,
-    "BatchNormalization"      : OnnxBatchNormalizationConverter,
-    "Bias"                    : OnnxBiasConverter,
-    "Concat"                  : OnnxConcatConverter,
-    "Conv"                    : OnnxConvolutionConverter,
-    "Convolution"             : OnnxConvolutionConverter,
-    "Constant"                : OnnxConstantConverter,
-    "ConstantOfShape"         : OnnxConstantOfShapeConverter,
-    "ConstantFill"            : OnnxConstantFillConverter,
-    "Cos"                     : OnnxCosConverter,
-    "Dropout"                 : OnnxPassthroughConverter,
-    "Exp"                     : OnnxExpConverter,
-    "Flatten"                 : OnnxFlattenConverter,
-    "Gather"                  : OnnxGatherConverter,
-    "Gemm"                    : OnnxGemmConverter,
-    "GlobalAveragePool"       : OnnxGlobalAveragePoolConverter,
-    "Greater"                 : OnnxPassthroughConverter,
-    "GRU"                     : OnnxGRUConverter,
-    "HardSigmoid"             : OnnxHardSigmoidConverter,
-    "Identity"                : OnnxIdentityConverter,
-    "Input"                   : OnnxInputConverter,
-    "InputNode"               : OnnxInputConverter,
-    "LeakyRelu"               : OnnxLeakyReLuConverter,
-    "LogSoftmax"              : OnnxSoftmaxConverter,
-    "Log"                     : OnnxLogConverter,
-    "LSTM"                    : OnnxLSTMConverter,
-    "MaxPool"                 : OnnxMaxPoolingConverter,
-    "Mul"                     : OnnxMulConverter,
-    "MatMul"                  : OnnxMatMulConverter,
-    "Pad"                     : OnnxPassthroughConverter,
-    "Passthrough"             : OnnxPassthroughConverter,
-    "Relu"                    : OnnxReLuConverter,
-    "ReLU"                    : OnnxReLuConverter,
-    "Reshape"                 : OnnxReshapeConverter,
-    "ReduceMean"              : OnnxPassthroughConverter,
-    "Shape"                   : OnnxShapeConverter,
-    "Sigmoid"                 : OnnxSigmoidConverter,
-    "Sin"                     : OnnxSinConverter,
-    "Sqrt"                    : OnnxSqrtConverter,
-    "Slice"                   : OnnxSliceConverter,
-    "Softmax"                 : OnnxSoftmaxConverter,
-    "Sub"                     : OnnxSubtractConverter,
-    "Tanh"                    : OnnxTanhConverter,
-    "Transpose"               : OnnxTransposeConverter,
-    "Unsqueeze"               : OnnxUnsqueezeConverter,
-    "Squeeze"                 : OnnxSqueezeConverter,
-    "Cast"                    : OnnxCastConverter
+ONNX_OP_TYPE_TO_CONVERTER_MAP = {
+    "Abs"                     : OnnxAbsConverter,  # noqa E203
+    "Add"                     : OnnxPlusConverter,  # noqa E203
+    "ATen"                    : OnnxAtenConverter,  # noqa E203
+    "AveragePool"             : OnnxAveragePoolingConverter,  # noqa E203
+    "BatchNormalization"      : OnnxBatchNormalizationConverter,  # noqa E203
+    "Bias"                    : OnnxBiasConverter,  # noqa E203
+    "Concat"                  : OnnxConcatConverter,  # noqa E203
+    "Conv"                    : OnnxConvolutionConverter,  # noqa E203
+    "Convolution"             : OnnxConvolutionConverter,  # noqa E203
+    "Constant"                : OnnxConstantConverter,  # noqa E203
+    "ConstantFill"            : OnnxConstantFillConverter,  # noqa E203
+    "Cos"                     : OnnxCosConverter,  # noqa E203
+    "Dropout"                 : OnnxPassthroughConverter,  # noqa E203
+    "Exp"                     : OnnxExpConverter,  # noqa E203
+    "Flatten"                 : OnnxFlattenConverter,  # noqa E203
+    "Gather"                  : OnnxGatherConverter,  # noqa E203
+    "Gemm"                    : OnnxGemmConverter,  # noqa E203
+    "GlobalAveragePool"       : OnnxGlobalAveragePoolConverter,  # noqa E203
+    "Greater"                 : OnnxPassthroughConverter,  # noqa E203
+    "GRU"                     : OnnxGRUConverter,  # noqa E203
+    "HardSigmoid"             : OnnxHardSigmoidConverter,  # noqa E203
+    "Identity"                : OnnxIdentityConverter,  # noqa E203
+    "Input"                   : OnnxInputConverter,  # noqa E203
+    "InputNode"               : OnnxInputConverter,  # noqa E203
+    "LeakyRelu"               : OnnxLeakyReLuConverter,  # noqa E203
+    "LogSoftmax"              : OnnxSoftmaxConverter,  # noqa E203
+    "Log"                     : OnnxLogConverter,  # noqa E203
+    "LSTM"                    : OnnxLSTMConverter,  # noqa E203
+    "MaxPool"                 : OnnxMaxPoolingConverter,  # noqa E203
+    "Mul"                     : OnnxMulConverter,  # noqa E203
+    "MatMul"                  : OnnxMatMulConverter,  # noqa E203
+    "Pad"                     : OnnxPassthroughConverter,  # noqa E203
+    "Passthrough"             : OnnxPassthroughConverter,  # noqa E203
+    "Relu"                    : OnnxReLuConverter,  # noqa E203
+    "ReLU"                    : OnnxReLuConverter,  # noqa E203
+    "Reshape"                 : OnnxReshapeConverter,  # noqa E203
+    "ReduceMean"              : OnnxPassthroughConverter,  # noqa E203
+    "Shape"                   : OnnxShapeConverter,  # noqa E203
+    "Sigmoid"                 : OnnxSigmoidConverter,  # noqa E203
+    "Sin"                     : OnnxSinConverter,  # noqa E203
+    "Sqrt"                    : OnnxSqrtConverter,  # noqa E203
+    "Slice"                   : OnnxSliceConverter,  # noqa E203
+    "Softmax"                 : OnnxSoftmaxConverter,  # noqa E203
+    "Sub"                     : OnnxSubtractConverter,  # noqa E203
+    "Tanh"                    : OnnxTanhConverter,  # noqa E203
+    "Transpose"               : OnnxTransposeConverter,  # noqa E203
+    "Unsqueeze"               : OnnxUnsqueezeConverter,  # noqa E203
+    "Squeeze"                 : OnnxSqueezeConverter,  # noqa E203
+    "Cast"                    : OnnxCastConverter  # noqa E203
 }
+
 
 class OnnxConverter:
     def __init__(self):
@@ -1584,7 +1620,7 @@ class OnnxConverter:
         self.input_tensors = None
         self.next_name = 0
         self.nodes = []
-        self.output_shapes = {} # id of node to ouput_shape
+        self.output_shapes = {}  # id of node to ouput_shape
 
     def _load_onnx(self, path):
         _logger.info("loading the ONNX model from: " + path)
@@ -1608,17 +1644,17 @@ class OnnxConverter:
             # onnx IR version
             _logger.info("ONNX IR_version {}".format(onnx_model.ir_version))
 
-        except Exception as ex :
+        except Exception as ex:
             _logger.error("Error occurred when loading onnx model file: " + str(ex))
             raise ex
 
-        _logger.info("ONNX Graph producer: {} version {}".format(onnx_model.producer_name,
-                                                      onnx_model.producer_version))
+        _logger.info("ONNX Graph producer: {} version {}".format(
+            onnx_model.producer_name, onnx_model.producer_version))
         _logger.info("ONNX Graph total len: {}".format(len(onnx_model.graph.input)))
         return onnx_model.graph
 
     def get_optype(self, name):
-        if not name in ONNX_OP_TYPE_TO_CONVERTER_MAP:
+        if name not in ONNX_OP_TYPE_TO_CONVERTER_MAP:
             return None
         return ONNX_OP_TYPE_TO_CONVERTER_MAP[name](self).op_type
 
@@ -1633,7 +1669,6 @@ class OnnxConverter:
         return self.set_graph(graph)
 
     def set_graph(self, graph):
-        #self.nodes  = utils.ONNX(self.graph).parse_onnx_model()
         self.model = common.importer.ImporterModel()
 
         input_tensors = {
@@ -1668,11 +1703,11 @@ class OnnxConverter:
         if hasattr(node, "onnx_node"):
             optype = node.onnx_node.op_type
 
-
-        attrs = dict((k,node.attributes[k]) for k in node.attributes)
+        attrs = dict((k, node.attributes[k]) for k in node.attributes)
         if "tensor" in attrs:
             attrs["tensor"] = "..."
-        _logger.info("{} {} Inputs {} {} Outputs: {} {} Attributes: {}".format(optype, node.id, node.inputs, node.input_shapes, node.outputs, node.output_shapes, attrs))
+        _logger.info("{} {} Inputs {} {} Outputs: {} {} Attributes: {}".format(
+            optype, node.id, node.inputs, node.input_shapes, node.outputs, node.output_shapes, attrs))
 
         self.nodes.append(node)
         self.model.add_node(node.id, node)
@@ -1680,21 +1715,22 @@ class OnnxConverter:
 
     def define_constant_inputs(self, node):
         for x in node.inputs:
-            if self.is_tensor(x) and not x in self.model.nodes:
+            if self.is_tensor(x) and x not in self.model.nodes:
                 t = self.get_tensor(x)[0]
                 self.add_constant_node(x, t)
 
     def add_constant_node(self, name, tensor):
-        node = common.converters.ImporterNode( id = name,
-                                operation_type = "Constant",
-                                inputs = [],
-                                outputs = [name]
-                                )
+        node = common.converters.ImporterNode(
+            id=name,
+            operation_type="Constant",
+            inputs=[],
+            outputs=[name]
+        )
 
         # assuming onnx_node is of type: NodeProto, this performs some common conversion operations
-        node.attributes      = { 'tensor': tensor }
-        node.input_shapes    = []
-        node.output_shapes   = [ (tensor.shape, self.get_order(tensor.shape))]
+        node.attributes = {'tensor': tensor}
+        node.input_shapes = []
+        node.output_shapes = [(tensor.shape, self.get_order(tensor.shape))]
         self.add_node(node)
 
     def get_node(self, id):
@@ -1735,11 +1771,11 @@ class OnnxConverter:
 
     def get_order(self, shape):
         tensor_len = len(shape)
-        if tensor_len  == 4:
+        if tensor_len == 4:
             return 'filter_channel_row_column'
-        elif tensor_len == 3 :
+        elif tensor_len == 3:
             return 'channel_row_column'
-        elif tensor_len == 2 :
+        elif tensor_len == 2:
             return 'row_column'
-        else :
+        else:
             return 'channel'

@@ -13,7 +13,6 @@ import os
 import argparse
 from typing import Text
 import sys
-import logging
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'utilities/pythonlibs'))
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
@@ -21,10 +20,11 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import find_ell  # noqa: 401
 import ell  # noqa: 401
+import logger
 import onnx_to_ell
 import ziptools
 
-_logger = logging.getLogger(__name__)
+_logger = logger.get()
 
 
 def convert(model, output=None, zip_ell_model=None, step_interval=None, lag_threshold=None):
@@ -83,12 +83,10 @@ def main():
         help="number of step intervals to fall behind before notifying the caller.\n"
              "used when step_interval is set\n",
         default=None)
-    args = parser.parse_args()
 
-    if args.verbose:
-        logging.basicConfig(level=logging.DEBUG, format="%(message)s")
-    else:
-        logging.basicConfig(level=logging.INFO, format="%(message)s")
+    logger.add_logging_args(parser)
+    args = parser.parse_args()
+    logger.setup(args)
 
     convert(args.input, args.output_directory, args.zip_ell_model, args.step_interval, args.lag_threshold)
 

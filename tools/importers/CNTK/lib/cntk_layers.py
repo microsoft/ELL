@@ -9,23 +9,17 @@
 ####################################################################################################
 
 """Imports CNTK layers to ELL equivalents"""
-import logging
-
-from cntk.initializer import glorot_uniform, he_normal
-from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
-import cntk.layers.blocks
+from cntk.layers import Convolution, MaxPooling, AveragePooling, Dense
 from cntk.layers.typing import *
 from cntk.ops import *
-from cntk import load_model
 from cntk.logging.graph import *
-from custom_functions import CustomSign, BinaryConvolution
+from custom_functions import CustomSign
 
 import ell
+import logger
 import cntk_converters as converters
 import cntk_utilities as utilities
-from custom_functions import BinaryConvolution, CustomSign
 
-_logger = logging.getLogger(__name__)
 
 class BaseLayer:
     """Base class with common layer processing functionality"""
@@ -54,10 +48,11 @@ class BaseLayer:
         layer_prefix = self.op_name
         if self.additional_layer_text:
             layer_prefix = '{} ({})'.format(layer_prefix, self.additional_layer_text)
-        return '{} : {} -> {} | input padding {} output padding {}'.format(layer_prefix, utilities.ell_shape_to_string(self.layer.ell_inputShape),
-                         utilities.ell_shape_to_string(self.layer.ell_outputShape),
-                         str(self.layer.ell_inputPaddingParameters.paddingSize),
-                         str(self.layer.ell_outputPaddingParameters.paddingSize))
+        return '{} : {} -> {} | input padding {} output padding {}'.format(
+            layer_prefix, utilities.ell_shape_to_string(self.layer.ell_inputShape),
+            utilities.ell_shape_to_string(self.layer.ell_outputShape),
+            str(self.layer.ell_inputPaddingParameters.paddingSize),
+            str(self.layer.ell_outputPaddingParameters.paddingSize))
 
     def get_input_padding_parameters(self):
         """Returns the default ell.neural.PaddingParameters for a layer's input.
@@ -95,6 +90,7 @@ class BaseLayer:
         raise NotImplementedError(
             "Error: subclasses must override this method")
 
+
 class DenseLayer(BaseLayer):
     """Logic for converting a CNTK Dense layer to ELL"""
 
@@ -129,11 +125,13 @@ class DenseLayer(BaseLayer):
 
         # Create the ell.neural.LayerParameters for the various ELL layers
         firstLayerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShapeMinusPadding, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShapeMinusPadding,
             ell.neural.NoPadding(), ell.nodes.PortType.smallReal)
-        middleLayerParameters = ell.neural.LayerParameters(self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(), 
+        middleLayerParameters = ell.neural.LayerParameters(
+            self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(),
             self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(), ell.nodes.PortType.smallReal)
-        lastLayerParameters = ell.neural.LayerParameters(self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(), 
+        lastLayerParameters = ell.neural.LayerParameters(
+            self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(),
             self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
 
         layerParameters = firstLayerParameters
@@ -146,14 +144,14 @@ class DenseLayer(BaseLayer):
             layerParameters, weightsTensor))
 
         # Create the ELL bias layer
-        if (utilities.is_softmax_activation(internalNodes) or activationType != None):
+        if (utilities.is_softmax_activation(internalNodes) or activationType is not None):
             layerParameters = middleLayerParameters
         else:
             layerParameters = lastLayerParameters
         ellLayers.append(ell.neural.BiasLayer(layerParameters, biasVector))
 
         # Create the ELL activation layer
-        if (utilities.is_softmax_activation(internalNodes) or activationType != None):
+        if (utilities.is_softmax_activation(internalNodes) or activationType is not None):
             layerParameters = lastLayerParameters
 
             # Special case: if this is softmax activation, create an ELL Softmax layer.
@@ -161,7 +159,7 @@ class DenseLayer(BaseLayer):
             if (utilities.is_softmax_activation(internalNodes)):
                 ellLayers.append(ell.neural.SoftmaxLayer(layerParameters))
             else:
-                if (activationType != None):
+                if (activationType is not None):
                     ellLayers.append(ell.neural.ActivationLayer(
                         layerParameters, activationType))
 
@@ -182,6 +180,7 @@ class DenseLayer(BaseLayer):
         if includeBias:
             layer.parameters[1].value = biasParameter.value
         return layer
+
 
 class BinaryConvolutionLayer(BaseLayer):
     """Logic for converting a CNTK Binary Convolution layer to ELL"""
@@ -233,8 +232,8 @@ class BinaryConvolutionLayer(BaseLayer):
         padding = 0
         receptiveField = self.weights_parameter.shape[2]
 
-        if ('autoPadding' in self.attributes):
-            if (self.attributes['autoPadding'][1] == True):
+        if 'autoPadding' in self.attributes:
+            if self.attributes['autoPadding'][1] is True:
                 padding = int((receptiveField - 1) / 2)
             else:
                 padding = self.attributes['upperPad'][0]
@@ -281,6 +280,7 @@ class BinaryConvolutionLayer(BaseLayer):
                                  channels=weightsShape[1], init=self.weights_parameter.value,
                                  pad=pad, activation=False, bias=False, init_bias=0)(x)
 
+
 class ConvolutionLayer(BaseLayer):
     """Logic for converting a CNTK Convolution layer to ELL"""
 
@@ -322,8 +322,8 @@ class ConvolutionLayer(BaseLayer):
         padding = 0
         receptiveField = self.weights_parameter.shape[2]
 
-        if ('autoPadding' in self.attributes):
-            if (self.attributes['autoPadding'][1] == True):
+        if 'autoPadding' in self.attributes:
+            if self.attributes['autoPadding'][1]:
                 padding = int((receptiveField - 1) / 2)
             else:
                 padding = self.attributes['upperPad'][0]
@@ -349,22 +349,22 @@ class ConvolutionLayer(BaseLayer):
         internalNodes = utilities.get_model_layers(self.layer.block_root)
         activationType = utilities.get_ell_activation_type(internalNodes)
         isSoftmaxActivation = utilities.is_softmax_activation(internalNodes)
-        hasActivation = isSoftmaxActivation or activationType != None
-        hasBias = self.bias_parameter != None
+        hasActivation = isSoftmaxActivation or activationType is not None
+        hasBias = self.bias_parameter is not None
 
         # Create the ell.neural.LayerParameters for the various ELL layers
         onlyLayerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape,
             self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
         firstLayerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShapeMinusPadding, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShapeMinusPadding,
             ell.neural.NoPadding(), ell.nodes.PortType.smallReal)
         middleLayerParameters = ell.neural.LayerParameters(self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(
         ), self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(), ell.nodes.PortType.smallReal)
         lastLayerParameters = ell.neural.LayerParameters(self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(
         ), self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
 
-        # Choose the layer parameters for the convolutional layer. If there is 
+        # Choose the layer parameters for the convolutional layer. If there is
         # bias or activation, then the convolution is the first of two or more,
         # otherwise it is the only layer
         if hasActivation or hasBias:
@@ -453,7 +453,7 @@ class LinearLayer(BaseLayer):
 
         # Create the ell.neural.LayerParameters for the various ELL layers
         firstLayerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters,
             self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(), ell.nodes.PortType.smallReal)
         middleLayerParameters = ell.neural.LayerParameters(self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(
         ), self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(), ell.nodes.PortType.smallReal)
@@ -471,7 +471,7 @@ class LinearLayer(BaseLayer):
 
         # Create the ELL bias layer
         isSoftmaxActivation = utilities.is_softmax_activation(internalNodes)
-        hasActivation = isSoftmaxActivation or activationType != None
+        hasActivation = isSoftmaxActivation or activationType is not None
         if (hasActivation):
             layerParameters = middleLayerParameters
         else:
@@ -494,6 +494,7 @@ class LinearLayer(BaseLayer):
         """Returns a clone of the CNTK layer for per-layer forward prop validation"""
         raise NotImplementedError("Error: not yet implemented")
 
+
 class ElementTimesLayer(BaseLayer):
     """Logic for converting a CNTK ElementTimes layer to ELL"""
 
@@ -515,7 +516,7 @@ class ElementTimesLayer(BaseLayer):
 
         # Create the ell.neural.LayerParameters for the ELL layer
         layerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape,
             self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
 
         # Create ELL scaling layer
@@ -535,6 +536,7 @@ class ElementTimesLayer(BaseLayer):
         x = reshape(feature, (self.layer.ell_outputShape.channels,))
         return element_times(x, self.scale)
 
+
 class BasePoolingLayer(BaseLayer):
     """Common logic for converting a Pooling layer to ELL"""
 
@@ -549,8 +551,8 @@ class BasePoolingLayer(BaseLayer):
         """Returns the ell.neural.PaddingParameters for a layer's input."""
 
         padding = 0
-        if ('autoPadding' in self.attributes):
-            if (self.attributes['autoPadding'][0] == True):
+        if 'autoPadding' in self.attributes:
+            if self.attributes['autoPadding'][0] is True:
                 padding = int((self.attributes['poolingWindowShape'][0] - 1) / 2)
             else:
                 padding = self.attributes['upperPad'][0]
@@ -573,7 +575,7 @@ class BasePoolingLayer(BaseLayer):
 
         # Create the ell.neural.LayerParameters for the ELL layer
         layerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape,
             self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
 
         # Fill in the pooling parameters
@@ -592,6 +594,7 @@ class BasePoolingLayer(BaseLayer):
         raise NotImplementedError(
             "Error: subclasses must override this method")
 
+
 class MaxPoolingLayer(BasePoolingLayer):
     """Logic for converting a CNTK MaxPooling layer to ELL"""
 
@@ -608,6 +611,7 @@ class MaxPoolingLayer(BasePoolingLayer):
         pad, filterShape, stride = self.get_cntk_parameters()
         return MaxPooling(filterShape, strides=(stride, stride), pad=pad)(feature)
 
+
 class AveragePoolingLayer(BasePoolingLayer):
     """Logic for converting a CNTK AveragePooling layer to ELL"""
 
@@ -623,6 +627,7 @@ class AveragePoolingLayer(BasePoolingLayer):
 
         pad, filterShape, stride = self.get_cntk_parameters()
         return AveragePooling(filterShape, strides=(stride, stride), pad=pad)(feature)
+
 
 class PoolingLayer(BaseLayer):
     """Logic for converting a CNTK Pooling layer to ELL"""
@@ -648,6 +653,7 @@ class PoolingLayer(BaseLayer):
 
         return self.actual_layer.clone_cntk_layer(feature)
 
+
 class ActivationLayer(BaseLayer):
     """Logic for converting a CNTK Activation layer to ELL"""
 
@@ -666,7 +672,7 @@ class ActivationLayer(BaseLayer):
 
         # Create the ell.neural.LayerParameters for the ELL layer
         layerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape,
             self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
 
         # Create the ELL activation layer
@@ -682,6 +688,7 @@ class ActivationLayer(BaseLayer):
         else:
             return relu(feature)
 
+
 class ReLULayer(BaseLayer):
     """Logic for converting a CNTK ReLU layer to ELL"""
 
@@ -694,7 +701,7 @@ class ReLULayer(BaseLayer):
 
         # Create the ell.neural.LayerParameters for the ELL layer
         layerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape,
             self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
 
         # Create the ELL activation layer
@@ -703,8 +710,8 @@ class ReLULayer(BaseLayer):
 
     def clone_cntk_layer(self, feature):
         """Returns a clone of the CNTK layer for per-layer forward prop validation"""
-
         return relu(feature)
+
 
 class LeakyReLULayer(BaseLayer):
     """Logic for converting a CNTK LeakyReLU layer to ELL"""
@@ -718,7 +725,7 @@ class LeakyReLULayer(BaseLayer):
 
         # Create the ell.neural.LayerParameters for the ELL layer
         layerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape,
             self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
 
         # Create the ELL activation layer
@@ -727,8 +734,8 @@ class LeakyReLULayer(BaseLayer):
 
     def clone_cntk_layer(self, feature):
         """Returns a clone of the CNTK layer for per-layer forward prop validation"""
-
         return leaky_relu(feature)
+
 
 class PReLULayer(BaseLayer):
     """Logic for converting a CNTK PReLU layer to ELL"""
@@ -747,7 +754,7 @@ class PReLULayer(BaseLayer):
 
         # Create the ell.neural.LayerParameters for the ELL layer
         layerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape,
             self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
 
         # Create the ELL PReLU activation layer
@@ -774,11 +781,11 @@ class SoftmaxLayer(BaseLayer):
             # ugly hack for CrossEntropyWithSoftmax
             # CrossEntropyWithSoftmax outputs to a Tensor[1], but we just need Softmax
             layerParameters = ell.neural.LayerParameters(
-                self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_inputShape, 
+                self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_inputShape,
                 self.layer.ell_inputPaddingParameters, ell.nodes.PortType.smallReal)
         else:
             layerParameters = ell.neural.LayerParameters(
-                self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, 
+                self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape,
                 self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
 
         # Create the ELL softmax layer
@@ -788,6 +795,7 @@ class SoftmaxLayer(BaseLayer):
         """Returns a clone of the CNTK layer for per-layer forward prop validation"""
 
         return softmax(feature)
+
 
 class BatchNormalizationLayer(BaseLayer):
     """Logic for converting a CNTK BatchNormalization layer to ELL"""
@@ -831,12 +839,14 @@ class BatchNormalizationLayer(BaseLayer):
 
         # Create the ell.neural.LayerParameters for the various ELL layers
         firstLayerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters,
             self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(), ell.nodes.PortType.smallReal)
-        middleLayerParameters = ell.neural.LayerParameters(self.layer.ell_outputShapeMinusPadding, 
-            ell.neural.NoPadding(), self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(), ell.nodes.PortType.smallReal)
-        lastLayerParameters = ell.neural.LayerParameters(self.layer.ell_outputShapeMinusPadding, 
-            ell.neural.NoPadding(), self.layer.ell_outputShape, self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
+        middleLayerParameters = ell.neural.LayerParameters(
+            self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(), self.layer.ell_outputShapeMinusPadding,
+            ell.neural.NoPadding(), ell.nodes.PortType.smallReal)
+        lastLayerParameters = ell.neural.LayerParameters(
+            self.layer.ell_outputShapeMinusPadding, ell.neural.NoPadding(), self.layer.ell_outputShape,
+            self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
 
         # Create the layers
         ellLayers.append(ell.neural.BatchNormalizationLayer(
@@ -853,6 +863,7 @@ class BatchNormalizationLayer(BaseLayer):
         run_variance = constant(shape=self.scale.shape, value=self.variance.value, name='aggregate_variance')
         run_count = constant(0, shape=(), name='aggregate_count')
         return batch_normalization(feature, scale, bias, run_mean, run_variance, running_count=run_count, spatial=True)
+
 
 class BiasLayer(BaseLayer):
     """Logic for converting a CNTK Plus layer to ELL"""
@@ -873,7 +884,7 @@ class BiasLayer(BaseLayer):
 
         # Create the ell.neural.LayerParameters for the ELL layer
         layerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape,
             self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
 
         # Create the ELL bias layer
@@ -906,7 +917,7 @@ class NegativeBiasLayer(BaseLayer):
 
         # Create the ell.neural.LayerParameters for the ELL layer
         layerParameters = ell.neural.LayerParameters(
-            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape, 
+            self.layer.ell_inputShape, self.layer.ell_inputPaddingParameters, self.layer.ell_outputShape,
             self.layer.ell_outputPaddingParameters, ell.nodes.PortType.smallReal)
 
         bias = -1.0 * self.layer.constants[0].value
@@ -922,9 +933,11 @@ class NegativeBiasLayer(BaseLayer):
         """Returns a clone of the CNTK layer for per-layer forward prop validation"""
         return minus(feature, constant(self.layer.constants[0].value), name=self.layer.output.name)
 
+
 class LayerFactory():
     @staticmethod
     def get_layer_object(cntkLayer):
+        _logger = logger.get()
         try:
             if (cntkLayer.op_name == 'Activation'):
                 return ActivationLayer(cntkLayer)
@@ -943,7 +956,7 @@ class LayerFactory():
                 return ElementTimesLayer(cntkLayer)
             elif (cntkLayer.op_name == 'LeakyReLU'):
                 return LeakyReLULayer(cntkLayer)
-            elif (cntkLayer.op_name == 'linear'): # Note: this op_name is lowercase
+            elif (cntkLayer.op_name == 'linear'):  # Note: this op_name is lowercase
                 return LinearLayer(cntkLayer)
             elif (cntkLayer.op_name == 'MaxPooling'):
                 return MaxPoolingLayer(cntkLayer)
@@ -960,8 +973,7 @@ class LayerFactory():
             elif (cntkLayer.op_name == 'Softmax'):
                 return SoftmaxLayer(cntkLayer)
             else:
-                _logger.warning("Will not process " + cntkLayer.op_name +
-                      "- skipping this layer as irrelevant.")
+                _logger.warning("Will not process " + cntkLayer.op_name + "- skipping this layer as irrelevant.")
         except (ValueError, AttributeError) as e:
             # raised if a layer contains invalid characteristics
             _logger.info("\nWill not process", cntkLayer.op_name, "-", str(e))
@@ -970,16 +982,16 @@ class LayerFactory():
 
     @staticmethod
     def has_inputs(cntkLayer):
-        return ((len(cntkLayer.arguments) > 0 and len(cntkLayer.arguments[0].shape) > 0) or
-                # special case for Binary Convolution
-                (cntkLayer.op_name == 'Convolution' and len(cntkLayer.inputs) > 0 and 
-                len(cntkLayer.inputs[0].shape) > 0))
+        return ((len(cntkLayer.arguments) > 0 and len(cntkLayer.arguments[0].shape) > 0)
+                or (cntkLayer.op_name == 'Convolution' and len(cntkLayer.inputs) > 0
+                    and len(cntkLayer.inputs[0].shape) > 0))  # special case for Binary Convolution
 
 
 def get_filtered_layers_list(modelLayers, maxLayerCount=None):
     """Returns a relevant list of CNTK layers and layer objects
     """
 
+    _logger = logger.get()
     # Go through the layers and append layer objects to the relevantLayers list
     relevantLayers = []
     lastSoftmaxLayer = None
@@ -995,7 +1007,7 @@ def get_filtered_layers_list(modelLayers, maxLayerCount=None):
                     # because the input is connected to it (it's used for evaluating training)
                     lastSoftmaxLayer = SoftmaxLayer(currentLayer)
             else:
-                _logger.warning("Will not process " + currentLayer.op_name + 
+                _logger.warning("Will not process " + currentLayer.op_name +
                                 " - empty input shape.")
 
     if (lastSoftmaxLayer is not None):
@@ -1025,7 +1037,7 @@ def get_filtered_layers_list(modelLayers, maxLayerCount=None):
 
 
 def convert_cntk_layers_to_ell_layers(layersToConvert):
-    """Walks a list of CNTK layers and returns a list of ELL Layer objects that is used to construct a Neural Network Predictor"""
+    """Walks a list of CNTK layers and returns a list of ELL Layer objects"""
 
     ellLayers = []
     for layerObject in layersToConvert:

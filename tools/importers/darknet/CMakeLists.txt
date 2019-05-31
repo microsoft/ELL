@@ -16,6 +16,9 @@ if(${PYTHON_ENABLED})
 
     #copy files
     copy_newer_files(${module_name} importer_src)
-    
+
     add_subdirectory(test)
+
+    # run flake8
+    flake8(${module_name})
 endif()  # PYTHON_ENABLED
