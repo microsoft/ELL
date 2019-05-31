@@ -49,7 +49,7 @@ endmacro()
 
 set(BLAS_INCLUDE_SEARCH_PATHS )
 set(BLAS_LIB_SEARCH_PATHS )
-set(BLAS_LIB_NAMES libopenblas.dll.a libopenblas.a openblas cblas libopenblas.lib)
+set(BLAS_LIB_NAMES libopenblas.dll.a libopenblas.a openblas cblas libopenblas.lib openblas.lib)
 
 if(NOT WIN32)
     ## Note: libopenblas installs on ubuntu in /usr/lib and /usr/include or /opt/OpenBLAS if it's manually built
@@ -93,7 +93,10 @@ find_package(BLAS QUIET)
 if(BLAS_FOUND)
     if(WIN32)
         get_filename_component(BLAS_LIB_PATH ${BLAS_LIBRARIES} DIRECTORY)
-        set(BLAS_INCLUDE_SEARCH_PATHS ${BLAS_LIB_PATH}/../include)
+        set(BLAS_INCLUDE_SEARCH_PATHS
+            ${BLAS_LIB_PATH}/../include/
+            ${BLAS_LIB_PATH}/../include/openblas
+        )
         set(BLAS_LIB_SEARCH_PATHS ${BLAS_LIB_PATH})
     endif()
 
