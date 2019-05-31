@@ -208,7 +208,7 @@ namespace model
         {
             PortMemoryLayout layout;
             archiver["layout"] >> layout;
-            SetShape(layout.GetActiveSize());
+            SetMemoryLayout(layout);
         }
         else
         {
