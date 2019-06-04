@@ -18,6 +18,7 @@
 
 #include <emitters/include/IRMetadata.h>
 
+#include <utilities/include/TypeName.h>
 #include <utilities/include/TypeTraits.h>
 
 #include <functional>
@@ -93,6 +94,9 @@ namespace nodes
         /// <param name="function"> The sink function to set. </param>
         void SetSinkFunction(SinkFunction<ValueType> function) { _sink = function; }
 
+        /// <summary> Gets the sink function for this node for use in Compute(). </summary>
+        SinkFunction<ValueType> GetSinkFunction() const { return _sink; }
+
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
@@ -160,15 +164,13 @@ namespace nodes
         _input(this, input, defaultInputPortName),
         _trigger(this, trigger, triggerPortName),
         _output(this, defaultOutputPortName, shape),
-        _sink(sink == nullptr ? [](const auto&) {} : sink)
+        _sink(sink)
     {
     }
 
     template <typename ValueType>
     void SinkNode<ValueType>::Compute() const
     {
-        DEBUG_THROW(_sink == nullptr, utilities::InputException(utilities::InputExceptionErrors::nullReference, "Sink function is not set"));
-
         if (_sink != nullptr && _trigger.GetValue(0))
         {
             _sink(_input.GetValue());
@@ -181,31 +183,65 @@ namespace nodes
     {
         emitters::LLVMValue pInput = compiler.EnsurePortEmitted(input);
         emitters::LLVMValue pTrigger = compiler.EnsurePortEmitted(trigger);
-        std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
         auto& module = function.GetModule();
         auto triggerValue = function.ValueAt(pTrigger, 0);
-        std::string name = this->GetFriendlyName();
-        if (name.empty())
+        std::string inputName = this->GetFriendlyName();
+        if (inputName.empty())
         {
-            name = "output";
+            inputName = "output";
         }
 
-        function.If(emitters::TypedComparison::equals, triggerValue, function.Literal(true), [prefixedName, pInput, &module, &compiler, &name](emitters::IRFunctionEmitter& function) {
+        function.If(emitters::TypedComparison::equals, triggerValue, function.Literal(true), [this, pInput, &module, &compiler, &inputName](emitters::IRFunctionEmitter& function) {
             // look up our global context object
             auto context = module.GlobalPointer(compiler.GetNamespacePrefix() + "_context", emitters::VariableType::Byte);
             auto globalContext = function.Load(context);
+            auto buffer = function.PointerOffset(pInput, function.Literal(0));
+            auto name = GetCallbackName();
+            int size = static_cast<int>(this->GetShape().NumElements());
 
-            // Callback signature: void SinkFunction(void* context, ValueType* array)
-            const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer },
-                                                                 { name, emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
-            module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
+            // Callback function
+            auto func = GetSinkFunction();
+            if (func)
+            {
+                // We have a std::function, so we can call these too if we use the CallbackRegistry.  These "thunks" will be defined by the IRCompiledMap.
+                auto& registry = function.GetModule().GetCallbackRegistry<ValueType>();
+                registry.RegisterSinkCallback(name, func);
+                int index = registry.GetSinkCallbackIndex(name);
 
-            emitters::LLVMFunction pSinkFunction = module.GetFunction(prefixedName);
-            function.Call(pSinkFunction, { globalContext, function.PointerOffset(pInput, function.Literal(0)) });
+                // Declare an external CallbackThunk that has some extra parameters.  The index parameter tells IRCompiledMap which registered
+                // std::function to invoke, and the size parameter tells it the size of the input buffer so it can back the conversion to
+                // std::vector and back.
+                const emitters::NamedVariableTypeList parameters = { { "index", emitters::VariableType::Int32 },
+                                                                     { "context", emitters::VariableType::BytePointer },
+                                                                     { inputName, emitters::GetPointerType(emitters::GetVariableType<ValueType>()) },
+                                                                     { "size", emitters::VariableType::Int32 } };
+                std::string thunkName = "SinkCallbackThunk_";
+                thunkName += utilities::TypeName<ValueType>::GetName();
+                module.DeclareFunction(thunkName, emitters::VariableType::Void, parameters);
+                module.IncludeInCallbackInterface(thunkName, "SinkNode");
+
+                emitters::LLVMFunction callbackFunction = module.GetFunction(thunkName);
+
+                // Invoke the callback
+                function.Call(callbackFunction, { function.Literal(index), globalContext, buffer, function.Literal(size) });
+            }
+            else
+            {
+                std::string prefixedName(compiler.GetNamespacePrefix() + "_" + name);
+
+                // Callback signature: void SinkFunction(void* context, ValueType* array)
+                const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer },
+                                                                     { inputName, emitters::GetPointerType(emitters::GetVariableType<ValueType>()) },
+                                                                     { "size", emitters::VariableType::Int32 } };
+                module.DeclareFunction(prefixedName, emitters::VariableType::Void, parameters);
+
+                // Tag the sink function as a callback that is emitted in headers
+                module.IncludeInCallbackInterface(prefixedName, "SinkNode");
+
+                emitters::LLVMFunction pSinkFunction = module.GetFunction(prefixedName);
+                function.Call(pSinkFunction, { globalContext, buffer, function.Literal(size) });
+            }
         });
-
-        // Tag the sink function as a callback that is emitted in headers
-        module.IncludeInCallbackInterface(prefixedName, "SinkNode");
 
         // Set output values as well, useful when user code is in a non-event-driven mode
         if (!IsScalar(input) && !function.GetCompilerOptions().unrollLoops)

@@ -32,6 +32,8 @@
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Target/TargetMachine.h>
 
+#include <utilities/include/CallbackRegistry.h>
+
 #include <initializer_list>
 #include <iosfwd>
 #include <memory>
@@ -344,14 +346,14 @@ namespace emitters
         /// <param name="name"> The function name. </param>
         ///
         /// <returns> True if the function name exists, false if not. </returns>
-        bool HasFunction(const std::string& name);
+        bool HasFunction(const std::string& name) const;
 
         /// <summary> Get an emitted or declared function with the given name. </summary>
         ///
         /// <param name="name"> The function name. </param>
         ///
         /// <returns> Pointer to an llvm::Function that represents the requested function, or nullptr if it doesn't exist. </returns>
-        LLVMFunction GetFunction(const std::string& name);
+        LLVMFunction GetFunction(const std::string& name) const;
 
         /// <summary> Get an LLVM intrinsic function with the given id and signature. </summary>
         ///
@@ -419,6 +421,16 @@ namespace emitters
         /// <returns> Pointer to FunctionDeclaration. </returns>
         FunctionDeclaration& GetFunctionDeclaration(const std::string& name) override;
 
+        /// <summary> Get list of all functions defined in this module.</summary>
+        ///
+        /// <returns> List of names. </returns>
+        std::vector<std::string> GetFunctionNames() const;
+
+        /// <summary> Get list of all callback functions defined in this module.</summary>
+        ///
+        /// <returns> List of names. </returns>
+        std::vector<std::string> GetCallbackFunctionNames() const;
+
         //
         // Code annotation
         //
@@ -439,7 +451,7 @@ namespace emitters
         /// <param name="tag"> The metadata tag. </param>
         ///
         /// <returns> `true` if the module has the metadata associated with it. </returns>
-        bool HasMetadata(const std::string& tag) override;
+        bool HasMetadata(const std::string& tag) const override;
 
         /// <summary> Indicates if a given function has the associated metadata. </summary>
         ///
@@ -447,7 +459,7 @@ namespace emitters
         /// <param name="tag"> The metadata tag. </param>
         ///
         /// <returns> `true` if the function has the metadata associated with it. </returns>
-        bool HasFunctionMetadata(const std::string& functionName, const std::string& tag) override;
+        bool HasFunctionMetadata(const std::string& functionName, const std::string& tag) const override;
 
         /// <summary> Gets the metadata associated with the module. </summary>
         ///
@@ -648,6 +660,15 @@ namespace emitters
         /// <param name="forData"> Optional global constant that this function is for. If the data is optimized away, then the finalization function will be also. </param>
         void AddFinalizationFunction(IRFunctionEmitter& function, int priority = 65536, llvm::Constant* forData = nullptr);
 
+
+        /// <summary> Return the typed CallbackRegistry object that is used to manage any std::functions defined
+        /// on any SourceNodes or SinkNodes in the graph. </summary>
+        template <typename ElementType>
+        ell::utilities::CallbackRegistry<ElementType>& GetCallbackRegistry() const;
+
+        /// <summary> Returns true if the CallbackRegistry objects contain some functions. </summary>
+        bool HasCallbackFunctions() const;
+
     private:
         friend class IRFunctionEmitter;
 
@@ -761,6 +782,12 @@ namespace emitters
         std::vector<std::pair<std::string, std::string>> _preprocessorDefinitions;
         std::vector<std::string> _resetFunctions;
         std::map<std::string, FunctionDeclaration> _functions;
+
+        ell::utilities::CallbackRegistry<float> _floatCallbacks;
+        ell::utilities::CallbackRegistry<double> _doubleCallbacks;
+        ell::utilities::CallbackRegistry<int> _intCallbacks;
+        ell::utilities::CallbackRegistry<int64_t> _int64Callbacks;
+        ell::utilities::CallbackRegistry<bool> _boolCallbacks;
     };
 
     //

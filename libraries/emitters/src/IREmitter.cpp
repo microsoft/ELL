@@ -59,13 +59,16 @@ namespace emitters
                 }
                 if (paramType != argType)
                 {
-                    llvm::raw_os_ostream out(Log());
+                    std::stringstream buffer;
+                    llvm::raw_os_ostream out(buffer);
                     out << "Wanted ";
                     paramType->print(out);
                     out << ", got ";
                     argType->print(out);
                     out.flush();
-                    throw EmitterException(EmitterError::badFunctionArguments, "mismatched types for function.");
+                    std::string s = buffer.str();
+                    s += ", mismatched types for function " + std::string(f->getName());
+                    throw EmitterException(EmitterError::badFunctionArguments, s);
                 }
             }
         }
@@ -87,7 +90,9 @@ namespace emitters
         case VariableType::Void:
             return GetBaseVariableType(type);
         case VariableType::VoidPointer:
-            return GetBaseVariableType(VariableType::Void)->getPointerTo();
+            // We use BytePointer to avoid LLVM Assertion failed: isValidElementType(EltTy) && "Invalid type for pointer element!", 
+            // file ~\llvm-8\lib\ir\type.cpp, line 632
+            return GetBaseVariableType(VariableType::Byte)->getPointerTo();
         case VariableType::Boolean:
             return GetBaseVariableType(type);
         case VariableType::Byte:

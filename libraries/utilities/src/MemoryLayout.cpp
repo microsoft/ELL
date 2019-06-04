@@ -331,10 +331,10 @@ namespace utilities
     {
         const auto numDim = NumDimensions();
         std::vector<int> result(numDim);
-        int offset = index;
+        int offset = static_cast<int>(index);
         for(int d = 0; d < numDim; ++d)
         {
-            const int thisExtent = GetCumulativeIncrement(d);
+            const int thisExtent = static_cast<int>(GetCumulativeIncrement(d));
             const int x = offset / thisExtent;
             result[d] = x - GetOffset(d);
             offset = (offset % thisExtent);

@@ -69,7 +69,7 @@ def test_voice_activity_node(testing):
     compiler_settings = ell.model.MapCompilerOptions()
     compiler_settings.useBlas = False  # not resolvable on our Linux test machines...
     optimizer_options = ell.model.ModelOptimizerOptions()
-    compiled_map = map.CompileFloat("host", "vadtest", "predict", compiler_settings, optimizer_options)
+    compiled_map = map.Compile("host", "vadtest", "predict", compiler_settings, optimizer_options)
 
     line = 1
     errors = 0
@@ -81,7 +81,7 @@ def test_voice_activity_node(testing):
         if len(data) < size:
             data.resize(size)
 
-        value = compiled_map.Compute(data, dtype=np.float)[0]
+        value = compiled_map.Compute(data)[0]
         if value != expected:
             print("### error on line {}, signam={}, expected={}".format(line, value, expected))
             errors += 1
@@ -168,7 +168,7 @@ def test_gru_node_with_vad_reset(testing):
     compiler_settings = ell.model.MapCompilerOptions()
     compiler_settings.useBlas = False  # not resolvable on our Linux test machines...
     optimizer_options = ell.model.ModelOptimizerOptions()
-    compiled_map = map.CompileFloat("host", "gruvadtest", "predict", compiler_settings, optimizer_options)
+    compiled_map = map.Compile("host", "gruvadtest", "predict", compiler_settings, optimizer_options)
 
     last_signal = 0
     was_reset = False
@@ -179,7 +179,7 @@ def test_gru_node_with_vad_reset(testing):
         # watch out for AutoDataVector compression
         if len(data) < input_size:
             data.resize(input_size)
-        value = compiled_map.Compute(list(data), dtype=np.float32)
+        value = np.array(compiled_map.Compute(data))
         total = np.sum(value)
 
         if was_reset and total > 0.1:
@@ -198,15 +198,15 @@ def hamming_callback(testing, map, iteration):
     size = map.GetInputShape().Size()
     expected = np.hamming(size)
     input = np.ones(size)
-    output = map.ComputeDouble(input)
+    output = map.Compute(input)
     testing.ProcessTest("test_hamming_node compute iteration {}".format(iteration), np.allclose(output, expected))
 
     compiler_settings = ell.model.MapCompilerOptions()
     compiler_settings.useBlas = False  # not resolvable on our Linux test machines...
     optimizer_options = ell.model.ModelOptimizerOptions()
-    compiled_map = map.CompileFloat("host", "hammingtest", "predict", compiler_settings, optimizer_options)
+    compiled_map = map.Compile("host", "hammingtest", "predict", compiler_settings, optimizer_options)
 
-    compiled_output = compiled_map.ComputeDouble(input)
+    compiled_output = compiled_map.Compute(input)
     testing.ProcessTest("test_hamming_node compiled iteration {}".format(iteration),
                         np.allclose(compiled_output, expected))
 
@@ -247,15 +247,15 @@ def mel_filterbank_callback(testing, map, iteration):
     chopped = input[0:fbanks.shape[1]]
     expected = np.dot(chopped, fbanks.T)
 
-    output = map.ComputeDouble(input)
+    output = map.Compute(input)
     testing.ProcessTest("test_mel_filterbank compute iteration {}".format(iteration), np.allclose(output, expected))
 
     compiler_settings = ell.model.MapCompilerOptions()
     compiler_settings.useBlas = False  # not resolvable on our Linux test machines...
     optimizer_options = ell.model.ModelOptimizerOptions()
-    compiled_map = map.CompileFloat("host", "hammingtest", "predict", compiler_settings, optimizer_options)
+    compiled_map = map.Compile("host", "hammingtest", "predict", compiler_settings, optimizer_options)
 
-    compiled_output = compiled_map.ComputeDouble(input)
+    compiled_output = compiled_map.Compute(input)
     testing.ProcessTest("test_mel_filterbank compiled iteration {}".format(iteration),
                         np.allclose(compiled_output, expected))
 
@@ -296,7 +296,7 @@ def fftnode_callback(testing, map, iteration):
 
     expected = np.absolute(np.fft.rfft(signal, n=fftSize))
 
-    output = map.ComputeDouble(signal)
+    output = map.Compute(signal)
     expected = expected[0:len(output)]  # ell returns size/2, numpy returns (size/2)+1
     filename = "ffttest_{}_{}_{}.npz".format(inputSize, fftSize, iteration)
     np.savez(filename, output=np.array(output), expected=np.array(expected))
@@ -305,9 +305,9 @@ def fftnode_callback(testing, map, iteration):
     compiler_settings = ell.model.MapCompilerOptions()
     compiler_settings.useBlas = False  # not resolvable on our Linux test machines...
     optimizer_options = ell.model.ModelOptimizerOptions()
-    compiled_map = map.CompileFloat("host", "ffttest", "predict", compiler_settings, optimizer_options)
+    compiled_map = map.Compile("host", "ffttest", "predict", compiler_settings, optimizer_options)
 
-    compiled_output = compiled_map.ComputeDouble(signal)
+    compiled_output = compiled_map.Compute(signal)
 
     testing.ProcessTest("test_fftnode compiled iteration {}".format(iteration), np.allclose(compiled_output, output))
 

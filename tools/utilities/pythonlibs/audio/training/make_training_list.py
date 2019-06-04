@@ -76,12 +76,13 @@ def make_training_list(wav_files, max_files_per_directory, bad_list=None):
 
     bad = []
     if bad_list:
-        if os.path.isfile(bad_list):
+        if not os.path.isfile(bad_list):
+            # try and resolve file relative to wav_file directory
             bad_list = os.path.join(wav_files, bad_list)
-            if not os.path.isfile(bad_list):
-                print("Bad list {} not found".format(bad_list))
-            else:
-                bad = load_list_file(bad_list)
+        if not os.path.isfile(bad_list):
+            print("Bad list {} not found".format(bad_list))
+        else:
+            bad = load_list_file(bad_list)
 
     testing_list = os.path.join(wav_files, "testing_list.txt")
     if not os.path.isfile(testing_list):

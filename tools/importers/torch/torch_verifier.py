@@ -265,8 +265,7 @@ class TorchModelVerifier:
                 self._logger.info("Getting compiled ELL results")
                 compiler_options = ell.model.MapCompilerOptions()
                 compiler_options.useBlas = True
-                compiled_ell_map = ell_map.Compile("host", "model", "predict", compilerOptions=compiler_options,
-                                                   dtype=np.float32)
+                compiled_ell_map = ell_map.Compile("host", "model", "predict", compilerOptions=compiler_options)
 
             input_index = 0
             for test_input in self.input_tensors:
@@ -278,12 +277,11 @@ class TorchModelVerifier:
                 test_input = test_input.detach().cpu().numpy()  # convert to numpy
                 order = self.get_order(test_input.shape)
                 ell_input_tensor = memory_shapes.get_tensor_in_ell_order(test_input, order)
-                ell_flat_input = ell_input_tensor.ravel().astype(np.float32)
                 if verify_compiled:
-                    ell_out_compiled = np.array(compiled_ell_map.Compute(ell_flat_input, dtype=np.float32))
+                    ell_out_compiled = np.array(compiled_ell_map.Compute(ell_input_tensor))
 
                 # must come after the compiled Compute so that map contains valid outputs for layer by layer test
-                ell_out = np.array(ell_map.Compute(ell_input_tensor, dtype=np.float32))
+                ell_out = np.array(ell_map.Compute(ell_input_tensor))
                 ell_nodes = get_nodes(ell_map)
 
                 if not arg_max_only:

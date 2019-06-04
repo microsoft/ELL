@@ -197,7 +197,7 @@ camera to use by changing this argument. Read the list of categories from
 
 Create a model wrapper to interact with the model
 ```python
-    model_wrapper = model.model.ModelWrapper()
+    model_wrapper = model.ModelWrapper()
 ```
 
 Get the model input shape, which you will use to prepare the input data.
@@ -240,13 +240,13 @@ that it can be provided as input to the model.
 
 Wrap the input_data `numpy` array in a FloatVector
 ```python
-        input_data = model.model.FloatVector(input_data) 
+        input_data = model.FloatVector(input_data)
 ```
 
 Send the processed image to the model to get a vector of predictions.
 
 ```python
-        predictions = model_wrapper.Predict(image)
+        predictions = model_wrapper.Predict(input_data)
 ```
 
 Next, reshape the predictions so that it is no longer a flat array. The

@@ -36,7 +36,7 @@ def get_image_from_camera(camera):
 
 def main():
     camera = cv2.VideoCapture(0)
-    
+
     # request a specific resolution (sometimes the camera has very small default resolution)
     helpers.set_camera_resolution(camera, 1280, 720)
 
@@ -44,7 +44,7 @@ def main():
         categories = categories_file.read().splitlines()
 
     # Get the model wrapper in order to interact with the model
-    model_wrapper = model.model.ModelWrapper()
+    model_wrapper = model.ModelWrapper()
 
     input_shape = model_wrapper.GetInputShape()
     output_shape = model_wrapper.GetOutputShape()
@@ -65,11 +65,11 @@ def main():
             ravel=False, preprocessing_metadata=preprocessing_metadata)
 
         # Wrap the resulting numpy array in a FloatVector
-        image = model.model.FloatVector(image) 
+        input_data = model.FloatVector(image)
 
         # Get the predictions by running the model. `predictions` is returned
         # as a flat array
-        predictions = model_wrapper.Predict(image)
+        predictions = model_wrapper.Predict(input_data)
 
         # Reshape the output of the model into a tensor that matches the
         # expected shape

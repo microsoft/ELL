@@ -36,7 +36,17 @@ set(LLVMSetup_included true)
 if(WIN32)
     set(LLVM_PACKAGE_NAME LLVMNativeWindowsLibs.x64)
     set(LLVM_PACKAGE_VERSION 8.0.0-a)
-    set(LLVM_PACKAGE_DIR ${PACKAGE_ROOT}/${LLVM_PACKAGE_NAME}.${LLVM_PACKAGE_VERSION})
+    if(DEFINED ENV{LLVM_PACKAGE_DIR})
+        set(LLVM_PACKAGE_DIR $ENV{LLVM_PACKAGE_DIR})
+    else()
+        set(LLVM_PACKAGE_DIR ${PACKAGE_ROOT}/${LLVM_PACKAGE_NAME}.${LLVM_PACKAGE_VERSION})
+    endif()
+
+    if(DEFINED ENV{LLVM_MD_OPTION})
+        set(LLVM_MD_OPTION $ENV{LLVM_MD_OPTION})
+    else()
+        set(LLVM_MD_OPTION "/MD")
+    endif()
 
     set(LLVM_COMPILE_OPTIONS /wd4141 /wd4146 /wd4180 /wd4244 /wd4258 /wd4267 /wd4291 /wd4345 /wd4351 /wd4355 /wd4456 /wd4457 /wd4458 /wd4459 /wd4503 /wd4624 /wd4722 /wd4800 /wd4100 /wd4127 /wd4512 /wd4505 /wd4610 /wd4510 /wd4702 /wd4245 /wd4706 /wd4310 /wd4701 /wd4703 /wd4389 /wd4611 /wd4805 /wd4204 /wd4577 /wd4091 /wd4592 /wd4319 /wd4324 /wd4996)
 

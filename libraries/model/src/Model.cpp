@@ -10,6 +10,7 @@
 #include "InputPort.h"
 #include "ModelTransformer.h"
 #include "Node.h"
+#include "OutputNode.h"
 #include "Port.h"
 #include "SliceNode.h"
 #include "SpliceNode.h"
@@ -496,6 +497,19 @@ namespace model
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
+    }
+
+    void Model::Step()
+    {
+        auto outputNodes = GetNodesByType<ell::model::OutputNodeBase>();
+        std::vector<const ell::model::OutputPortBase*> ports;
+        for (auto node : outputNodes)
+        {
+            ports.push_back(&(node->GetOutputPort()));
+        }
+        VisitSubmodel(ports, [](const Node& node) {
+            node.Compute();
+        });
     }
 
     void swap(Model& a, Model& b)

@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph GraphDirection="TopToBottom" Layout="Sugiyama" ZoomLevel="-1" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="@1" Bounds="221.666666666667,573.211268119905,156.666666666667,25.96" Label="(IRCompiledMap*)context" UseManualLocation="True" />
+    <Node Id="CallbackRegistry&lt;float&gt;" Bounds="562.74,481.895,146.52,25.96" UseManualLocation="True" />
+    <Node Id="ClassFoo:CallbackBase" Bounds="-120.398333333433,464.840037841797,145.496666666667,25.96" Label="class Foo : CallbackBase" UseManualLocation="True" />
+    <Node Id="IRCompiledMap" Bounds="346.428333333334,415.975,105.143333333333,25.96" UseManualLocation="True" />
+    <Node Id="IRModuleEmitter" Bounds="485.430833333283,292.467500000001,109.113333333333,25.96" UseManualLocation="True" />
+    <Node Id="MapInterface" Bounds="-75.2049999997995,306.527415771484,120.853333333333,25.96" Label="SinkNode Interface" UseManualLocation="True" />
+    <Node Id="Python" Bounds="-119.601697184245,378.879937841897,57.2033333333334,25.96" UseManualLocation="True" />
+    <Node Id="RegisterCallback" Bounds="5.64833333333354,362.487515771284,106.703333333333,25.96" Label="RegisterCallback" UseManualLocation="True" />
+    <Node Id="SinkCallbackThunk" Bounds="195.178318074544,485.894984741211,118.67,25.96" UseManualLocation="True" />
+    <Node Id="SinkNode" Bounds="93.794984741211,486.407451171875,71.3833333333332,25.96" UseManualLocation="True" />
+    <Node Id="SinkNode::Compile" Bounds="241.738333333333,280.055,120.523333333333,25.9600000000001" UseManualLocation="True" />
+    <Node Id="Std::function" Bounds="54.45,581.92,85.0999999999999,25.96" Label="std::function" UseManualLocation="True" />
+  </Nodes>
+  <Links>
+    <Link Source="@1" Target="CallbackRegistry&lt;float&gt;" Bounds="347.760164643099,510.215354656994,231.794699447689,62.9959134629108" Label="GetCallbackByIndex" LabelBounds="366.645630401701,521.750772056741,104.113333333333,15.96" />
+    <Link Source="ClassFoo:CallbackBase" Target="RegisterCallback" Bounds="-34.1250084122263,394.679304779012,73.1065735341438,70.1607330627854" />
+    <Link Source="IRCompiledMap" Target="CallbackRegistry&lt;float&gt;" Bounds="445.666566830234,441.935001831055,134.996023312882,37.5482599561186" Label="owns" LabelBounds="506.237023691647,440.746355087871,27.5866666666666,15.96" />
+    <Link Source="IRCompiledMap" Target="SinkCallbackThunk" Bounds="289.437215849238,441.935001831055,82.7401641595318,40.0396132496329" Label="implements" LabelBounds="331.678491186898,463.755092407752,62.0433333333334,15.96" />
+    <Link Source="IRModuleEmitter" Target="CallbackRegistry&lt;float&gt;" Bounds="546.566493282343,318.427500000001,78.7856197236002,155.439791487404" Label="contains" LabelBounds="587.743238369165,379.283197141111,44.3266666666667,15.96" />
+    <Link Source="MapInterface" Target="RegisterCallback" Bounds="2.33462333898682,332.487415771484,32.3817460245391,24.5612182308209" />
+    <Link Source="Python" Target="ClassFoo:CallbackBase" Bounds="-84.4541633522594,404.839937841897,26.2057275636032,51.9641378575084" />
+    <Link Source="Python" Target="MapInterface" Bounds="-77.3259027727118,338.683545588987,42.3459632164138,40.1963922529098" />
+    <Link Source="RegisterCallback" Target="SinkNode" Bounds="66.3831279230145,388.447515771284,51.2706082163735,90.1369313369305" Label="SetSinkFunction" LabelBounds="93.7568773786814,416.567139807421,84.5266666666666,15.96" />
+    <Link Source="RegisterCallback" Target="Std::function" Bounds="61.2477984594382,388.447515771284,31.9686943837865,184.604474373234" Label="wraps" LabelBounds="42.1317090909424,473.111021557309,31.1,15.96" />
+    <Link Source="SinkCallbackThunk" Target="@1" Bounds="261.275139679247,511.854984741211,27.8049493662612,53.3744106060191" />
+    <Link Source="SinkCallbackThunk" Target="Std::function" Bounds="125.97615770765,511.854984741211,107.24559521486,65.3802487486873" Label="call" LabelBounds="180.640014539547,546.252796350136,17.4633333333333,15.96" />
+    <Link Source="SinkNode" Target="SinkNode::Compile" Bounds="140.338101206556,312.919882885743,145.03787657563,173.487568286132" />
+    <Link Source="SinkNode" Target="Std::function" Bounds="104.312998010686,512.367451171875,20.7587703221618,61.0319309033657" />
+    <Link Source="SinkNode::Compile" Target="CallbackRegistry&lt;float&gt;" Bounds="323.478993261989,306.015,283.339267002399,171.225142669952" Label="Register(std::function)" LabelBounds="397.561810776056,332.487260656014,115.026666666667,15.96" />
+    <Link Source="SinkNode::Compile" Target="IRModuleEmitter" Bounds="362.261666666666,296.178013551133,114.181382913495,5.95525569794262" Label="GetCallbackRegistry" LabelBounds="377.48981486526,279.009535969678,104.81,15.96" />
+    <Link Source="SinkNode::Compile" Target="SinkCallbackThunk" Bounds="259.530900827739,306.015,39.4746511685482,171.110325352989" Label="call" LabelBounds="283.269570865533,384.03974817638,17.4633333333336,15.96" />
+    <Link Source="Std::function" Target="ClassFoo:CallbackBase" Bounds="-24.6178428154802,496.46230601736,105.581307054867,85.4576939826402" Label="run" LabelBounds="9.16119556182833,540.745735547348,17.7533333333331,15.96" />
+  </Links>
+  <Properties>
+    <Property Id="Bounds" DataType="System.Windows.Rect" />
+    <Property Id="GraphDirection" DataType="Microsoft.VisualStudio.Diagrams.Layout.LayoutOrientation" />
+    <Property Id="Label" Label="Label" Description="Displayable label of an Annotatable object" DataType="System.String" />
+    <Property Id="LabelBounds" DataType="System.Windows.Rect" />
+    <Property Id="Layout" DataType="System.String" />
+    <Property Id="UseManualLocation" DataType="System.Boolean" />
+    <Property Id="ZoomLevel" DataType="System.String" />
+  </Properties>
+  <IdentifierAliases>
+    <Alias n="1" Id="(IRCompiledMap*)" />
+  </IdentifierAliases>
+</DirectedGraph>

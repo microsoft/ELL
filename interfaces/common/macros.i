@@ -109,7 +109,6 @@ import numpy as np
 %typemap(in) (BUFFER_TYPE* buffer, size_t length)
              (Py_buffer view_ = {})
 {
-    static const char* data_type = "BUFFER_TYPE";
     int res = PyObject_GetBuffer($input, &view_, PyBUF_ANY_CONTIGUOUS | PyBUF_WRITABLE | PyBUF_FORMAT);
     if (res < 0)
     {
@@ -121,12 +120,53 @@ import numpy as np
         PyErr_Clear();
         SWIG_exception_fail(res, "Expected a 1-dimensional array");
     }
-
-    if (view_.format == nullptr || view_.format[0] != data_type[0])
+    if (view_.format == nullptr) 
     {
         PyErr_Clear();
-        SWIG_exception_fail(res, "Expected an array of BUFFER_TYPE");
+        SWIG_exception_fail(res, "Expected an array with type information");
     }
+    else if (typeid(BUFFER_TYPE) == typeid(float))
+    {
+        // See struct format field values defined in https://docs.python.org/3/library/struct.html#module-struct
+        if (view_.format[0] != 'f')
+        {
+            PyErr_Clear();
+            SWIG_exception_fail(res, "Expected an array of BUFFER_TYPE");
+        }
+    }
+    else if (typeid(BUFFER_TYPE) == typeid(double))
+    {
+        if (view_.format[0] != 'd')
+        {
+            PyErr_Clear();
+            SWIG_exception_fail(res, "Expected an array of BUFFER_TYPE");
+        }
+    }
+    else if (typeid(BUFFER_TYPE) == typeid(int))
+    {
+        if (strchr("iIlL", view_.format[0]) == nullptr)
+        {
+            PyErr_Clear();
+            SWIG_exception_fail(res, "Expected an array of BUFFER_TYPE");
+        }
+    }
+    else if (typeid(BUFFER_TYPE) == typeid(int64_t))
+    {
+        if (strchr("qQ", view_.format[0]) == nullptr)
+        {
+            PyErr_Clear();
+            SWIG_exception_fail(res, "Expected an array of BUFFER_TYPE");
+        }
+    }
+    else if (typeid(BUFFER_TYPE) == typeid(bool))
+    {
+        if (view_.format[0] != '?')
+        {
+            PyErr_Clear();
+            SWIG_exception_fail(res, "Expected an array of BUFFER_TYPE");
+        }
+    }
+
     $1 = ($1_ltype) view_.buf;
     $2 = ($2_ltype) view_.shape[0];
 }
@@ -168,6 +208,19 @@ void copy_from_buffer(
     }
 }
 
+template<typename ElementType, typename InputElementType>
+void copy_from_vector(
+    std::vector<ElementType>& target,
+    const std::vector<InputElementType>& source)
+{
+    auto length = source.size();
+    target.resize(length);
+    for (size_t i = 0; i < length; i++)
+    {
+        target[i] = static_cast<ElementType>(source[i]);
+    }
+}
+
 %}
 
 %define TYPEMAP_VECTOR_TO_ARRAY(ELEMENT_TYPE)
@@ -176,6 +229,12 @@ TYPEMAP_COPY_TO_VECTOR(ELEMENT_TYPE)
 
 void copy_to_buffer_ ## ELEMENT_TYPE(const std::vector<ELEMENT_TYPE>& field, ELEMENT_TYPE* buffer, size_t length);
 void copy_from_buffer_ ## ELEMENT_TYPE(std::vector<ELEMENT_TYPE>& field, ELEMENT_TYPE* buffer, size_t length);
+void copy_from_vector_float_to_## ELEMENT_TYPE(std::vector<ELEMENT_TYPE>& target, std::vector<float>& source);
+void copy_from_vector_double_to_## ELEMENT_TYPE(std::vector<ELEMENT_TYPE>& target, std::vector<double>& source);
+void copy_from_vector_int_to_## ELEMENT_TYPE(std::vector<ELEMENT_TYPE>& target, std::vector<int>& source);
+void copy_from_vector_int64_to_## ELEMENT_TYPE(std::vector<ELEMENT_TYPE>& target, std::vector<int64_t>& source);
+void copy_from_vector_int8_to_## ELEMENT_TYPE(std::vector<ELEMENT_TYPE>& target, std::vector<int8_t>& source);
+
 %{
 void copy_to_buffer_## ELEMENT_TYPE(const std::vector<ELEMENT_TYPE>& field, ELEMENT_TYPE* buffer, size_t length)
 {
@@ -184,6 +243,26 @@ void copy_to_buffer_## ELEMENT_TYPE(const std::vector<ELEMENT_TYPE>& field, ELEM
 void copy_from_buffer_## ELEMENT_TYPE(std::vector<ELEMENT_TYPE>& field, ELEMENT_TYPE* buffer, size_t length)
 {
     copy_from_buffer<std::vector<ELEMENT_TYPE>>(field, buffer, length);
+}
+void copy_from_vector_float_to_## ELEMENT_TYPE(std::vector<ELEMENT_TYPE>& target, std::vector<float>& source)
+{
+    copy_from_vector(target, source);
+}
+void copy_from_vector_double_to_## ELEMENT_TYPE(std::vector<ELEMENT_TYPE>& target, std::vector<double>& source)
+{
+    copy_from_vector(target, source);
+}
+void copy_from_vector_int_to_## ELEMENT_TYPE(std::vector<ELEMENT_TYPE>& target, std::vector<int>& source)
+{
+    copy_from_vector(target, source);
+}
+void copy_from_vector_int64_to_## ELEMENT_TYPE(std::vector<ELEMENT_TYPE>& target, std::vector<int64_t>& source)
+{
+    copy_from_vector(target, source);
+}
+void copy_from_vector_int8_to_## ELEMENT_TYPE(std::vector<ELEMENT_TYPE>& target, std::vector<int8_t>& source)
+{
+    copy_from_vector(target, source);
 }
 %}
 
@@ -196,15 +275,32 @@ def __array__(self):
     if type_name == "float":
         a = np.ndarray(shape=(s,), dtype=np.float32)
     elif type_name == "double":
-        a = np.ndarray(shape=(s,), dtype=np.float)
+        a = np.ndarray(shape=(s,), dtype=np.float64)
+    elif type_name == "int":
+        a = np.ndarray(shape=(s,), dtype=np.int32)
+    elif type_name == "int64" or type_name == "int64_t":
+        a = np.ndarray(shape=(s,), dtype=np.int64)
+    elif type_name == "bool":
+        a = np.ndarray(shape=(s,), dtype=np.bool)
     else:
         raise Exception("Expecting float or double type")
     copy_to_buffer_## ELEMENT_TYPE(self, a)
     return a
 
 def copy_from(self, a):
-    """Enable buffer copy from given numpy array """
-    copy_from_buffer_## ELEMENT_TYPE(self, a)
+    """Enable buffer copy from given numpy array or vector """
+    if isinstance(a, FloatVector):
+        copy_from_vector_float_to_## ELEMENT_TYPE(self, a)
+    elif isinstance(a, DoubleVector):
+        copy_from_vector_double_to_## ELEMENT_TYPE(self, a)
+    elif isinstance(a, IntVector):
+        copy_from_vector_int_to_## ELEMENT_TYPE(self, a)
+    #elif isinstance(a, Int64Vector):
+    #    copy_from_vector_int64_to_## ELEMENT_TYPE(self, a)
+    elif isinstance(a, Int8Vector):
+        copy_from_vector_int8_to_## ELEMENT_TYPE(self, a)
+    else:
+        copy_from_buffer_## ELEMENT_TYPE(self, a)
 %}
 }
 %enddef

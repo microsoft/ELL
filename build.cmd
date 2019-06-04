@@ -71,19 +71,17 @@ cmake -G "!CMakeGenerator!" -Thost=x64 "!STRICT!" "!NOPYTHON!" -DCNTK=%CNTK% -DO
 goto :buildit
 
 :buildit
-for /F "tokens=* USEBACKQ" %%i in (
-  `powershell -nologo -noprofile -command "$proc = $env:NUMBER_OF_PROCESSORS - 1; if ($proc -lt 1) { $proc = 1; }; echo $proc"`
-) do (
-  set procs=%%i
-)
-echo Building with !procs! processes
+set procs=%ELL_BUILD_PROCS%
+if "%procs%"=="" set /a procs=%NUMBER_OF_PROCESSORS% / 2
+if "%procs%"=="0" set procs=1
+echo Building with %procs% processes
 
-cmake --build . --config Release -- /m:!procs! /verbosity:minimal
+cmake --build . --config Release -- /m:%procs% /verbosity:minimal
 if ERRORLEVEL 1 goto :builderror
 
 if NOT "!NOPYTHON!" == "" goto :eof
 
-cmake --build . --target _ELL_python --config Release -- /m:!procs! /verbosity:minimal
+cmake --build . --target _ELL_python --config Release -- /m:%procs% /verbosity:minimal
 if ERRORLEVEL 1 goto :builderror
 
 goto :eof

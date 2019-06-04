@@ -8,7 +8,7 @@
 #pragma once
 
 #include "MathInterface.h"
-#include "ModelInterface.h"
+#include "Ports.h"
 #include "NeuralLayersInterface.h"
 
 #ifndef SWIG

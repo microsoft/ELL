@@ -42,7 +42,8 @@ set(include
   include/AnyIterator.h
   include/Archiver.h
   include/ArchiveVersion.h
-  include/Boolean.h
+  include/Boolean.h  
+  include/CallbackRegistry.h
   include/CommandLineParser.h
   include/CompressedIntegerList.h
   include/CStringParser.h

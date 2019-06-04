@@ -167,6 +167,7 @@ namespace model
         void RefineAndOptimize(Map& map);
         bool TryMergeNodeIntoRegion(emitters::IRBlockRegion* pDestination, const Node& src);
 
+        void EmitPredictDispatchFunction(const Map& map);
         void EmitGetInputSizeFunction(const Map& map);
         void EmitGetOutputSizeFunction(const Map& map);
         void EmitGetSinkOutputSizeFunction(const Map& map);

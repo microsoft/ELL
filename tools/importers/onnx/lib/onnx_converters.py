@@ -1629,11 +1629,7 @@ class OnnxConverter:
             if isinstance(path, onnx.ModelProto):
                 onnx_model = path
             else:
-                onnx_model = ModelProto()
-
-            with open(path, 'rb') as f:
-                content = f.read()
-                onnx_model.ParseFromString(content)
+                onnx_model = onnx.load(path)
 
             end = time.time()
             seconds = end - start

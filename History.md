@@ -1,3 +1,7 @@
+## 3.0.0 *
+- Improve Python API so Map and CompiledMap have a way of calling compute on models with multiple inputs and outputs (see ComputeList)
+- Improve Python Callback handling so Python apps can handle models with any number of and type of callbacks.
+
 ## 2.5.4
 - Add support for ONNX GlobalAveragePooling
 - Publish 13 new audio models trained using Azure ML

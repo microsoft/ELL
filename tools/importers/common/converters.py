@@ -934,7 +934,7 @@ class ConvertInput(ConvertBase):
                 "{}LagNotification".format(function_prefix))
             source_node = builder.AddSourceNode(
                 model, ell.nodes.PortElements(clock_node.GetOutputPort("output")),
-                ell.nodes.PortType.smallReal, ell_shape,
+                ell.nodes.PortType.smallReal, ell.model.PortMemoryLayout(ell_shape),
                 "{}InputCallback".format(function_prefix))
 
             original_input_node = input_node

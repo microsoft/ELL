@@ -6,6 +6,7 @@ include (CommonInterfaces)
 set (INTERFACE_SRC src/ModelBuilderInterface.cpp
                    src/ModelInterface.cpp
                    src/NeuralNetworkPredictorInterface.cpp
+                   src/Ports.cpp
                    src/TrainerInterface.cpp
                    src/DatasetInterface.cpp)
 

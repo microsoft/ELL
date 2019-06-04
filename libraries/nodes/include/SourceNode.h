@@ -19,6 +19,9 @@
 #include <model/include/InputNodeBase.h>
 #include <model/include/ModelTransformer.h>
 
+#include <utilities/include/TypeName.h>
+
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -94,6 +97,9 @@ namespace nodes
         /// <param name="function"> The source function to set. </param>
         void SetSourceFunction(SourceFunction<ValueType> function) { _source = function; }
 
+        /// <summary> Gets the source function for this node for use in Compute(). </summary>
+        SourceFunction<ValueType> GetSourceFunction() const { return _source; }
+
         /// <summary> Sets the value output by this node </summary>
         ///
         /// <param name="inputValues"> The values for this node to output </param>
@@ -149,7 +155,7 @@ namespace nodes
         model::SourceNodeBase(_input, _output, sourceFunctionName),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, shape),
-        _source(source == nullptr ? [](auto&) { return false; } : source)
+        _source(source)
     {
         _bufferedSample.resize(shape.NumElements());
     }
@@ -159,7 +165,7 @@ namespace nodes
         model::SourceNodeBase(_input, _output, sourceFunctionName),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, layout),
-        _source(source == nullptr ? [](auto&) { return false; } : source)
+        _source(source)
     {
         if (!layout.IsCanonicalOrder())
         {
@@ -202,10 +208,10 @@ namespace nodes
         compiler.EnsurePortEmitted(output);
         auto& module = function.GetModule();
 
-        std::string name = this->GetFriendlyName();
-        if (name.empty())
+        std::string inputName = this->GetFriendlyName();
+        if (inputName.empty())
         {
-            name = "input";
+            inputName = "input";
         }
 
         // Globals
@@ -216,14 +222,8 @@ namespace nodes
         emitters::LLVMValue bufferedSampleTime = function.Load(pBufferedSampleTime);
         UNUSED(bufferedSampleTime);
 
-        // Callback function
-        const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer },
-                                                             { name, emitters::GetPointerType(emitters::GetVariableType<ValueType>()) } };
-        std::string prefixedName(compiler.GetNamespacePrefix() + "_" + GetCallbackName());
-        module.DeclareFunction(prefixedName, emitters::GetVariableType<bool>(), parameters);
-        module.IncludeInCallbackInterface(prefixedName, "SourceNode");
-
-        emitters::LLVMFunction pSamplingFunction = module.GetFunction(prefixedName);
+        auto name = GetCallbackName();
+        auto buffer = function.PointerOffset(pBufferedSample, 0);
 
         // look up our global context object
         auto context = module.GlobalPointer(compiler.GetNamespacePrefix() + "_context", emitters::VariableType::Byte);
@@ -231,9 +231,49 @@ namespace nodes
 
         // Locals
         auto sampleTime = function.ValueAt(pInput, function.Literal(0));
+        int size = static_cast<int>(this->Size());
 
-        // Invoke the callback and optionally interpolate.
-        function.Call(pSamplingFunction, { globalContext, function.PointerOffset(pBufferedSample, 0) });
+        // Callback function
+        auto func = GetSourceFunction();
+        if (func)
+        {
+            // We have a std::function, so we can call these too if we use the CallbackRegistry.  These "thunks" will be defined by the IRCompiledMap.
+            auto& registry = function.GetModule().GetCallbackRegistry<ValueType>();
+            registry.RegisterSourceCallback(name, func);
+            int index = registry.GetSourceCallbackIndex(name);
+
+            // Declare our external CallbackThunk that has some extra parameters.  The index parameter tells IRCompiledMap which registered
+            // std::function to invoke, and the size parameter tells it the size of the input buffer so it can back the conversion to
+            // std::vector and back.
+            const emitters::NamedVariableTypeList parameters = { { "index", emitters::VariableType::Int32 },
+                                                                 { "context", emitters::VariableType::BytePointer },
+                                                                 { inputName, emitters::GetPointerType(emitters::GetVariableType<ValueType>()) },
+                                                                 { "size", emitters::VariableType::Int32 } };
+            std::string thunkName = "SourceCallbackThunk_";
+            thunkName += utilities::TypeName<ValueType>::GetName();
+            module.DeclareFunction(thunkName, emitters::GetVariableType<bool>(), parameters);
+            module.IncludeInCallbackInterface(thunkName, "SourceNode");
+
+            emitters::LLVMFunction callbackFunction = module.GetFunction(thunkName);
+
+            // Invoke the callback
+            function.Call(callbackFunction, { function.Literal(index), globalContext, buffer, function.Literal(size) });
+        }
+        else
+        {
+            const emitters::NamedVariableTypeList parameters = { { "context", emitters::VariableType::BytePointer },
+                                                                 { inputName, emitters::GetPointerType(emitters::GetVariableType<ValueType>()) },
+                                                                 { "size", emitters::VariableType::Int32 } };
+
+            std::string prefixedName(compiler.GetNamespacePrefix() + "_" + name);
+            module.DeclareFunction(prefixedName, emitters::GetVariableType<bool>(), parameters);
+            module.IncludeInCallbackInterface(prefixedName, "SourceNode");
+
+            emitters::LLVMFunction callbackFunction = module.GetFunction(prefixedName);
+
+            // Invoke the callback and optionally interpolate.
+            function.Call(callbackFunction, { globalContext, buffer, function.Literal(size) });
+        }
 
         // TODO: Interpolate if there is a sample, and currentTime > sampleTime
         // Note: currentTime can be retrieved via currentTime = function.ValueAt(pInput, function.Literal(1));
@@ -296,7 +336,7 @@ namespace nodes
         std::string sourceFunctionName;
         archiver["sourceFunctionName"] >> sourceFunctionName;
         SetCallbackName(sourceFunctionName);
-       
+
         if (archiver.HasNextPropertyName("shape"))
         {
             // legacy support, we no longer need this "shape" property because the

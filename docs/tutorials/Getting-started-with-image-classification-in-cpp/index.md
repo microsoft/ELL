@@ -16,7 +16,7 @@ This tutorial guides you through the process of getting started with image class
 ## Before you begin
 
 Complete the following steps before starting the tutorial.
-* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)). 
+* Install ELL on your computer ([Windows](https://github.com/Microsoft/ELL/blob/master/INSTALL-Windows.md), [Ubuntu Linux](https://github.com/Microsoft/ELL/blob/master/INSTALL-Ubuntu.md), [macOS](https://github.com/Microsoft/ELL/blob/master/INSTALL-Mac.md)).
 
 **Note** The **wrap.py** tool, which simplifies the process of compiling ELL models, is written in **Python**. If you prefer not to use it, you can perform the compilation steps manually, as described in the [wrap tool documentation](https://github.com/Microsoft/ELL/blob/master/tools/wrap/README.md).
 
@@ -42,7 +42,7 @@ Download this [compressed ELL model file](https://github.com/Microsoft/ELL-model
 curl --location -o model.ell.zip https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I224x224x3CMCMCMCMCMCMC1AS/d_I224x224x3CMCMCMCMCMCMC1AS.ell.zip
 ```
 
-Unzip the compressed file and rename the **d_I224x224x3CMCMCMCMCMCMC1AS.ell** model file as **model.ell**. 
+Unzip the compressed file and rename the **d_I224x224x3CMCMCMCMCMCMC1AS.ell** model file as **model.ell**.
 
 **Note** On Windows computers, the **unzip** utility is distributed as part of Git. For example, in `\Program Files\Git\usr\bin`. On Linux computers, you can install unzip using the **apt-get install unzip** command.
 
@@ -242,7 +242,7 @@ Next, you'll create a CMake project for the application that you wrote above. Ei
 project(tutorial)
 ```
 
-Set the `OpenCV_DIR` variable to the directory containing `OpenCVConfig.cmake`. For example, on the Raspberry Pi device, if the full file path is **/usr/share/OpenCV/OpenCVConfig.cmake**, then add the following.
+Set the `OpenCV_DIR` variable to the directory containing `OpenCVConfig.cmake`. For example, on the Raspberry Pi device, if the full file path is **/usr/share/OpenCV/OpenCVConfig.cmake**, then add the following.  Note, on Windows, be sure to use forward slashes in the path otherwise you will get an error saying "Invalid escape sequence".
 
 ```cmake
 set(OpenCV_DIR /usr/share/OpenCV)
@@ -323,7 +323,7 @@ The [ELL gallery](/ELL/gallery/) offers different models for image classificatio
 
 ## Troubleshooting
 
-**Found OpenCV Windows Pack but it has no binaries compatible with your configuration**  
+**Found OpenCV Windows Pack but it has no binaries compatible with your configuration**
 
 This means you are missing the full OpenCV C++ SDK.  On Windows you will need to download the OpenCV binaries from [sourceforge](https://sourceforge.net/projects/opencvlibrary/files/opencv-win/3.4.3/) then modify the tutorial CMakeLists.txt file to point to your installed OpenCV build folder.
 

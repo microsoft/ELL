@@ -10,13 +10,17 @@ from ..ell_py import DoubleArgmax, \
 DoubleTensor, \
 DoubleVector, \
 DoubleVectorVector, \
+DoubleCallbackBase, \
 FloatArgmax, \
 FloatTensor, \
 FloatVector, \
 FloatVectorVector, \
+FloatCallbackBase, \
 HingeLoss, \
-Int8Vector, \
+IntCallbackBase, \
+Int8CallbackBase, \
 IntVector, \
+Int8Vector, \
 LogLoss, \
 SquaredLoss, \
 TensorShape

@@ -34,12 +34,15 @@
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Transforms/Utils/ModuleUtils.h>
 
+#include <algorithm>
+
 namespace ell
 {
 namespace emitters
 {
     using namespace utilities::logging;
-    using utilities::logging::Log;
+    using utilities::logging::Log; 
+    using namespace ell::utilities;
 
     //
     // Constructors
@@ -281,6 +284,32 @@ namespace emitters
         return _functions[name];
     }
 
+    std::vector<std::string> IRModuleEmitter::GetFunctionNames() const
+    {
+        std::vector<std::string> names;
+        std::transform(_functions.begin(), _functions.end(), std::back_inserter(names), [](const auto& pair) {
+            return pair.first;
+        });
+        return names;
+    }
+
+    std::vector<std::string> IRModuleEmitter::GetCallbackFunctionNames() const
+    {
+        std::vector<std::string> names;
+        for (auto pair : _functions)
+        {
+            std::string name = pair.first;
+            if (GetFunction(name) != nullptr)
+            {
+                if (HasFunctionMetadata(name, c_callbackFunctionTagName))
+                {
+                    names.push_back(name);
+                }
+            }
+        }
+        return names;
+    }
+
     // Module metadata
     std::vector<std::vector<std::string>> IRModuleEmitter::GetMetadata(const std::string& tag)
     {
@@ -323,13 +352,13 @@ namespace emitters
     }
 
     // Module metadata
-    bool IRModuleEmitter::HasMetadata(const std::string& tag)
+    bool IRModuleEmitter::HasMetadata(const std::string& tag) const
     {
         return (_llvmModule->getNamedMetadata(tag) != nullptr);
     }
 
     // Function metadata
-    bool IRModuleEmitter::HasFunctionMetadata(const std::string& functionName, const std::string& tag)
+    bool IRModuleEmitter::HasFunctionMetadata(const std::string& functionName, const std::string& tag) const
     {
         auto pFunction = GetFunction(functionName);
         if (pFunction == nullptr)
@@ -472,16 +501,26 @@ namespace emitters
 
     LLVMFunction IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType)
     {
+        _functions[name] = FunctionDeclaration(name, returnType);
         return _emitter.DeclareFunction(GetLLVMModule(), name, returnType);
     }
 
     LLVMFunction IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType, const VariableTypeList& arguments)
     {
+        NamedVariableTypeList fake;
+        for (auto t : arguments)
+        {
+            fake.push_back({ "", t });
+        }
+        // record this function definition in our local _functions so that these definitions can be found via GetFunctionNames
+        // and GetCallbackFunctionNames
+        _functions[name] = FunctionDeclaration(name, returnType, fake);
         return _emitter.DeclareFunction(GetLLVMModule(), name, returnType, arguments);
     }
 
     LLVMFunction IRModuleEmitter::DeclareFunction(const std::string& name, VariableType returnType, const NamedVariableTypeList& arguments)
     {
+        _functions[name] = FunctionDeclaration(name, returnType, arguments);
         return _emitter.DeclareFunction(GetLLVMModule(), name, returnType, arguments);
     }
 
@@ -569,15 +608,15 @@ namespace emitters
         {
             throw EmitterException(EmitterError::functionNotFound);
         }
-        return IRFunctionEmitter(this, pFunction, name);
+        return IRFunctionEmitter(this, pFunction, arguments, name);
     }
 
-    bool IRModuleEmitter::HasFunction(const std::string& name)
+    bool IRModuleEmitter::HasFunction(const std::string& name) const
     {
         return GetLLVMModule()->getFunction(name) != nullptr;
     }
 
-    LLVMFunction IRModuleEmitter::GetFunction(const std::string& name)
+    LLVMFunction IRModuleEmitter::GetFunction(const std::string& name) const
     {
         return GetLLVMModule()->getFunction(name);
     }
@@ -839,9 +878,8 @@ namespace emitters
         auto& context = _emitter.GetContext();
         auto type = llvm::FunctionType::get(
             llvm::Type::getInt32Ty(context),
-            {
-                llvm::Type::getInt8PtrTy(context)
-            }, true);
+            { llvm::Type::getInt8PtrTy(context) },
+            true);
         DeclareFunction("printf", type);
     }
 
@@ -1092,6 +1130,44 @@ namespace emitters
 
         return registry;
     }
+
+    template <>
+    CallbackRegistry<float>& IRModuleEmitter::GetCallbackRegistry() const
+    {
+        return const_cast<CallbackRegistry<float>&>(_floatCallbacks);
+    }
+
+    template <>
+    CallbackRegistry<double>& IRModuleEmitter::GetCallbackRegistry() const
+    {
+        return const_cast<CallbackRegistry<double>&>(_doubleCallbacks);
+    }
+
+    template <>
+    CallbackRegistry<int>& IRModuleEmitter::GetCallbackRegistry() const
+    {
+        return const_cast<CallbackRegistry<int>&>(_intCallbacks);
+    }
+
+    template <>
+    CallbackRegistry<int64_t>& IRModuleEmitter::GetCallbackRegistry() const
+    {
+        return const_cast<CallbackRegistry<int64_t>&>(_int64Callbacks);
+    }
+
+    template <>
+    CallbackRegistry<bool>& IRModuleEmitter::GetCallbackRegistry() const
+    {
+        return const_cast<CallbackRegistry<bool>&>(_boolCallbacks);
+    }
+
+    /// <summary> Returns true if the CallbackRegistry objects contain some functions. </summary>
+    bool IRModuleEmitter::HasCallbackFunctions() const
+    {
+        return _floatCallbacks.HasCallbackFunctions() || _doubleCallbacks.HasCallbackFunctions() || _intCallbacks.HasCallbackFunctions() || 
+            _int64Callbacks.HasCallbackFunctions() || _boolCallbacks.HasCallbackFunctions();
+    }
+
 
     //
     // Functions

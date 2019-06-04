@@ -23,6 +23,16 @@
 
 #include <sstream>
 
+extern "C" {
+    // This is implementing the Source and SinkNode callback thunks which are used to provide support for std::function callbacks.
+    bool SourceCallbackThunk_float(int index, void* context, float* buffer, int size);
+    bool SourceCallbackThunk_double(int index, void* context, double* buffer, int size);
+    bool SourceCallbackThunk_int(int index, void* context, int* buffer, int size);
+    void SinkCallbackThunk_float(int index, void* context, float* buffer, int size);
+    void SinkCallbackThunk_double(int index, void* context, double* buffer, int size);
+    void SinkCallbackThunk_int(int index, void* context, int* buffer, int size);
+}
+
 namespace ell
 {
 namespace model
@@ -48,8 +58,13 @@ namespace model
         _verifyJittedModule(verifyJittedModule),
         _computeFunctionDefined(false)
     {
+        // copy the callbacks over from the IRModuleEmitter so we can call them during Compute.
+        _floatCallbacks = module.GetCallbackRegistry<float>();
+        _doubleCallbacks = module.GetCallbackRegistry<double>();
+        _intCallbacks = module.GetCallbackRegistry<int>();
+        _int64Callbacks = module.GetCallbackRegistry<int64_t>();
+        _boolCallbacks = module.GetCallbackRegistry<bool>();
     }
-
 
     IRCompiledMap IRCompiledMap::Clone()
     {
@@ -85,7 +100,20 @@ namespace model
     void IRCompiledMap::FinishJitting()
     {
         EnsureExecutionEngine();
+        ResolveCallbacks();
         SetComputeFunction();
+    }
+
+    void IRCompiledMap::ComputeMultiple(const std::vector<void*>& inputs, const std::vector<void*>& outputs)
+    {
+        FinishJitting();
+        _computeDispatchFunction(InternalGetContext(), inputs.data(), outputs.data());
+    }
+
+    void IRCompiledMap::Reset()
+    {
+        FinishJitting();
+        _resetFunction();
     }
 
     void IRCompiledMap::SetComputeFunction()
@@ -131,7 +159,7 @@ namespace model
             temp[index] = static_cast<bool>(inputValues[index]);
         }
 
-        std::get<ComputeFunction<bool>>(_computeInputFunction)(GetContext(), (bool*)temp.data());
+        std::get<ComputeFunction<bool>>(_computeInputFunction)(InternalGetContext(), (bool*)temp.data());
     }
 
     void IRCompiledMap::SetNodeInput(model::InputNode<int>* node, const std::vector<int>& inputValues)
@@ -143,7 +171,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        std::get<ComputeFunction<int>>(_computeInputFunction)(GetContext(), inputValues.data());
+        std::get<ComputeFunction<int>>(_computeInputFunction)(InternalGetContext(), inputValues.data());
     }
 
     void IRCompiledMap::SetNodeInput(model::InputNode<int64_t>* node, const std::vector<int64_t>& inputValues)
@@ -155,7 +183,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        std::get<ComputeFunction<int64_t>>(_computeInputFunction)(GetContext(), inputValues.data());
+        std::get<ComputeFunction<int64_t>>(_computeInputFunction)(InternalGetContext(), inputValues.data());
     }
 
     void IRCompiledMap::SetNodeInput(model::InputNode<float>* node, const std::vector<float>& inputValues)
@@ -167,7 +195,7 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
         }
 
-        std::get<ComputeFunction<float>>(_computeInputFunction)(GetContext(), inputValues.data());
+        std::get<ComputeFunction<float>>(_computeInputFunction)(InternalGetContext(), inputValues.data());
     }
 
     void IRCompiledMap::SetNodeInput(model::InputNode<double>* node, const std::vector<double>& inputValues)
@@ -182,7 +210,26 @@ namespace model
             throw utilities::InputException(utilities::InputExceptionErrors::nullReference);
         }
 
-        std::get<ComputeFunction<double>>(_computeInputFunction)(GetContext(), inputValues.data());
+        std::get<ComputeFunction<double>>(_computeInputFunction)(InternalGetContext(), inputValues.data());
+    }
+
+    void IRCompiledMap::SetContext(void* context)
+    {
+        if (HasCallbackFunctions())
+        {
+            // The reason being that the compiler needs to use the context pointer in order to call your std::functions correctly.
+            throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "You should not call SetContext if you have defined any std::functions on your SourceNodes and SinkNodes.");
+        }
+        _context = context;
+    }
+
+    void* IRCompiledMap::InternalGetContext()
+    {
+        if (_context)
+        {
+            return _context;
+        }
+        return this; // this is the default context if one was not provided.
     }
 
     std::vector<bool> IRCompiledMap::ComputeBoolOutput(const model::PortElementsBase& outputs)
@@ -404,5 +451,119 @@ namespace model
         auto fn = reinterpret_cast<void (*)()>(jitter.GetFunctionAddress(_moduleName + "_ResetRegionProfilingInfo"));
         fn();
     }
+
+    void IRCompiledMap::ResolveCallbacks()
+    {
+        auto list = GetModule().GetCallbackFunctionNames();
+        if (!list.empty())
+        {
+            auto& jitter = GetJitter();
+            for (const auto& name : list)
+            {
+                auto func = GetModule().GetFunction(name);
+                // these callbacks need to be resolved or else we will not be able to load the compiled module.
+                if (name.find("SourceCallbackThunk_float") != std::string::npos)
+                {
+                    jitter.DefineFunction(func, reinterpret_cast<uintptr_t>(&SourceCallbackThunk_float));
+                }
+                else if (name.find("SourceCallbackThunk_double") != std::string::npos)
+                {
+                    jitter.DefineFunction(func, reinterpret_cast<uintptr_t>(&SourceCallbackThunk_double));
+                }
+                else if (name.find("SourceCallbackThunk_int") != std::string::npos)
+                {
+                    jitter.DefineFunction(func, reinterpret_cast<uintptr_t>(&SourceCallbackThunk_int));
+                }
+                else if (name.find("SinkCallbackThunk_float") != std::string::npos)
+                {
+                    jitter.DefineFunction(func, reinterpret_cast<uintptr_t>(&SinkCallbackThunk_float));
+                }
+                else if (name.find("SinkCallbackThunk_double") != std::string::npos)
+                {
+                    jitter.DefineFunction(func, reinterpret_cast<uintptr_t>(&SinkCallbackThunk_double));
+                }
+                else if (name.find("SinkCallbackThunk_int") != std::string::npos)
+                {
+                    jitter.DefineFunction(func, reinterpret_cast<uintptr_t>(&SinkCallbackThunk_int));
+                }
+                else
+                {
+                    // the predict function and the openblas_gemm functions also have external linkage.
+                }
+            }
+        }
+    }
+
+    namespace detail
+    {
+        template <typename ElementType>
+        bool ForwardSourceCallback(int index, void* context, ElementType* buffer, int size)
+        {
+            bool result = true;
+            IRCompiledMap* map = reinterpret_cast<IRCompiledMap*>(context);
+            if (map)
+            {
+                auto func = map->GetCallbackRegistry<ElementType>().GetSourceCallback(index);
+                if (func)
+                {
+                    std::vector<ElementType> data(buffer, buffer + size);
+                    result = func(data);
+                    ::memcpy(buffer, data.data(), sizeof(ElementType) * size);
+                }
+            }
+            return result;
+        }
+
+        template <typename ElementType>
+        void ForwardSinkCallback(int index, void* context, ElementType* buffer, int size)
+        {
+            IRCompiledMap* map = reinterpret_cast<IRCompiledMap*>(context);
+            if (map)
+            {
+                auto func = map->GetCallbackRegistry<ElementType>().GetSinkCallback(index);
+                if (func)
+                {
+                    std::vector<ElementType> data(buffer, buffer + size);
+                    func(data);
+                }
+            }
+        }
+    } // namespace detail
 } // namespace model
 } // namespace ell
+
+using namespace ell::model::detail;
+
+extern "C" {
+// This is implementing the Source and SinkNode callback thunks which are used to provide support for std::function callbacks.
+
+bool SourceCallbackThunk_float(int index, void* context, float* buffer, int size)
+{
+    return ForwardSourceCallback<float>(index, context, buffer, size);
+}
+
+bool SourceCallbackThunk_double(int index, void* context, double* buffer, int size)
+{
+    return ForwardSourceCallback<double>(index, context, buffer, size);
+}
+
+bool SourceCallbackThunk_int(int index, void* context, int* buffer, int size)
+{
+    return ForwardSourceCallback<int>(index, context, buffer, size);
+}
+
+void SinkCallbackThunk_float(int index, void* context, float* buffer, int size)
+{
+    ForwardSinkCallback<float>(index, context, buffer, size);
+}
+
+void SinkCallbackThunk_double(int index, void* context, double* buffer, int size)
+{
+    ForwardSinkCallback<double>(index, context, buffer, size);
+}
+
+void SinkCallbackThunk_int(int index, void* context, int* buffer, int size)
+{
+    ForwardSinkCallback<int>(index, context, buffer, size);
+}
+}

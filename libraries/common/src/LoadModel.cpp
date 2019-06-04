@@ -412,7 +412,7 @@ namespace common
 
         if (!IsFileReadable(filename))
         {
-            throw SystemException(SystemExceptionErrors::fileNotFound);
+            throw SystemException(SystemExceptionErrors::fileNotFound, "File not found '" + filename + "'");
         }
 
         auto filestream = OpenIfstream(filename);

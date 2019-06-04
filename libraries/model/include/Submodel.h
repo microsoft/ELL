@@ -68,10 +68,10 @@ namespace model
         Model& GetModel() { return _model; }
 
         /// <summary> Returns the number of input ports for this submodel </summary>
-        int NumInputs() const { return _inputs.size(); }
+        int NumInputs() const { return static_cast<int>(_inputs.size()); }
 
         /// <summary> Returns the number of output ports for this submodel </summary>
-        int NumOutputs() const { return _outputs.size(); }
+        int NumOutputs() const { return static_cast<int>(_outputs.size()); }
 
         /// <summary> Returns the input ports for this submodel </summary>
         const std::vector<const InputPortBase*>& GetInputs() const { return _inputs; }

@@ -39,7 +39,7 @@ def main():
         categories = categories_file.read().splitlines()
 
     # Get the model wrapper in order to interact with the model
-    model_wrapper = model.model.ModelWrapper()
+    model_wrapper = model.ModelWrapper()
 
     # Get the model's input shape. We will use this information later to resize
     # images appropriately.
@@ -66,7 +66,7 @@ def main():
             image, input_shape.columns, input_shape.rows, preprocessing_metadata=preprocessing_metadata)
 
         # Wrap the resulting numpy array in a FloatVector
-        input_data = model.model.FloatVector(input_data) 
+        input_data = model.FloatVector(input_data)
 
         # Send the image to the compiled model and get the predictions vector
         # with scores, measure how long it takes

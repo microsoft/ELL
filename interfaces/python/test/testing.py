@@ -1,39 +1,41 @@
+import math
+import numpy as a
+
+
 class Testing(object):
     @staticmethod
     def IsEqualWithinTolerance(a, b, tol):
         t = a - b
-        return (a - b) < tol and (b - a) < tol
+        scale = 1.0
+        diff = abs(t)
+        if abs(a) > 10 and abs(b) > 10:
+            scale = math.pow(10, int(math.log10(abs(a))))
+            diff /= scale
+        return diff < tol
+
+    @staticmethod
+    def ToList(a):
+        if type(a) is float:
+            return [a]
+        if type(a) is int:
+            return [a]
+        if type(a) is bool:
+            return [a]
+        return list(a)
 
     @staticmethod
     def IsEqual(a, b, tol=1.0e-8):
         # Instances of the same swig proxy types (e.g. DoubleVector) resolve to different type()'s
-        if 'Vector' in str(type(a)):
-            if str(type(a)) != str(type(b)):
-                return False
-            if a.size() != b.size():
-                return False
-            if a.size() == 0:
-                return True
-            for i in range(a.size()):
-                if not Testing.IsEqual(a[i], b[i]):
-                    return False
-            return True
-        elif type(a) != type(b):
+        a = Testing.ToList(a)
+        b = Testing.ToList(b)
+        if len(a) != len(b):
             return False
-        if type(a) is list:
-            if len(a) != len(b):
-                return False
-            if len(a) == 0:
-                return True
-            for i in range(len(a)):
-                if not Testing.IsEqual(a[i], b[i]):
-                    return False
+        if len(a) == 0:
             return True
-        else:
-            if type(a) is float:
-                return Testing.IsEqualWithinTolerance(a, b, tol)
-            else:
-                return a == b
+        for i in range(len(a)):
+            if not Testing.IsEqualWithinTolerance(a[i], b[i], tol):
+                return False
+        return True
 
     def __init__(self):
         self.testFailedFlag = False

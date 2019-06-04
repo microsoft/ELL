@@ -27,10 +27,13 @@
 #include <node.h>
 #include <v8.h>
 #include <nan.h>
+#include <vector>
+#include <stdint.h>
 %}
 #endif // SWIGJAVASCRIPT
 
 %include "stdint.i"
+
 %include "vector.i"
 
 #ifndef SWIGXML

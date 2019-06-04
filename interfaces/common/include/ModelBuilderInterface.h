@@ -12,9 +12,6 @@
 #include "ModelInterface.h"
 #include "NeuralNetworkPredictorInterface.h"
 
-#include <nodes/include/BinaryOperationNode.h>
-#include <nodes/include/UnaryOperationNode.h>
-
 #include <math/include/Tensor.h>
 
 #include <model/include/Model.h>
@@ -29,43 +26,6 @@
 
 namespace ELL_API
 {
-
-//
-// Operation types for unary operation nodes
-//
-enum class UnaryOperationType
-{
-    none = (int)ell::nodes::UnaryOperationType::none,
-    abs = (int)ell::nodes::UnaryOperationType::abs,
-    exp = (int)ell::nodes::UnaryOperationType::exp,
-    hardSigmoid = (int)ell::nodes::UnaryOperationType::hardSigmoid,
-    log = (int)ell::nodes::UnaryOperationType::log,
-    logicalNot = (int)ell::nodes::UnaryOperationType::logicalNot,
-    sin = (int)ell::nodes::UnaryOperationType::sin,
-    sigmoid = (int)ell::nodes::UnaryOperationType::sigmoid,
-    sign = (int)ell::nodes::UnaryOperationType::sign,
-    softmax = (int)ell::nodes::UnaryOperationType::softmax,
-    square = (int)ell::nodes::UnaryOperationType::square,
-    cos = (int)ell::nodes::UnaryOperationType::cos,
-    sqrt = (int)ell::nodes::UnaryOperationType::sqrt,
-    tanh = (int)ell::nodes::UnaryOperationType::tanh,
-};
-
-//
-// Operation types for binary operation nodes
-//
-enum class BinaryOperationType
-{
-    none = (int)ell::nodes::BinaryOperationType::none,
-    add = (int)ell::nodes::BinaryOperationType::add,
-    subtract = (int)ell::nodes::BinaryOperationType::subtract,
-    multiply = (int)ell::nodes::BinaryOperationType::multiply, // elementwise only
-    divide = (int)ell::nodes::BinaryOperationType::divide,
-    logicalAnd = (int)ell::nodes::BinaryOperationType::logicalAnd,
-    logicalOr = (int)ell::nodes::BinaryOperationType::logicalOr,
-    logicalXor = (int)ell::nodes::BinaryOperationType::logicalXor
-};
-
 //
 // ModelBuilder
 //
@@ -99,8 +59,8 @@ public:
     OutputNode AddOutputNode(Model model, const PortMemoryLayout& memoryLayout, PortElements input);
     Node AddReinterpretLayoutNode(Model model, PortElements input, PortMemoryLayout outputMemoryLayout);
     Node AddReorderDataNode(Model model, PortElements input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order = {}, double outputPaddingValue = 0.0);
-    Node AddSinkNode(Model model, PortElements input, const PortMemoryLayout& memoryLayout, const std::string& sinkFunctionName, PortElements trigger = PortElements());
-    Node AddSourceNode(Model model, PortElements input, PortType outputType, const PortMemoryLayout& memoryLayout, const std::string& sourceFunctionName);
+    SinkNode AddSinkNode(Model model, PortElements input, const PortMemoryLayout& memoryLayout, const std::string& sinkFunctionName, PortElements trigger = PortElements());
+    SourceNode AddSourceNode(Model model, PortElements input, PortType outputType, const PortMemoryLayout& memoryLayout, const std::string& sourceFunctionName);
     Node AddUnaryOperationNode(Model model, PortElements input, UnaryOperationType operation);
     Node AddDTWNode(Model model, std::vector<std::vector<double>> prototype, PortElements input);
     Node AddVoiceActivityDetectorNode(Model model, PortElements input, double sampleRate, double frameDuration, double tauUp, double tauDown, double largeInput, double gainAtt, double thresholdUp, double thresholdDown, double levelThreshold);

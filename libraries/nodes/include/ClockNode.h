@@ -73,6 +73,9 @@ namespace nodes
         /// <returns> Ticks until the next interval. </param>
         TimeTickType GetTicksUntilNextInterval(TimeTickType now) const;
 
+        /// <summary> Get the custom name of the lag notification callback function. </summary>
+        std::string GetLagNotificationFunctionName() const { return _lagNotificationFunctionName; }
+
     protected:
         void Compute() const override;
         void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;

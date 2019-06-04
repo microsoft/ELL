@@ -19,7 +19,7 @@ import tutorial_helpers as helpers
 import model
 
 # Get the model wrapper in order to interact with the model
-model_wrapper = model.model.ModelWrapper()
+model_wrapper = model.ModelWrapper()
 
 # Get the input and output shapes
 input_shape = model_wrapper.GetInputShape()
@@ -41,7 +41,7 @@ input_data = helpers.prepare_image_for_model(sample_image, input_shape.columns,
                                              input_shape.rows, preprocessing_metadata=preprocessing_metadata)
 
 # Wrap the resulting numpy array in a FloatVector
-input_data = model.model.FloatVector(input_data) 
+input_data = model.FloatVector(input_data)
 
 # Send the input to the predict function and get the prediction result
 predictions = model.predict(input_data)

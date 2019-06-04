@@ -28,6 +28,7 @@
 #include <value/include/EmitterContext.h>
 
 #include <algorithm>
+#include <functional>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -333,28 +334,28 @@ namespace model
         template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
         void SetInputValue(const std::string& inputName, const DataVectorType& inputValues);
 
-        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        /// <summary> Computes one of the map's outputs from its current input values </summary>
         ///
         /// <param name="index"> The index of the output </param>
         /// <returns> A vector of output values </returns>
         template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
         std::vector<ValueType> ComputeOutput(int index);
 
-        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        /// <summary> Computes one of the map's outputs from its current input values </summary>
         ///
         /// <param name="index"> The index of the output </param>
         /// <returns> A vector of output values </returns>
         template <typename DataVectorType, data::IsDataVector<DataVectorType> Concept = true>
         DataVectorType ComputeOutput(int index);
 
-        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        /// <summary> Computes one of the map's outputs from its current input values </summary>
         ///
         /// <param name="outputName"> The name of the output </param>
         /// <returns> A vector of output values </returns>
         template <typename ValueType, utilities::IsFundamental<ValueType> = 0>
         std::vector<ValueType> ComputeOutput(const std::string& outputName);
 
-        /// <summary> Computes of one of the map's outputs from its current input values </summary>
+        /// <summary> Computes one of the map's outputs from its current input values </summary>
         ///
         /// <param name="outputName"> The name of the output </param>
         /// <returns> A vector of output values </returns>
@@ -418,6 +419,14 @@ namespace model
         /// <param name="outputName"> Name of the output. </param>
         /// <param name="inputNode"> The output elements. </param>
         void AddOutput(const std::string& outputName, PortElementsBase outputElements);
+
+        /// <summary> This exposes another way to call Compute when the model has multiple inputs and outputs
+        /// These void* pointers must point to pre-allocated buffers of the right type (float*, double*, etc)
+        /// and size. </summary>
+        ///
+        /// <param name="inputs"> A vector containing all the input buffers. </param>
+        /// <param name="outputs"> A vector containing all the output buffers. </param>
+        virtual void ComputeMultiple(const std::vector<void*>& inputs, const std::vector<void*>& outputs);
 
     protected:
         template <typename DataVectorType, typename ElementsType, data::IsDataVector<DataVectorType> Concept = true>
@@ -705,6 +714,8 @@ namespace model
     {
         return static_cast<const OutputPort<ValueType>&>(GetOutput(outputName));
     }
+
+
 } // namespace model
 } // namespace ell
 

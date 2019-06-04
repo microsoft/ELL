@@ -10,7 +10,6 @@
 #ifndef SWIG
 
 #include "MathInterface.h"
-#include "ModelInterface.h"
 
 #include <math/include/Tensor.h>
 

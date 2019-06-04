@@ -141,7 +141,7 @@ import model
 
 Create a model wrapper to interact with the model
 ```python
-model_wrapper = model.model.ModelWrapper()
+model_wrapper = model.ModelWrapper()
 ```
 
 Print the model's input and output shapes.
@@ -185,7 +185,7 @@ input_data = helpers.prepare_image_for_model(sample_image, input_shape.columns,
 
 Wrap the input_data numpy array in a FloatVector
 ```python
-input_data = model.model.FloatVector(input_data) 
+input_data = model.FloatVector(input_data)
 ```
 
 Invoke the model by calling its **Predict** method.
@@ -283,7 +283,7 @@ The argument **0** in the function call above selects the default camera. If you
 
 Create a model wrapper to interact with the model
 ```python
-    model_wrapper = model.model.ModelWrapper()
+    model_wrapper = model.ModelWrapper()
 ```
 
 The model expects its input in a certain shape. Get this shape and store it for use later on.
@@ -313,7 +313,7 @@ As mentioned above, the image stored in the `image` variable cannot be sent to t
 
 Wrap the input_data numpy array in a FloatVector
 ```python
-        input_data = model.model.FloatVector(input_data) 
+        input_data = model.FloatVector(input_data)
 ```
 
 With the processed image input handy, call the **Predict** method to invoke the model.

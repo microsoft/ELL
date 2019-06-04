@@ -33,15 +33,30 @@ class ComputeModel:
         self.map = ell.model.Map(model_path)
         self.input_shape = self.map.GetInputShape()
         self.output_shape = self.map.GetOutputShape()
+        self.state_size = 0
+        if self.map.NumInputs() == 2 and self.map.NumOutputs() == 2:
+            # then perhaps we have a FastGRNN model with external state.
+            self.input_size = self.input_shape.Size()
+            self.output_size = self.output_shape.Size()
+            self.state_size = self.map.GetInputShape(1).Size()
+            self.output_buffer = ell.math.FloatVector(self.output_size)
+            self.hidden_state = ell.math.FloatVector(self.state_size)
+            self.new_state = ell.math.FloatVector(self.state_size)
 
     def transform(self, x):
         """ call the ell model with input array 'x' and return the output as numpy array """
-        # Turn the input into something the model can read
-        in_vec = np.array(x).astype(np.float32).ravel()
-
         # Send the input to the predict function and return the prediction result
-        return np.array(self.map.Compute(in_vec, dtype=np.float32))
+        if self.state_size:
+            i = ell.math.FloatVector(x)
+            self.map.ComputeMultiple([i, self.hidden_state], [self.output_buffer, self.new_state])
+            self.hidden_state.copy_from(self.new_state)
+            out_vec = self.output_buffer
+        else:
+            out_vec = self.map.Compute(x)
+        return np.array(out_vec)
 
     def reset(self):
         """ reset all model state """
         self.map.Reset()
+        if self.state_size:
+            self.hidden_state = ell.math.FloatVector(self.state_size)

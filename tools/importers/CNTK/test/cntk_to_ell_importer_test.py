@@ -171,8 +171,8 @@ class CntkLayersTestCase(common_importer_test.EllImporterTestBase):
         # Note: for testing purposes, callback functions assume the "model" namespace
         compile_options = ell.model.MapCompilerOptions()
         compile_options.useBlas = False
-        compiled = map.Compile("host", "model", method_name, compilerOptions=compile_options, dtype=np.float32)
-        compiledResults = compiled.Compute(input, dtype=np.float32)
+        compiled = map.Compile("host", "model", method_name, compilerOptions=compile_options)
+        compiledResults = compiled.Compute(input)
 
         # Compare compiled results
         if precision > 0:
@@ -656,8 +656,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
 
     def compute_ell_map(self, ellMap, ellOrderedInput, cntkResults, modelName):
 
-        ellMapFromArchiveResults = ellMap.Compute(
-            ellOrderedInput, dtype=np.float32)
+        ellMapFromArchiveResults = ellMap.Compute(ellOrderedInput)
         # Verify CNTK results and unarchived ELL model results match
         np.testing.assert_array_almost_equal(
             cntkResults, ellMapFromArchiveResults, decimal=5,
@@ -688,13 +687,12 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             # Note: for testing purposes, callback functions assume the "model" namespace
             compiler_options = ell.model.MapCompilerOptions()
             compiler_options.useBlas = False
-            ellCompiledMap = ellMap.Compile('host', 'model', 'predict', compilerOptions=compiler_options,
-                                            dtype=np.float32)
+            ellCompiledMap = ellMap.Compile('host', 'model', 'predict', compilerOptions=compiler_options)
 
             # Compile the unarchived map
             # Note: for testing purposes, callback functions assume the "model" namespace
             ellCompiledMapFromArchive = ellMapFromArchive.Compile(
-                'host', 'model', 'predict', compilerOptions=compiler_options, dtype=np.float32)
+                'host', 'model', 'predict', compilerOptions=compiler_options)
 
             cntkInput = np.random.uniform(
                 high=255, size=(inputShape.channels, inputShape.rows, inputShape.columns)
@@ -726,7 +724,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             _logger.info('Comparing map output (reference)')
             sys.stdout.flush()
 
-            ellMapResults = ellMap.Compute(ellOrderedInput, dtype=np.float32)
+            ellMapResults = ellMap.Compute(ellOrderedInput)
 
             # Verify CNTK results and ELL map results match
             np.testing.assert_array_almost_equal(
@@ -742,7 +740,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             _logger.info('Comparing map output (compiled)')
             sys.stdout.flush()
 
-            ellCompiledMapResults = ellCompiledMap.Compute(ellOrderedInput, dtype=np.float32)
+            ellCompiledMapResults = ellCompiledMap.Compute(ellOrderedInput)
 
             # Verify CNTK results and unarchived ELL model results match
             np.testing.assert_array_almost_equal(
@@ -754,7 +752,7 @@ class CntkModelsTestCase(CntkToEllFullModelTestBase):
             sys.stdout.flush()
 
             ellCompiledMapFromArchiveResults = ellCompiledMapFromArchive.\
-                Compute(ellOrderedInput, dtype=np.float32)
+                Compute(ellOrderedInput)
 
             # Verify CNTK results and unarchived ELL model results match
             np.testing.assert_array_almost_equal(
@@ -896,11 +894,11 @@ class CntkFullModelTest(CntkToEllFullModelTestBase):
         ell_map = ell.neural.utilities.ell_map_from_predictor(predictor)
         compiler_options = ell.model.MapCompilerOptions()
         compiler_options.useBlas = False
-        compiled = ell_map.Compile("host", "model", "test{}".format(
-            self.method_index), compilerOptions=compiler_options, dtype=np.float32)
+        compiled = ell_map.Compile("host", "model", "test{}".format(self.method_index),
+                                   compilerOptions=compiler_options)
         self.method_index += 1
 
-        compiledResults = np.array(compiled.Compute(inputData, dtype=np.float32))
+        compiledResults = np.array(compiled.Compute(inputData))
 
         # Compare compiled results
         np.testing.assert_array_almost_equal(

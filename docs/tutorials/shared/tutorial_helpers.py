@@ -39,7 +39,7 @@ def find_ell():
 # add it and its platform-specific build directory to Python's import lookup
 # path
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
-SEARCH_DIRS = [d for d in os.listdir(SCRIPT_PATH) if
+SEARCH_DIRS = [os.path.join(SCRIPT_PATH, d) for d in os.listdir(SCRIPT_PATH) if
                os.path.isdir(d) and (
                d in ["pi3", "pi3_64", "aarch64", "host"] or
                d.startswith("model"))]

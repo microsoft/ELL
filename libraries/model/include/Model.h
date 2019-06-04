@@ -363,6 +363,9 @@ namespace model
         /// <returns> `false` if this model is idential to the other model (they are the same object or are shallow copies of one another), otherwise `true` </returns>
         bool operator!=(const Model& other) const;
 
+        /// <summary> Perform one compute operation on all nodes.  This assumes input has already been set </summary>
+        void Step();
+
     protected:
         utilities::ArchiveVersion GetArchiveVersion() const override;
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;

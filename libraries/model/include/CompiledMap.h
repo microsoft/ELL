@@ -9,6 +9,7 @@
 #pragma once
 
 #include <emitters/include/ModuleEmitter.h>
+#include <utilities/include/CallbackRegistry.h>
 
 #include "Map.h"
 #include "MapCompilerOptions.h"
@@ -83,6 +84,17 @@ namespace model
         ///
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+        
+        /// <summary> Reset any model state. </summary>
+        virtual void Reset() = 0;
+
+        /// <summary> Return the typed CallbackRegistry object that is used to manage any std::functions defined
+        /// on any SourceNodes or SinkNodes in the graph. </summary>
+        template <typename ElementType>
+        ell::utilities::CallbackRegistry<ElementType>& GetCallbackRegistry() const;
+
+        /// <summary> Returns true if the CallbackRegistry objects contain some functions. </summary>
+        bool HasCallbackFunctions() const;
 
     protected:
         CompiledMap(Map map, std::string functionName, const MapCompilerOptions& options);
@@ -90,6 +102,12 @@ namespace model
         
         std::string _functionName;
         MapCompilerOptions _compilerOptions;
+
+        ell::utilities::CallbackRegistry<float> _floatCallbacks;
+        ell::utilities::CallbackRegistry<double> _doubleCallbacks;
+        ell::utilities::CallbackRegistry<int> _intCallbacks;
+        ell::utilities::CallbackRegistry<int64_t> _int64Callbacks;
+        ell::utilities::CallbackRegistry<bool> _boolCallbacks;
     };
 } // namespace model
 } // namespace ell

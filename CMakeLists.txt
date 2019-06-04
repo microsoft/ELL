@@ -104,6 +104,17 @@ if(STRICT_MODE)
   message("-- Turning on strict mode with warnings as errors.")
 endif()
 
+# Turn on ctest tests
+enable_testing()
+
+# Set up global variables to help find NuGet projects
+set(PACKAGE_ROOT ${EXTERNAL_DIR})
+include(OpenBLASSetup)
+include(LLVMSetup)
+include(SWIGSetup)
+include(CopySharedLibraries)
+include(AddPrecompiledHeader)
+
 if(MSVC)
   # Set Visual Studio-specific options
   add_definitions(-DUNICODE)
@@ -115,8 +126,9 @@ if(MSVC)
   if(STRICT_MODE)
     add_compile_options(/WX)
   endif()
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MD")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MD")
+  # the debug linker needs to match how LLVM was built (either /MD or /MDd)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${LLVM_MD_OPTION}")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${LLVM_MD_OPTION}")
 else()
   # Set Clang/GCC-specific options
   add_compile_options(-Wall)
@@ -138,17 +150,6 @@ else()
     add_compile_options(-Wno-self-assign)
   endif()
 endif()
-
-# Turn on ctest tests
-enable_testing()
-
-# Set up global variables to help find NuGet projects
-set(PACKAGE_ROOT ${EXTERNAL_DIR})
-include(OpenBLASSetup)
-include(LLVMSetup)
-include(SWIGSetup)
-include(CopySharedLibraries)
-include(AddPrecompiledHeader)
 
 # Print helpful message if LLVM not found on Windows
 if(NOT LLVM_FOUND AND WIN32)

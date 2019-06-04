@@ -9,6 +9,7 @@
 #include "ModelInterface.h"
 #include "DatasetInterface.h"
 #include "DatasetInterfaceImpl.h"
+#include "ModelBuilderInterface.h"
 
 #include <common/include/LoadModel.h>
 #include <common/include/MapLoadArguments.h>
@@ -26,152 +27,14 @@
 
 #include <utilities/include/JsonArchiver.h>
 #include <utilities/include/StringUtil.h>
+#include <utilities/include/UniqueNameList.h>
 
 #include <algorithm>
-
-//
-// Callback functions
-//
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-// Note: this currently assumes that there is just 1 source and 1 sink in the map
-// Future: extend this to route to multiple sources + sinks based on extra context parameter.
-bool model_CompiledMap_SourceCallback_Double(void* context, double* input)
-{
-    // Note: this context is passed through by IRCompiledMap::SetNodeInput where it calls GetContext()
-    // for the first parameter to the compiled _computeInputFunction and SetContext() happens in
-    // CompiledMap::Step so we know the context is the CompiledMap interface object.
-    auto map = reinterpret_cast<ELL_API::CompiledMap*>(context);
-    return map->InvokeSourceCallback(input);
-}
-
-bool model_CompiledMap_SourceCallback_Float(void* context, float* input)
-{
-    auto map = reinterpret_cast<ELL_API::CompiledMap*>(context);
-    return map->InvokeSourceCallback(input);
-}
-
-void model_CompiledMap_SinkCallback_Double(void* context, double* output)
-{
-    auto map = reinterpret_cast<ELL_API::CompiledMap*>(context);
-    return map->InvokeSinkCallback(output);
-}
-
-void model_CompiledMap_SinkCallback_Float(void* context, float* output)
-{
-    auto map = reinterpret_cast<ELL_API::CompiledMap*>(context);
-    return map->InvokeSinkCallback(output);
-}
-
-void model_CompiledMap_LagNotificationCallback(void* context, double lag)
-{
-}
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
 
 using namespace ell::utilities;
 
 namespace ELL_API
 {
-
-//
-// Port
-//
-PortType Port::GetOutputType()
-{
-    return static_cast<PortType>(_port->GetType());
-}
-
-Port::Port(const ell::model::Port* other) :
-    _port(other)
-{
-}
-
-Node Port::GetNode()
-{
-    return Node(_port->GetNode());
-}
-
-std::string Port::GetName()
-{
-    return _port->GetName();
-}
-
-std::string Port::GetRuntimeTypeName()
-{
-    return _port->GetRuntimeTypeName();
-}
-
-int Port::Size()
-{
-    return static_cast<int>(_port->Size());
-}
-
-PortMemoryLayout Port::GetMemoryLayout()
-{
-    return PortMemoryLayout(_port->GetMemoryLayout());
-}
-
-//
-// InputPortIterator
-//
-bool InputPortIterator::IsValid()
-{
-    return _i < _ports.size();
-}
-
-void InputPortIterator::Next()
-{
-    _i = _i + 1;
-}
-
-InputPort InputPortIterator::Get()
-{
-    if (!IsValid())
-    {
-        throw std::out_of_range("invalid iterator");
-    }
-    return InputPort(_ports[_i]);
-}
-
-InputPortIterator::InputPortIterator(const std::vector<const ell::model::InputPortBase*>& ports) :
-    _i(0),
-    _ports(ports)
-{
-}
-
-//
-// OutputPortIterator
-//
-bool OutputPortIterator::IsValid()
-{
-    return _i < _ports.size();
-}
-
-void OutputPortIterator::Next()
-{
-    _i = _i + 1;
-}
-
-OutputPort OutputPortIterator::Get()
-{
-    if (!IsValid())
-    {
-        throw std::out_of_range("invalid iterator");
-    }
-    return OutputPort(_ports[_i]);
-}
-
-OutputPortIterator::OutputPortIterator(const std::vector<const ell::model::OutputPortBase*>& ports) :
-    _i(0),
-    _ports(ports)
-{
-}
 
 //
 // NodeIterator
@@ -208,35 +71,38 @@ Node NodeIterator::Get()
         {
             throw std::out_of_range("invalid iterator");
         }
-        return Node(_nodes[_i]);
+        return Node(_nodes[_i], _model);
     }
     else
     {
-        return Node(_iterator.Get());
+        return Node(_iterator.Get(), _model);
     }
 }
 
-NodeIterator::NodeIterator(const std::vector<const ell::model::Node*>& nodes) :
+NodeIterator::NodeIterator(const std::vector<const ell::model::Node*>& nodes, std::shared_ptr<ell::model::Model> model) :
     _i(0),
     _isVector(true),
     _nodes(nodes),
-    _iterator()
+    _iterator(),
+    _model(model)
 {
 }
 
-NodeIterator::NodeIterator(ell::model::ForwardNodeIterator& other) :
+NodeIterator::NodeIterator(ell::model::ForwardNodeIterator& other, std::shared_ptr<ell::model::Model> model) :
     _i(0),
     _isVector(false),
     _nodes(0),
-    _iterator(other)
+    _iterator(other),
+    _model(model)
 {
 }
 
 //
 // Node
 //
-Node::Node(const ell::model::Node* other) :
-    _node(other)
+Node::Node(const ell::model::Node* other, std::shared_ptr<ell::model::Model> model) :
+    _node(other),
+    _model(model)
 {
 }
 
@@ -245,14 +111,19 @@ std::string Node::GetId()
     return to_string(_node->GetId());
 }
 
+Model Node::GetModel()
+{
+    return Model(_model);
+}
+
 NodeIterator Node::GetParents()
 {
-    return NodeIterator(_node->GetParentNodes());
+    return NodeIterator(_node->GetParentNodes(), _model);
 }
 
 NodeIterator Node::GetDependents()
 {
-    return NodeIterator(_node->GetDependentNodes());
+    return NodeIterator(_node->GetDependentNodes(), _model);
 }
 
 OutputPort Node::GetOutputPort(const std::string& portName)
@@ -262,7 +133,7 @@ OutputPort Node::GetOutputPort(const std::string& portName)
     {
         throw std::invalid_argument("no port named '" + portName + "'");
     }
-    return OutputPort(port);
+    return OutputPort(port, _model);
 }
 
 InputPort Node::GetInputPort(const std::string& portName)
@@ -273,7 +144,7 @@ InputPort Node::GetInputPort(const std::string& portName)
     {
         throw std::invalid_argument("no port named '"s + portName + "'");
     }
-    return InputPort(port);
+    return InputPort(port, _model);
 }
 
 Port Node::GetPort(const std::string& portName)
@@ -284,21 +155,21 @@ Port Node::GetPort(const std::string& portName)
     {
         throw std::invalid_argument("no port named '"s + portName + "'");
     }
-    return Port(port);
+    return Port(port, _model);
 }
 
 OutputPortIterator Node::GetOutputPorts()
 {
     auto ports = _node->GetOutputPorts();
     std::vector<const ell::model::OutputPortBase*> constPorts(ports.begin(), ports.end());
-    return OutputPortIterator(constPorts);
+    return OutputPortIterator(constPorts, _model);
 }
 
 InputPortIterator Node::GetInputPorts()
 {
     auto ports = _node->GetInputPorts();
     std::vector<const ell::model::InputPortBase*> constPorts(ports.begin(), ports.end());
-    return InputPortIterator(constPorts);
+    return InputPortIterator(constPorts, _model);
 }
 
 std::string Node::GetRuntimeTypeName()
@@ -330,8 +201,8 @@ void Node::CopyMetadataFrom(const Node& other)
 //
 // InputNode
 //
-InputNode::InputNode(const InputNode& node) :
-    Node(node.GetNode())
+InputNode::InputNode(const InputNode& node, std::shared_ptr<ell::model::Model> model) :
+    Node(node.GetNode(), model)
 {
     if (dynamic_cast<const ell::model::InputNodeBase*>(node.GetNode()) == nullptr)
     {
@@ -340,7 +211,7 @@ InputNode::InputNode(const InputNode& node) :
 }
 
 InputNode::InputNode(Node node) :
-    Node(node.GetNode())
+    Node(node.GetNode(), node.GetModel().GetModel())
 {
     if (dynamic_cast<const ell::model::InputNodeBase*>(node.GetNode()) == nullptr)
     {
@@ -348,8 +219,8 @@ InputNode::InputNode(Node node) :
     }
 }
 
-InputNode::InputNode(const ell::model::InputNodeBase* other) :
-    Node(other)
+InputNode::InputNode(const ell::model::InputNodeBase* other, std::shared_ptr<ell::model::Model> model) :
+    Node(other, model)
 {
 }
 
@@ -361,26 +232,26 @@ const ell::model::InputNodeBase* InputNode::GetInputNode() const
 //
 // OutputNode
 //
-OutputNode::OutputNode(const OutputNode& node) :
-    Node(node.GetNode())
+OutputNode::OutputNode(const OutputNode& node, std::shared_ptr<ell::model::Model> model) :
+    Node(node.GetNode(), model)
 {
-    if (dynamic_cast<const ell::model::OutputNodeBase*>(node.GetNode()) == nullptr)
+    if (GetOutputNode() == nullptr)
     {
         throw std::invalid_argument("Error: not an OutputNode");
     }
 }
 
 OutputNode::OutputNode(Node node) :
-    Node(node.GetNode())
+    Node(node.GetNode(), node.GetModel().GetModel())
 {
-    if (dynamic_cast<const ell::model::OutputNodeBase*>(node.GetNode()) == nullptr)
+    if (GetOutputNode() == nullptr)
     {
         throw std::invalid_argument("Error: not an OutputNode");
     }
 }
 
-OutputNode::OutputNode(const ell::model::OutputNodeBase* other) :
-    Node(other)
+OutputNode::OutputNode(const ell::model::OutputNodeBase* other, std::shared_ptr<ell::model::Model> model) :
+    Node(other, model)
 {
 }
 
@@ -390,186 +261,43 @@ const ell::model::OutputNodeBase* OutputNode::GetOutputNode() const
 }
 
 //
-// PortElement
+// SourceNode
 //
-PortElement::PortElement(const ell::model::PortElementBase& other) :
-    _port(other)
+SourceNode::SourceNode(const SourceNode& node, std::shared_ptr<ell::model::Model> model) :
+    Node(node.GetNode(), model),
+    _sourceNode(node._sourceNode)
 {
 }
 
-int PortElement::GetIndex()
+SourceNode::SourceNode(ell::model::SourceNodeBase* other, std::shared_ptr<ell::model::Model> model) :
+    Node(other, model),
+    _sourceNode(other)
 {
-    return static_cast<int>(_port.GetIndex());
 }
 
-PortType PortElement::GetType()
+ell::model::SourceNodeBase* SourceNode::GetSourceNode() const
 {
-    return static_cast<PortType>(_port.GetPortType());
-}
-
-OutputPort PortElement::ReferencedPort()
-{
-    auto port = _port.ReferencedPort();
-    if (port == nullptr)
-    {
-        throw Exception("no referenced port");
-    }
-    return OutputPort(port);
+    return _sourceNode;
 }
 
 //
-// PortElements
+// SinkNode
 //
-PortElements::PortElements(const ell::model::PortElementsBase& other) :
-    _elements(other)
+SinkNode::SinkNode(const SinkNode& node, std::shared_ptr<ell::model::Model> model) :
+    Node(node.GetNode(), model),
+    _sinkNode(node._sinkNode)
 {
 }
 
-PortElements::PortElements(const OutputPort& port) :
-    _elements(port.GetOutputPort())
+SinkNode::SinkNode(ell::model::SinkNodeBase* other, std::shared_ptr<ell::model::Model> model) :
+    Node(other, model),
+    _sinkNode(other)
 {
 }
 
-int PortElements::Size() const
+ell::model::SinkNodeBase* SinkNode::GetSinkNode() const
 {
-    return _elements.Size();
-}
-
-PortMemoryLayout PortElements::GetMemoryLayout() const
-{
-    return _elements.GetMemoryLayout();
-}
-
-PortType PortElements::GetType() const
-{
-    return static_cast<PortType>(_elements.GetPortType());
-}
-
-PortElement PortElements::GetElement(int index) const
-{
-    if (index < 0 || index >= Size())
-    {
-        throw std::invalid_argument("index out of range");
-    }
-    return PortElement(_elements.GetElement(index));
-}
-
-//
-// InputPort
-//
-
-InputPort::InputPort(const ell::model::InputPortBase* other) :
-    Port(other),
-    _input_port(other)
-{
-}
-
-NodeIterator InputPort::GetParentNodes()
-{
-    return NodeIterator(_input_port->GetParentNodes());
-}
-
-OutputPort InputPort::GetReferencedPort()
-{
-    return OutputPort(&_input_port->GetReferencedPort());
-}
-
-//
-// OutputPort
-//
-OutputPort::OutputPort(const ell::model::OutputPortBase* other) :
-    Port(other),
-    _output_port(other)
-{
-}
-
-bool OutputPort::IsReferenced() const
-{
-    return _output_port->IsReferenced();
-}
-
-InputPortIterator OutputPort::GetReferences()
-{
-    return InputPortIterator(_output_port->GetReferences());
-}
-
-std::vector<double> OutputPort::GetDoubleOutput()
-{
-    return _output_port->GetDoubleOutput();
-}
-
-double OutputPort::GetDoubleOutput(int index)
-{
-    return _output_port->GetDoubleOutput((size_t)index);
-}
-
-//
-// PortMemoryLayout
-//
-
-bool IsAllZeros(const std::vector<int>& p)
-{
-    if (p.size() == 0)
-    {
-        return true;
-    }
-    return std::all_of(p.begin(), p.end(), [](const int& value) { return value == 0; });
-}
-
-ell::model::PortMemoryLayout GetPortMemoryLayout(const std::vector<int>& size, const std::vector<int>& extent, const std::vector<int>& offset, const std::vector<int>& order)
-{
-    ell::model::MemoryShape sizeMemoryShape = ell::model::MemoryShape{ size };
-    ell::model::MemoryShape extentMemoryShape = {};
-
-    if (IsAllZeros(extent))
-    {
-        extentMemoryShape = ell::model::MemoryShape{ size };
-    }
-    else
-    {
-        extentMemoryShape = ell::model::MemoryShape{ extent };
-    }
-
-    if (IsAllZeros(offset) && IsAllZeros(order))
-    {
-        return ell::model::PortMemoryLayout(sizeMemoryShape);
-    }
-    else if (IsAllZeros(order))
-    {
-        return ell::model::PortMemoryLayout(sizeMemoryShape, extentMemoryShape, ell::model::MemoryShape{ offset });
-    }
-    else if (IsAllZeros(offset))
-    {
-        return ell::model::PortMemoryLayout(sizeMemoryShape, ell::model::DimensionOrder{ order });
-    }
-    else
-    {
-        return ell::model::PortMemoryLayout(sizeMemoryShape, extentMemoryShape, ell::model::MemoryShape{ offset }, ell::model::DimensionOrder{ order });
-    }
-}
-
-PortMemoryLayout::PortMemoryLayout(const std::vector<int>& size, const std::vector<int>& extent, const std::vector<int>& offset, const std::vector<int>& order) :
-    PortMemoryLayout(GetPortMemoryLayout(size, extent, offset, order))
-{
-}
-
-PortMemoryLayout::PortMemoryLayout(const ell::api::math::TensorShape& size) :
-    PortMemoryLayout(ell::model::PortMemoryLayout(size.ToMemoryShape()))
-{
-}
-
-PortMemoryLayout::PortMemoryLayout(const ell::model::PortMemoryLayout& layout) :
-    size(layout.GetActiveSize().ToVector()),
-    extent(layout.GetExtent().ToVector()),
-    offset(layout.GetOffset().ToVector()),
-    order(layout.GetLogicalDimensionOrder().ToVector()),
-    _layout(layout)
-{
-}
-
-bool PortMemoryLayout::IsEqual(const PortMemoryLayout& other)
-{
-    return _layout == other._layout;
+    return _sinkNode;
 }
 
 //
@@ -583,6 +311,11 @@ Model::Model()
 Model::Model(const std::string& filename)
 {
     Load(filename);
+}
+
+Model::Model(std::shared_ptr<ell::model::Model> underlyingModel) :
+    _model(underlyingModel)
+{
 }
 
 void Model::Load(const std::string& filename)
@@ -612,7 +345,7 @@ size_t Model::Size()
 NodeIterator Model::GetNodes()
 {
     auto iter = _model->GetNodeIterator();
-    return NodeIterator(iter);
+    return NodeIterator(iter, _model);
 }
 
 std::string Model::GetJson() const
@@ -621,6 +354,187 @@ std::string Model::GetJson() const
     JsonArchiver ar(stream);
     ar << *_model;
     return stream.str();
+}
+
+ModelBuilder builder;
+
+PortElements GetDefaultOutput(Node node)
+{
+    OutputPortIterator iter = node.GetOutputPorts();
+    if (iter.IsValid())
+    {
+        auto port = iter.Get();
+        return PortElements(port);
+    }
+    else
+    {
+        throw std::out_of_range("node has no output port");
+    }
+}
+
+// This provides a simpler version of ModelBuilder that hides Ports
+Node Model::AddBinaryOperation(Node input1, Node input2, BinaryOperationType operation)
+{
+    return builder.AddBinaryOperationNode(Model(_model), GetDefaultOutput(input1), GetDefaultOutput(input2), operation);
+}
+
+Node Model::AddBuffer(Node input, int windowSize)
+{
+    return builder.AddBufferNode(Model(_model), GetDefaultOutput(input), windowSize);
+}
+
+Node Model::AddClock(Node input, double interval, double lagThreshold, const std::string& lagNotificationName)
+{
+    return builder.AddClockNode(Model(_model), GetDefaultOutput(input), interval, lagThreshold, lagNotificationName);
+}
+
+Node Model::AddConcatenation(const PortMemoryLayout& outputMemoryLayout, const std::vector<Node>& inputs)
+{
+    std::vector<PortElements> elements_list; // keep the object alive.
+    std::vector<PortElements*> elements;
+    for (const auto node : inputs)
+    {
+        elements_list.push_back(GetDefaultOutput(node));
+        elements.push_back(&elements_list.back());
+    }
+    return builder.AddConcatenationNode(Model(_model), outputMemoryLayout, elements);
+}
+
+Node Model::AddConstant(std::vector<double> values, const PortMemoryLayout& outputMemoryLayout, PortType type)
+{
+    return builder.AddConstantNode(Model(_model), values, outputMemoryLayout, type);
+}
+
+Node Model::AddConstant(std::vector<double> values, PortType type)
+{
+    return builder.AddConstantNode(Model(_model), values, type);
+}
+
+Node Model::AddDCT(Node input, int numFilters)
+{
+    return builder.AddDCTNode(Model(_model), GetDefaultOutput(input), numFilters);
+}
+
+Node Model::AddDotProduct(Node input1, Node input2)
+{
+    return builder.AddDotProductNode(Model(_model), GetDefaultOutput(input1), GetDefaultOutput(input2));
+}
+
+Node Model::AddDTW(std::vector<std::vector<double>> prototype, Node input)
+{
+    return builder.AddDTWNode(Model(_model), prototype, GetDefaultOutput(input));
+}
+
+Node Model::AddFFT(Node input, int nfft)
+{
+    return builder.AddFFTNode(Model(_model), GetDefaultOutput(input), nfft);
+}
+
+Node Model::AddGRU(Node input, Node reset, size_t hiddenUnits, Node inputWeights, Node hiddenWeights, Node inputBias, Node hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
+{
+    return builder.AddGRUNode(Model(_model), GetDefaultOutput(input), GetDefaultOutput(reset), hiddenUnits, GetDefaultOutput(inputWeights), GetDefaultOutput(hiddenWeights), GetDefaultOutput(inputBias), GetDefaultOutput(hiddenBias), activation, recurrentActivation);
+}
+
+Node Model::AddHammingWindow(Node input)
+{
+    return builder.AddHammingWindowNode(Model(_model), GetDefaultOutput(input));
+}
+
+Node Model::AddIIRFilter(Node input, std::vector<double> bCoeffs, std::vector<double> aCoeffs)
+{
+    return builder.AddIIRFilterNode(Model(_model), GetDefaultOutput(input), bCoeffs, aCoeffs);
+}
+
+InputNode Model::AddInput(const PortMemoryLayout& memoryLayout, PortType type)
+{
+    return builder.AddInputNode(Model(_model), memoryLayout, type);
+}
+
+Node Model::AddLinearFilterBank(Node input, double sampleRate, int numFilters, int numFiltersToUse, double offset)
+{
+    return builder.AddLinearFilterBankNode(Model(_model), GetDefaultOutput(input), sampleRate, numFilters, numFiltersToUse, offset);
+}
+
+Node Model::AddLSTM(Node input, Node reset, size_t hiddenUnits, Node inputWeights, Node hiddenWeights, Node inputBias, Node hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
+{
+    return builder.AddLSTMNode(Model(_model), GetDefaultOutput(input), GetDefaultOutput(reset), hiddenUnits, GetDefaultOutput(inputWeights), GetDefaultOutput(hiddenWeights), GetDefaultOutput(inputBias), GetDefaultOutput(hiddenBias), activation, recurrentActivation);
+}
+
+Node Model::AddMatrixMultiply(Node input1, Node input2)
+{
+    return builder.AddMatrixMultiplyNode(Model(_model), GetDefaultOutput(input1), GetDefaultOutput(input2));
+}
+
+Node Model::AddMelFilterBank(Node input, double sampleRate, int fftSize, int numFilters, int numFiltersToUse, double offset)
+{
+    return builder.AddMelFilterBankNode(Model(_model), GetDefaultOutput(input), sampleRate, fftSize, numFilters, numFiltersToUse, offset);
+}
+
+Node Model::AddNeuralNetworkPredictor(Node input, ell::api::predictors::NeuralNetworkPredictor predictor)
+{
+    return builder.AddNeuralNetworkPredictorNode(Model(_model), GetDefaultOutput(input), predictor);
+}
+
+OutputNode Model::AddOutput(const PortMemoryLayout& memoryLayout, Node input)
+{
+    return builder.AddOutputNode(Model(_model), memoryLayout, GetDefaultOutput(input));
+}
+
+Node Model::AddReinterpretLayout(Node input, PortMemoryLayout outputMemoryLayout)
+{
+    return builder.AddReinterpretLayoutNode(Model(_model), GetDefaultOutput(input), outputMemoryLayout);
+}
+
+Node Model::AddReorderData(Node input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order, double outputPaddingValue)
+{
+    return builder.AddReorderDataNode(Model(_model), GetDefaultOutput(input), inputMemoryLayout, outputMemoryLayout, order, outputPaddingValue);
+}
+
+Node Model::AddRNN(Node input, Node reset, size_t hiddenUnits, Node inputWeights, Node hiddenWeights, Node inputBias, Node hiddenBias, ell::api::predictors::neural::ActivationType activation)
+{
+    return builder.AddRNNNode(Model(_model), GetDefaultOutput(input), GetDefaultOutput(reset), hiddenUnits, GetDefaultOutput(inputWeights), GetDefaultOutput(hiddenWeights), GetDefaultOutput(inputBias), GetDefaultOutput(hiddenBias), activation);
+}
+
+SinkNode Model::AddSink(Node input, const PortMemoryLayout& memoryLayout, const std::string& sinkFunctionName, Node trigger)
+{
+    PortElements triggerElements;
+    if (trigger.GetNode() != nullptr)
+    {
+        triggerElements = GetDefaultOutput(trigger);
+    }
+    return builder.AddSinkNode(Model(_model), GetDefaultOutput(input), memoryLayout, sinkFunctionName, triggerElements);
+}
+
+SourceNode Model::AddSource(Node input, PortType outputType, const PortMemoryLayout& memoryLayout, const std::string& sourceFunctionName)
+{
+    return builder.AddSourceNode(Model(_model), GetDefaultOutput(input), outputType, memoryLayout, sourceFunctionName);
+}
+
+Node Model::AddSplice(const std::vector<Node>& inputs)
+{
+    std::vector<PortElements> elements_list; // keep them alive
+    std::vector<PortElements*> elements;
+    for (const auto node : inputs)
+    {
+        elements_list.push_back(GetDefaultOutput(node));
+        elements.push_back(&elements_list.back());
+    }
+    return builder.AddSpliceNode(Model(_model), elements);
+}
+
+Node Model::AddTypeCast(Node input, PortType outputType)
+{
+    return builder.AddTypeCastNode(Model(_model), GetDefaultOutput(input), outputType);
+}
+
+Node Model::AddUnaryOperation(Node input, UnaryOperationType operation)
+{
+    return builder.AddUnaryOperationNode(Model(_model), GetDefaultOutput(input), operation);
+}
+
+Node Model::AddVoiceActivityDetector(Node input, double sampleRate, double frameDuration, double tauUp, double tauDown, double largeInput, double gainAtt, double thresholdUp, double thresholdDown, double levelThreshold)
+{
+    return builder.AddVoiceActivityDetectorNode(Model(_model), GetDefaultOutput(input), sampleRate, frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold);
 }
 
 std::string Model::GetMetadataValue(const std::string& key)
@@ -643,9 +557,9 @@ Model::Model(ell::model::Model&& other)
     _model = std::make_shared<ell::model::Model>(std::move(other));
 }
 
-ell::model::Model& Model::GetModel()
+std::shared_ptr<ell::model::Model> Model::GetModel() const
 {
-    return *_model;
+    return _model;
 }
 
 //
@@ -687,34 +601,85 @@ Map::Map(Model model, InputNode inputNode, PortElements output)
 
     const ell::model::PortElementsBase& innerPortElements = output.GetPortElements();
     name = GetVariableName(innerPortElements, "output");
-    auto& ellModel = model.GetModel();
-    auto outputs = std::vector<std::pair<std::string, const ell::model::OutputPortBase&>>{ { name, ellModel.SimplifyOutputs(innerPortElements) } };
-    _map = std::make_shared<ell::model::Map>(ellModel, inputs, outputs);
+    std::shared_ptr<ell::model::Model> ellModel = model.GetModel();
+    auto outputs = std::vector<std::pair<std::string, const ell::model::OutputPortBase&>>{ { name, ellModel->SimplifyOutputs(innerPortElements) } };
+    _map = std::make_shared<ell::model::Map>(*ellModel, inputs, outputs);
+}
+
+Map::Map(Model model, InputNode inputNode, OutputNode outputNode)
+{
+    auto output = GetDefaultOutput(outputNode);
+    const ell::model::InputNodeBase* innerInputNode = inputNode.GetInputNode();
+    std::string name = innerInputNode->GetFriendlyName();
+    if (name.empty())
+    {
+        name = "input";
+    }
+
+    std::vector<std::pair<std::string, ell::model::InputNodeBase*>> inputs = { std::pair<std::string, ell::model::InputNodeBase*>{ name, const_cast<ell::model::InputNodeBase*>(innerInputNode) } };
+
+    const ell::model::PortElementsBase& innerPortElements = output.GetPortElements();
+    name = GetVariableName(innerPortElements, "output");
+    std::shared_ptr<ell::model::Model> ellModel = model.GetModel();
+    auto outputs = std::vector<std::pair<std::string, const ell::model::OutputPortBase&>>{ { name, ellModel->SimplifyOutputs(innerPortElements) } };
+    _map = std::make_shared<ell::model::Map>(*ellModel, inputs, outputs);
 }
 
 Map::Map(Model model, const std::vector<InputNode*> inputNodes, const std::vector<PortElements*> outputs)
 {
     std::vector<std::pair<std::string, ell::model::InputNodeBase*>> mapInputs;
+
+    ell::utilities::UniqueNameList inputScope;
     for (auto& inputNode : inputNodes)
     {
         const ell::model::InputNodeBase* innerInputNode = inputNode->GetInputNode();
         auto name = innerInputNode->GetFriendlyName();
         if (name.empty())
         {
-            name = "input";
+            name = inputScope.Add("input");
         }
         mapInputs.push_back(std::pair<std::string, ell::model::InputNodeBase*>{ name, const_cast<ell::model::InputNodeBase*>(innerInputNode) });
     }
 
-    auto& ellModel = model.GetModel();
+    auto ellModel = model.GetModel();
     std::vector<std::pair<std::string, const ell::model::OutputPortBase&>> mapOutputs;
+    ell::utilities::UniqueNameList outputScope;
     for (auto& output : outputs)
     {
         const ell::model::PortElementsBase& innerPortElements = output->GetPortElements();
-        auto name = GetVariableName(innerPortElements, "output");
-        mapOutputs.push_back({ name, ellModel.SimplifyOutputs(innerPortElements) });
+        auto name = outputScope.Add(GetVariableName(innerPortElements, "output"));
+        mapOutputs.push_back({ name, ellModel->SimplifyOutputs(innerPortElements) });
     }
-    _map = std::make_shared<ell::model::Map>(model.GetModel(), mapInputs, mapOutputs);
+    _map = std::make_shared<ell::model::Map>(*ellModel, mapInputs, mapOutputs);
+}
+
+Map::Map(Model model, const std::vector<InputNode*> inputNodes, const std::vector<OutputNode*> outputNodes)
+{
+    std::vector<std::pair<std::string, ell::model::InputNodeBase*>> mapInputs;
+
+    ell::utilities::UniqueNameList inputScope;
+    for (auto& inputNode : inputNodes)
+    {
+        const ell::model::InputNodeBase* innerInputNode = inputNode->GetInputNode();
+        auto name = innerInputNode->GetFriendlyName();
+        if (name.empty())
+        {
+            name = inputScope.Add("input");
+        }
+        mapInputs.push_back(std::pair<std::string, ell::model::InputNodeBase*>{ name, const_cast<ell::model::InputNodeBase*>(innerInputNode) });
+    }
+
+    auto ellModel = model.GetModel();
+    std::vector<std::pair<std::string, const ell::model::OutputPortBase&>> mapOutputs;
+    ell::utilities::UniqueNameList outputScope;
+    for (auto& outputNode : outputNodes)
+    {
+        auto output = GetDefaultOutput(*outputNode);
+        const ell::model::PortElementsBase& innerPortElements = output.GetPortElements();
+        auto name = outputScope.Add(GetVariableName(innerPortElements, "output"));
+        mapOutputs.push_back({ name, ellModel->SimplifyOutputs(innerPortElements) });
+    }
+    _map = std::make_shared<ell::model::Map>(*ellModel, mapInputs, mapOutputs);
 }
 
 Map::Map(std::shared_ptr<ell::model::Map>& map) :
@@ -727,19 +692,54 @@ Map::Map(const std::string& filename)
     Load(filename);
 }
 
-ell::api::math::TensorShape Map::GetInputShape() const
+int Map::NumInputs() const
 {
-    return ell::api::math::TensorShape::FromMemoryShape(_map->GetInputShape());
+    return _map->NumInputs();
 }
 
-ell::api::math::TensorShape Map::GetOutputShape() const
+ell::api::math::TensorShape Map::GetInputShape(int index) const
 {
-    return ell::api::math::TensorShape::FromMemoryShape(_map->GetOutputShape());
+    return ell::api::math::TensorShape::FromMemoryShape(_map->GetInputShape(index));
+}
+
+ell::api::math::TensorShape Map::GetOutputShape(int index) const
+{
+    return ell::api::math::TensorShape::FromMemoryShape(_map->GetOutputShape(index));
+}
+
+PortMemoryLayout Map::GetInputLayout(int index) const
+{
+    return PortMemoryLayout(_map->GetInput(index)->GetMemoryLayout());
+}
+
+PortMemoryLayout Map::GetOutputLayout(int index) const
+{
+    return PortMemoryLayout(_map->GetOutput(index).GetMemoryLayout());
+}
+
+PortType Map::GetInputType(int index) const
+{
+    return (PortType)_map->GetInputType(index);
+}
+
+int Map::NumOutputs() const
+{
+    return _map->NumOutputs();
+}
+
+PortType Map::GetOutputType(int index) const
+{
+    return (PortType)_map->GetOutputType(index);
 }
 
 Model Map::GetModel() const
 {
     return Model(_map->GetModel().ShallowCopy());
+}
+
+void Map::Refine(int iterations)
+{
+    _map->Refine(iterations);
 }
 
 void Map::Load(const std::string& filename)
@@ -781,6 +781,63 @@ std::string Map::GetMetadataValue(const std::string& key)
     return value;
 }
 
+std::vector<CallbackInfo> Map::GetSinkCallbackInfo()
+{
+    std::vector<CallbackInfo> result;
+    auto floatNodes = GetModel().GetModel()->GetNodesByType<ell::nodes::SinkNode<float>>();
+    for (auto node : floatNodes)
+    {
+        result.push_back({ node->GetCallbackName(), PortType::smallReal });
+    }
+
+    auto doubleNodes = GetModel().GetModel()->GetNodesByType<ell::nodes::SinkNode<double>>();
+    for (auto node : doubleNodes)
+    {
+        result.push_back({ node->GetCallbackName(), PortType::real });
+    }
+
+    auto intNodes = GetModel().GetModel()->GetNodesByType<ell::nodes::SinkNode<int>>();
+    for (auto node : intNodes)
+    {
+        result.push_back({ node->GetCallbackName(), PortType::integer });
+    }
+    return result;
+}
+
+std::vector<CallbackInfo> Map::GetSourceCallbackInfo()
+{
+    std::vector<CallbackInfo> result;
+    auto floatNodes = GetModel().GetModel()->GetNodesByType<ell::nodes::SourceNode<float>>();
+    for (auto node : floatNodes)
+    {
+        result.push_back({ node->GetCallbackName(), PortType::smallReal });
+    }
+
+    auto doubleNodes = GetModel().GetModel()->GetNodesByType<ell::nodes::SourceNode<double>>();
+    for (auto node : doubleNodes)
+    {
+        result.push_back({ node->GetCallbackName(), PortType::real });
+    }
+
+    auto intNodes = GetModel().GetModel()->GetNodesByType<ell::nodes::SourceNode<int>>();
+    for (auto node : intNodes)
+    {
+        result.push_back({ node->GetCallbackName(), PortType::integer });
+    }
+    return result;
+}
+
+std::vector<CallbackInfo> Map::GetLagCallbackInfo()
+{
+    std::vector<CallbackInfo> result;
+    auto nodes = GetModel().GetModel()->GetNodesByType<ell::nodes::ClockNode>();
+    for (auto node : nodes)
+    {
+        result.push_back({ node->GetLagNotificationFunctionName(), PortType::real });
+    }
+    return result;
+}
+
 void Map::SetMetadataValue(const std::string& key, const std::string& value)
 {
     _map->GetMetadata()[key] = value;
@@ -803,80 +860,33 @@ std::vector<float> Map::ComputeFloat(const std::vector<float>& inputData)
     return _map->Compute<float>(inputData);
 }
 
-void ResolveCallbacks(llvm::Module* module, ell::emitters::IRExecutionEngine& jitter)
-{
-    for (llvm::Function& func : module->getFunctionList())
-    {
-        std::string name = func.getName().str();
-        if (func.hasExternalLinkage())
-        {
-            if (name.find("LagNotification") != std::string::npos)
-            {
-                jitter.DefineFunction(&func, reinterpret_cast<uintptr_t>(&model_CompiledMap_LagNotificationCallback));
-            }
-            else if (name.find("SourceCallback_Float") != std::string::npos)
-            {
-                jitter.DefineFunction(&func, reinterpret_cast<uintptr_t>(&model_CompiledMap_SourceCallback_Float));
-            }
-            else if (name.find("SinkCallback_Float") != std::string::npos)
-            {
-                jitter.DefineFunction(&func, reinterpret_cast<uintptr_t>(&model_CompiledMap_SinkCallback_Float));
-            }
-            else if (name.find("SourceCallback_Double") != std::string::npos)
-            {
-                jitter.DefineFunction(&func, reinterpret_cast<uintptr_t>(&model_CompiledMap_SourceCallback_Double));
-            }
-            else if (name.find("SinkCallback_Double") != std::string::npos)
-            {
-                jitter.DefineFunction(&func, reinterpret_cast<uintptr_t>(&model_CompiledMap_SinkCallback_Double));
-            }
-            else
-            {
-                // the predict function and the openblas_gemm functions also have external linkage.
-            }
-        }
-    }
-}
-
-CompiledMap Map::CompileDouble(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings) const
-{
-    return Map::Compile(targetDevice, moduleName, functionName, "CompiledMap_SourceCallback_Double", "CompiledMap_SinkCallback_Double", compilerSettings, optimizerSettings, &ResolveCallbacks);
-}
-
-CompiledMap Map::CompileFloat(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings) const
-{
-    return Map::Compile(targetDevice, moduleName, functionName, "CompiledMap_SourceCallback_Float", "CompiledMap_SinkCallback_Float", compilerSettings, optimizerSettings, &ResolveCallbacks);
-}
-
-CompiledMap Map::Compile(const std::string& targetDevice,
-                         const std::string& moduleName,
-                         const std::string& functionName,
-                         const std::string& sourceFunctionName,
-                         const std::string& sinkFunctionName,
-                         const MapCompilerOptions& compilerSettings,
-                         const ModelOptimizerOptions& optimizerSettings,
-                         std::function<void(llvm::Module*, ell::emitters::IRExecutionEngine&)> resolveCallbacks) const
+CompiledMap Map::Compile(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings) const
 {
     ell::model::MapCompilerOptions settings;
     settings.moduleName = moduleName;
     settings.mapFunctionName = functionName;
-    settings.sourceFunctionName = sourceFunctionName;
-    settings.sinkFunctionName = sinkFunctionName;
     settings.compilerSettings.targetDevice.deviceName = targetDevice;
+    settings.compilerSettings.optimize = compilerSettings.optimize;
+    settings.compilerSettings.profile = compilerSettings.profile;
+    settings.compilerSettings.parallelize = compilerSettings.parallelize;
+    settings.compilerSettings.useThreadPool = compilerSettings.useThreadPool;
+    settings.compilerSettings.maxThreads = compilerSettings.maxThreads;
+    settings.compilerSettings.useFastMath = compilerSettings.useFastMath;
+    settings.compilerSettings.includeDiagnosticInfo = compilerSettings.includeDiagnosticInfo;
     settings.compilerSettings.useBlas = compilerSettings.useBlas;
+    settings.compilerSettings.unrollLoops = compilerSettings.unrollLoops;
+    settings.compilerSettings.inlineOperators = compilerSettings.inlineOperators;
+    settings.compilerSettings.allowVectorInstructions = compilerSettings.allowVectorInstructions;
+    settings.compilerSettings.vectorWidth = compilerSettings.vectorWidth;
+    settings.compilerSettings.debug = compilerSettings.debug;
 
     ell::model::ModelOptimizerOptions optimizerOptions;
     optimizerOptions["fuseLinearFunctionNodes"] = optimizerSettings.fuseLinearFunctionNodes;
 
     auto compiler = std::make_shared<ell::model::IRMapCompiler>(settings, optimizerOptions);
-
-    auto module = compiler->GetModule().GetLLVMModule();
     auto compiledMap = std::make_shared<ell::model::IRCompiledMap>(compiler->Compile(*_map));
-    if (!sourceFunctionName.empty() || !sinkFunctionName.empty())
-    {
-        resolveCallbacks(module, compiledMap->GetJitter());
-    }
-    return CompiledMap(std::move(compiler), std::move(compiledMap), GetInputShape(), GetOutputShape());
+
+    return CompiledMap(std::move(compiler), std::move(compiledMap), _map);
 }
 
 //
@@ -884,27 +894,23 @@ CompiledMap Map::Compile(const std::string& targetDevice,
 //
 CompiledMap::CompiledMap(
     std::shared_ptr<ell::model::IRMapCompiler> compiler,
-    std::shared_ptr<ell::model::IRCompiledMap> map,
-    ell::api::math::TensorShape inputShape,
-    ell::api::math::TensorShape outputShape) :
+    std::shared_ptr<ell::model::IRCompiledMap> compiledMap,
+    std::shared_ptr<ell::model::Map> map) :
     _compiler(std::move(compiler)),
-    _map(std::move(map)),
-    _inputShape(inputShape),
-    _outputShape(outputShape)
+    _compiledMap(std::move(compiledMap)),
+    _map(map)
 {}
 
 CompiledMap::~CompiledMap()
 {
-    UnregisterCallbacks<double>();
-    UnregisterCallbacks<float>();
 }
 
 std::string CompiledMap::GetCodeString()
 {
     std::stringstream s;
-    if (_map != nullptr)
+    if (_compiledMap != nullptr)
     {
-        _map->WriteCode(s, ell::emitters::ModuleOutputFormat::ir);
+        _compiledMap->WriteCode(s, ell::emitters::ModuleOutputFormat::ir);
     }
     return s.str();
 }
@@ -920,59 +926,138 @@ bool CompiledMap::HasSourceNodes()
     return _sourceNodeState == TriState::Yes;
 }
 
-std::vector<double> CompiledMap::ComputeDouble(const std::vector<double>& inputData)
+int CompiledMap::NumInputs() const
 {
     if (_map != nullptr)
     {
-        return _map->Compute<double>(inputData);
+        return _map->NumInputs();
+    }
+    return 0;
+}
+
+ell::api::math::TensorShape CompiledMap::GetInputShape(int index) const
+{
+    if (_map != nullptr)
+    {
+        return ell::api::math::TensorShape::FromMemoryShape(_map->GetInputShape(index));
+    }
+    return {};
+}
+
+PortMemoryLayout CompiledMap::GetInputLayout(int index) const
+{
+    if (_map != nullptr)
+    {
+        return PortMemoryLayout(_map->GetInput(index)->GetMemoryLayout());
+    }
+    auto empty = ell::model::PortMemoryLayout();
+    return PortMemoryLayout(empty);
+}
+
+PortType CompiledMap::GetInputType(int index) const
+{
+    return (PortType)_map->GetInputType(index);
+}
+
+int CompiledMap::NumOutputs() const
+{
+    if (_map != nullptr)
+    {
+        return _map->NumOutputs();
+    }
+    return 0;
+}
+
+ell::api::math::TensorShape CompiledMap::GetOutputShape(int index) const
+{
+    if (_map != nullptr)
+    {
+        return ell::api::math::TensorShape::FromMemoryShape(_map->GetInputShape(index));
+    }
+    return {};
+}
+
+PortMemoryLayout CompiledMap::GetOutputLayout(int index) const
+{
+    if (_map != nullptr)
+    {
+        return PortMemoryLayout(_map->GetOutput(index).GetMemoryLayout());
+    }
+    auto empty = ell::model::PortMemoryLayout();
+    return PortMemoryLayout(empty);
+}
+
+PortType CompiledMap::GetOutputType(int index) const
+{
+    return (PortType)_map->GetOutputType(index);
+}
+
+std::vector<double> CompiledMap::ComputeDouble(const std::vector<double>& inputData)
+{
+    if (_compiledMap != nullptr)
+    {
+        return _compiledMap->Compute<double>(inputData);
     }
     return {};
 }
 
 std::vector<float> CompiledMap::ComputeFloat(const std::vector<float>& inputData)
 {
-    if (_map != nullptr)
+    if (_compiledMap != nullptr)
     {
-        return _map->Compute<float>(inputData);
+        return _compiledMap->Compute<float>(inputData);
     }
     return {};
 }
 
+std::vector<int> CompiledMap::ComputeInt(const std::vector<int>& inputData)
+{
+    if (_compiledMap != nullptr)
+    {
+        return _compiledMap->Compute<int>(inputData);
+    }
+    return {};
+}
+//
+//std::vector<int64_t> CompiledMap::ComputeInt64(const std::vector<int64_t>& inputData)
+//{
+//    if (_compiledMap != nullptr)
+//    {
+//        return _compiledMap->Compute<int64_t>(inputData);
+//    }
+//    return {};
+//}
+
+void CompiledMap::Reset()
+{
+    if (_compiledMap != nullptr)
+    {
+        return _compiledMap->Reset();
+    }
+}
+
 void CompiledMap::WriteIR(const std::string& filePath)
 {
-    if (_map != nullptr)
+    if (_compiledMap != nullptr)
     {
-        _map->WriteCode(filePath, ell::emitters::ModuleOutputFormat::ir);
+        _compiledMap->WriteCode(filePath, ell::emitters::ModuleOutputFormat::ir);
     }
 }
 
 void CompiledMap::WriteBitcode(const std::string& filePath)
 {
-    if (_map != nullptr)
+    if (_compiledMap != nullptr)
     {
-        _map->WriteCode(filePath, ell::emitters::ModuleOutputFormat::bitcode);
+        _compiledMap->WriteCode(filePath, ell::emitters::ModuleOutputFormat::bitcode);
     }
 }
 
 void CompiledMap::WriteSwigInterface(const std::string& filePath)
 {
-    if (_map != nullptr)
+    if (_compiledMap != nullptr)
     {
-        _map->WriteCode(filePath, ell::emitters::ModuleOutputFormat::swigInterface);
+        _compiledMap->WriteCode(filePath, ell::emitters::ModuleOutputFormat::swigInterface);
     }
 }
 
-// Specializations with type-specific static forwarder instances
-template <>
-ell::api::CallbackForwarder<double, double>& CompiledMap::GetCallbackForwarder()
-{
-    return forwarderDouble;
-}
-
-// Specializations with type-specific static forwarder instances
-template <>
-ell::api::CallbackForwarder<float, float>& CompiledMap::GetCallbackForwarder()
-{
-    return forwarderFloat;
-}
 } // namespace ELL_API

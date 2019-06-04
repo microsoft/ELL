@@ -72,7 +72,7 @@ class CatsDogsPredictor(model.ModelWrapper):
         # - reorders the image channels if needed
         # - returns the data as a ravelled numpy array of floats so it can be
         # handed to the model
-        return model.model.FloatVector(helpers.prepare_image_for_model(
+        return model.FloatVector(helpers.prepare_image_for_model(
             self.image, self.input_shape.columns, self.input_shape.rows, preprocessing_metadata=self.preprocessing_metadata))
 
     def output_callback(self, predictions):

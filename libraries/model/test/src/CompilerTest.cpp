@@ -78,16 +78,6 @@ std::string OutputPath(std::string relPath)
 // Helper functions for constructing example models/maps
 //
 
-model::Map MakeSimpleMap()
-{
-    // make a model
-    model::Model model;
-    auto inputNode = model.AddNode<model::InputNode<double>>(3);
-    const auto& sum = nodes::Sum(inputNode->output);
-
-    return model::Map{ model, { { "input", inputNode } }, { { "output", sum } } };
-}
-
 model::Map MakeForestMap()
 {
     // define some abbreviations
@@ -151,8 +141,20 @@ void TestSimpleMap(bool optimize)
     model::ModelOptimizerOptions optimizerOptions;
     model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
-
     testing::ProcessTest("Testing IsValid of original map", testing::IsEqual(compiledMap.IsValid(), true));
+
+    std::vector<double> input({ 4,5,6 });
+    std::vector<double> output({ 0, 0, 0 });
+    std::vector<double> expected({ 12, 15, 18 });
+
+    // AccumulatorNode just keeps accumulating, so we have to make sure we make the same number of calls
+    // to Compute, and compiled.Compute.
+    auto actual = map.Compute<double>(input);
+    auto compiledActual = compiledMap.Compute<double>(input);
+
+    actual = map.Compute<double>(input);
+    compiledMap.ComputeMultiple(std::vector<void*>({ (void*)input.data() }), std::vector<void*>({ (void*)output.data() }));
+    testing::ProcessTest("Test ComputeDispatch", testing::IsEqual(output, expected));
 
     // compare output
     std::vector<std::vector<double>> signal = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 3, 4, 5 }, { 2, 3, 2 }, { 1, 5, 3 }, { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }, { 7, 4, 2 }, { 5, 2, 1 } };
@@ -765,27 +767,29 @@ void TestForest()
 
 extern "C" {
 // Callbacks used by compiled map
-bool TestMulti_DataCallback1(void* context, double* input)
+bool TestMulti_DataCallback1(void* context, double* input, int size)
 {
     Log() << "Data callback 1" << EOL;
     const std::vector<double> input1{ 1, 3, 5, 7, 9, 11, 13 };
+    testing::ProcessTest("Sink callback size is correct", size == static_cast<int>(input1.size()));
     std::copy(input1.begin(), input1.end(), input);
     return true;
 }
-bool TestMulti_DataCallback2(void* context, double* input)
+bool TestMulti_DataCallback2(void* context, double* input, int size)
 {
     Log() << "Data callback 2" << EOL;
     const std::vector<double> input2{ 42 };
+    testing::ProcessTest("Sink callback size is correct", size == static_cast<int>(input2.size()));
     std::copy(input2.begin(), input2.end(), input);
     return true;
 }
 
-void TestMulti_ResultsCallback_Scalar(void* context, double result)
+void TestMulti_ResultsCallback_Scalar(void* context, double result, int size)
 {
     Log() << "Results callback (scalar): " << result << EOL;
 }
 
-void TestMulti_ResultsCallback_Vector(void* context, double* result)
+void TestMulti_ResultsCallback_Vector(void* context, double* result, int size)
 {
     Log() << "Results callback (vector): " << result[0] << EOL;
 }
@@ -797,10 +801,10 @@ void TestMulti_LagNotificationCallback(void* context, double lag)
 }
 
 // Ensure that LLVM jit can find these symbols
-TESTING_FORCE_DEFINE_SYMBOL(TestMulti_DataCallback1, bool, void*, double*);
-TESTING_FORCE_DEFINE_SYMBOL(TestMulti_DataCallback2, bool, void*, double*);
-TESTING_FORCE_DEFINE_SYMBOL(TestMulti_ResultsCallback_Scalar, void, void*, double);
-TESTING_FORCE_DEFINE_SYMBOL(TestMulti_ResultsCallback_Vector, void, void*, double*);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_DataCallback1, bool, void*, double*, int);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_DataCallback2, bool, void*, double*, int);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_ResultsCallback_Scalar, void, void*, double, int);
+TESTING_FORCE_DEFINE_SYMBOL(TestMulti_ResultsCallback_Vector, void, void*, double*, int);
 TESTING_FORCE_DEFINE_SYMBOL(TestMulti_LagNotificationCallback, void, void*, double);
 
 void TestMultiSourceSinkMap(bool expanded, bool optimized)
@@ -808,12 +812,11 @@ void TestMultiSourceSinkMap(bool expanded, bool optimized)
     // Create the map
     constexpr nodes::TimeTickType lagThreshold = 200;
     constexpr nodes::TimeTickType interval = 40;
-
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<nodes::TimeTickType>>(1 /*currentTime*/);
     auto clockNode = model.AddNode<nodes::ClockNode>(inputNode->output, interval, lagThreshold, "LagNotificationCallback");
-    auto sourceNode1 = model.AddNode<nodes::SourceNode<double>>(clockNode->output, 7, "DataCallback1", [](auto& v) { return TestMulti_DataCallback1(nullptr, &v[0]); });
-    auto sourceNode2 = model.AddNode<nodes::SourceNode<double>>(clockNode->output, 1, "DataCallback2", [](auto& v) { return TestMulti_DataCallback2(nullptr, &v[0]); });
+    auto sourceNode1 = model.AddNode<nodes::SourceNode<double>>(clockNode->output, 7, "DataCallback1", [](auto& v) { return TestMulti_DataCallback1(nullptr, &v[0], 7); });
+    auto sourceNode2 = model.AddNode<nodes::SourceNode<double>>(clockNode->output, 1, "DataCallback2", [](auto& v) { return TestMulti_DataCallback2(nullptr, &v[0], 1); });
     auto sumNode = model.AddNode<nodes::SumNode<double>>(sourceNode1->output);
     auto minusNode = model.AddNode<nodes::BinaryOperationNode<double>>(sumNode->output,
                                                                        sourceNode2->output,
@@ -837,6 +840,16 @@ void TestMultiSourceSinkMap(bool expanded, bool optimized)
     model::ModelOptimizerOptions optimizerOptions;
     model::IRMapCompiler compiler(settings, optimizerOptions);
     auto compiledMap = compiler.Compile(map);
+
+    bool found = false;
+    for (std::string name : compiler.GetModule().GetCallbackFunctionNames())
+    {
+        if (name == "TestMulti_LagNotificationCallback")
+        {
+            found = true;
+        }
+    }
+    testing::ProcessTest("Testing GetCallbackFunctionNames", found);
 
     // Compare output
     std::vector<std::vector<nodes::TimeTickType>> signal =

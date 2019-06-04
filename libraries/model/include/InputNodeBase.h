@@ -35,7 +35,7 @@ namespace model
         /// <summary> Returns the dimensionality of the output </summary>
         ///
         /// <returns> The dimensionality of the output </returns>
-        size_t Size() { return _outputBase.Size(); }
+        size_t Size() const { return _outputBase.Size(); }
 
         /// <summary> Gets the output type of this node </summary>
         ///

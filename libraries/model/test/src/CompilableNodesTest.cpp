@@ -1237,21 +1237,6 @@ struct TestCompilableSourceNodeContext
     size_t callbackCount;
     size_t inputSize;
 };
-// C callback (called by emitted code)
-extern "C" {
-bool TestSourceNode_CompiledSourceNode_InputCallback(void* context, double* input)
-{
-    TestCompilableSourceNodeContext* s = (TestCompilableSourceNodeContext*)context;
-    Log() << "Source Input Callback " << input << EOL;
-    for (size_t i = 0; i < s->inputSize; ++i)
-    {
-        input[i] = 42.0;
-    }
-    s->callbackCount++;
-    return true;
-}
-TESTING_FORCE_DEFINE_SYMBOL(TestSourceNode_CompiledSourceNode_InputCallback, bool, void*, double*);
-}
 
 void TestCompilableSourceNode()
 {
@@ -1279,21 +1264,31 @@ void TestCompilableSourceNode()
         const SourceNode<double>* constSourceNode = static_cast<const SourceNode<double>*>(map.GetSourceNodes()[0]);
         SourceNode<double>* sourceNode = const_cast<SourceNode<double>*>(constSourceNode);
         sourceNode->SetSourceFunction(
-            [context](auto& input) {
+            [&context](auto& input) {
                 input.assign(context.inputSize, 42.0);
+                context.callbackCount++;
                 return true;
             });
 
         model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
-        compiledMap.SetContext(&context);
+        bool exception = false;
+        try 
+        {
+            compiledMap.SetContext(&context);
+        }
+        catch (const ell::utilities::InputException&)
+        {
+            exception = true;
+        }
+        testing::ProcessTest("SetContext throws an exception when SetSourceFunction is used", exception);
 
         // compare output
         VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
     });
 
     // Verify that jitted source callbacks are actually called, we have 3 inputs and 3 iterations, so 9 times in total.
-    size_t expectedCount = 3 * 3;
+    size_t expectedCount = 3 * 3 * 2;
     testing::ProcessTest("Testing callback values", testing::IsEqual(context.callbackCount, expectedCount));
 }
 
@@ -1306,14 +1301,15 @@ struct CallbackContext
 
 // C callback (called by emitted code)
 extern "C" {
-void TestSinkNode_CompiledSinkNode_OutputCallback(void* context, double* output)
+void TestSinkNode_CompiledSinkNode_OutputCallback(void* context, double* output, int size)
 {
     CallbackContext* cc = static_cast<CallbackContext*>(context);
     cc->called = true;
-    Log() << "Sink Output Callback (size=" << cc->inputSize << ") " << *output << EOL;
-    cc->outputValues.assign(output, output + cc->inputSize); // assign reallocates as needed
+    Log() << "Sink Output Callback (size=" << size << ") " << *output << EOL;
+    testing::ProcessTest("Callback size is correct", size == static_cast<int>(cc->inputSize));
+    cc->outputValues.assign(output, output + size); // assign reallocates as needed
 }
-TESTING_FORCE_DEFINE_SYMBOL(TestSinkNode_CompiledSinkNode_OutputCallback, void, void*, double*);
+TESTING_FORCE_DEFINE_SYMBOL(TestSinkNode_CompiledSinkNode_OutputCallback, void, void*, double*, int);
 }
 
 void TestCompilableSinkNode(size_t inputSize, bool triggerValue)

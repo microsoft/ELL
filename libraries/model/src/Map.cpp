@@ -74,14 +74,16 @@ namespace model
         TransformContext context;
         ModelTransformer transformer;
         _model = transformer.CopyModel(other._model, context);
-        for (const auto& input : other._inputNodeMap)
+        for (const auto& name : other._inputNames)
         {
-            AddInput(input.first, transformer.GetCorrespondingInputNode(input.second));
+            auto node = other._inputNodeMap.at(name);
+            AddInput(name, transformer.GetCorrespondingInputNode(node));
         }
 
-        for (const auto& output : other._outputsMap)
+        for (const auto& name : other._outputNames)
         {
-            AddOutput(output.first, transformer.GetCorrespondingOutputs(*output.second));
+            const auto outputPort = other._outputsMap.at(name);
+            AddOutput(name, transformer.GetCorrespondingOutputs(*outputPort));
         }
 
         _model.Verify();
@@ -186,6 +188,100 @@ namespace model
         value::ContextGuard<> guard(_computeContext);
 
         return ComputeDoubleOutput(elements);
+    }
+
+    void Map::ComputeMultiple(const std::vector<void*>& inputs, const std::vector<void*>& outputs)
+    {
+        value::ContextGuard<> guard(_computeContext);
+
+        auto numInputs = NumInputs();
+        for (size_t i = 0; i < numInputs && i < inputs.size(); i++)
+        {
+            auto size = GetInputSize(i);
+            void* ptr = inputs[i];
+            switch (GetInputType(i))
+            {
+            case ell::model::Port::PortType::smallReal:
+            {
+                float* floatData = reinterpret_cast<float*>(ptr);
+                SetInputValue<float>(i, std::vector<float>(floatData, floatData + size));
+            }
+            break;
+            case ell::model::Port::PortType::real:
+            {
+                double* doubleData = reinterpret_cast<double*>(ptr);
+                SetInputValue<double>(i, std::vector<double>(doubleData, doubleData + size));
+            }
+            break;
+            case ell::model::Port::PortType::integer:
+            {
+                int* intData = reinterpret_cast<int*>(ptr);
+                SetInputValue<int>(i, std::vector<int>(intData, intData + size));
+            }
+            case ell::model::Port::PortType::bigInt:
+            {
+                int64_t* int64Data = reinterpret_cast<int64_t*>(ptr);
+                SetInputValue<int64_t>(i, std::vector<int64_t>(int64Data, int64Data + size));
+            }
+            case ell::model::Port::PortType::boolean:
+            {
+                bool* boolData = reinterpret_cast<bool*>(ptr);
+                SetInputValue<bool>(i, std::vector<bool>(boolData, boolData + size));
+            }
+            break;
+            default:
+                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unsupported PortType found on InputNode");
+            }
+        }
+
+        _model.Step();
+
+        auto numOutputs = NumOutputs();
+        for (size_t i = 0; i < numOutputs && i < outputs.size(); i++)
+        {
+            auto size = GetOutputSize(i);
+            void* ptr = outputs[i];
+            switch (GetOutputType(i))
+            {
+            case ell::model::Port::PortType::smallReal:
+            {
+                const std::vector<float>& values = _outputs[i]->GetOutput<float>();
+                ::memcpy(ptr, values.data(), size * sizeof(float));
+            }
+            break;
+            case ell::model::Port::PortType::real:
+            {
+                const std::vector<double>& values = _outputs[i]->GetOutput<double>();
+                ::memcpy(ptr, values.data(), size * sizeof(double));
+            }
+            break;
+            case ell::model::Port::PortType::integer:
+            {
+                const std::vector<int>& values = _outputs[i]->GetOutput<int>();
+                ::memcpy(ptr, values.data(), size * sizeof(int));
+            }
+            break;
+            case ell::model::Port::PortType::bigInt:
+            {
+                const std::vector<int64_t>& values = _outputs[i]->GetOutput<int64_t>();
+                ::memcpy(ptr, values.data(), size * sizeof(int64_t));
+            }
+            break;
+            case ell::model::Port::PortType::boolean:
+            {
+                bool* boolData = reinterpret_cast<bool*>(ptr);
+                const std::vector<bool>& values = _outputs[i]->GetOutput<bool>();
+                // std::vector<bool> has no data() member.
+                for (int i = 0, n = values.size(); i < n; i++)
+                {
+                    boolData[i] = values[i];
+                }
+            }
+            break;
+            default:
+                throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unsupported PortType found on InputNode");
+            }
+        }
     }
 
     void Map::Reset()
@@ -705,5 +801,6 @@ namespace model
         ModelSerializationContext(previousContext, nullptr)
     {
     }
+
 } // namespace model
 } // namespace ell

@@ -7,7 +7,7 @@ permalink: /tutorials/Boosting-classifier-accuracy-by-grouping-categories/
 
 *by Chris Lovett, Byron Changuion, Ofer Dekel, and Lisa Ong*
 
-The pretrained models in the [Embedded Learning Library (ELL) gallery](/ELL/gallery/) are trained to identify 1,000 different image categories (see the category names [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)). This tutorial uses that image classification model to help solve a simpler classification problem: distinguishing among *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). This classification model has an error rate of 64% on the 1,000-class problem, but it has a low error rate of just 5.7% on the 3-class problem. 
+The pretrained models in the [Embedded Learning Library (ELL) gallery](/ELL/gallery/) are trained to identify 1,000 different image categories (see the category names [here](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/categories.txt)). This tutorial uses that image classification model to help solve a simpler classification problem: distinguishing among *dogs*, *cats*, and *other* (anything that isn't a dog or a cat). This classification model has an error rate of 64% on the 1,000-class problem, but it has a low error rate of just 5.7% on the 3-class problem.
 
 The tutorial includes instructions for a Python script that reads images from the camera and prints `Woof!` for dog recognition and `Meow!` for cat recognition while showing the class *Dog* or *Cat* as the window header text. In addition, the **Next steps** section describes how to include sound clips and also how to use callbacks with the model.
 
@@ -36,7 +36,7 @@ You'll start by repeating the steps of [Getting Started with Image Classificatio
 1. Download [the model](https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/d_I160x160x3CMCMBMBMBMBMC1AS/d_I160x160x3CMCMBMBMBMBMC1AS.ell.zip) to your computer.
 2. Use the `wrap` tool to compile it for the Raspberry Pi device.
 3. Copy the resulting CMake project to the Pi device.
-4. Build the project on the Pi device. 
+4. Build the project on the Pi device.
 
 Now, a Python module named `model` is on your Pi device.
 
@@ -84,7 +84,7 @@ def prediction_index_in_set(prediction_index, set):
             return True
     return False
 ```
-Define helper functions that print *woof* or  *meow* appropriately.  
+Define helper functions that print *woof* or  *meow* appropriately.
 
 ```python
 def take_action(group):
@@ -110,7 +110,7 @@ The argument **0** in the function call above selects the default camera. If you
 
 Create a model wrapper to interact with the model
 ```python
-    model_wrapper = model.model.ModelWrapper()
+    model_wrapper = model.ModelWrapper()
 ```
 
 Get the model input shape, which we will use to prepare the input data.
@@ -132,13 +132,13 @@ reordering the image channels (if needed), and returning the image data as a fla
         image = get_image_from_camera(camera)
 
         input_data = helpers.prepare_image_for_model(
-            image, input_shape.columns, input_shape.rows, 
+            image, input_shape.columns, input_shape.rows,
             preprocessing_metadata=preprocessing_metadata)
 ```
 
 Wrap the input_data **NumPy** array in a FloatVector
 ```python
-        input_data = model.model.FloatVector(input_data) 
+        input_data = model.FloatVector(input_data)
 ```
 
 Send the processed image to the model to get a vector of predictions.
@@ -203,7 +203,7 @@ Point the camera at different objects and see how the model classifies them. Loo
 A fun next step would be to introduce the playing of sounds to indicate the detection of either a dog or cat. To do this, download a dog's bark [here](http://freesound.org/people/davidmenke/sounds/231762/) and a
 cat's meow [here](https://freesound.org/people/tuberatanka/sounds/110011/). These can be used with the **play_sound** function that's available in the `tutorial_helpers` module, to play sounds on your computer or on your Raspberry Pi. Find more details on playing sounds at [Notes on Playing Audio](/ELL/tutorials/Notes-on-playing-audio).
 
-Here's an example of the classifier running with the audio barks and meows. 
+Here's an example of the classifier running with the audio barks and meows.
 
 [![screenshot](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/thumbnail.png)](https://youtu.be/SOmV8tzg_DU)
 
@@ -214,7 +214,7 @@ Instead of using the **predict** function, you can implement input and output ca
 
 The `pets_callback.py` script from [here](/ELL/tutorials/Boosting-classifier-accuracy-by-grouping-categories/pets_callback.py) demonstrates how to provide callbacks for the input image and the output predictions.
 
-First, define a class called **CatsDogsPredictor** that extends the **model.Model** class.
+First, define a class called **CatsDogsPredictor** that extends the **model.ModelWrapper** class.
 
 ```python
 class CatsDogsPredictor(model.ModelWrapper):
@@ -242,14 +242,14 @@ class CatsDogsPredictor(model.ModelWrapper):
         self.image = None
 ```
 
-**CatsDogsPredictor.input_callback** gets an image from the camera, processes it, and returns it to the ELL model. The ELL model will call this when it is ready to get input. 
+**CatsDogsPredictor.input_callback** gets an image from the camera, processes it, and returns it to the ELL model. The ELL model will call this when it is ready to get input.
 
 ```python
     def input_callback(self):
         """The input callback that returns an image to the model"""
         self.image = get_image_from_camera(self.camera)
 
-        return model.model.FloatVector(helpers.prepare_image_for_model(
+        return model.FloatVector(helpers.prepare_image_for_model(
             self.image, self.input_shape.columns, self.input_shape.rows, preprocess_tag=self.preprocess_tag))
 ```
 
@@ -267,7 +267,7 @@ class CatsDogsPredictor(model.ModelWrapper):
             if group == "Dog":
                 print("Woof!")
             elif group == "Cat":
-                print("Meow!")            
+                print("Meow!")
             header_text = "({:.0%}) {}".format(probability, group)
 
         helpers.draw_header(self.image, header_text)

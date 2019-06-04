@@ -38,14 +38,14 @@ This frequency map is something that a neural network can learn to recognize thr
 The classifier model file contains a deep neural network trained for keyword spotting on a [Kaggle audio dataset](https://www.kaggle.com/c/tensorflow-speech-recognition-challenge/data), which consists of
 60,000 recordings of 30 different keywords. (Keywords that the classifier should recognize are in the **categories.txt** file and include the following: bed, bird, cat, dog, down, eight, five, four, go, happy, house, left, marvin, nine, no, off, on, one, right, seven, sheila, six, stop, three, tree, two, up, wow, yes, zero.)
 
-In this tutorial, you'll download a pretrained keyword spotting model from the [Embedded Learning Library (ELL) audio gallery](/ELL/gallery/speech_commands_v0.01/) to a laptop or desktop computer. 
-You'll compile the model and wrap it in a Python module. 
+In this tutorial, you'll download a pretrained keyword spotting model from the [Embedded Learning Library (ELL) audio gallery](/ELL/gallery/speech_commands_v0.01/) to a laptop or desktop computer.
+You'll compile the model and wrap it in a Python module.
 Finally, you'll write a simple Python script that captures audio from the Raspberry Pi's microphone and then attempts to detect the keywords spoken.
 
 
 ## Activate your environment and create a tutorial directory
 
-After following the setup instructions, you'll have an Anaconda environment named **py36** on your laptop or desktop computer. 
+After following the setup instructions, you'll have an Anaconda environment named **py36** on your laptop or desktop computer.
 On your computer, open a terminal window and activate your Anaconda environment.
 
 
@@ -56,28 +56,28 @@ On your computer, open a terminal window and activate your Anaconda environment.
 Create a directory for this tutorial anywhere on your computer and `cd` into it.
 
 ## Download the featurizer model and the classifier model
-On your laptop or desktop computer, download this [ELL featurizer model file](https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/RunnerBean/featurizer.ell.zip) and this [ELL classifier model file](https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/RunnerBean/GRU100KeywordSpotter.ell.zip) into your new tutorial directory. 
+On your laptop or desktop computer, download this [ELL featurizer model file](https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/BluePaloVerde/featurizer.ell.zip) and this [ELL classifier model file](https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/BluePaloVerde/GRU110KeywordSpotter.ell.zip) into your new tutorial directory.
 
 
-Save the files locally as **featurizer.ell.zip** and **GRU100KeywordSpotter.ell.zip**.
+Save the files locally as **featurizer.ell.zip** and **GRU110KeywordSpotter.ell.zip**.
 The 16k suffix is to remind us that these models expect 16 kHz audio input:
 
 ```shell
-curl --location -O https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/RunnerBean/featurizer.ell.zip
+curl --location -O https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/BluePaloVerde/featurizer.ell.zip
 
-curl --location -O https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/RunnerBean/GRU100KeywordSpotter.ell.zip
+curl --location -O https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/BluePaloVerde/GRU110KeywordSpotter.ell.zip
 ```
 
 Unzip the compressed files and rename them to the shorter names:
 
-**Note** On Windows computers, the unzip utility is distributed as part of Git. For example, in `\Program Files\Git\usr\bin`. 
+**Note** On Windows computers, the unzip utility is distributed as part of Git. For example, in `\Program Files\Git\usr\bin`.
 On Linux computers, you can install unzip using the **apt-get install unzip** command.
 
 ```shell
 unzip featurizer.ell.zip
-unzip GRU100KeywordSpotter.ell.zip
-[Linux/macOS] mv GRU100KeywordSpotter.ell classifier.ell
-[Windows] ren GRU100KeywordSpotter.ell classifier.ell
+unzip GRU110KeywordSpotter.ell.zip
+[Linux/macOS] mv GRU110KeywordSpotter.ell classifier.ell
+[Windows] ren GRU110KeywordSpotter.ell classifier.ell
 ```
 
 Next, download the **categories.txt** file from [here](https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/categories.txt) and save it in the directory.
@@ -93,8 +93,8 @@ There should now be a **featurizer.ell** file and a **classifier.ell** file in y
 
 ## Compile and run the model on your laptop or desktop computer
 
-Before deploying the model to the Raspberry Pi device, practice deploying it to your laptop or desktop computer. 
-Deploying an ELL model requires two steps. First, you'll run the **wrap** tool, which both compiles the `featurizer.ell` and `classifier.ell` models into machine code and generates a CMake project to build a Python wrapper for it. 
+Before deploying the model to the Raspberry Pi device, practice deploying it to your laptop or desktop computer.
+Deploying an ELL model requires two steps. First, you'll run the **wrap** tool, which both compiles the `featurizer.ell` and `classifier.ell` models into machine code and generates a CMake project to build a Python wrapper for it.
 Second, you'll call **CMake** to build the Python library.
 
 Run **wrap** as follows, replacing `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).
@@ -138,9 +138,9 @@ into the correct scale of floating point numbers needed for the featurizer model
 
 ## Invoke the model on your computer
 
-The next step is to create a Python script that 
+The next step is to create a Python script that
 1. Loads the compiled models
-2. Sends audio to the featurizer model 
+2. Sends audio to the featurizer model
 3. Send the featurizer model output to the classifier model
 4. Interprets the classifier model's output.
 (View the full script [here](https://github.com/Microsoft/ELL/raw/master/tools/utilities/pythonlibs/audio/run_classifier.py).)
@@ -161,10 +161,11 @@ while True:
             print("<<< DETECTED ({}) {}% {} >>>".format(prediction, percent, label))
 ```
 
-So try it out using the `seven.wav` file included with this tutorial, using the compiled featurizer model and classifier model:
+So try it out using the `seven.wav` file included with this tutorial.  Make a directory named `audio` and copy the `seven.wav` file into it.
+Then run the following:
 
 ```shell
-python run_classifier.py --featurizer compiled_featurizer/mfcc --classifier compiled_classifier/model --categories categories.txt --wav_file seven.wav --sample_rate 16000 --auto_scale
+python run_classifier.py --featurizer compiled_featurizer/mfcc --classifier compiled_classifier/model --categories categories.txt --wav_file audio --sample_rate 16000 --auto_scale
 ```
 
 Output similar to this will be displayed:
@@ -193,7 +194,7 @@ Use the following tips and information to adjust noise levels, use a USB microph
 This will make the classifier output more noisy, which is why some smoothing of the output is recommended.
 
 * **USB microphone.** If you have a USB microphone attached to your computer, try running `run_classifier.py` with no wav_file and it will process your voice input.
-When you use a microphone you will need to make sure the gain is high.  Test your microphone using your favorite voice recorder app, and if 
+When you use a microphone you will need to make sure the gain is high.  Test your microphone using your favorite voice recorder app, and if
 the audio recording is nice and loud then it should work well.
 The classifier was trained on auto-gain leveled input, so if your microphone is too quiet the classifier will not work.
 Because the microphone input is an infinite stream you will also see a much longer "tail" on the classifier output as it drops back to 60% during the "silence" period between your spoken keywords.  Type 'x' to terminate the script.
@@ -236,12 +237,12 @@ On the Pi you will see an average processing time of about 2.3 milliseconds, whi
 
 ## Next steps
 
-The [ELL gallery](/ELL/gallery/) offers different models for keyword spotting. Some are slow and accurate, while others are faster and less accurate. Different models can even lead to different power draw on the Raspberry Pi. Repeat the steps above with different models.  
+The [ELL gallery](/ELL/gallery/) offers different models for keyword spotting. Some are slow and accurate, while others are faster and less accurate. Different models can even lead to different power draw on the Raspberry Pi. Repeat the steps above with different models.
 
 This tutorial used the **wrap** tool as a convenient way to compile the model and prepare for building its Python wrapper. To learn more, read the [wrap documentation](https://github.com/Microsoft/ELL/blob/master/tools/wrap/README.md).
 
 ## Troubleshooting
 
-If you are not getting any results from run_classifier.py or view_audio.py then check the `sample_rate` information in `train_results.json` file from the model gallery.  If you see a sample rate of 8000 then you need to pass this information to run_classifier.py as the command line argument: `--sample_rate 8000`.  Similarly, check if 'auto_scale' was set to `true`, and if so pass `--auto_scale` to the python script.  
+If you are not getting any results from run_classifier.py or view_audio.py then check the `sample_rate` information in `train_results.json` file from the model gallery.  If you see a sample rate of 8000 then you need to pass this information to run_classifier.py as the command line argument: `--sample_rate 8000`.  Similarly, check if 'auto_scale' was set to `true`, and if so pass `--auto_scale` to the python script.
 
 Look for troubleshooting tips at the end of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup).

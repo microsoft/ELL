@@ -15,6 +15,7 @@ set(_sources
     common/src/ModelBuilderInterface.cpp
     common/src/ModelInterface.cpp
     common/src/NeuralNetworkPredictorInterface.cpp
+    common/src/Ports.cpp
     common/src/TrainerInterface.cpp
 )
 foreach(src ${_sources})
@@ -30,6 +31,7 @@ set(_sources
     common/include/ModelInterface.h
     common/include/NeuralLayersInterface.h
     common/include/NeuralNetworkPredictorInterface.h
+    common/include/Ports.h
     common/include/TrainerInterface.h
 )
 foreach(src ${_sources})

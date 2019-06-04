@@ -27,7 +27,6 @@ using namespace ell;
 void SetOutputPathBase(std::string path);
 std::string OutputPath(std::string relPath);
 
-ell::model::Map MakeSimpleMap();
 ell::model::Map MakeForestMap();
 
 void TestBinaryVector(bool expanded, bool runJit = false);

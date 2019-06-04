@@ -20,6 +20,9 @@
 #include <emitters/include/LLVMUtilities.h>
 #include <emitters/include/Variable.h>
 
+#include <nodes/include/SinkNode.h>
+#include <nodes/include/SourceNode.h>
+
 #include <utilities/include/Logger.h>
 #include <utilities/include/StringUtil.h>
 
@@ -119,7 +122,6 @@ namespace model
                 _moduleEmitter.IncludeInCallbackInterface(functionName, std::get<2>(savedCallback)[0]);
             }
         }
-
         return IRCompiledMap(std::move(map), GetMapCompilerOptions().mapFunctionName, GetMapCompilerOptions(), _moduleEmitter, GetMapCompilerOptions().verifyJittedModule);
     }
 
@@ -136,6 +138,72 @@ namespace model
         map.Prune();
     }
 
+    void IRMapCompiler::EmitPredictDispatchFunction(const Map& map)
+    {
+        auto& emitter = _moduleEmitter.GetIREmitter();
+
+        // Now add a dynamic predict that we can call from jitted CompiledMap that can handle multiple inputs and outputs.
+        // Essentially we package up the pointers to the buffers in an array of void* pointers, into "predict_dispatch" which
+        // unpacks them, casts them to the right type and calls the above predict function.
+        emitters::NamedLLVMTypeList args;
+
+        std::vector<std::string> comments;
+        emitters::LLVMType returnType = emitter.Type(emitters::VariableType::Void);
+
+        auto predictFunction = _moduleEmitter.GetFunction(GetPredictFunctionName());
+        emitters::NamedLLVMTypeList predictArgs;
+        for (auto arg = predictFunction->arg_begin(), end = predictFunction->arg_end(); arg != end; ++arg)
+        {
+            predictArgs.push_back({ arg->getName(), arg->getType() });
+        }
+
+        args.push_back(predictArgs[0]); // the context parameter
+
+        //  we really want void** but LLVM doesn't allow that.
+        emitters::LLVMType argType = llvm::PointerType::getUnqual(emitter.Type(emitters::VariableType::Char8Pointer));
+        args.push_back({ "inputs", argType });
+        args.push_back({ "outputs", argType });
+
+        auto functionName = GetPredictFunctionName() + "_dispatch";
+        auto function = _moduleEmitter.BeginFunction(functionName, returnType, args);
+
+        // stops it from getting optimized away so it will always be in the JIT'd module.
+        function.GetFunction()->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
+
+        auto arg0 = function.GetFunctionArgument("context");
+        auto arg1 = function.GetFunctionArgument("inputs");
+        auto arg2 = function.GetFunctionArgument("outputs");
+
+        // unpack the array of buffers and turn them in to predict function arguments.
+        emitters::IRValueList arguments;
+        arguments.push_back(arg0); // pass the context through
+
+        int predictArgIndex = 1; // skip context.
+        size_t size = map.NumInputs();
+        for (size_t i = 0; i < size; ++i)
+        {
+            auto index = function.Literal(static_cast<int>(i));
+            auto offset = emitter.PointerOffset(arg1, index); // get &args[i]
+            auto ptr = function.Load(offset); // char*
+            auto typedPtr = function.CastPointer(ptr, predictArgs[predictArgIndex++].second); // cast it to the right type
+            arguments.push_back(typedPtr);
+        }
+
+        size = map.NumOutputs();
+        for (size_t i = 0; i < size; ++i)
+        {
+            auto index = function.Literal(static_cast<int>(i));
+            auto offset = emitter.PointerOffset(arg2, index); // get &args[i]
+            auto ptr = function.Load(offset); // char*
+            auto typedPtr = function.CastPointer(ptr, predictArgs[predictArgIndex++].second); // cast it to the right type
+            arguments.push_back(typedPtr);
+        }
+
+        function.Call(predictFunction, arguments);
+        function.Return();
+        _moduleEmitter.EndFunction();
+    }
+
     void IRMapCompiler::EmitModelAPIFunctions(const Map& map)
     {
         EmitGetInputSizeFunction(map);
@@ -147,6 +215,7 @@ namespace model
         EmitGetOutputShapeFunction(map);
         EmitGetSinkOutputShapeFunction(map);
         EmitGetMetadataFunction(map);
+        EmitPredictDispatchFunction(map);
 
         // Finish any profiling stuff we need to do and emit functions
         _profiler.EmitModelProfilerFunctions();

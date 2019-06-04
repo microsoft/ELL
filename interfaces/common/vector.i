@@ -16,12 +16,14 @@
 
 %{
 #include <vector>
+#include <stdint.h>
 %}
 
 #ifndef SWIGXML
 %include "std_string.i"
 %include "std_vector.i"
 %include "macros.i"
+%include "stdint.i"
 
 %template(DoubleVector) std::vector<double>;
 %template(DoubleVectorVector) std::vector<std::vector<double>>;
@@ -29,6 +31,8 @@
 %template(FloatVectorVector) std::vector<std::vector<float>>;
 %template(StringVector) std::vector<std::string>;
 %template(IntVector) std::vector<int>;
+// bugbug: doesn't compile with GCC or CLang.
+// %template(Int64Vector) std::vector<int64_t>;
 %template(Int8Vector) std::vector<int8_t>;
 
 // Include language specific SWIG definitions that must be declared after the

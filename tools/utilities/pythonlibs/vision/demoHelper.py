@@ -139,7 +139,7 @@ class ReferenceModel(EllModel):
         return ell
 
     def predict(self, data):
-        return self.model.Compute(data, dtype=np.float32)
+        return np.array(self.model.Compute(data))
 
 
 class ImageStream:

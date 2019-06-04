@@ -60,22 +60,22 @@ class DarknetModelTestCase(unittest.TestCase):
         np.testing.assert_array_almost_equal(
             result2, expectedResult2, 5, 'prediction of second input does not match expected results!')
 
-        # create a map and save to file
-        ell_map = ell.neural.utilities.ell_map_from_predictor(predictor)
-        ell_map.Save("darknet_test.map")
-
-        # create a map and save to file
+        # create a steppable map and save to file
         ell_map = ell.neural.utilities.ell_map_from_predictor(
             predictor, step_interval_msec=100, lag_threshold_msec=150, function_prefix="DarknetTest")
         ell_map.Save("darknet_steppable_test.map")
 
+        # create a simple map and save to file
+        ell_map = ell.neural.utilities.ell_map_from_predictor(predictor)
+        ell_map.Save("darknet_test.map")
+
         # now compile it
         compiler_options = ell.model.MapCompilerOptions()
         compiler_options.useBlas = False
-        compiled = ell_map.Compile("host", "model", "test1", compilerOptions=compiler_options, dtype=np.float32)
+        compiled = ell_map.Compile("host", "model", "test1", compilerOptions=compiler_options)
 
         # call the compiled model
-        compiledResults = np.array(compiled.Compute(input2.ravel(), dtype=np.float32))
+        compiledResults = np.array(compiled.Compute(input2))
 
         np.testing.assert_array_almost_equal(
             compiledResults, expectedResult2, 5,

@@ -71,7 +71,7 @@ def test():
         compilerSettings = ell.model.MapCompilerOptions()
         compilerSettings.useBlas = False
         optimizerSettings = ell.model.ModelOptimizerOptions()
-        compiledMap = map.CompileDouble("host", "protonn", "predict", compilerSettings, optimizerSettings)
+        compiledMap = map.Compile("host", "protonn", "predict", compilerSettings, optimizerSettings)
         compiled = True
     except Exception as e:
         print("Compile ProtoNN model failed: {}", e)
@@ -79,7 +79,7 @@ def test():
 
     testing.ProcessTest("Compiling protonnTestData.ell", testing.IsEqual(compiled, True))
     if compiled:
-        accuracy = get_accuracy(predictor, dataset, features, compiledMap.ComputeDouble)
+        accuracy = get_accuracy(predictor, dataset, features, compiledMap.Compute)
         print("Compiled Accuracy %f" % (accuracy))
         testing.ProcessTest("ProtoNN compiled accuracy test", testing.IsEqual(int(accuracy), 1))
 

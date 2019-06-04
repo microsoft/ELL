@@ -14,6 +14,7 @@ InputPortIterator, \
 Node,\
 NodeIterator,\
 OutputNode,\
+OutputNodeList,\
 OutputPort,\
 OutputPortIterator,\
 Port,\

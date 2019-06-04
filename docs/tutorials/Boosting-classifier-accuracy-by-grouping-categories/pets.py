@@ -60,7 +60,7 @@ def main():
         cats = cats_file.read().splitlines()
 
     # Get the model wrapper in order to interact with the model
-    model_wrapper = model.model.ModelWrapper()
+    model_wrapper = model.ModelWrapper()
 
     # Get the model's input dimensions. We'll use this information later to
     # resize images appropriately.
@@ -83,7 +83,7 @@ def main():
             image, input_shape.columns, input_shape.rows, preprocessing_metadata=preprocessing_metadata)
 
         # Wrap the resulting numpy array in a FloatVector
-        input_data = model.model.FloatVector(input_data) 
+        input_data = model.FloatVector(input_data)
 
         # Get the predicted classes using the model's predict function on the
         # image input data. The predictions are returned as a numpy array with the

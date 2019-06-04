@@ -10,7 +10,7 @@ permalink: /tutorials/Training-audio-keyword-spotter-with-pytorch/
 
 This tutorial will show you how to train a keyword spotter using PyTorch.  A keyword spotter listens to an audio stream from a microphone and recognizes certain spoken keywords.
 Since it is always listening there is good reason to find a keyword spotter that can run on a very small low-power co-processor so the main computer can sleep until
-a word is recognized.  The ELL compiler makes that possible.  In this tutorial you will train a keyword spotter using the the [speech commands dataset](http://download.tensorflow.org/data/speech_commands_v0.01.tar.gz) which contains 65,000 recordings of 30 different keywords (_bed, bird, cat, dog, down, eight, five, four, go, happy, house, left, marvin, nine, no, off, on, one, right, seven, sheila, six, stop, three, tree, two, up, wow, yes, zero_) each about one second long.  
+a word is recognized.  The ELL compiler makes that possible.  In this tutorial you will train a keyword spotter using the the [speech commands dataset](http://download.tensorflow.org/data/speech_commands_v0.01.tar.gz) which contains 65,000 recordings of 30 different keywords (_bed, bird, cat, dog, down, eight, five, four, go, happy, house, left, marvin, nine, no, off, on, one, right, seven, sheila, six, stop, three, tree, two, up, wow, yes, zero_) each about one second long.
 
 This is the dataset used to train the models in the [speech commands model gallery](/ELL/gallery/speech_commands_v0.01/).  The [Getting started with keyword spotting on the Raspberry Pi](/ELL/tutorials/Getting-started-with-audio-keyword-spotting-on-the-Raspberry-Pi/) tutorial uses these models.
 Once you learn how to train a model you can then train your own custom model that responds to different keywords, or even random sounds, or perhaps you want just a subset of the 30 keywords for your application.  This tutorial shows you how to do that.
@@ -32,7 +32,7 @@ The picture below illustrates the process you will follow in this tutorial.  Fir
 
 ![process](process.jpg)
 
-Training a Neural Network is a computationally intensive task that takes millions or even billions of floating point operations.  That is why you probably want to use CUDA accelerated training.  Fortunately, audio models train pretty quickly.  On an NVidia 1080 graphic card the 30 keyword speech_commands dataset trains in about 3 minutes using PyTorch.  Without CUDA the same training takes over 2.5 hours on an Intel Core i7 CPU.  
+Training a Neural Network is a computationally intensive task that takes millions or even billions of floating point operations.  That is why you probably want to use CUDA accelerated training.  Fortunately, audio models train pretty quickly.  On an NVidia 1080 graphic card the 30 keyword speech_commands dataset trains in about 3 minutes using PyTorch.  Without CUDA the same training takes over 2.5 hours on an Intel Core i7 CPU.
 
 ## ELL Root
 
@@ -118,13 +118,13 @@ As shown in the [earlier tutorial](/ELL/tutorials/Getting-started-with-audio-key
 This featurizer is created as an ELL model using the `make_featurizer` command:
 
 ```
-python make_featurizer.py --sample_rate 16000 --window_size 512 --input_buffer_size 512 --filterbank_size 80 --filterbank_type mel --log
+python make_featurizer.py --sample_rate 16000 --window_size 512 --input_buffer_size 512 --filterbank_type mel --filterbank_size 80 --filterbank_nfft 512 --nfft 512 --log
 ```
 
 You should see a message saying "Saving **featurizer.ell**" and if you print this using the following command line:
 
 ```shell
-[Linux] %ELL_ROOT%/build/bin/print -imap featurizer.ell 
+[Linux] %ELL_ROOT%/build/bin/print -imap featurizer.ell
 [Windows] %ELL_ROOT%\build\bin\release\print -imap featurizer.ell -fmt dgml -of graph.dgml
 ```
 
@@ -153,7 +153,7 @@ cmake --build . --config Release
 cd ..
 ```
 
-**Linux**: 
+**Linux**:
 
 ```shell
 #!/bin/bash
@@ -182,12 +182,12 @@ python make_dataset.py --list_file audio/validation_list.txt --featurizer compil
 python make_dataset.py --list_file audio/testing_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --window_size 40 --shift 40 --auto_scale
 ```
 
-Where the **audio** folder contains your unpacked .wav files.  If your audio files are in a different location then simply provide the full path to it in the above commands.  
+Where the **audio** folder contains your unpacked .wav files.  If your audio files are in a different location then simply provide the full path to it in the above commands.
 
 The reason for the `--sample_rate 16000` argument is that small low powered target devices might not be able to record and process audio at very high rates.
 So while your host PC can probably do 96kHz audio and higher just fine, this tutorial shows you how to down sample the audio to something that will run on a tiny target device.  The main point being that you will get the best results if you train the model on audio that is sampled at the same rate that your target device will be recording.
 
-The `--auto_scale` option converts raw integer audio values to floating point numbers in the range [-1, 1].  
+The `--auto_scale` option converts raw integer audio values to floating point numbers in the range [-1, 1].
 
 Creating the datasets will take a while, about 10 minutes or more, so now is a great time to grab a cup of tea.  It will produce three files in your working folder named **training.npz**, **validation.npz** and **testing.npz** which you will use below.
 
@@ -279,7 +279,7 @@ So you can now take the new compiled keyword spotter for a spin and see how it w
 python test_ell_model.py --classifier KeywordSpotter/model --featurizer compiled_featurizer/mfcc --sample_rate 16000 --list_file audio/testing_list.txt --categories categories.txt --reset --auto_scale
 ```
 
-This is going back to the raw .wav file input and refeaturizing each .wav file using the compiled featurizer.  This is similar to what you will do on your target device while processing microphone input.  As a result this test pass will take a little longer (about 2 minutes).  You will see every file scroll by telling you which one passed or failed with 
+This is going back to the raw .wav file input and refeaturizing each .wav file using the compiled featurizer.  This is similar to what you will do on your target device while processing microphone input.  As a result this test pass will take a little longer (about 2 minutes).  You will see every file scroll by telling you which one passed or failed with
 a running pass rate.  The last page of output should look something like this:
 
 ```
@@ -355,14 +355,14 @@ The neural network you just trained is described by the KeywordSpotter class in 
         # input has shape: [seq,batch,feature]
         gru_out, self.hidden1 = self.gru1(input, self.hidden1)
         gru_out, self.hidden2 = self.gru2(gru_out, self.hidden2)
-        keyword_space = self.hidden2keyword(gru_out) 
+        keyword_space = self.hidden2keyword(gru_out)
         result = F.log_softmax(keyword_space, dim=2)
-        # return the mean across the sequence length to produce the 
+        # return the mean across the sequence length to produce the
         # best prediction of which word it found in that sequence.
-        # we can do that because we know each window_size sequence in  
+        # we can do that because we know each window_size sequence in
         # the training dataset contains at most one word and a single
         # word is not spread across multiple training rows
-        result = result.mean(dim=0) 
+        result = result.mean(dim=0)
         return result
 ```
 
@@ -371,16 +371,16 @@ You can now experiment with different model architectures.  For example, what ha
 1. Add the construction of the 3rd GRU layer in the **\_\_init\_\_** method:
 
     ```python
-    self.gru3 = nn.GRU(hidden_dim, num_keywords)    
+    self.gru3 = nn.GRU(hidden_dim, num_keywords)
     ```
 
 2. Change the Linear layer to take a different number of inputs since the output of gru3 will now be size **num_keywords** instead of **hidden_dim**:
 
     ```python
     self.hidden2keyword = nn.Linear(num_keywords, num_keywords)
-    ```    
+    ```
 
-3. Add a third hidden state member in the **init_hidden** method: 
+3. Add a third hidden state member in the **init_hidden** method:
 
     ```python
     self.hidden3 = None
@@ -401,15 +401,15 @@ To learn more about PyTorch see their [excellent tutorials](https://pytorch.org/
 
 ## Hyper-parameter Tuning
 
-So far your training has used all the defaults provided by `train_classifier`, but an important step in training neural networks is 
-tuning all the training parameters.  These include `learning_rate`, `batch_size`, `weight_decay`, `lr_schedulers` and their associated 
+So far your training has used all the defaults provided by `train_classifier`, but an important step in training neural networks is
+tuning all the training parameters.  These include `learning_rate`, `batch_size`, `weight_decay`, `lr_schedulers` and their associated
 `lr_min` and `lr_peaks`, and of course the number of `epochs`.  It is good practice to do a set of training runs that test a range
 of different values independently testing all these hyper-parameters.  You can probably get a full 1% increase in training accuracy by finding
 the optimal parameters.
 
 ## Cleaning the Data
 
-The speech commands dataset contains many bad training files, either total silence, or bad noise, clipped words and some 
+The speech commands dataset contains many bad training files, either total silence, or bad noise, clipped words and some
 completely mislabelled words.  Obviously this will impact your training accuracy.  So included in this tutorial is a `bad_list.txt` file.  If you copy that to your speech commands folder (next to your `testing_list.txt` file) then re-run `make_training_list.py` with the additional argument `--bad_list bad_list.txt` then it will create a cleaner test, validation and training list.
 
 Re-run the featurization steps with `make_dataset.py` and retrain your model and you should now see the test accuracy jump
@@ -419,7 +419,7 @@ to about 94%.  So this is a good illustration of the fact that higher quality la
 
 That's it, you just trained your first keyword spotter using PyTorch and you compiled and tested it using ELL, congratulations!  You can now use your new featurizer and classifier in your embedded application, perhaps on a Raspberry Pi, or even on an [Azure IOT Dev Kit](https://microsoft.github.io/azure-iot-developer-kit/), as shown in the [DevKitKeywordSpotter](https://github.com/IoTDevEnvExamples/DevKitKeywordSpotter/) example.
 
-There are also lots of things you can experiment with as listed above.  You can also build your own training sets, or customize the speech commands set by simply modifying the the **training_list.txt** file, then recreate the **training_list.npz** dataset using `make_dataset.py`, retrain the model and see how it does.  
+There are also lots of things you can experiment with as listed above.  You can also build your own training sets, or customize the speech commands set by simply modifying the the **training_list.txt** file, then recreate the **training_list.npz** dataset using `make_dataset.py`, retrain the model and see how it does.
 
 Another dimension you can play with is mixing noise with your clean .wav files.  This can give you a much bigger dataset and a model that performs better in noisy locations.  Of course, this depends on what kind of noise you care about.  Crowds of people? Industrial machinery? Just the hum of computers and HVAC systems in an Office environment?  It depends on your application.  You can experiment using the noise files included in the speech_commands dataset.  There are some more advanced options on the `make_dataset.py` script to help with mixing noise in with the audio recordings.
 

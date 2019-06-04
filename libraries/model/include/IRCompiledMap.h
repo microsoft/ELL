@@ -185,11 +185,23 @@ namespace model
         /// <summary> Force jitting to finish so you can time execution without jit cost. </summary>
         void FinishJitting();
 
-        /// <summary> Set a context object to use in the predict call </summary>
-        void SetContext(void* context) { _context = context; }
+        /// <summary> Set a context object to use in the predict call.  Do not call this if you have
+        /// already provided std::functions on your SourceNodes and SinkNodes.  </summary>
+        void SetContext(void* context);
 
         /// <summary> Get the context object to use in the predict call </summary>
         void* GetContext() const { return _context; }
+
+        /// <summary> This exposes another way to call Compute when the model has multiple inputs and outputs
+        /// These void* pointers must point to pre-allocated buffers of the right type (float*, double*, etc)
+        /// and size. </summary>
+        ///
+        /// <param name="inputs"> A vector containing all the input buffers. </param>
+        /// <param name="outputs"> A vector containing all the output buffers. </param>
+        void ComputeMultiple(const std::vector<void*>& inputs, const std::vector<void*>& outputs) override;
+
+        /// <summary> Reset any model state. </summary>
+        void Reset() override;
 
     protected:
         void WriteCode(const std::string& filePath, emitters::ModuleOutputFormat format, emitters::MachineCodeOutputOptions options) const;
@@ -227,12 +239,17 @@ namespace model
         bool _verifyJittedModule = true;
         void* _context = nullptr;
 
+        void* InternalGetContext();
+        void ResolveCallbacks();
+
         template <typename T>
         using Vector = std::vector<std::conditional_t<std::is_same_v<bool, T>, Boolean, T>>;
 
         bool _computeFunctionDefined = false;
         std::variant<ComputeFunction<bool>, ComputeFunction<int>, ComputeFunction<int64_t>, ComputeFunction<float>, ComputeFunction<double>> _computeInputFunction;
         std::variant<Vector<bool>, Vector<int>, Vector<int64_t>, Vector<float>, Vector<double>> _cachedOutput;
+        std::function<void(void*, void* const*, void* const*)> _computeDispatchFunction;
+        std::function<void()> _resetFunction;
     };
 } // namespace model
 } // namespace ell
@@ -309,6 +326,11 @@ namespace model
             }
 
             _computeInputFunction = computeFunction;
+            functionPointer = _executionEngine->ResolveFunctionAddress(_functionName + "_dispatch");
+            _computeDispatchFunction = reinterpret_cast<void(*)(void*, void* const*, void* const*)>(functionPointer);
+
+            functionPointer = _executionEngine->ResolveFunctionAddress(_moduleName + "_Reset");
+            _resetFunction = reinterpret_cast<void(*)()>(functionPointer);
         }
     }
 

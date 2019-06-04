@@ -62,7 +62,7 @@ namespace emitters
         /// <param name="tag"> The metadata tag. </param>
         ///
         /// <returns> `true` if the module has the metadata associated with it. </returns>
-        virtual bool HasMetadata(const std::string& tag) = 0;
+        virtual bool HasMetadata(const std::string& tag) const = 0;
 
         /// <summary> Indicates if a given function has the associated metadata. </summary>
         ///
@@ -70,7 +70,7 @@ namespace emitters
         /// <param name="tag"> The metadata tag. </param>
         ///
         /// <returns> `true` if the function has the metadata associated with it. </returns>
-        virtual bool HasFunctionMetadata(const std::string& functionName, const std::string& tag) = 0;
+        virtual bool HasFunctionMetadata(const std::string& functionName, const std::string& tag) const = 0;
 
         /// <summary> Gets the metadata associated with the module. </summary>
         ///
