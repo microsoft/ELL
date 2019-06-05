@@ -168,7 +168,7 @@ void TestTransformDataWithModel()
     auto transformedData = TransformDataWithModel(dataset, modelOutput);
     for (size_t i = 0; i < dataset.Size(); ++i)
     {
-        ProcessTest("Testing transformed model", IsEqual(dataset[i].ToArray(), transformedData[i].ToArray(), 0.0001));
+        ProcessTest("Testing transformed model", IsEqual(dataset[i].ToArray(), transformedData[i].ToArray(), 0.0001f));
     }
 
     auto transformedData1 = TransformDataWithModel(dataset, static_cast<const OutputPort<float>&>(*outputPorts[1]));
@@ -176,13 +176,13 @@ void TestTransformDataWithModel()
     {
         auto row = dataset[i].ToArray();
         std::transform(row.begin(), row.end(), row.begin(), [](auto x) { return std::sqrt(x); });
-        ProcessTest("Testing transformed model", IsEqual(row, transformedData1[i].ToArray(), 0.0001));
+        ProcessTest("Testing transformed model", IsEqual(row, transformedData1[i].ToArray(), 0.0001f));
     }
 
     auto transformedData2 = TransformDataWithModel(dataset, static_cast<const OutputPort<float>&>(*outputPorts[2]));
     for (size_t i = 0; i < dataset.Size(); ++i)
     {
-        ProcessTest("Testing transformed model", IsEqual(dataset[i].ToArray(), transformedData2[i].ToArray(), 0.0001));
+        ProcessTest("Testing transformed model", IsEqual(dataset[i].ToArray(), transformedData2[i].ToArray(), 0.0001f));
     }
 }
 
@@ -197,7 +197,7 @@ void TestTransformDataWithSubmodel()
     auto transformedData = TransformDataWithSubmodel(dataset, submodel);
     for (size_t i = 0; i < dataset.Size(); ++i)
     {
-        ProcessTest("Testing transformed submodel", IsEqual(dataset[i].ToArray(), transformedData[i].ToArray(), 0.0001));
+        ProcessTest("Testing transformed submodel", IsEqual(dataset[i].ToArray(), transformedData[i].ToArray(), 0.0001f));
     }
 
     Submodel submodel1{ { outputPorts[1] } };
@@ -206,14 +206,14 @@ void TestTransformDataWithSubmodel()
     {
         auto row = dataset[i].ToArray();
         std::transform(row.begin(), row.end(), row.begin(), [](auto x) { return std::sqrt(x); });
-        ProcessTest("Testing transformed submodel", IsEqual(row, transformedData1[i].ToArray(), 0.0001));
+        ProcessTest("Testing transformed submodel", IsEqual(row, transformedData1[i].ToArray(), 0.0001f));
     }
 
     Submodel submodel2{ { outputPorts[2] } };
     auto transformedData2 = TransformDataWithSubmodel(dataset, submodel2);
     for (size_t i = 0; i < dataset.Size(); ++i)
     {
-        ProcessTest("Testing transformed submodel", IsEqual(dataset[i].ToArray(), transformedData2[i].ToArray(), 0.0001));
+        ProcessTest("Testing transformed submodel", IsEqual(dataset[i].ToArray(), transformedData2[i].ToArray(), 0.0001f));
     }
 }
 
@@ -237,21 +237,21 @@ void TestTransformDataWithCachedSubmodel()
 
     Submodel submodel{ { &modelOutput } };
     auto transformedData = TransformDataWithSubmodel(dataset, submodel, cache);
-    ProcessTest("Testing transformed cached submodel", IsEqual(dataset, transformedData, 0.0001));
+    ProcessTest("Testing transformed cached submodel", IsEqual(dataset, transformedData, 0.0001f));
 
     Submodel submodel1{ { outputPorts[1] } };
     auto transformedData1 = TransformDataWithSubmodel(dataset, submodel1, cache);
-    ProcessTest("Testing transformed cached submodel", IsEqual(sqrtDataset, transformedData1, 0.0001));
+    ProcessTest("Testing transformed cached submodel", IsEqual(sqrtDataset, transformedData1, 0.0001f));
 
     Submodel submodel2{ { outputPorts[2] } };
     auto transformedData2 = TransformDataWithSubmodel(dataset, submodel2, cache);
-    ProcessTest("Testing transformed cached submodel", IsEqual(dataset, transformedData2, 0.0001));
+    ProcessTest("Testing transformed cached submodel", IsEqual(dataset, transformedData2, 0.0001f));
 
     auto transformedData1_take2 = TransformDataWithSubmodel(dataset, submodel1, cache);
-    ProcessTest("Testing transformed cached submodel", IsEqual(sqrtDataset, transformedData1_take2, 0.0001));
+    ProcessTest("Testing transformed cached submodel", IsEqual(sqrtDataset, transformedData1_take2, 0.0001f));
 
     auto bogusDataset = GetConstantDataset(3, 4, 12345);
     cache.SetCachedData(submodel1.GetOutputs()[0], bogusDataset);
     auto transformedData1_take3 = TransformDataWithSubmodel(dataset, submodel1, cache);
-    ProcessTest("Testing transformed cached submodel with broken cache", !IsEqual(sqrtDataset, transformedData1_take3, 0.0001));
+    ProcessTest("Testing transformed cached submodel with broken cache", !IsEqual(sqrtDataset, transformedData1_take3, 0.0001f));
 }
