@@ -301,14 +301,14 @@ namespace nodes
     {
         double nearestPowerOf2Size = std::pow(2, std::ceil(std::log2(input.Size())));
         _fftSize = static_cast<size_t>(nearestPowerOf2Size);
-        _output.SetSize(_fftSize / 2);
+        _output.SetSize(_fftSize / 2 + 1);
     }
 
     template <typename ValueType>
     FFTNode<ValueType>::FFTNode(const model::OutputPort<ValueType>& input, size_t fftSize) :
         CompilableNode({ &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
-        _output(this, defaultOutputPortName, fftSize / 2),
+        _output(this, defaultOutputPortName, fftSize / 2 + 1),
         _fftSize(fftSize)
     {
         if (fftSize == 0)
@@ -747,7 +747,7 @@ namespace nodes
         {
             _fftSize = _input.Size();
         }
-        _output.SetSize(_fftSize / 2);
+        _output.SetSize(_fftSize / 2 + 1);
     }
 
     // Explicit instantiations

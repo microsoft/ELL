@@ -11,7 +11,7 @@ import featurizer
 import make_dataset
 
 
-def featurize_wav(wav_file, label, featurizer_path, sample_rate, window_size, shift, dump):
+def featurize_wav(wav_file, label, featurizer_path, sample_rate, window_size, shift, auto_scale, dump):
 
     transform = featurizer.AudioTransform(featurizer_path, 0)
     input_size = transform.input_size
@@ -24,7 +24,8 @@ def featurize_wav(wav_file, label, featurizer_path, sample_rate, window_size, sh
       wav_log.write("{}:\n".format(wav_file))
       transform.set_log(wav_log)
 
-    features = list(make_dataset.get_wav_features(wav_file, transform, sample_rate, window_size, shift))
+    generator = make_dataset.get_wav_features(wav_file, transform, sample_rate, window_size, shift, auto_scale, None)
+    features = list(generator)
     # reshape features to record the fact that the window_size is a kind of batch size for this type of model
     features = [np.reshape(f, (window_size, 1, 1, int(len(f) / window_size))) for f in features]
     labels = [label] * len(features)
@@ -42,6 +43,7 @@ def featurize_wav(wav_file, label, featurizer_path, sample_rate, window_size, sh
             f.write("{}\n".format(", ".join([str(x) for x in a.ravel()])))
 
       wav_log.close()
+    return features
 
 
 if __name__ == "__main__":
