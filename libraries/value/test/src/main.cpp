@@ -37,6 +37,11 @@ struct TestLLVMContext : public LLVMContext
 
     void DebugDump() { _emitter->DebugDump(); }
 
+    ell::emitters::IRFunctionEmitter& GetFunctionEmitter() const
+    {
+        return _emitter->GetCurrentFunction();
+    }
+
 private:
     std::unique_ptr<ell::emitters::IRModuleEmitter> _emitter;
 };
@@ -53,6 +58,20 @@ void JittedDebugPrint(char* message)
 {
     std::cout << message;
 }
+
+void JittedDebugPrintInts(int* ints, int* len)
+{
+    std::cout << std::setprecision(6);
+    for (int i = 0; i < *len; i++)
+    {
+        if (i > 0)
+        {
+            std::cout << ", ";
+        }
+        std::cout << ints[i];
+    }
+}
+
 void JittedDebugPrintFloats(float* f, int* len)
 {
     std::cout << std::setprecision(6);
@@ -81,8 +100,9 @@ void JittedDebugPrintDoubles(double* f, int* len)
 }
 
 ell::emitters::LLVMFunction printFunction;
-ell::emitters::LLVMFunction printFloatsFunction;
 ell::emitters::LLVMFunction printDoublesFunction;
+ell::emitters::LLVMFunction printFloatsFunction;
+ell::emitters::LLVMFunction printIntsFunction;
 
 void DeclarDebugPrintFunctions(ell::emitters::IRModuleEmitter& module)
 {
@@ -104,6 +124,12 @@ void DeclarDebugPrintFunctions(ell::emitters::IRModuleEmitter& module)
         { llvm::Type::getDoublePtrTy(context), llvm::Type::getInt32PtrTy(context) },
         false);
     printDoublesFunction = module.DeclareFunction("DebugPrintDoubles", type3);
+
+    auto type4 = llvm::FunctionType::get(
+        llvm::Type::getInt32Ty(context),
+        { llvm::Type::getInt32PtrTy(context), llvm::Type::getInt32PtrTy(context) },
+        false);
+    printIntsFunction = module.DeclareFunction("DebugPrintInts", type4);
 }
 
 void DefineDebugPrintFunctions(ell::emitters::LLVMFunction debugPrintFunction, ell::emitters::IRExecutionEngine& jitter)
@@ -111,6 +137,7 @@ void DefineDebugPrintFunctions(ell::emitters::LLVMFunction debugPrintFunction, e
     jitter.DefineFunction(debugPrintFunction, reinterpret_cast<uintptr_t>(&JittedDebugPrint));
     jitter.DefineFunction(printFloatsFunction, reinterpret_cast<uintptr_t>(&JittedDebugPrintFloats));
     jitter.DefineFunction(printDoublesFunction, reinterpret_cast<uintptr_t>(&JittedDebugPrintDoubles));
+    jitter.DefineFunction(printIntsFunction, reinterpret_cast<uintptr_t>(&JittedDebugPrintInts));
 }
 
 namespace ell
@@ -121,7 +148,7 @@ void DebugPrint(std::string message)
         std::cout << message;
     });
 
-    InvokeForContext<LLVMContext>([&](auto& context) {
+    InvokeForContext<TestLLVMContext>([&](auto& context) {
         auto function = context.GetFunctionEmitter();
         auto arg = function.Literal(message.c_str());
         function.Call(printFunction, { arg });
@@ -140,7 +167,7 @@ void DebugPrint(Vector message)
                                  .Parameters(Value(ValueType::Char8, MemoryLayout{ { static_cast<int>(message.Size()) } }))
                                  .Decorated(FunctionDecorated::No);
 
-        context.EmitExternalCall(printFunction, { message.GetValue() });
+        printFunction.Call(message);
     });
 }
 
@@ -149,34 +176,48 @@ void DebugPrintVector(Vector message)
     int size = static_cast<int>(message.Size());
 
     InvokeForContext<ComputeContext>([&](auto&) {
-        //
+        std::visit(
+            [size = message.Size()](auto&& data) {
+                using Type = std::decay_t<decltype(data)>;
+                if constexpr (IsOneOf<Type, Emittable, Boolean*>)
+                {
+                    throw LogicException(LogicExceptionErrors::notImplemented);
+                }
+                else
+                {
+                    std::copy(
+                        data,
+                        data + size,
+                        std::ostream_iterator<std::remove_pointer_t<Type>>(std::cout, ", "));
+                    std::cout << std::endl;
+                }
+            },
+            message.GetValue().GetUnderlyingData());
     });
 
     InvokeForContext<LLVMContext>([&](auto& context) {
-        if (message.GetType() == ValueType::Float)
+        std::string fnName = "DebugPrint";
+        switch (message.GetType())
         {
-            auto printFloatsFunction = FunctionDeclaration("DebugPrintFloats")
-                                           .Parameters(
-                                               Value(ValueType::Float, MemoryLayout{ { size } }),
-                                               Value(ValueType::Int32, ScalarLayout))
-                                           .Decorated(FunctionDecorated::No);
-
-            context.EmitExternalCall(printFloatsFunction, { message.GetValue(), size });
-        }
-        else if (message.GetType() == ValueType::Double)
-        {
-            auto printDoublesFunction = FunctionDeclaration("DebugPrintDoubles")
-                                            .Parameters(
-                                                Value(ValueType::Double, MemoryLayout{ { size } }),
-                                                Value(ValueType::Int32, ScalarLayout))
-                                            .Decorated(FunctionDecorated::No);
-
-            context.EmitExternalCall(printDoublesFunction, { message.GetValue(), size });
-        }
-        else
-        {
+        case ValueType::Float:
+            fnName += "Floats";
+            break;
+        case ValueType::Double:
+            fnName += "Doubles";
+            break;
+        case ValueType::Int32:
+            fnName += "Ints";
+            break;
+        default:
             DebugPrint("DebugPrintVector not implemented on type: " + ToString(message.GetType()));
+            return;
         }
+        auto printFunction = FunctionDeclaration(fnName)
+                                 .Parameters(
+                                     Value(message.GetType(), MemoryLayout{ { size } }),
+                                     Value(ValueType::Int32, ScalarLayout))
+                                 .Decorated(FunctionDecorated::No);
+        printFunction.Call(message, Scalar{ size });
     });
 }
 } // namespace ell

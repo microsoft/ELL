@@ -56,11 +56,11 @@ void test_simpleDepthwiseSeparableConvolve2D()
     math::ColumnRowChannelTensor<double> expectedTensor(2, 2, 2, expected);
 
     auto convolve2D = DeclareFunction("testSimpleDepthwiseSeparableConvolve2D")
-                          .Parameters(inputTensor.GetValue(),
-                                      filterTensor.GetValue(),
+                          .Parameters(inputTensor,
+                                      filterTensor,
                                       Value(ValueType::Int32, ScalarLayout),
                                       Value(ValueType::Int32, ScalarLayout),
-                                      outputTensor.GetValue())
+                                      outputTensor)
                           .Define(SimpleDepthwiseSeparableConvolve2D);
 
     InvokeForContext<ComputeContext>([&](auto&) {

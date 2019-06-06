@@ -758,7 +758,7 @@ Scalar Tensor_test1()
     ok2 = 0;
 
     InvokeForContext<ComputeContext>([&](auto&) {
-        // These tests use row.Get<int>() to get the actual row,col indexes as constants, which can 
+        // These tests use row.Get<int>() to get the actual row,col indexes as constants, which can
         // only be done during ComputeContext.
 
         // test we can enummerate all items of a tensor.
@@ -1043,7 +1043,7 @@ Scalar Tensor_slice_test1()
     ok2 = 0;
     InvokeForContext<ComputeContext>([&](auto&)
     {
-        // This tests uses row.Get<int>() to get the actual row, col indexes as constants, which can 
+        // This tests uses row.Get<int>() to get the actual row, col indexes as constants, which can
         // only be done during ComputeContext.
         For(inputTensor, [&](Scalar row, Scalar col, Scalar ch) {
             int rowInt = row.Get<int>(), colInt = col.Get<int>(), chInt = ch.Get<int>();
@@ -1338,7 +1338,7 @@ Scalar Intrinsics_test2_impl(Tuple tuple, Idx = {})
             DebugPrint("Intrinsics " + fnName + " test 2 failed\n");
         });
 
-        // recurrsively process next item in the tuple
+        // recursively process next item in the tuple
         Scalar r = Intrinsics_test2_impl(tuple, std::integral_constant<size_t, index + 1>{});
 
         If(r != 0, [&] {

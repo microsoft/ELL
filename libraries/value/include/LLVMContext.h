@@ -44,8 +44,6 @@ namespace value
 
         emitters::IRFunctionEmitter& GetFunctionEmitter() const;
 
-        std::optional<Value> EmitExternalCall(FunctionDeclaration func, std::vector<Value> args);
-
     private:
         Value AllocateImpl(ValueType value, MemoryLayout layout) override;
 
@@ -84,6 +82,8 @@ namespace value
         void DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const override;
 
         Value IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args);
+
+        std::optional<Value> EmitExternalCall(FunctionDeclaration func, std::vector<Value> args);
 
         bool TypeCompatible(Value value1, Value value2);
 

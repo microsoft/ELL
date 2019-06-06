@@ -42,7 +42,6 @@ void TestVoiceActivityDetectorInternal(const std::string& filename, VoiceActivit
 {
     std::vector<ValueType> data(40);
     auto valueType = GetValueType<typename decltype(data)::value_type>();
-    Vector temp = data;
 
     auto vadfn = DeclareFunction("ProcessTest")
                      .Returns(Value{ GetValueType<int>(), ScalarLayout })

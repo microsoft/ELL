@@ -233,7 +233,7 @@ namespace testing
         }
         return false;
     }
-    
+
     /// <summary> Call a test function, but register success if a "TestNotImplemented" exception is thrown. </summary>
     /// <param name="function"> The test function to call. </param>
     /// <param name="args"> Aguments to pass to the test function. </param>
@@ -291,5 +291,5 @@ namespace testing
 #define TESTING_FORCE_DEFINE_SYMBOL(x, returnType, ...) __pragma(comment(linker, "/export:_" #x))
 #endif
 #else
-#define TESTING_FORCE_DEFINE_SYMBOL(x, returnType, ...) returnType (*__##x##_fp)(__VA_ARGS__) = &x;
+#define TESTING_FORCE_DEFINE_SYMBOL(x, returnType, ...) returnType (*__##x##_fp)(__VA_ARGS__) __attribute__((used)) = &x;
 #endif

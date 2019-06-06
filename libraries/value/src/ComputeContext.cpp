@@ -596,7 +596,13 @@ namespace value
                 std::optional<Value> maybeGlobal;
                 {
                     FunctionScope scope(*this, fnName);
-                    auto fnArgs = expectedArgs;
+                    std::vector<Value> fnArgs;
+                    fnArgs.reserve(expectedArgs.size());
+                    for (auto arg : expectedArgs)
+                    {
+                        fnArgs.push_back(Value(arg.GetBaseType(), arg.GetLayout()));
+                    }
+                    
                     std::copy(args.begin(), args.end(), fnArgs.begin());
 
                     Value returnValue = expectedReturn;

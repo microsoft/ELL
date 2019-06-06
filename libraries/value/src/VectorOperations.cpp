@@ -59,9 +59,9 @@ namespace value
                           .Returns(Value({ ValueType::Float, 0 }, ScalarLayout))
                           .Parameters(
                               Value({ ValueType::Int32, 0 }, ScalarLayout), /*n*/
-                              Value({ ValueType::Float, 1 }, v1.GetValue().GetLayout()), /*x*/
+                              v1, /*x*/
                               Value({ ValueType::Int32, 0 }, ScalarLayout), /*incx*/
-                              Value({ ValueType::Float, 1 }, v2.GetValue().GetLayout()), /*y*/
+                              v2, /*y*/
                               Value({ ValueType::Int32, 0 }, ScalarLayout)); /*incy*/
 
             auto result = InvokeForContext<ComputeContext>([&](auto&) {
@@ -87,11 +87,11 @@ namespace value
                 {
                     auto returnValue = fn.Decorated(FunctionDecorated::No)
                                            .Call(
-                                               { static_cast<int>(v1.Size()),
-                                                 v1.GetValue(),
-                                                 static_cast<int>(v1.GetValue().GetLayout().GetCumulativeIncrement(0)),
-                                                 v2.GetValue(),
-                                                 static_cast<int>(v2.GetValue().GetLayout().GetCumulativeIncrement(0)) });
+                                               Scalar{ static_cast<int>(v1.Size()) },
+                                               v1,
+                                               Scalar{ static_cast<int>(v1.GetValue().GetLayout().GetCumulativeIncrement(0)) },
+                                               v2,
+                                               Scalar{ static_cast<int>(v2.GetValue().GetLayout().GetCumulativeIncrement(0)) });
 
                     return *returnValue;
                 }
@@ -109,9 +109,9 @@ namespace value
                           .Returns(Value({ ValueType::Double, 0 }, ScalarLayout))
                           .Parameters(
                               Value({ ValueType::Int32, 0 }, ScalarLayout), /*n*/
-                              Value({ ValueType::Double, 1 }, v1.GetValue().GetLayout()), /*x*/
+                              v1, /*x*/
                               Value({ ValueType::Int32, 0 }, ScalarLayout), /*incx*/
-                              Value({ ValueType::Double, 1 }, v2.GetValue().GetLayout()), /*y*/
+                              v2, /*y*/
                               Value({ ValueType::Int32, 0 }, ScalarLayout)); /*incy*/
 
             auto result = InvokeForContext<ComputeContext>([&](auto&) {
@@ -137,11 +137,11 @@ namespace value
                 {
                     auto returnValue = fn.Decorated(FunctionDecorated::No)
                                            .Call(
-                                               { static_cast<int>(v1.Size()),
-                                                 v1.GetValue(),
-                                                 static_cast<int>(v1.GetValue().GetLayout().GetCumulativeIncrement(0)),
-                                                 v2.GetValue(),
-                                                 static_cast<int>(v2.GetValue().GetLayout().GetCumulativeIncrement(0)) });
+                                               Scalar{ static_cast<int>(v1.Size()) },
+                                               v1,
+                                               Scalar{ static_cast<int>(v1.GetValue().GetLayout().GetCumulativeIncrement(0)) },
+                                               v2,
+                                               Scalar{ static_cast<int>(v2.GetValue().GetLayout().GetCumulativeIncrement(0)) });
 
                     return *returnValue;
                 }

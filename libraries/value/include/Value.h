@@ -155,7 +155,7 @@ namespace value
         {}
 
         /// <summary> Constructor that creates an instance which serves as a placeholder for data that matches the type and layout specified </summary>
-        /// <param name="type"> The type to be the basis of this instance </typeparam>
+        /// <param name="type"> The type to be the basis of this instance </param>
         /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the eventual data to be stored. If
         /// MemoryLayout is not provided, the Value instance is considered unconstrained </param>
         Value(ValueType type, std::optional<MemoryLayout> layout = {});
@@ -212,7 +212,7 @@ namespace value
         {}
 
         /// <summary> Constructor that creates an instance which serves as a placeholder for data that matches the full type description and layout specified </summary>
-        /// <param name="typeDescription"> The full type description to be the basis of this instance </typeparam>
+        /// <param name="typeDescription"> The full type description to be the basis of this instance </param>
         /// <param name="layout"> An optional MemoryLayout instance that describes the memory structure of the eventual data to be stored. If
         /// MemoryLayout is not provided, the Value instance is considered unconstrained </param>
         Value(detail::ValueTypeDescription typeDescription, std::optional<MemoryLayout> layout = {}) noexcept;

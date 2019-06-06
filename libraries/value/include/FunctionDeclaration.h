@@ -64,23 +64,32 @@ namespace value
         [[maybe_unused]] auto Define(Fn&& fn);
 
         /// <summary> Sets the parameters this function requires </summary>
-        /// <param name="paramTypes"> Zero or more Value instances describing the types of the arguments and their memory layout expected by the function </param>
+        /// <param name="paramTypes"> Zero or more Value instances or view types with a GetValue() member function describing
+        /// the types of the arguments and their memory layout expected by the function </param>
         /// <returns> A reference to this instance </returns>
         /// <remarks> If this function is not called, the instance defaults to taking no arguments </remarks>
         template <typename... Types>
-        FunctionDeclaration& Parameters(Types&& ... paramTypes)
-        {
-            static_assert(utilities::AllSame<Value, std::decay_t<Types>...>);
-            return Parameters(std::vector<Value>{ std::forward<Types>(paramTypes)... });
-        }
+        FunctionDeclaration& Parameters(Types&&... paramTypes);
 
+        /// <summary> Sets the parameters this function requires </summary>
+        /// <param name="paramTypes"> Zero or more Value instances describing the types of the arguments and their memory layout expected by the function </param>
+        /// <returns> A reference to this instance </returns>
+        /// <remarks> If this function is not called, the instance defaults to taking no arguments </remarks>
         [[nodiscard]] FunctionDeclaration& Parameters(std::vector<Value> parameters);
 
         /// <summary> Emits a call to the function declaration </summary>
         /// <param name="arguments"> A vector of Value instances that hold the arguments for the function call </param>
         /// <returns> A std::optional instance that holds a Value instance with the return value of the call, if it is expected, otherwise empty </returns>
         /// <remarks> If the function is not defined and the context is capable of it, this will emit a call to an external function </remarks>
-        std::optional<Value> Call(std::vector<Value> arguments = {}) const;
+        [[maybe_unused]] std::optional<Value> Call(std::vector<Value> arguments) const;
+
+        /// <summary> Emits a call to the function declaration </summary>
+        /// <param name="arguments"> Zero or more Value instances or view types with a GetValue() member function describing
+        /// the arguments for this function call </param>
+        /// <returns> A std::optional instance that holds a Value instance with the return value of the call, if it is expected, otherwise empty </returns>
+        /// <remarks> If the function is not defined and the context is capable of it, this will emit a call to an external function </remarks>
+        template <typename... Types>
+        [[maybe_unused]] std::optional<Value> Call(Types&& ... arguments) const;
 
         /// <summary> Gets the final function name, including any decoration if so applicable </summary>
         const std::string& GetFunctionName() const;
@@ -147,8 +156,10 @@ namespace value
         template <typename Fn>
         struct Function : public std::function<Fn>
         {
-            Function(const std::function<Fn>& fn) : std::function<Fn>(fn) {}
-            Function(std::function<Fn>&& fn) : std::function<Fn>(std::move(fn)) {}
+            Function(const std::function<Fn>& fn) :
+                std::function<Fn>(fn) {}
+            Function(std::function<Fn>&& fn) :
+                std::function<Fn>(std::move(fn)) {}
             using std::function<Fn>::function;
         };
 
@@ -182,21 +193,31 @@ namespace value
 
         // Function pointer
         template <typename ReturnT, typename... Args>
-        Function(ReturnT (*)(Args...)) -> Function<ReturnT(Args...)>;
+        Function(ReturnT (*)(Args...))->Function<ReturnT(Args...)>;
 
         // Functor
         template <typename Functor,
                   typename Signature = typename StdFunctionDeductionGuideHelper<decltype(&Functor::operator())>::Type>
-        Function(Functor) -> Function<Signature>;
+        Function(Functor)->Function<Signature>;
 #endif // defined(__APPLE__)
 
-        template <typename ViewType, std::enable_if_t<std::is_same_v<decltype(std::declval<ViewType>().GetValue()), Value>, void*> = nullptr>
+        template <typename ViewType>
         Value GetValue(ViewType value)
         {
-            return value.GetValue();
-        }
+            if constexpr (std::is_same_v<Value, utilities::RemoveCVRefT<ViewType>>)
+            {
+                return value;
+            }
+            else
+            {
+                static_assert(std::is_same_v<decltype(std::declval<ViewType>().GetValue()), Value>,
+                              "Parameter type isn't a valid view type of Value. Must have member function GetValue that returns Value instance.");
 
-        inline Value GetValue(Value value) { return value; }
+                return value.GetValue();
+            }
+
+
+        }
 
     } // namespace detail
 
@@ -214,8 +235,21 @@ namespace value
 
 #undef FUNCTION_TYPE
 
+    template <typename... Types>
+    FunctionDeclaration& FunctionDeclaration::Parameters(Types&&... paramTypes)
+    {
+        return Parameters(std::vector<Value>{ detail::GetValue(std::forward<Types>(paramTypes))... });
+    }
+
+    template <typename... Types>
+    std::optional<Value> FunctionDeclaration::Call(Types&&... arguments) const
+    {
+        return Call(std::vector<Value>{ detail::GetValue(std::forward<Types>(arguments))... });
+    }
+
     template <typename ReturnT, typename... Args>
-    [[maybe_unused]] std::function<ReturnT(Args...)> FunctionDeclaration::DefineImpl(std::function<ReturnT(Args...)> fn) {
+    [[maybe_unused]] std::function<ReturnT(Args...)> FunctionDeclaration::DefineImpl(std::function<ReturnT(Args...)> fn)
+    {
         if constexpr (std::is_same_v<ReturnT, void>)
         {
             if (_returnType.has_value())

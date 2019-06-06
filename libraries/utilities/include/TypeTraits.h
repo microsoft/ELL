@@ -154,5 +154,20 @@ namespace utilities
     template <typename T, typename... RestOfTypes>
     inline constexpr bool AllSame = detail::AllSame<T, RestOfTypes...>::value;
 
+    namespace detail
+    {
+        template <typename T>
+        struct RemoveCVRef
+        {
+            using type = std::remove_cv_t<std::remove_reference_t<T>>;
+        };
+    }
+
+    // Convenience type alias to remove all references and const/volatile qualifiers
+    // from a type.
+    // NB: Should be removed when we move to C++20 and be replaced by std::remove_cvref_t<T>
+    template <typename T>
+    using RemoveCVRefT = typename detail::RemoveCVRef<T>::type;
+
 } // namespace utilities
 } // namespace ell
