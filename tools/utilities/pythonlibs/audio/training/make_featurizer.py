@@ -70,7 +70,7 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
         last_node = builder.AddFFTNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")), nfft)
     else:
         last_node = builder.AddFFTNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")))
-        nfft = (last_node.GetOutputPort("output").Size() - 1)*2
+        nfft = (last_node.GetOutputPort("output").Size() - 1) * 2
 
     if not filterbank_nfft:
         # default is to just use the size of the fft.
@@ -81,7 +81,7 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
         square_node = builder.AddUnaryOperationNode(
             ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")),
             ell.nodes.UnaryOperationType.square)
-        denom = builder.AddConstantNode(ell_model, [nfft]*fft_size, ell.nodes.PortType.smallReal)
+        denom = builder.AddConstantNode(ell_model, [nfft] * fft_size, ell.nodes.PortType.smallReal)
         last_node = builder.AddBinaryOperationNode(
             ell_model, ell.nodes.PortElements(square_node.GetOutputPort("output")),
             ell.nodes.PortElements(denom.GetOutputPort("output")),
