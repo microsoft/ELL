@@ -67,7 +67,7 @@ void TestIIRFilter(std::vector<double> signal, std::vector<double> b, std::vecto
                             return FilterSamples(signal, { b, a });
                         });
 
-    InvokeForContext<ComputeContext>([&](auto&) {
+    InvokeForContext<ComputeContext>([&] {
         bool ok = true;
         Vector result = filter1D(signal, b, a);
         For(result, [&](Scalar index) {

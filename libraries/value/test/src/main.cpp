@@ -144,7 +144,7 @@ namespace ell
 {
 void DebugPrint(std::string message)
 {
-    InvokeForContext<ComputeContext>([&](auto&) {
+    InvokeForContext<ComputeContext>([&] {
         std::cout << message;
     });
 
@@ -157,7 +157,7 @@ void DebugPrint(std::string message)
 
 void DebugPrint(Vector message)
 {
-    InvokeForContext<ComputeContext>([&](auto&) {
+    InvokeForContext<ComputeContext>([&] {
         char* ptr = message.GetValue().Get<char*>();
         std::cout << ptr;
     });
@@ -175,7 +175,7 @@ void DebugPrintVector(Vector message)
 {
     int size = static_cast<int>(message.Size());
 
-    InvokeForContext<ComputeContext>([&](auto&) {
+    InvokeForContext<ComputeContext>([&] {
         std::visit(
             [size = message.Size()](auto&& data) {
                 using Type = std::decay_t<decltype(data)>;

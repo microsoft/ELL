@@ -64,7 +64,7 @@ namespace value
                               v2, /*y*/
                               Value({ ValueType::Int32, 0 }, ScalarLayout)); /*incy*/
 
-            auto result = InvokeForContext<ComputeContext>([&](auto&) {
+            auto result = InvokeForContext<ComputeContext>([&] {
                 auto wrapper = fn.Define([](Scalar n, Vector x, Scalar incx, Vector y, Scalar incy) -> Scalar {
                     return math::Blas::Dot(n.Get<int>(), x.GetValue().Get<float*>(), incx.Get<int>(), y.GetValue().Get<float*>(), incy.Get<int>());
                 });
@@ -114,7 +114,7 @@ namespace value
                               v2, /*y*/
                               Value({ ValueType::Int32, 0 }, ScalarLayout)); /*incy*/
 
-            auto result = InvokeForContext<ComputeContext>([&](auto&) {
+            auto result = InvokeForContext<ComputeContext>([&] {
                 auto wrapper = fn.Define([](Scalar n, Vector x, Scalar incx, Vector y, Scalar incy) -> Scalar {
                     return math::Blas::Dot(n.Get<int>(), x.GetValue().Get<double*>(), incx.Get<int>(), y.GetValue().Get<double*>(), incy.Get<int>());
                 });

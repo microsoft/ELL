@@ -241,7 +241,7 @@ namespace value
         IfContext If(Scalar test, std::function<void()> fn);
 
         std::optional<Value> Call(FunctionDeclaration func, std::vector<Value> args);
-        
+
         void DebugDump(Value value, std::string tag, std::ostream* stream) const;
 
     protected:
@@ -296,11 +296,29 @@ namespace value
     /// <summary> Clears the global instance of EmitterContext </summary>
     void ClearContext() noexcept;
 
+    namespace detail
+    {
+        template <bool TakesContext, typename Fn, typename ContextType>
+        struct InvokeForContextHelper
+        {
+            using ResultType = std::invoke_result_t<Fn, ContextType&>;
+        };
+
+        template <typename Fn, typename ContextType>
+        struct InvokeForContextHelper<false, Fn, ContextType>
+        {
+            using ResultType = std::invoke_result_t<Fn>;
+        };
+
+        template <typename Fn, typename ContextType>
+        using InvokeForContextHelperT = typename InvokeForContextHelper<std::is_invocable_v<Fn, ContextType&>, Fn, ContextType>::ResultType;
+    } // namespace detail
+
     /// <summary> Invokes the provided function object if the GlobalContext is of the provided ContextType </summary>
     /// <typeparam name="ContextType"> The specific context derived from EmitterContext </typeparam>
     /// <param name="fn"> The function object to call, which takes a lvalue-reference of ContextType </param>
     /// <returns> The return value of `fn`, wrapped in a `std::optional` </returns>
-    template <typename ContextType, typename Fn, typename ReturnType = std::invoke_result_t<Fn, ContextType&>>
+    template <typename ContextType, typename Fn, typename ReturnType = detail::InvokeForContextHelperT<Fn, ContextType>>
     auto InvokeForContext(Fn&& fn) -> std::conditional_t<std::is_same_v<ReturnType, void>, void, std::optional<ReturnType>>;
 
     /// <summary> A helper RAII class to set a particular EmitterContext instance as the global context and unset it at the end of scope </summary>
@@ -518,7 +536,14 @@ namespace value
 
         if (auto ptr = dynamic_cast<ContextType*>(&GetContext()); ptr != nullptr)
         {
-            return fn(*ptr);
+            if constexpr (std::is_invocable_v<Fn, decltype(*ptr)>)
+            {
+                return fn(*ptr);
+            }
+            else
+            {
+                return fn();
+            }
         }
 
         if constexpr (!std::is_same_v<ReturnType, void>)

@@ -48,7 +48,7 @@ void TestVoiceActivityDetectorInternal(const std::string& filename, VoiceActivit
                      .Parameters(Value{ valueType, MemoryLayout({ (int)data.size() }) })
                      .Define([&vad](Vector data) -> Scalar { return vad.Process(data); });
 
-    InvokeForContext<ComputeContext>([&](auto&) {
+    InvokeForContext<ComputeContext>([&] {
         int errors = 0;
         // load the dataset
         auto stream2 = utilities::OpenIfstream(filename);
@@ -108,7 +108,7 @@ void TestVoiceActivityDetector(const std::string& path)
     // test serialization
 
     {
-        value::ContextGuard<value::ComputeContext> contextGuard{"vad"};
+        value::ContextGuard<value::ComputeContext> contextGuard{ "vad" };
         SerializationContext context;
         std::stringstream strstream;
         {

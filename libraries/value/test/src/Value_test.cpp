@@ -194,7 +194,7 @@ namespace
         Scalar ry = Allocate(ValueType::Double, ScalarLayout);
         rx = Floor(Cast(x, ValueType::Double) / e) * e;
         ry = Floor(Cast(y, ValueType::Double) / e) * e;
-        InvokeForContext<ComputeContext>([&](auto&) {
+        InvokeForContext<ComputeContext>([&] {
             double t = tens.Get<double>();
             double dx = rx.Get<double>();
             double dy = ry.Get<double>();
@@ -245,7 +245,7 @@ namespace
         });
         If(ok != 0, [&] {
             DebugPrint("## Matrix compare failed\n");
-            InvokeForContext<ComputeContext>([&](auto&) {
+            InvokeForContext<ComputeContext>([&] {
                 std::cout << "Expected: \n";
                 PrintMatrix("   ", expected);
                 std::cout << "\n";
@@ -757,7 +757,7 @@ Scalar Tensor_test1()
     Scalar ok2 = Allocate(ValueType::Int32, ScalarLayout);
     ok2 = 0;
 
-    InvokeForContext<ComputeContext>([&](auto&) {
+    InvokeForContext<ComputeContext>([&] {
         // These tests use row.Get<int>() to get the actual row,col indexes as constants, which can
         // only be done during ComputeContext.
 
@@ -1041,8 +1041,7 @@ Scalar Tensor_slice_test1()
 */
     Scalar ok2 = Allocate(ValueType::Int32, ScalarLayout);
     ok2 = 0;
-    InvokeForContext<ComputeContext>([&](auto&)
-    {
+    InvokeForContext<ComputeContext>([&] {
         // This tests uses row.Get<int>() to get the actual row, col indexes as constants, which can
         // only be done during ComputeContext.
         For(inputTensor, [&](Scalar row, Scalar col, Scalar ch) {
@@ -1197,7 +1196,7 @@ Scalar Sum_test()
         Scalar result = Sum(v);
         If(result != expected, [&] {
             ok = 1;
-            InvokeForContext<ComputeContext>([&](auto&) {
+            InvokeForContext<ComputeContext>([&] {
                 std::cout << "### Sum_test failed for size " << i << "\n";
             });
         });

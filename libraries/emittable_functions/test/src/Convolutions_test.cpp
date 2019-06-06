@@ -63,7 +63,7 @@ void test_simpleDepthwiseSeparableConvolve2D()
                                       outputTensor)
                           .Define(SimpleDepthwiseSeparableConvolve2D);
 
-    InvokeForContext<ComputeContext>([&](auto&) {
+    InvokeForContext<ComputeContext>([&] {
         bool ok = true;
         convolve2D(inputTensor, filterTensor, 1, 1, outputTensor);
         For(outputTensor, [&](Scalar row, Scalar col, Scalar channel) {
