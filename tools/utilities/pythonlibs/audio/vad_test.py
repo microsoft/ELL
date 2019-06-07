@@ -34,6 +34,10 @@ import wav_reader
 import microphone
 import vad
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path += [os.path.join(script_dir, "training")]
+import make_vad
+
 
 class VadTest(Frame):
     """ A demo class that provides simple GUI for testing voice activity detection on microphone or wav file input. """
@@ -180,7 +184,6 @@ class VadTest(Frame):
 
         self.canvas = FigureCanvasTkAgg(self.features_figure, master=viz_frame)
         self.canvas.draw()
-        self.canvas.show()
         self.canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
 
         # Output section
@@ -203,8 +206,6 @@ class VadTest(Frame):
         if featurizer_path:
             self.featurizer = featurizer.AudioTransform(featurizer_path, 40)
             self.setup_spectrogram_image()
-
-            self.vad = vad.VoiceActivityDetector(self.sample_rate, self.featurizer.output_size)
 
             self.show_output("Feature input size: {}, output size: {}".format(
                 self.featurizer.input_size,
@@ -271,24 +272,29 @@ class VadTest(Frame):
     def update_ui(self):
         self.set_entry(self.wav_filename_entry, self.wav_filename)
         self.set_entry(self.features_entry, self.featurizer_path)
-        self.set_entry(self.tau_up, vad.DEFAULT_TAU_UP)
-        self.set_entry(self.tau_down, vad.DEFAULT_TAU_DOWN)
-        self.set_entry(self.threshold_up, vad.DEFAULT_THRESHOLD_UP)
-        self.set_entry(self.threshold_down, vad.DEFAULT_THRESHOLD_DOWN)
-        self.set_entry(self.large_input, vad.DEFAULT_LARGE_INPUT)
-        self.set_entry(self.gain_att, vad.DEFAULT_GAIN_ATT)
-        self.set_entry(self.level_threshold, vad.DEFAULT_LEVEL_THRESHOLD)
+        self.set_entry(self.tau_up, make_vad.VAD_DEFAULTS["tau_up"])
+        self.set_entry(self.tau_down, make_vad.VAD_DEFAULTS["tau_down"])
+        self.set_entry(self.threshold_up, make_vad.VAD_DEFAULTS["threshold_up"])
+        self.set_entry(self.threshold_down, make_vad.VAD_DEFAULTS["threshold_down"])
+        self.set_entry(self.large_input, make_vad.VAD_DEFAULTS["large_input"])
+        self.set_entry(self.gain_att, make_vad.VAD_DEFAULTS["gain_att"])
+        self.set_entry(self.level_threshold, make_vad.VAD_DEFAULTS["level_threshold"])
 
-    def read_ui_settings(self):
-        self.vad.configure(
-            self.get_entry(self.tau_up),
-            self.get_entry(self.tau_down),
-            self.get_entry(self.threshold_up),
-            self.get_entry(self.threshold_down),
-            self.get_entry(self.large_input),
-            self.get_entry(self.gain_att),
-            self.get_entry(self.level_threshold)
-        )
+    def create_vad(self):
+
+        vad_options = {
+            "tau_up": self.get_entry(self.tau_up),
+            "tau_down": self.get_entry(self.tau_down),
+            "threshold_up": self.get_entry(self.threshold_up),
+            "threshold_down": self.get_entry(self.threshold_down),
+            "large_input": self.get_entry(self.large_input),
+            "gain_att": self.get_entry(self.gain_att),
+            "level_threshold": self.get_entry(self.level_threshold)
+        }
+
+        model = make_vad.make_vad("vad.ell", self.sample_rate, self.featurizer.input_size,
+                                  self.featurizer.output_size, vad_options)
+        self.vad = vad.VoiceActivityDetector(model)
 
     def init_data(self):
         """ initialize the spectrogram_image_data based on the newly loaded model info """
@@ -375,9 +381,7 @@ class VadTest(Frame):
             signals = np.array(self.signals)
             self.subplot2.plot(levels)
             self.subplot2.plot(signals)
-            self.vad.reset()
         self.canvas.draw()
-        self.canvas.show()
         self.levels = []
         self.signals = []
 
@@ -470,7 +474,7 @@ class VadTest(Frame):
 
         self.stop()
 
-        self.read_ui_settings()
+        self.create_vad()
         self.reading_input = False
         self.wav_file = wav_reader.WavReader(self.sample_rate, self.channels, auto_scale=self.auto_scale)
         self.wav_file.open(filename, self.featurizer.input_size, self.speaker)
@@ -497,14 +501,14 @@ class VadTest(Frame):
         self.read_input_thread.start()
 
     def start_recording(self):
-        """ Start recording audio from the microphone nd classify the audio. Note we use a background thread to
+        """ Start recording audio from the microphone and classify the audio. Note we use a background thread to
         process the audio and we setup a UI animation function to draw the sliding spectrogram image, this way
         the UI update doesn't interfere with the smoothness of the microphone readings """
         if self.microphone is None:
             self.microphone = microphone.Microphone(True, False)
 
         self.stop()
-        self.read_ui_settings()
+        self.create_vad()
         num_channels = 1
         self.microphone.open(self.featurizer.input_size, self.sample_rate, num_channels, self.input_device)
 
@@ -538,8 +542,9 @@ class VadTest(Frame):
                 if feature_data is None:
                     break  # eof
                 else:
-                    signal = self.vad.process(feature_data)
-                    self.levels += [self.vad.level]
+                    signal = self.vad.predict(feature_data)
+                    level = np.sum(feature_data)
+                    self.levels += [level]
                     self.signals += [signal]
                     self.lock.acquire()
                     if self.show_spectrogram:

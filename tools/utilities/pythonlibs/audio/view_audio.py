@@ -35,6 +35,7 @@ import featurizer
 import microphone
 import speaker
 import wav_reader
+import vad
 
 
 class AudioDemo(Frame):
@@ -43,7 +44,7 @@ class AudioDemo(Frame):
 
     def __init__(self, featurizer_model=None, classifier_model=None, auto_scale=True,
                  sample_rate=None, channels=None, input_device=None, categories=None,
-                 image_width=80, threshold=None, wav_file=None, clear=5, serial=None):
+                 image_width=80, threshold=None, wav_file=None, clear=5, serial=None, vad_model=None):
         """ Initialize AudioDemo object
         featurizer_model - the path to the ELL featurizer
         classifier_model - the path to the ELL classifier
@@ -56,6 +57,7 @@ class AudioDemo(Frame):
         threshold - ignore predictions that have confidence below this number (e.g. 0.5)
         wav_file - optional wav_file to use  when you click Play
         serial - optional serial input, reading numbers from the given serial port.
+        vad_model - optional ELL model containing VoiceActivityDetector
         """
         super().__init__()
 
@@ -81,6 +83,10 @@ class AudioDemo(Frame):
             self.settings[self.CLASSIFIER_MODEL_KEY] = classifier_model
         elif self.CLASSIFIER_MODEL_KEY in self.settings:
             self.classifier_model = self.settings[self.CLASSIFIER_MODEL_KEY]
+
+        if vad_model:
+            self.vad = vad.VoiceActivityDetector(vad_model)
+            self.previous_vad = 0
 
         self.wav_filename = wav_file
         if self.wav_filename is None and self.WAV_FILE_KEY in self.settings:
@@ -212,6 +218,13 @@ class AudioDemo(Frame):
 
     def accumulate_feature(self, feature_data):
         """ accumulate the feature data and pass feature data to classifier """
+        if self.vad:
+            vad_signal = self.vad.predict(feature_data)
+            if self.previous_vad != vad_signal:
+                if vad_signal == 0:
+                    self.show_output("--- reset ---")
+                    self.classifier.reset()
+                self.previous_vad = vad_signal
         if self.classifier and self.show_classifier_output:
             self.classifier_feature_data = np.vstack((self.classifier_feature_data,
                                                       feature_data))[-self.num_classifier_features:, :]
@@ -577,12 +590,12 @@ class AudioDemo(Frame):
 
 
 def main(featurizer_model=None, classifier=None, auto_scale=True, sample_rate=None, channels=None, input_device=None,
-         categories=None, image_width=80, threshold=None, wav_file=None, clear=5, serial=None):
+         categories=None, image_width=80, threshold=None, wav_file=None, clear=5, serial=None, vad_model=None):
     """ Main function to create root UI and AudioDemo object, then run the main UI loop """
     root = tk.Tk()
     root.geometry("800x800")
     app = AudioDemo(featurizer_model, classifier, auto_scale, sample_rate, channels, input_device, categories,
-                    image_width, threshold, wav_file, clear, serial)
+                    image_width, threshold, wav_file, clear, serial, vad_model)
     root.bind("+", app.on_plus_key)
     root.bind("-", app.on_minus_key)
     while True:
@@ -624,6 +637,8 @@ if __name__ == "__main__":
                             default=None)
     arg_parser.add_argument("--auto_scale", help="Whether to auto scale audio input to range [-1, 1]",
                             action="store_true")
+    arg_parser.add_argument("--vad", help="Use given vad.ell model to determine when to reset the classifier",
+                            default=None)
     args = arg_parser.parse_args()
 
     if args.serial and args.input_device:
@@ -634,4 +649,4 @@ if __name__ == "__main__":
     else:
         main(args.featurizer, args.classifier, args.auto_scale,
              args.sample_rate, args.channels, args.input_device, args.categories,
-             args.image_width, args.threshold, args.wav_file, args.clear, args.serial)
+             args.image_width, args.threshold, args.wav_file, args.clear, args.serial, args.vad)

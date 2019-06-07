@@ -43,6 +43,9 @@ class ComputeModel:
             self.hidden_state = ell.math.FloatVector(self.state_size)
             self.new_state = ell.math.FloatVector(self.state_size)
 
+    def predict(self, x):
+        return self.transform(x)
+
     def transform(self, x):
         """ call the ell model with input array 'x' and return the output as numpy array """
         # Send the input to the predict function and return the prediction result
