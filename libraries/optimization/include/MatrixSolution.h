@@ -17,6 +17,8 @@
 #include <math/include/Vector.h>
 #include <math/include/VectorOperations.h>
 
+#include <utilities/include/Unused.h>
+
 namespace ell
 {
 namespace optimization
@@ -46,7 +48,7 @@ namespace optimization
         void Reset();
 
         /// <summary> Sets the solution parameters. This solution type doesn't have any parameters, so it does nothing. </summary>
-        void SetParameters(const ParametersType& parameters) {}
+        void SetParameters(const ParametersType& parameters) { UNUSED(parameters); }
 
         /// <summary> Returns the matrix. </summary>
         math::ConstColumnMatrixReference<double> GetMatrix() const { return _weights; }

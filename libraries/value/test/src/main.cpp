@@ -31,19 +31,19 @@ using namespace ell::value;
 
 struct TestLLVMContext : public LLVMContext
 {
-    TestLLVMContext(std::unique_ptr<ell::emitters::IRModuleEmitter> emitter) :
-        LLVMContext(*emitter),
-        _emitter(std::move(emitter)) {}
+    TestLLVMContext(ell::emitters::IRModuleEmitter& emitter) :
+        LLVMContext(emitter),
+        _emitter(emitter) {}
 
-    void DebugDump() { _emitter->DebugDump(); }
+    void DebugDump() { _emitter.DebugDump(); }
 
     ell::emitters::IRFunctionEmitter& GetFunctionEmitter() const
     {
-        return _emitter->GetCurrentFunction();
+        return _emitter.GetCurrentFunction();
     }
 
 private:
-    std::unique_ptr<ell::emitters::IRModuleEmitter> _emitter;
+    ell::emitters::IRModuleEmitter& _emitter;
 };
 
 void PrintIR(TestLLVMContext& context)
@@ -189,7 +189,6 @@ void DebugPrintVector(Vector message)
                         data,
                         data + size,
                         std::ostream_iterator<std::remove_pointer_t<Type>>(std::cout, ", "));
-                    std::cout << std::endl;
                 }
             },
             message.GetValue().GetUnderlyingData());
@@ -243,7 +242,7 @@ void LLVMJitTest(std::string testName, std::function<Scalar()> defineFunction)
     compilerSettings.useBlas = false;
     ell::emitters::IRModuleEmitter moduleEmitter("Value_test_llvm", compilerSettings);
     DeclarDebugPrintFunctions(moduleEmitter);
-    ContextGuard<LLVMContext> guard(moduleEmitter);
+    ContextGuard<TestLLVMContext> guard(moduleEmitter);
 
     auto fn = DeclareFunction(testName)
                   .Returns(Value(ValueType::Int32, ScalarLayout));
@@ -282,6 +281,7 @@ int main()
 
         // Value tests
         ADD_TEST_FUNCTION(Basic_test);
+        ADD_TEST_FUNCTION(DebugPrint_test);
         ADD_TEST_FUNCTION(If_test1);
         ADD_TEST_FUNCTION(Value_test1);
         ADD_TEST_FUNCTION(Scalar_test1);

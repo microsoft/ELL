@@ -323,6 +323,15 @@ Scalar Basic_test()
     return 0;
 }
 
+Scalar DebugPrint_test()
+{
+    DebugPrint("### Test that debug print is working: ");
+    Vector v(std::vector<int>{ 1, 2, 3, 4 });
+    DebugPrintVector(v);
+    DebugPrint("\n");
+    return 0;
+}
+
 Scalar Value_test1()
 {
     Vector v(std::vector<int>{ 1, 2, 3, 4 });

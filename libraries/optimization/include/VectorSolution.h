@@ -48,7 +48,7 @@ namespace optimization
         void Reset();
 
         /// <summary> Sets the solution parameters. This solution type doesn't have any parameters, so it does nothing. </summary>
-        void SetParameters(const ParametersType& parameters) {}
+        void SetParameters(const ParametersType&) {}
 
         /// <summary> Returns a reference to the vector. </summary>
         math::ColumnVectorReference<double> GetVector() { return _weights; }

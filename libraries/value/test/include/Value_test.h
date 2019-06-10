@@ -16,6 +16,7 @@
 namespace ell
 {
 value::Scalar Basic_test();
+value::Scalar DebugPrint_test();
 value::Scalar Value_test1();
 value::Scalar Scalar_test1();
 value::Scalar Vector_test1();

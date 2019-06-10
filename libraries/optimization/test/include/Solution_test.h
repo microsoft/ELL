@@ -215,7 +215,7 @@ void TestMaskedMatrixSolution()
     randomEngine.seed(seed);
     auto examples = GetRandomDataset<RealType, VectorVectorExampleType<RealType>, VectorRefVectorRefExampleType<RealType>>(numExamples, inputSize, outputSize, randomEngine, 0);
 
-    const float regularizationParameter = 0.0001;
+    const double regularizationParameter = 0.0001;
     auto optimizer = MakeSDCAOptimizer<SolutionType<RealType>>(examples, MultivariateLoss<LossFunctionType>{}, RegularizerType{}, { regularizationParameter });
     optimizer.Update();
     const auto& solution = optimizer.GetSolution();
