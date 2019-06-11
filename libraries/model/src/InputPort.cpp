@@ -122,18 +122,7 @@ namespace model
         Port::ReadFromArchive(archiver);
         PortElementsBase input;
         archiver["input"] >> input;
-        if (!input.IsFullPortOutput())
-        {
-            // Back-compat: if this port has a non-simple PortElements, add nodes to the model as needed to simplify.
-            auto& context = archiver.GetContext();
-            ModelSerializationContext& modelContext = dynamic_cast<ModelSerializationContext&>(context);
-            const auto& newInput = modelContext.GetModel()->SimplifyOutputs(input);
-            SetReferencedPort(&newInput);
-        }
-        else
-        {
-            SetReferencedPort(input.GetRanges()[0].ReferencedPort());
-        }
+        SetReferencedPort(input.GetRanges()[0].ReferencedPort());
     }
 
     static_assert(sizeof(InputPortBase) == sizeof(InputPort<double>), "InputPort<T> must have the same layout as InputPortBase");

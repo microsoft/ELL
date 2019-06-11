@@ -739,14 +739,7 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
-        if (archiver.HasNextPropertyName("fftSize"))
-        {
-            archiver["fftSize"] >> _fftSize;
-        }
-        else
-        {
-            _fftSize = _input.Size();
-        }
+        archiver["fftSize"] >> _fftSize;
         _output.SetSize(_fftSize / 2 + 1);
     }
 

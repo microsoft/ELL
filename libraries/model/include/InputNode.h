@@ -199,21 +199,9 @@ namespace model
     void InputNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
-
-        int size;
-        archiver.OptionalProperty("size", 0) >> size;
-        std::vector<int> shapeVector;
-        archiver.OptionalProperty("shape", std::vector<int>{ size }) >> shapeVector;
-        if (archiver.HasNextPropertyName("layout"))
-        {
-            PortMemoryLayout layout;
-            archiver["layout"] >> layout;
-            SetMemoryLayout(layout);
-        }
-        else
-        {
-            SetShape({ shapeVector });
-        }
+        PortMemoryLayout layout;
+        archiver["layout"] >> layout;
+        SetMemoryLayout(layout);
     }
 
     template <typename ValueType, typename ModelLikeType, typename IntType, utilities::IsNonBooleanIntegral<IntType> concept>

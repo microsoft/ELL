@@ -190,10 +190,7 @@ namespace dsp
         archiver["numFilters"] >> _numFilters;
         archiver["begin"] >> _beginFilter;
         archiver["end"] >> _endFilter;
-        if (archiver.HasNextPropertyName("offset")) 
-        {
-            archiver["offset"] >> _offset;
-        }
+        archiver["offset"] >> _offset;
     }
 
     void TriangleFilterBank::SetBins(const std::vector<size_t>& bins)
@@ -306,14 +303,7 @@ namespace dsp
     void MelFilterBank::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         TriangleFilterBank::ReadFromArchive(archiver);
-        if (archiver.HasNextPropertyName("fftSize"))
-        {
-            archiver["fftSize"] >> _fftSize;
-        }
-        else
-        {
-            _fftSize = GetWindowSize();
-        }
+        archiver["fftSize"] >> _fftSize;
         InitializeBins();
     }
 

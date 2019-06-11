@@ -169,14 +169,6 @@ namespace common
         context.GetTypeFactory().AddType<predictors::neural::ActivationImpl<ElementType>, predictors::neural::ReLUActivation<ElementType>>();
         context.GetTypeFactory().AddType<predictors::neural::ActivationImpl<ElementType>, predictors::neural::SigmoidActivation<ElementType>>();
         context.GetTypeFactory().AddType<predictors::neural::ActivationImpl<ElementType>, predictors::neural::TanhActivation<ElementType>>();
-
-        // Map the old type names to the new ones for compatibility reasons.
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",SigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",HardSigmoidActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",ReLUActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",LeakyReLUActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",TanhActivation>");
-        context.GetTypeFactory().AddType<model::Node, nodes::ActivationLayerNode<ElementType>>("ActivationLayerNode<"s + TypeName<ElementType>::GetName() + ",ParametricReLUActivation>");
     }
 
     void RegisterNodeTypes(SerializationContext& context)

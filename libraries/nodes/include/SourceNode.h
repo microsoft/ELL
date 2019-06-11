@@ -337,14 +337,6 @@ namespace nodes
         archiver["sourceFunctionName"] >> sourceFunctionName;
         SetCallbackName(sourceFunctionName);
 
-        if (archiver.HasNextPropertyName("shape"))
-        {
-            // legacy support, we no longer need this "shape" property because the
-            // _output port now contains it's own serializable MemoryLayout.
-            std::vector<int> shapeVector;
-            archiver["shape"] >> shapeVector;
-            SetShape({ shapeVector });
-        }
         _bufferedSample.resize(_output.GetMemoryLayout().NumElements());
     }
 

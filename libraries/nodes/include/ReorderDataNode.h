@@ -534,41 +534,8 @@ namespace nodes
         archiver[defaultInputPortName] >> _input;
         archiver["inputLayout"] >> _inputMemoryLayout;
         model::PortMemoryLayout outputMemoryLayout;
-        if (archiver.HasNextPropertyName("outputLayout"))
-        {
-            // backward-compatability
-            archiver["outputLayout"] >> outputMemoryLayout;
-
-            if (archiver.HasNextPropertyName("order"))
-            {
-                std::vector<int> order;
-                archiver["order"] >> order;
-                outputMemoryLayout = model::PortMemoryLayout(outputMemoryLayout.GetActiveSize(),
-                                                             outputMemoryLayout.GetExtent(),
-                                                             outputMemoryLayout.GetOffset(),
-                                                             outputMemoryLayout.GetCumulativeIncrement(),
-                                                             order);
-            }
-            _output.SetMemoryLayout(outputMemoryLayout);
-        }
-        else
-        {
-            _output.SetMemoryLayout(_inputMemoryLayout);
-            if (archiver.HasNextPropertyName("order"))
-            {
-                std::vector<int> order;
-                archiver["order"] >> order;
-                _output.SetMemoryLayout(GetOutputMemoryLayout().ReorderedCopy(order));
-            }
-        }
-
-        if (archiver.HasNextPropertyName("order"))
-        {
-            std::vector<int> order;
-            archiver["order"] >> order;
-            _output.SetMemoryLayout(GetOutputMemoryLayout().ReorderedCopy(order));
-        }
-
+        archiver["outputLayout"] >> outputMemoryLayout;
+        _output.SetMemoryLayout(outputMemoryLayout);
         archiver["paddingValue"] >> _paddingValue;
     }
 

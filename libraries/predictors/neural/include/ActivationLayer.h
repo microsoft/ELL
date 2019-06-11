@@ -141,15 +141,7 @@ namespace predictors
         void ActivationLayer<ElementType>::ReadFromArchive(utilities::Unarchiver& archiver)
         {
             Layer<ElementType>::ReadFromArchive(archiver);
-
-            if (archiver.HasNextPropertyName("activation"))
-            {
-                _activation.ReadFromArchive(archiver);
-            }
-            if (!_activation.GetImpl())
-            {
-                _activation.LegacyReadFromArchive(archiver);
-            }
+            _activation.ReadFromArchive(archiver);
         }
     } // namespace neural
 } // namespace predictors

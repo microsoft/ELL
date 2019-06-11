@@ -156,9 +156,6 @@ namespace predictors
             /// <summary> Internal use only. </summary>
             void Reset(ActivationImpl<ElementType>* impl) { _impl.reset(impl); }
 
-            /// <summary> Internal use only. </summary>
-            void LegacyReadFromArchive(utilities::Unarchiver& archiver);
-
         private:
             std::unique_ptr<ActivationImpl<ElementType>> _impl;
         };

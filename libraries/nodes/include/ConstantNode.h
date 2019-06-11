@@ -238,16 +238,9 @@ namespace nodes
     {
         Node::ReadFromArchive(archiver);
         archiver["values"] >> _values;
-        if (archiver.HasNextPropertyName("layout"))
-        {
-            model::PortMemoryLayout layout;
-            archiver["layout"] >> layout;
-            _output.SetMemoryLayout(layout);
-        }
-        else
-        {
-            _output.SetSize(_values.size());
-        }
+        model::PortMemoryLayout layout;
+        archiver["layout"] >> layout;
+        _output.SetMemoryLayout(layout);        
     }
 
     template <typename ValueType, typename ModelLikeType>

@@ -152,21 +152,9 @@ namespace model
     {
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;
-
-        int size;
-        archiver.OptionalProperty("size", 0) >> size;
-        std::vector<int> shapeVector;
-        archiver.OptionalProperty("shape", std::vector<int>{ size }) >> shapeVector;
-        if (archiver.HasNextPropertyName("layout"))
-        {
-            PortMemoryLayout layout;
-            archiver["layout"] >> layout;
-            SetShape(layout.GetActiveSize());
-        }
-        else
-        {
-            SetShape({ shapeVector });
-        }
+        PortMemoryLayout layout;
+        archiver["layout"] >> layout;
+        SetShape(layout.GetActiveSize());
     }
 
     template <typename ValueType>
