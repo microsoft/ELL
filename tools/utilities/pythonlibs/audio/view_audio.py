@@ -84,6 +84,7 @@ class AudioDemo(Frame):
         elif self.CLASSIFIER_MODEL_KEY in self.settings:
             self.classifier_model = self.settings[self.CLASSIFIER_MODEL_KEY]
 
+        self.vad = None
         if vad_model:
             self.vad = vad.VoiceActivityDetector(vad_model)
             self.previous_vad = 0
@@ -292,7 +293,9 @@ class AudioDemo(Frame):
             prediction, probability, label, _ = self.classifier.predict(self.classifier_feature_data.ravel())
             if prediction is not None:
                 percent = int(100 * probability)
-                if self.last_prediction != prediction or self.probability < probability:
+                if label == "silence":
+                    self.classifier.reset()
+                elif self.last_prediction != prediction or self.probability < probability:
                     self.last_prediction = prediction
                     self.probability = probability
                     self.show_output("<<< DETECTED ({}) {}% {} >>>".format(prediction, percent, label))
@@ -539,7 +542,6 @@ class AudioDemo(Frame):
 
         canvas = FigureCanvasTkAgg(self.features_figure, master=viz_frame)
         canvas.draw()
-        canvas.show()
         canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
 
         # Classifier section

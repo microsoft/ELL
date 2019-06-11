@@ -1573,6 +1573,7 @@ ONNX_OP_TYPE_TO_CONVERTER_MAP = {
     "Convolution"             : OnnxConvolutionConverter,  # noqa E203
     "Constant"                : OnnxConstantConverter,  # noqa E203
     "ConstantFill"            : OnnxConstantFillConverter,  # noqa E203
+    "ConstantOfShape"         : OnnxConstantOfShapeConverter,  # noqa E203
     "Cos"                     : OnnxCosConverter,  # noqa E203
     "Dropout"                 : OnnxPassthroughConverter,  # noqa E203
     "Exp"                     : OnnxExpConverter,  # noqa E203

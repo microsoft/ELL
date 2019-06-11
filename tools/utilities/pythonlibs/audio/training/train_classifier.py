@@ -599,7 +599,7 @@ if __name__ == '__main__':
     parser.add_argument("--batch_size", "-bs", help="Batch size of training", type=int)
     parser.add_argument("--architecture", help="Specify model architecture (GRU, LSTM)")
     parser.add_argument("--num_layers", type=int, help="Number of RNN layers (1, 2 or 3)")
-    parser.add_argument("--hidden_units", "-hu", help="Number of hidden units in the GRU layers")
+    parser.add_argument("--hidden_units", "-hu", type=int, help="Number of hidden units in the GRU layers")
     parser.add_argument("--use_gpu", help="Whether to use GPU for training")
 
     # or you can just specify an options file.
@@ -645,5 +645,8 @@ if __name__ == '__main__':
         config.dataset.categories = args.categories
     if args.dataset:
         config.dataset.path = args.dataset
+
+    if not os.path.isfile("config.json"):
+        config.save("config.json")
 
     train(config, args.eval, args.outdir, args.detail)
