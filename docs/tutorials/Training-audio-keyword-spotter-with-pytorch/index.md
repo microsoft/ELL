@@ -124,7 +124,7 @@ python make_featurizer.py --sample_rate 16000 --window_size 512 --input_buffer_s
 You should see a message saying "Saving **featurizer.ell**" and if you print this using the following command line:
 
 ```shell
-[Linux] %ELL_ROOT%/build/bin/print -imap featurizer.ell 
+[Linux] $ELL_ROOT/build/bin/print -imap featurizer.ell 
 [Windows] %ELL_ROOT%\build\bin\release\print -imap featurizer.ell -fmt dgml -of graph.dgml
 ```
 
