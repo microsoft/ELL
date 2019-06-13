@@ -71,82 +71,51 @@ Rename the `dsf_I64x64x3CCMCCMCCMCMCMC1AS.ell` model file to `pretrained.ell`:
 
 A `pretrained.ell` file now appears in the directory.
 
-## Create your training and validation datasets
-Before you retarget an existing neural network, you must create a training dataset and a validation dataset for the image classes you want to recognize. In this tutorial, you'll classify images of 10 common fruits, including `apple, banana, blackberry, blueberry, cherry, grapes, lemon, lime, orange and raspberry`.
+## Create your training datasets
+Before you retarget an existing neural network, you must create a training dataset for the image classes you want to recognize. In this tutorial, you'll classify images of 10 common fruits, including `apple, banana, blackberry, blueberry, cherry, grapes, lemon, lime, orange and raspberry`.
 
 Put images of each class in a separate folder under the class name, using a different set of images for training and validation. For example:
 ```
 data
    +-----fruit
-            +-----train
-                        +-----apple
-                                ------ apple01.jpg
-                                ------ apple02.jpg
-                                .... etc ...
-                        +-----banana
-                        +-----blackberry
-                        +-----blueberry
-                        +-----cherry
-                        +-----grapes
-                        +-----lemon
-                        +-----lime
-                        +-----orange
-                        +-----raspberry
-            +-----validate
-                        +-----apple
-                                ------ apple41.jpg
-                                ------ apple42.jpg
-                                .... etc ...
-                        +-----banana
-                        +-----blackberry
-                        +-----blueberry
-                        +-----cherry
-                        +-----grapes
-                        +-----lemon
-                        +-----lime
-                        +-----orange
-                        +-----raspberry
+            +-----apple
+                    ------ apple01.jpg
+                    ------ apple02.jpg
+                    .... etc ...
+            +-----banana
+            +-----blackberry
+            +-----blueberry
+            +-----cherry
+            +-----grapes
+            +-----lemon
+            +-----lime
+            +-----orange
+            +-----raspberry
 ```
 **Note** Make sure that you have the appropriate rights or licensing to use the images in your datasets. If you use a search engine like Bing or Google, filter on the license type that makes sense for your situation.
 
 After you have the images in the appropriate folder structure, you are ready to use the [datasetsFromImages](https://github.com/Microsoft/ELL/blob/master/tools/utilities/datasetFromImages/README.md) Python tool to create our training and validation datasets with the `--folder` option. Make sure to replace `<ELL-root>` with the path to the ELL root directory (the directory where you cloned the ELL repository).  It might be handy to set an environment variable named ELL_root with this path.
 
 ```shell
-python <ELL-root>/tools/utilities/datasetFromImages/datasetFromImages.py --imageSize 64x64 --outputDataset fruit_train.gsdf --folder data/fruit/train
+python <ELL-root>/tools/utilities/datasetFromImages/datasetFromImages.py --imageSize 64x64 --outputDataset train.gsdf --folder data/fruit/train --extractValidation 0.1
 ```
 
-This tells the `datasetsFromImages` tool to create a multiclass dataset by walking the folders. It uses each subdirectory as the class name and each image as an example of that class. The `--imageSize 64x64` switch tells the tool to center, crop, and scale images to 64x64, because that's what the pretrained model expects. The dataset is in ELL's generalized spare data format and is saved to `fruit_train.gsdf`.
+This tells the `datasetsFromImages` tool to create a multiclass dataset by walking the folders. It uses each subdirectory as the class name and each image as an example of that class. The `--imageSize 64x64` switch tells the tool to center, crop, and scale images to 64x64, because that's what the pretrained model expects. The dataset is in ELL's generalized spare data format and is saved to `train.gsdf`.  The `--extractValidation` switch causes the tool to automatically allocate
+10% of the images to a separate `validation.gsdf` dataset.
 
 Output may look like this:
 ```
 Wrote class category labels to categories.txt
-Processing 400 examples, using image size 64x64, bgr=True
-Processing 0 | data/fruit/train/apple/apple01.jpg
-    Wrote 12288 data values
-Processing 0 | data/fruit/train/apple/apple02.jpg
-    Wrote 12288 data values
-Processing 0 | data/fruit/train/apple/apple03.jpg
-    Wrote 12288 data values
-...
-...
-Processing 9 | data/fruit/train/apple/raspberry01.jpg
-    Wrote 12288 data values
-Processing 9 | data/fruit/train/apple/raspberry02.jpg
-    Wrote 12288 data values
-
-Wrote 400 examples to fruit_train.gsdf
-Total time to create dataset: 11.7 seconds
+Discovered 400 examples and 10 categories
+Processing 80 examples, using image size 64x64, bgr=True
+Wrote 80 examples to validation.gsdf
+Extracted 'validation.gsdf' subset containing 28 examples
+Processing 320 examples, using image size 64x64, bgr=True
+Wrote 320 examples to train.gsdf
+Total time to create dataset: 8.8 seconds
 ```
 
-This indicates the tool processed 10 classes (0 through 9), each example containing 12288 values (which is 64x64x3, the image size our model expects). The resulting dataset file `fruit_train.gsdf` contains a total of 400 examples, and the text names of each of the classes was written to `categories.txt`.
-
-Next, create a validation set, which you'll use to test the model after you train it.
-
-```shell
-python <ELL-root>/tools/utilities/datasetFromImages/datasetFromImages.py --imageSize 64x64 --outputDataset fruit_validate.gsdf --folder data/fruit/validate
-```
-
-The two dataset files `fruit_train.gsdf` and `fruit_validate.gsdf`are now in your directory. You'll use them to train and validate the new model.
+This indicates the tool found 280 images across 10 categories, which it then split into a `train.gsdf` dataset and a `validation.gsdf` dataset.  It also wrote the class names to `categories.txt`.
 
 ## Create a custom classifier from a pretrained one
 
@@ -164,51 +133,33 @@ Use the `print` option to list the ELL nodes in the model:
 [Windows] %ELL_root%\build\bin\release\retargetTrainer --refineIterations 1 --inputModelFilename pretrained.ell --print
 ```
 
-This will output information of the network after one refinement operation. You should see output like this (the node id's and addresses might be different):
+This will output all the nodes in the network after one refinement operation. This produces a lot of output, so instead we can "grep" just for those nodes involved in ReLUActivation and you will find the following nodes:
 
 ```
-node_1384 (0x7fe10ae03fa0) = InputNode<float>()
-node_1385 (0x7fe10ae051f0) = ConstantNode<float>()
-node_1386 (0x7fe10ae0eb80) = ConstantNode<float>()
-node_1387 (0x7fe10ae01480) = BroadcastLinearFunctionNode<float>(node_1384.output, node_1385.output, node_1386.output)
-node_1388 (0x7fe10ae0e130) = ConstantNode<float>()
-node_1389 (0x7fe10ae0cc10) = ConstantNode<float>()
-...
-...
-node_1509 (0x7fe10ae4dba0) = BroadcastLinearFunctionNode<float>(node_1506.output, node_1507.output, node_1508.output)
-node_1510 (0x7fe10ae4e1a0) = ReorderDataNode<float>(node_1509.output)
-node_1511 (0x7fe10ae4e680) = UnrolledConvolutionNode<float>(node_1510.output)
-node_1512 (0x7fe10ac14380) = ReorderDataNode<float>(node_1511.output)
-node_1513 (0x7fe10ac14650) = ConstantNode<float>()
-node_1514 (0x7fe10ac149e0) = ConstantNode<float>()
-node_1515 (0x7fe10ac14d70) = BroadcastLinearFunctionNode<float>(node_1512.output, node_1513.output, node_1514.output)
-node_1516 (0x7fe10ac15370) = BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(node_1515.output)
-node_1517 (0x7fe10b00cc00) = PoolingLayerNode<float,MaxPoolingFunction>(node_1516.output)
-node_1518 (0x7fe10ac15af0) = ReorderDataNode<float>(node_1517.output)
-node_1519 (0x7fe10ac15fd0) = UnrolledConvolutionNode<float>(node_1518.output)
-node_1520 (0x7fe10ac164f0) = ReorderDataNode<float>(node_1519.output)
-node_1521 (0x7fe10ac169d0) = ConstantNode<float>()
-node_1522 (0x7fe10ac16d60) = ConstantNode<float>()
-node_1523 (0x7fe10ac170f0) = BroadcastLinearFunctionNode<float>(node_1520.output, node_1521.output, node_1522.output)
-node_1524 (0x7fe10ac176f0) = BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(node_1523.output)
-node_1525 (0x7fe10b00f000) = PoolingLayerNode<float,MeanPoolingFunction>(node_1524.output)
-node_1526 (0x7fe10ac17e60) = SoftmaxLayerNode<float>(node_1525.output)
-node_1527 (0x7fe10ac18500) = OutputNode<float>(node_1526.output)
+node_1340 (000002C554420D20) = BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(node_1339.output)
+node_1356 (000002C554433450) = BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(node_1355.output)
+node_1373 (000002C5544E5BB0) = BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(node_1372.output)
+node_1389 (000002C55441DB70) = BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(node_1388.output)
+node_1406 (000002C5545C5420) = BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(node_1405.output)
+node_1422 (000002C554661B40) = BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(node_1421.output)
+node_1439 (000002C55468A680) = BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(node_1438.output)
+node_1456 (000002C5546A7E10) = BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(node_1455.output)
+node_1464 (000002C5546B7D10) = BroadcastUnaryFunctionNode<float,ReLUActivationFunction<float>>(node_1463.output)
 ```
 
-For this tutorial, you'll use output from the ReLU activation node that comes after the second-to-last convolutional layer.  In our print above this is node `1516`, but you might see different node ids in your output.  Another way to find the right node is to run `grep ReLU` on the above output and take the node id shown at the beginning of the second last row.  Refer to the Troubleshooting section of this tutorial for more information about choosing the right ELL node (or nodes) for your specific case.
+For this tutorial, you'll use output from the second to last ReLU activation node.  In our print above this is node `1456`, but you might see different node ids in your output.  Refer to the Troubleshooting section of this tutorial for more information about choosing the right ELL node (or nodes) for your specific case.
 
-Run the `retargetTrainer`, taking output from the node id you have identified in the pretrained model, and produce a retargeted model using the `fruit_train.gsdf` dataset.  Notice below that the name of the output of node `1516` is simply specified as `1516.output`.
+Run the `retargetTrainer`, taking output from the node id you have identified in the pretrained model, and produce a retargeted model using the `train.gsdf` dataset.  Notice below that the name of the output of node `1456` is simply specified as `1456.output`.
 
 ```shell
-[Linux/macOS] $ELL_root/build/bin/retargetTrainer --maxEpochs 100 --multiClass true --refineIterations 1 --verbose --inputModelFilename pretrained.ell --targetPortElements 1516.output --inputDataFilename fruit_train.gsdf --outputModelFilename model.ell
+[Linux/macOS] $ELL_root/build/bin/retargetTrainer --maxEpochs 100 --multiClass true --refineIterations 1 --verbose --inputModelFilename pretrained.ell --targetPortElements 1456.output --inputDataFilename train.gsdf --outputModelFilename model.ell
 
-[Windows] %ELL_root%\build\bin\release\retargetTrainer --maxEpochs 100 --multiClass true --refineIterations 1 --inputModelFilename pretrained.ell --targetPortElements 1516.output --inputDataFilename fruit_train.gsdf --outputModelFilename model.ell
+[Windows] %ELL_root%\build\bin\release\retargetTrainer --maxEpochs 100 --multiClass true --refineIterations 1 --inputModelFilename pretrained.ell --targetPortElements 1456.output --inputDataFilename train.gsdf --outputModelFilename model.ell
 ```
 
 Output similar to the following indicates how training for each of the new classes progressed.
 ```
-Redirected output for port elements 1516.output from model
+Redirected output for port elements 1456.output from model
 
 === Training binary classifier for class 0 vs Rest ===
 Training ...
@@ -277,7 +228,7 @@ To finish creating the Python wrapper, build the CMake project.
 [Windows] cmake -G "Visual Studio 15 2017 Win64" -Thost=x64 .. && cmake --build . --config release && cd ..\..
 ```
 
-You have just created a Python module named **model**. This module provides functions that report the shapes of the model's input and output as well as the **predict** function, which invokes the retargeted model you created earlier.
+You have just created a Python module named **model**.  This module provides functions that report the shapes of the model's input and output as well as the **predict** function, which invokes a compiled and optimized version of the retargeted model you created earlier.
 
 Before writing the script that will use the compiled model, you also need to copy over some Python helper code.
 
@@ -288,7 +239,7 @@ Before writing the script that will use the compiled model, you also need to cop
 
 At this point, your **host** directory that contains a CMake project that builds the Python wrapper and some helpful Python utilities. In the next steps, you will use the following files created in the current directory:
 * `categories.txt`
-* `fruit_validate.gsdf`
+* `validate.gsdf`
 * `tutorial_helpers.py`
 
 ## Write code to validate the model
@@ -359,7 +310,7 @@ Add code for the main function and define a few variables that hold filenames yo
 def main(args):
 
     categories_filename = 'categories.txt'
-    validation_filename = 'fruit_validate.gsdf'
+    validation_filename = 'validate.gsdf'
     confusion_matrix_filename = 'confusion_matrix.txt'
 ```
 
@@ -457,11 +408,11 @@ Looking at the confusion matrix, you can also see where the model doesn't do wel
 * In 2 instances, the model predicted raspberry, but the actual image was a cherry (row raspberry, column cherry)
 * In 1 instance, the model predicted raspberry but the actual image was a lemon.
 
-This tutorial used a training set of 400 examples and a validation set of 100. Be sure to choose the training and validation datasets that are suited to your scenario, because that has a dramatic effect on the accuracy of your model.
+**Note**: The repurposed model will no longer be able to handle the 1000 classes the pretrained model.  It will get very confused if you show it a picture of a school bus or a dog.  It is now only useful in classifying the 10 fruits you have trained it on.  This is the price you pay for greatly increased accuracy.
 
 ## Next steps
 
-Choosing the right ELL node to use for retargeting depends on the pretrained model and your new target domain. For example, in models that are highly specialized and don't relate well to your domain,  you'll probably get better results by picking ELL nodes nearer the input, where the features are more general and less correlated to the pretrained domain. Alternatively, models that are more general  (or where the original and target domains are similar) may benefit from retargeting ELL nodes closer to the output. Some models may even perform better retargeting at two or more ELL nodes. For example, specifying `--targetPortElements {1516.output,1524.output}` will tell the `retargetTrainer` to use output from ELL nodes 1516 and 1524. Experiment to see what works best for you.
+Choosing the right ELL node to use for retargeting depends on the pretrained model and your new target domain. For example, in models that are highly specialized and don't relate well to your domain,  you'll probably get better results by picking ELL nodes nearer the input, where the features are more general and less correlated to the pretrained domain. Alternatively, models that are more general  (or where the original and target domains are similar) may benefit from retargeting ELL nodes closer to the output. Some models may even perform better retargeting at two or more ELL nodes. For example, specifying `--targetPortElements {1456.output,1524.output}` will tell the `retargetTrainer` to use output from ELL nodes 1456 and 1524. Experiment to see what works best for you.
 
 Follow the steps in [Getting started with image classification on the Raspberry Pi](/ELL/tutorials/Getting-started-with-image-classification-on-the-Raspberry-Pi/) to deploy your new model onto the Raspberry Pi.
 
@@ -470,6 +421,9 @@ The [ELL gallery](/ELL/gallery/) offers different models for image classificatio
 The **wrap** tool used here is a convenient way to compile the model and prepare for building its Python wrapper. To understand how `wrap` works, read the [wrap documentation](https://github.com/Microsoft/ELL/blob/master/tools/wrap/README.md).
 
 ## Troubleshooting
+
+* If you got lazy and created fewer than 10 categories of fruit make sure
+you at least have more than one category.  The trainer needs that to work.
 
 * For more information about the `datasetsFromImages` tool read the [datasetsFromImages Readme].(https://github.com/Microsoft/ELL/blob/master/tools/utilities/datasetFromImages/README.md).
 * For more information about using the `retargetTrainer` tool read [retargetTrainer Readme].(https://github.com/Microsoft/ELL/blob/master/tools/trainers/retargetTrainer/README.md)

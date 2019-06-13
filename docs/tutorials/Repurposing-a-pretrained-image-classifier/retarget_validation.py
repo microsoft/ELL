@@ -53,7 +53,7 @@ def save_confusion_matrix(categories, confusion_matrix_filename,
 def main(args):
     """Entry point for the script when called directly"""
     categories_filename = 'categories.txt'
-    validation_filename = 'fruit_validate.gsdf'
+    validation_filename = 'validation.gsdf'
     confusion_matrix_filename = 'confusion_matrix.txt'
 
     # Read the category names

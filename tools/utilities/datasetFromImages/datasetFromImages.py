@@ -12,6 +12,7 @@
 import argparse
 import enum
 import os
+import random
 import sys
 import time
 
@@ -220,6 +221,23 @@ def get_category_index_from_categories(categories, category):
     return categories[category]
 
 
+def extract_random_subset(examples, categories, ratio):
+    if ratio > 1:
+        raise Exception("The ratio must be between 0 and 1")
+    subset = []
+    number = int(float(len(examples)) * ratio / len(categories))
+    for c in range(len(categories)):
+        count = 0
+        while count < number:
+            category_subset = [x for x in examples if x[0] == c]
+            i = random.randint(0, len(category_subset) - 1)
+            e = category_subset[i]
+            subset += [e]
+            del examples[examples.index(e)]
+            count += 1
+    return subset
+
+
 def main(argv):
     arg_parser = argparse.ArgumentParser("Creates ELL dataset file from list of labelled images")
     arg_parser.add_argument("--imageSize", default="224x224",
@@ -229,20 +247,30 @@ def main(argv):
     arg_parser.add_argument("--bgr", default=True,
                             help="specify True if output data should be in BGR format (default True)")
     arg_parser.add_argument("--positiveCategory", default=None,
-                            help="if examples define a binary classification (e.g. A, not A), specifies which class \
-category is the positive label.")
-    arg_parser.add_argument("--categories", default=None, help="if examples define a multi-class classification \
-(e.g. A, B, C), specifies the class category index file.")
+                            help="if examples define a binary classification (e.g. A, not A), "
+                            "specifies which class category is the positive label.")
+    arg_parser.add_argument("--categories", default=None,
+                            help="if examples define a multi-class classification (e.g. A, B, C), "
+                            "specifies the class category index file.")
 
     # mutually exclusive options for specifying examples
     group = arg_parser.add_mutually_exclusive_group()
     group.add_argument("--folder", default=None,
-                       help="path to a folder, with sub-folders containing images. Each sub-folder is a class and the \
-images inside are the examples of that class")
-    group.add_argument("--exampleList", default=None, help="path to the file containing list of examples, where each \
-line is a label number followed by whitespace path to image")
+                       help="path to a folder, with sub-folders containing images. Each sub-folder is a class "
+                       "and the images inside are the examples of that class")
+    group.add_argument("--exampleList", default=None,
+                       help="path to the file containing list of examples, where each line is a label number "
+                            "followed by whitespace path to image")
     arg_parser.add_argument("--exampleOrder", choices=['labelfirst', 'filefirst'], default="labelfirst",
                             help="the order of the columns in the example list")
+    arg_parser.add_argument("--extractValidation", "-ev", type=float,
+                            help="automatically extract a validation set from the discovered set "
+                            "and save it to 'validation.gsdf'. Specify the ratio, e.g. 0.1 "
+                            "means 10 percent of the images go into the validation set.")
+    arg_parser.add_argument("--extractTest", "-et", type=float,
+                            help="automatically extract a test set from the discovered set "
+                            "and save it to 'test.gsdf'. Specify the ratio, e.g. 0.1 "
+                            "means 10 percent of the images go into the test set.")
 
     arg_parser.add_argument("--verbose", help="print info for each file processed", action="store_true")
 
@@ -261,6 +289,20 @@ line is a label number followed by whitespace path to image")
     else:
         arg_parser.print_help()
         return
+
+    print("Discovered {} examples and {} categories".format(len(examples), len(categories)))
+
+    if args.extractValidation:
+        subset = extract_random_subset(examples, categories, args.extractValidation)
+        write_examples_to_dataset_file(subset, categories, width, height, args.bgr, "validation.gsdf",
+                                       verbose=args.verbose)
+        print("Extracted 'validation.gsdf' subset containing {} examples".format(len(subset)))
+
+    if args.extractTest:
+        subset = extract_random_subset(examples, args.extractTest)
+        write_examples_to_dataset_file(subset, categories, width, height, args.bgr, "test.gsdf",
+                                       verbose=args.verbose)
+        print("Extracted 'test.gsdf' subset containing {} examples".format(len(subset)))
 
     # process the examples
     write_examples_to_dataset_file(examples, categories, width, height, args.bgr, args.outputDataset,
