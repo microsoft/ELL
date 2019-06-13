@@ -1377,4 +1377,35 @@ Scalar Intrinsics_test2()
         });
 }
 
+namespace
+{
+template <typename T>
+Scalar ForRangeCasting_test_impl()
+{
+    Scalar ok = Allocate<int>(ScalarLayout);
+
+    Scalar acc = Allocate<T>(ScalarLayout);
+    ForRange(4, [&](Scalar index) {
+        auto casted = Cast<T>(index);
+        acc += casted;
+    });
+
+    If(acc != static_cast<T>(6), [&] {
+        ok = 1;
+    });
+
+    return ok;
+}
+} // namespace
+
+Scalar ForRangeCasting_test1()
+{
+    return ForRangeCasting_test_impl<int64_t>();
+}
+
+Scalar ForRangeCasting_test2()
+{
+    return ForRangeCasting_test_impl<float>();
+}
+
 } // namespace ell

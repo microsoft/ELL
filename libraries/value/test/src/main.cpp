@@ -301,6 +301,8 @@ int main()
         ADD_TEST_FUNCTION(Intrinsics_test2);
         ADD_TEST_FUNCTION(For_test1);
         ADD_TEST_FUNCTION(For_test2);
+        ADD_TEST_FUNCTION(ForRangeCasting_test1);
+        ADD_TEST_FUNCTION(ForRangeCasting_test2);
 
         for (auto [name, fn] : testFunctions)
         {

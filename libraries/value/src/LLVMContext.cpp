@@ -766,12 +766,20 @@ namespace value
         auto stepValue = EnsureEmittable(step.GetValue());
 
         auto& fnEmitter = GetFunctionEmitter();
+
+        // IRFunctionEmitter::For returns a true scalar (not a pointer pointing to a single value)
+        // It works better (especially with the rest of value library) if we pass in a pointer
+        // instead. So, we allocate our own index and set it to the value of iterationVariable, below,
+        // from IRFunctionEmitter and then use our own index when passing it into the functor provded
+        Scalar index = value::Allocate<int>(ScalarLayout);
+
         fnEmitter.For(
             fnEmitter.Load(ToLLVMValue(startValue)),
             fnEmitter.Load(ToLLVMValue(stopValue)),
             fnEmitter.Load(ToLLVMValue(stepValue)),
             [&](IRFunctionEmitter&, IRLocalScalar iterationVariable) {
-                fn(Value{ Emittable{ iterationVariable.value }, ScalarLayout });
+                index = Scalar(Value{ Emittable{ iterationVariable.value }, ScalarLayout });
+                fn(index);
             });
     }
 
