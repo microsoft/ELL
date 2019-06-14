@@ -35,8 +35,8 @@ def _get_tensor_shape(shape):
 
 
 def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, filterbank_size,
-                  nfft=None, iir_node=False, log_node=False, dct_node=False, power_spec=False,
-                  log_delta=1.0, filterbank_nfft=None):
+                  pre_emphasis=0.97, nfft=None, iir_node=False, log_node=False, dct_node=False,
+                  power_spec=False, log_delta=1.0, filterbank_nfft=None, hamming_window=False):
     builder = ell.model.ModelBuilder()
     ell_model = ell.model.Model()
 
@@ -52,7 +52,7 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
         # this simulates a simple pre-emphasis filter that matches what python_speech_features does
         # in the fbank function.
         a_coeffs = []  # no feed forward
-        b_coeffs = [1.0, -0.97]  # subtract 0.97 of previous input
+        b_coeffs = [1.0, -1 * pre_emphasis]  # subtract pre_emphasis of previous input
         port = ell.nodes.PortElements(last_node.GetOutputPort("output"))
         last_node = iir_node = builder.AddIIRFilterNode(ell_model, port, b_coeffs, a_coeffs)
         last_node.SetMetadataValue("iir", "true")
@@ -63,7 +63,8 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
     buffer_node.SetMetadataValue("window_size", str(window_size))
 
     # Add Hamming window
-    last_node = builder.AddHammingWindowNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")))
+    if hamming_window:
+        last_node = builder.AddHammingWindowNode(ell_model, ell.nodes.PortElements(last_node.GetOutputPort("output")))
 
     # Add FFT
     if nfft:
@@ -128,8 +129,8 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
 
 
 def make_featurizer(output_filename, sample_rate, window_size, input_buffer_size, filterbank_type,
-                    filterbank_size, nfft=None, iir_node=False, log_node=False, dct_node=False, power_spec=False,
-                    log_delta=1.0, filterbank_nfft=None):
+                    filterbank_size, pre_emphasis=0.97, nfft=None, iir_node=False, log_node=False, dct_node=False,
+                    power_spec=False, log_delta=1.0, filterbank_nfft=None, hamming_window=False):
     """
     Create a new featurizer ELL model:
     output_filename     - the output ELL model file name
@@ -150,8 +151,8 @@ def make_featurizer(output_filename, sample_rate, window_size, input_buffer_size
         os.makedirs(output_directory)
 
     map = _create_model(sample_rate, window_size, input_buffer_size, filterbank_type,
-                        filterbank_size, nfft, iir_node, log_node, dct_node, power_spec, log_delta,
-                        filterbank_nfft)
+                        filterbank_size, pre_emphasis, nfft, iir_node, log_node, dct_node, power_spec, log_delta,
+                        filterbank_nfft, hamming_window)
 
     # print("Saving model {}".format(output_filename))
     map.Save(output_filename)
@@ -183,9 +184,12 @@ higher speed classifier that might be better at spotting word boundaries, at the
                             help="Add this delta before applying the log function")
     arg_parser.add_argument("--dct", help="Add DCT of output", action="store_true")
     arg_parser.add_argument("--power_spec", help="Add a power spectrum scaling of FFT output", action="store_true")
+    arg_parser.add_argument("--hamming_window", help="Include Hamming window", action="store_true")
+    arg_parser.add_argument("--pre_emphasis", "-pe", help="Coefficient of first order iir prefilter (default : 0.97)",
+                            type=float, default=0.97)
 
     args = arg_parser.parse_args()
 
     make_featurizer(args.output_filename, args.sample_rate, args.window_size, args.input_buffer_size,
-                    args.filterbank_type, args.filterbank_size, args.nfft, args.iir, args.log, args.dct,
-                    args.power_spec, args.log_delta, args.filterbank_nfft)
+                    args.filterbank_type, args.filterbank_size, args.pre_emphasis, args.nfft, args.iir, args.log,
+                    args.dct, args.power_spec, args.log_delta, args.filterbank_nfft, args.hamming_window)

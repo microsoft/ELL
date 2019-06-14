@@ -57,7 +57,7 @@ def lazy_apply_transform(transform):
         yield y[np.newaxis, ...]
 
 
-def sliding_window_frame(source, window_size, shift_amount):
+def sliding_window_frame(source, window_size, shift_amount, drop_frames):
     """ General windowing and merging generator that concatenates & shifts samples through a sliding window frame """
     # Source is a container or generator that returns numpy vectors
     # We buffer them and return arrays of length window_size, shifted by shift_amount
@@ -68,6 +68,9 @@ def sliding_window_frame(source, window_size, shift_amount):
         if np.isscalar(new_samples):
             new_samples = (new_samples,)
         if buffer is None:
+            if drop_frames > 0:
+                drop_frames -= 1
+                continue
             buffer = new_samples
         else:
             buffer = np.concatenate((buffer, new_samples))
@@ -88,7 +91,7 @@ def sliding_window_frame(source, window_size, shift_amount):
         yield buffer[:window_size]
 
 
-def get_wav_features(input_filename, transform, sample_rate, window_size, shift, auto_scale, mixer):
+def get_wav_features(input_filename, transform, sample_rate, window_size, shift, auto_scale, mixer, drop_frames):
     """
     Transform the given .wav input file into a set of features given the required sample rate
     window size and shift.  The window size is the number of features we need to give the
@@ -110,7 +113,7 @@ def get_wav_features(input_filename, transform, sample_rate, window_size, shift,
     source = lazy_apply_transform(transform)
 
     # and apply the classifier window frame size
-    source = sliding_window_frame(source, window_size, shift)
+    source = sliding_window_frame(source, window_size, shift, drop_frames)
 
     rows_generated = 0
     for row in source:
@@ -122,7 +125,7 @@ def get_wav_features(input_filename, transform, sample_rate, window_size, shift,
         print("### no rows generated for input file: {}".format(input_filename))
 
 
-def _get_dataset(entry_map, categories, transform, sample_rate, window_size, shift, auto_scale, mixer):
+def _get_dataset(entry_map, categories, transform, sample_rate, window_size, shift, auto_scale, mixer, drop_frames):
     data_rows = []
     label_rows = []
 
@@ -137,7 +140,7 @@ def _get_dataset(entry_map, categories, transform, sample_rate, window_size, shi
         for file in entry_map[e]:
             full_path = os.path.join(e, file)
             file_features = list(get_wav_features(full_path, transform, sample_rate, window_size, shift, auto_scale,
-                                                  mixer))
+                                                  mixer, drop_frames))
             if len(file_features) > 0:
                 labels = [label for r in file_features]
                 data_rows.append(file_features)
@@ -153,8 +156,9 @@ def _get_dataset(entry_map, categories, transform, sample_rate, window_size, shi
     return Dataset(features, label_names, categories, parameters)
 
 
-def make_dataset(list_file, outdir, categories_path, featurizer_path, sample_rate, window_size, shift, auto_scale=True,
-                 noise_path=None, max_noise_ratio=0.1, noise_selection=0.1, use_cache=False):
+def make_dataset(list_file, outdir, categories_path, featurizer_path, sample_rate, window_size, shift,
+                 auto_scale=True, noise_path=None, max_noise_ratio=0.1, noise_selection=0.1, use_cache=False,
+                 drop_frames=2):
 
     """
     Create a dataset given the input list file, a featurizer, the desired .wav sample rate,
@@ -163,15 +167,21 @@ def make_dataset(list_file, outdir, categories_path, featurizer_path, sample_rat
     """
     dataset_name = os.path.basename(list_file)
     dataset_path = os.path.splitext(dataset_name)[0] + ".npz"
-    dataset_path = os.path.join(outdir, dataset_path)
+    if not outdir:
+        dir_name = os.path.dirname(list_file)
+        dataset_path = os.path.join(dir_name, dataset_path)
+    else:
+        dataset_path = os.path.join(outdir, dataset_path)
+
     if use_cache and os.path.isfile(dataset_path):
-      return
+        return
 
     transform = featurizer.AudioTransform(featurizer_path, 0)
 
     entry_map = parse_list_file(list_file)
     if not categories_path:
-        categories_path = "categories.txt"
+        dir_name = os.path.dirname(list_file)
+        categories_path = os.path.join(dir_name, "categories.txt")
     if not os.path.isfile(categories_path):
         raise Exception("{} file not found".format(categories_path))
 
@@ -183,7 +193,8 @@ def make_dataset(list_file, outdir, categories_path, featurizer_path, sample_rat
                        if os.path.splitext(f)[1] == ".wav"]
         mixer = noise_mixer.AudioNoiseMixer(noise_files, max_noise_ratio, noise_selection)
 
-    dataset = _get_dataset(entry_map, categories, transform, sample_rate, window_size, shift, auto_scale, mixer)
+    dataset = _get_dataset(entry_map, categories, transform, sample_rate, window_size, shift, auto_scale, mixer,
+                           drop_frames)
     if len(dataset.features) == 0:
         print("No features found in list file")
 
@@ -197,8 +208,7 @@ if __name__ == "__main__":
 
     # options
     arg_parser.add_argument("--list_file", "-l", help="The path to the list file to process")
-    arg_parser.add_argument("--outdir", "-o", help="The path where you want the *.npz files saved",
-                            default=os.getcwd())
+    arg_parser.add_argument("--outdir", "-o", help="The path where you want the *.npz files saved")
     arg_parser.add_argument("--categories", "-c",
                             help="The full list of labels (a given list file might only see a subset of these)")
     arg_parser.add_argument("--featurizer", "-f", help="Compiled featurizer module to use", default="featurizer/mfcc")
@@ -213,6 +223,8 @@ if __name__ == "__main__":
                             help="Specifies the ratio of noise to audio (default 0.1)")
     arg_parser.add_argument("--noise_selection", type=float, default=0.1,
                             help="Ratio of audio files to mix with noise (default 0.1)")
+    arg_parser.add_argument("--drop_frames", "-df", help="Total initial frames to drop (default: 0)", type=int,
+                            default=0)
     args = arg_parser.parse_args()
 
     if args.noise_path and not os.path.isdir(args.noise_path):
@@ -220,4 +232,5 @@ if __name__ == "__main__":
         sys.exit(1)
 
     make_dataset(args.list_file, args.outdir, args.categories, args.featurizer, args.sample_rate, args.window_size,
-                 args.shift, args.auto_scale, args.noise_path, args.max_noise_ratio, args.noise_selection)
+                 args.shift, args.auto_scale, args.noise_path, args.max_noise_ratio,
+                 args.noise_selection, drop_frames=args.drop_frames)

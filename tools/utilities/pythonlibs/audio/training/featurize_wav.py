@@ -11,7 +11,7 @@ import featurizer
 import make_dataset
 
 
-def featurize_wav(wav_file, label, featurizer_path, sample_rate, window_size, shift, auto_scale, dump):
+def featurize_wav(wav_file, label, featurizer_path, sample_rate, window_size, shift, auto_scale, dump, drop_frames):
 
     transform = featurizer.AudioTransform(featurizer_path, 0)
     input_size = transform.input_size
@@ -24,7 +24,8 @@ def featurize_wav(wav_file, label, featurizer_path, sample_rate, window_size, sh
       wav_log.write("{}:\n".format(wav_file))
       transform.set_log(wav_log)
 
-    generator = make_dataset.get_wav_features(wav_file, transform, sample_rate, window_size, shift, auto_scale, None)
+    generator = make_dataset.get_wav_features(wav_file, transform, sample_rate, window_size, shift, auto_scale, None,
+                                              drop_frames)
     features = list(generator)
     # reshape features to record the fact that the window_size is a kind of batch size for this type of model
     features = [np.reshape(f, (window_size, 1, 1, int(len(f) / window_size))) for f in features]
@@ -60,7 +61,9 @@ if __name__ == "__main__":
                             default=80)
     arg_parser.add_argument("--shift", "-s", help="Classifier shift amount (default: 10)", type=int,
                             default=10)
+    arg_parser.add_argument("--drop_frames", "-df", help="Total initial frames to drop (default: 0)", type=int,
+                            default=0)
     args = arg_parser.parse_args()
 
     featurize_wav(args.wav_file, args.label, args.featurizer, args.sample_rate,
-                  args.window_size, args.shift, args.dump)
+                  args.window_size, args.shift, args.dump, args.drop_frames)
