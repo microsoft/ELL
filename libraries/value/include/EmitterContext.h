@@ -42,6 +42,8 @@ namespace value
 
     class FunctionDeclaration;
     class Vector;
+    enum class PrefetchType;
+    enum class PrefetchLocality;
 
     /// <summary> An interface describing the global context that's used by the Value library </summary>
     /// <remarks> This class employs the non-virtual interface pattern to provide an easy to use API while
@@ -246,6 +248,8 @@ namespace value
 
         std::optional<Value> Call(FunctionDeclaration func, std::vector<Value> args);
 
+        void Prefetch(Value data, PrefetchType type, PrefetchLocality locality);
+
         /// <summary> Runs the provided function, in parallel if possible </summary>
         /// <param name="numTasks"> The number of tasks that should be created </param>
         /// <param name="captured"> A list of values to be used inside the function </param>
@@ -291,6 +295,8 @@ namespace value
         virtual IfContext IfImpl(Scalar test, std::function<void()> fn) = 0;
 
         virtual std::optional<Value> CallImpl(FunctionDeclaration func, std::vector<Value> args) = 0;
+
+        virtual void PrefetchImpl(Value data, PrefetchType type, PrefetchLocality locality) = 0;
 
         virtual void ParallelizeImpl(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn) = 0;
 
@@ -548,6 +554,30 @@ namespace value
     Vector Floor(Vector v);
     Vector Ceil(Vector v);
 
+    /// <summary> Specifier determining if the fetch should be for a read or a write </summary>
+    enum class PrefetchType
+    {
+        Read = 0,
+        Write
+    };
+
+    /// <summary> Temporal locality specifier. Data with temporal locality, or persistence,
+    /// is expected to be accessed multiple times and so should be left in a cache when it
+    /// is prefetched so it will continue to be readily accessible. Accesses to data with
+    /// no temporal locality are transient; the data is unlikely to be accessed multiple times
+    /// and, if possible, should not be left in a cache where it would displace other data that
+    /// might be needed soon. </summary>
+    enum class PrefetchLocality
+    {
+        None = 0,
+        Low,
+        Moderate,
+        Extreme
+    };
+
+    template <typename ViewType>
+    void Prefetch(ViewType view, PrefetchType type = PrefetchType::Read, PrefetchLocality locality = PrefetchLocality::None);
+
 } // namespace value
 } // namespace ell
 
@@ -623,6 +653,12 @@ namespace value
                 }();
                 std::apply(fn, fnArgsTuple);
             });
+    }
+
+    template <typename ViewType>
+    void Prefetch(ViewType view, PrefetchType type, PrefetchLocality locality)
+    {
+        GetContext().Prefetch(detail::GetValue(view), type, locality);
     }
 
 } // namespace value

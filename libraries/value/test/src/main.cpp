@@ -307,6 +307,7 @@ int main()
         ADD_TEST_FUNCTION(ForRangeCasting_test2);
         ADD_TEST_FUNCTION(Parallelized_test1);
         ADD_TEST_FUNCTION(Parallelized_test2);
+        ADD_TEST_FUNCTION(Prefetch_test1);
 
         for (auto [name, fn] : testFunctions)
         {

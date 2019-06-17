@@ -1044,6 +1044,9 @@ namespace value
         throw InputException(InputExceptionErrors::invalidArgument, "Specified function is not defined for this context");
     }
 
+    void ComputeContext::PrefetchImpl(Value, PrefetchType, PrefetchLocality)
+    {}
+
     void ComputeContext::ParallelizeImpl(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn)
     {
         std::vector<std::future<void>> futures;

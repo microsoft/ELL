@@ -441,7 +441,7 @@ namespace emitters
     LLVMFunction IRRuntime::GetRoundFunction(VariableType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::round, { argType });
-    }    
+    }
 
     LLVMFunction IRRuntime::GetSqrtFunction(LLVMType argType)
     {
@@ -527,6 +527,11 @@ namespace emitters
     LLVMFunction IRRuntime::GetCopySignFunction(LLVMType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::copysign, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetPrefetchFunction()
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::prefetch, std::initializer_list<llvm::Type*>{});
     }
 
     LLVMFunction IRRuntime::GetStringCompareFunction()

@@ -69,7 +69,7 @@ namespace value
         /// <returns> A reference to this instance </returns>
         /// <remarks> If this function is not called, the instance defaults to taking no arguments </remarks>
         template <typename... Types>
-        FunctionDeclaration& Parameters(Types&&... paramTypes);
+        FunctionDeclaration& Parameters(Types&& ... paramTypes);
 
         /// <summary> Sets the parameters this function requires </summary>
         /// <param name="paramTypes"> Zero or more Value instances describing the types of the arguments and their memory layout expected by the function </param>

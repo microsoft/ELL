@@ -90,7 +90,7 @@ namespace value
         {
             return ValueType::Boolean;
         }
-        else if constexpr (std::is_same_v<T, char>)
+        else if constexpr (std::is_same_v<T, char> || std::is_same_v<T, int8_t>)
         {
             return ValueType::Char8;
         }

@@ -40,6 +40,7 @@ value::Scalar ForRangeCasting_test1();
 value::Scalar ForRangeCasting_test2();
 value::Scalar Parallelized_test1();
 value::Scalar Parallelized_test2();
+value::Scalar Prefetch_test1();
 
 void DebugPrint(std::string message);
 void DebugPrint(value::Vector message); // expecting null terminated ValueType::Char8

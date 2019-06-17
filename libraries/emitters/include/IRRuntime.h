@@ -120,6 +120,8 @@ namespace emitters
         LLVMFunction GetCeilFunction(LLVMType argType);
         LLVMFunction GetCopySignFunction(LLVMType argType);
 
+        LLVMFunction GetPrefetchFunction();
+
         //
         // Dot product
         //

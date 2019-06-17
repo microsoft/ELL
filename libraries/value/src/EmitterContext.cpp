@@ -215,9 +215,14 @@ namespace value
         return CallImpl(func, args);
     }
 
-    void EmitterContext::Parallelize(int numThreads, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn)
+    void EmitterContext::Prefetch(Value data, PrefetchType type, PrefetchLocality locality)
     {
-        return ParallelizeImpl(numThreads, captured, fn);
+        PrefetchImpl(data, type, locality);
+    }
+
+    void EmitterContext::Parallelize(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn)
+    {
+        return ParallelizeImpl(numTasks, captured, fn);
     }
 
     void EmitterContext::DebugDump(Value value, std::string tag, std::ostream* stream) const

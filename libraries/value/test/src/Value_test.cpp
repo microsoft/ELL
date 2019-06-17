@@ -1121,52 +1121,47 @@ Scalar Tensor_slice_test1()
     });
 
     {
-        { Matrix mathMatrix = ToMatrix(mathTensor.GetSlice<Dimension::row, Dimension::column>(0));
-    auto matrix = inputTensor.Slice(Slice::All, Slice::All, 0);
+        Matrix mathMatrix = ToMatrix(mathTensor.GetSlice<Dimension::row, Dimension::column>(0));
+        auto matrix = inputTensor.Slice(Slice::All, Slice::All, 0);
 
-    If(Verify(matrix, mathMatrix) != 0, [&] {
-        ok = 1;
-        DebugPrint("Tensor_slice_test1: Tensor row-column GetSlice failed\n");
-    });
-}
-} // namespace ell
+        If(Verify(matrix, mathMatrix) != 0, [&] {
+            ok = 1;
+            DebugPrint("Tensor_slice_test1: Tensor row-column GetSlice failed\n");
+        });
+    }
 
-{
-    { // We can't use ToArray() on this slice because data is not stored in the same layout, we have to build flat vector manually.
-      auto slice = mathTensor.GetSlice<Dimension::column, Dimension::channel>(0);
-Matrix mathMatrix = ToMatrix(slice);
-auto matrix = inputTensor.Slice(0, Slice::All, Slice::All);
+    {
+        // We can't use ToArray() on this slice because data is not stored in the same layout, we have to build flat vector manually.
+        auto slice = mathTensor.GetSlice<Dimension::column, Dimension::channel>(0);
+        Matrix mathMatrix = ToMatrix(slice);
+        auto matrix = inputTensor.Slice(0, Slice::All, Slice::All);
 
-If(Verify(matrix, mathMatrix) != 0, [&] {
-    ok = 1;
-    DebugPrint("Tensor_slice_test1: Tensor column-channel GetSlice failed\n");
-});
-}
-}
+        If(Verify(matrix, mathMatrix) != 0, [&] {
+            ok = 1;
+            DebugPrint("Tensor_slice_test1: Tensor column-channel GetSlice failed\n");
+        });
+    }
 
-{
-    { Vector mathVector = mathTensor.GetSlice<Dimension::channel>(0, 0).ToArray();
-auto vector = inputTensor.Slice(0, 0, Slice::All);
+    {
+        Vector mathVector = mathTensor.GetSlice<Dimension::channel>(0, 0).ToArray();
+        auto vector = inputTensor.Slice(0, 0, Slice::All);
 
-If(Verify(mathVector, vector) != 0, [&] {
-    ok = 1;
-    DebugPrint("Tensor_slice_test1: Tensor channel vector failed\n");
-});
-}
-}
+        If(Verify(mathVector, vector) != 0, [&] {
+            ok = 1;
+            DebugPrint("Tensor_slice_test1: Tensor channel vector failed\n");
+        });
+    }
 
-{
-    { Vector mathVector = mathTensor.GetSlice<Dimension::column>(0, 0).ToArray();
-auto vector = inputTensor.Slice(0, Slice::All, 0);
+    {
+        Vector mathVector = mathTensor.GetSlice<Dimension::column>(0, 0).ToArray();
+        auto vector = inputTensor.Slice(0, Slice::All, 0);
 
-If(Verify(mathVector, vector) != 0, [&] {
-    ok = 1;
-    DebugPrint("Tensor_slice_test1: Tensor column vector failed");
-});
-}
-}
+        If(Verify(mathVector, vector) != 0, [&] {
+            ok = 1;
+            DebugPrint("Tensor_slice_test1: Tensor column vector failed");
+        });
+    }
 
-{
     {
         Vector mathVector = mathTensor.GetSlice<Dimension::row>(0, 0).ToArray();
         auto vector = inputTensor.Slice(Slice::All, 0, 0);
@@ -1176,8 +1171,7 @@ If(Verify(mathVector, vector) != 0, [&] {
             DebugPrint("Tensor_slice_test1: Tensor row vector failed");
         });
     }
-}
-return ok;
+    return ok;
 }
 
 Scalar Casting_test1()
@@ -1291,41 +1285,41 @@ Scalar Dot_test()
 
 namespace
 {
-const std::vector<float> intrinsics_data{ 0.1f, 1.2f, 2.3f, 3.4f, 4.5f, 5.6f, 6.7f, 7.8f, 8.9f, 9.10f };
+    const std::vector<float> intrinsics_data{ 0.1f, 1.2f, 2.3f, 3.4f, 4.5f, 5.6f, 6.7f, 7.8f, 8.9f, 9.10f };
 
-template <typename Tuple, typename Idx = std::integral_constant<size_t, 0>>
-Scalar Intrinsics_test1_impl(Tuple tuple, Idx = {})
-{
-    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
-    ok = 0;
-    constexpr auto index = Idx::value;
-    if constexpr (index < std::tuple_size_v<Tuple>)
+    template <typename Tuple, typename Idx = std::integral_constant<size_t, 0>>
+    Scalar Intrinsics_test1_impl(Tuple tuple, Idx = {})
     {
-        auto& element = std::get<index>(tuple);
-        auto fnName = std::string{ "Intrinsics_test1_" } + std::to_string(index);
-
+        Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+        ok = 0;
+        constexpr auto index = Idx::value;
+        if constexpr (index < std::tuple_size_v<Tuple>)
         {
-            auto f = element.first;
-            std::vector<float> expected_data(intrinsics_data.size());
-            std::transform(intrinsics_data.begin(), intrinsics_data.end(), expected_data.begin(), [f = element.second](float n) { return f(n); });
-            Vector input = intrinsics_data;
-            Vector actual = f(input);
-            Vector expected = expected_data;
-            If(Verify(actual, expected, 1e-5) != 0, [&] {
-                ok = 1;
-                DebugPrint("Intrinsics " + fnName + " test failed\n");
+            auto& element = std::get<index>(tuple);
+            auto fnName = std::string{ "Intrinsics_test1_" } + std::to_string(index);
+
+            {
+                auto f = element.first;
+                std::vector<float> expected_data(intrinsics_data.size());
+                std::transform(intrinsics_data.begin(), intrinsics_data.end(), expected_data.begin(), [f = element.second](float n) { return f(n); });
+                Vector input = intrinsics_data;
+                Vector actual = f(input);
+                Vector expected = expected_data;
+                If(Verify(actual, expected, 1e-5) != 0, [&] {
+                    ok = 1;
+                    DebugPrint("Intrinsics " + fnName + " test failed\n");
+                });
+            }
+
+            // recurrsively process next item in the tuple
+            Scalar r = Intrinsics_test1_impl(tuple, std::integral_constant<size_t, index + 1>{});
+
+            If(r != 0, [&] {
+                ok = 1; // bubble up the error
             });
         }
-
-        // recurrsively process next item in the tuple
-        Scalar r = Intrinsics_test1_impl(tuple, std::integral_constant<size_t, index + 1>{});
-
-        If(r != 0, [&] {
-            ok = 1; // bubble up the error
-        });
+        return ok;
     }
-    return ok;
-}
 } // namespace
 
 Scalar Intrinsics_test1()
@@ -1370,44 +1364,44 @@ Scalar Intrinsics_test1()
 
 namespace
 {
-template <typename Tuple, typename Idx = std::integral_constant<size_t, 0>>
-Scalar Intrinsics_test2_impl(Tuple tuple, Idx = {})
-{
-    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
-    ok = 0;
-    constexpr auto index = Idx::value;
-    if constexpr (index < std::tuple_size_v<Tuple>)
+    template <typename Tuple, typename Idx = std::integral_constant<size_t, 0>>
+    Scalar Intrinsics_test2_impl(Tuple tuple, Idx = {})
     {
-        int size = static_cast<int>(intrinsics_data.size());
-        auto& element = std::get<index>(tuple);
-        auto fnName = std::string{ "Intrinsics_test2_" } + std::to_string(index);
+        Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+        ok = 0;
+        constexpr auto index = Idx::value;
+        if constexpr (index < std::tuple_size_v<Tuple>)
+        {
+            int size = static_cast<int>(intrinsics_data.size());
+            auto& element = std::get<index>(tuple);
+            auto fnName = std::string{ "Intrinsics_test2_" } + std::to_string(index);
 
-        auto fn = DeclareFunction(fnName)
-                      .Parameters(Value(ValueType::Float, MemoryLayout{ { size } }))
-                      .Returns(Value(ValueType::Float, ScalarLayout))
-                      .Define([f = element.first](Vector v) {
-                          v = intrinsics_data;
-                          return f(v);
-                      });
+            auto fn = DeclareFunction(fnName)
+                          .Parameters(Value(ValueType::Float, MemoryLayout{ { size } }))
+                          .Returns(Value(ValueType::Float, ScalarLayout))
+                          .Define([f = element.first](Vector v) {
+                              v = intrinsics_data;
+                              return f(v);
+                          });
 
-        auto f = element.second;
-        Scalar expected = *f(intrinsics_data);
-        Scalar actual = fn(MakeVector<float>(size));
+            auto f = element.second;
+            Scalar expected = *f(intrinsics_data);
+            Scalar actual = fn(MakeVector<float>(size));
 
-        If(actual != expected, [&] {
-            ok = 1;
-            DebugPrint("Intrinsics " + fnName + " test 2 failed\n");
-        });
+            If(actual != expected, [&] {
+                ok = 1;
+                DebugPrint("Intrinsics " + fnName + " test 2 failed\n");
+            });
 
-        // recursively process next item in the tuple
-        Scalar r = Intrinsics_test2_impl(tuple, std::integral_constant<size_t, index + 1>{});
+            // recursively process next item in the tuple
+            Scalar r = Intrinsics_test2_impl(tuple, std::integral_constant<size_t, index + 1>{});
 
-        If(r != 0, [&] {
-            ok = 1; // bubble up the error
-        });
+            If(r != 0, [&] {
+                ok = 1; // bubble up the error
+            });
+        }
+        return ok;
     }
-    return ok;
-}
 
 } // namespace
 
@@ -1432,23 +1426,23 @@ Scalar Intrinsics_test2()
 
 namespace
 {
-template <typename T>
-Scalar ForRangeCasting_test_impl()
-{
-    Scalar ok = Allocate<int>(ScalarLayout);
+    template <typename T>
+    Scalar ForRangeCasting_test_impl()
+    {
+        Scalar ok = Allocate<int>(ScalarLayout);
 
-    Scalar acc = Allocate<T>(ScalarLayout);
-    ForRange(4, [&](Scalar index) {
-        auto casted = Cast<T>(index);
-        acc += casted;
-    });
+        Scalar acc = Allocate<T>(ScalarLayout);
+        ForRange(4, [&](Scalar index) {
+            auto casted = Cast<T>(index);
+            acc += casted;
+        });
 
-    If(acc != static_cast<T>(6), [&] {
-        ok = 1;
-    });
+        If(acc != static_cast<T>(6), [&] {
+            ok = 1;
+        });
 
-    return ok;
-}
+        return ok;
+    }
 } // namespace
 
 Scalar ForRangeCasting_test1()
@@ -1512,6 +1506,36 @@ Scalar Parallelized_test2()
     If(Verify(data, expected) == 0, [&] {
         ok = 1;
     });
+
+    return ok;
+}
+
+// Prefetches have no effect on the behavior of the program but can change its performance characteristics, so this
+// test just makes sure that the code compiles/runs and behavior is not affected
+Scalar Prefetch_test1()
+{
+    constexpr int DataPerThread = 8;
+    constexpr int NumThreads = 4;
+    constexpr int VectorSize = DataPerThread * NumThreads;
+    auto A = MakeVector<int>(VectorSize);
+    auto B = MakeVector<int>(VectorSize);
+
+    Parallelize(
+        NumThreads,
+        std::tuple{ A, B },
+        std::function{ [&](Scalar id, Vector A, Vector B) {
+            ForRange(DataPerThread, [&](Scalar index) {
+                A[id * DataPerThread + index] = GetTID();
+                B[id * DataPerThread + index] = GetTID() / 2;
+            });
+        } });
+
+    Prefetch(A);
+    Prefetch(B);
+    Scalar result = Dot(A, B);
+
+    Scalar ok = Allocate<int>(ScalarLayout);
+    If(result == 0, [&]{ ok = 1; });
 
     return ok;
 }

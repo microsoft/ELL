@@ -1235,6 +1235,44 @@ namespace value
 
         return EmitExternalCall(func, args);
     }
+    void LLVMContext::PrefetchImpl(Value data, PrefetchType type, PrefetchLocality locality)
+    {
+        if (data.IsConstant())
+        {
+            // Maybe it's better to make the data emittable and prefetch it...
+            return;
+        }
+
+        int localityNum = 0;
+        switch (locality)
+        {
+        case PrefetchLocality::None:
+            localityNum = 0;
+            break;
+        case PrefetchLocality::Low:
+            localityNum = 1;
+            break;
+        case PrefetchLocality::Moderate:
+            localityNum = 2;
+            break;
+        case PrefetchLocality::Extreme:
+            localityNum = 3;
+            break;
+        default:
+            throw LogicException(LogicExceptionErrors::illegalState);
+        }
+
+        int typeNum = type == PrefetchType::Read ? 0 : 1;
+
+        auto& fnEmitter = GetFunctionEmitter();
+        auto llvmData = fnEmitter.BitCast(ToLLVMValue(data), fnEmitter.GetEmitter().Type(VariableType::Char8Pointer));
+        auto llvmType = fnEmitter.Literal(static_cast<int>(typeNum));
+        auto llvmLocality = fnEmitter.Literal(static_cast<int>(localityNum));
+        auto llvmCacheType = fnEmitter.Literal(1); // data cache prefetching
+
+        auto prefetchFn = fnEmitter.GetModule().GetRuntime().GetPrefetchFunction();
+        fnEmitter.Call(prefetchFn, { llvmData, llvmType, llvmLocality, llvmCacheType });
+    }
 
     void LLVMContext::ParallelizeImpl(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn)
     {
