@@ -215,6 +215,11 @@ namespace value
         return CallImpl(func, args);
     }
 
+    void EmitterContext::Parallelize(int numThreads, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn)
+    {
+        return ParallelizeImpl(numThreads, captured, fn);
+    }
+
     void EmitterContext::DebugDump(Value value, std::string tag, std::ostream* stream) const
     {
         std::ostream& outStream = stream != nullptr ? *stream : std::cerr;
@@ -319,6 +324,11 @@ namespace value
     void DebugDump(Value value, std::string tag, std::ostream* stream)
     {
         GetContext().DebugDump(value, tag, stream);
+    }
+
+    void Parallelize(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn)
+    {
+        GetContext().Parallelize(numTasks, captured, fn);
     }
 
     Scalar Abs(Scalar s)
@@ -484,10 +494,9 @@ namespace value
         {
             If(v == Cast(0, v.GetType()), [&] {
                 r = Cast(1, v.GetType());
-            })
-                .Else([&] {
-                    r = Cast(0, v.GetType());
-                });
+            }).Else([&] {
+                r = Cast(0, v.GetType());
+            });
         }
         return r;
     }

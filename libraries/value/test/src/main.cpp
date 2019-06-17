@@ -240,6 +240,8 @@ void LLVMJitTest(std::string testName, std::function<Scalar()> defineFunction)
     // Run the test in the LLVM context
     ell::emitters::CompilerOptions compilerSettings;
     compilerSettings.useBlas = false;
+    compilerSettings.parallelize = true;
+    compilerSettings.useThreadPool = false;
     ell::emitters::IRModuleEmitter moduleEmitter("Value_test_llvm", compilerSettings);
     DeclarDebugPrintFunctions(moduleEmitter);
     ContextGuard<TestLLVMContext> guard(moduleEmitter);
@@ -303,6 +305,8 @@ int main()
         ADD_TEST_FUNCTION(For_test2);
         ADD_TEST_FUNCTION(ForRangeCasting_test1);
         ADD_TEST_FUNCTION(ForRangeCasting_test2);
+        ADD_TEST_FUNCTION(Parallelized_test1);
+        ADD_TEST_FUNCTION(Parallelized_test2);
 
         for (auto [name, fn] : testFunctions)
         {

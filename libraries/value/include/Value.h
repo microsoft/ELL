@@ -15,8 +15,8 @@
 #include <utilities/include/Boolean.h>
 #include <utilities/include/Exception.h>
 #include <utilities/include/MemoryLayout.h>
-#include <utilities/include/TypeTraits.h>
 #include <utilities/include/StringUtil.h>
+#include <utilities/include/TypeTraits.h>
 
 #include <initializer_list>
 #include <optional>
@@ -234,7 +234,7 @@ namespace value
             if (!ptr.has_value())
             {
                 throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented,
-                    ell::utilities::FormatString("Cannot get const value of type %s from Value of type %s", typeid(T).name(), ToString(GetBaseType()).c_str()));
+                                                ell::utilities::FormatString("Cannot get const value of type %s from Value of type %s", typeid(T).name(), ToString(GetBaseType()).c_str()));
             }
 
             return *ptr;
@@ -250,7 +250,7 @@ namespace value
             if (!ptr.has_value())
             {
                 throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented,
-                    ell::utilities::FormatString("Cannot get value of type %s from Value of type %s", typeid(T).name(), ToString(GetBaseType()).c_str()));
+                                                ell::utilities::FormatString("Cannot get value of type %s from Value of type %s", typeid(T).name(), ToString(GetBaseType()).c_str()));
             }
 
             return *ptr;
@@ -372,6 +372,9 @@ namespace value
 
         /// <summary> Clear the MemoryLayout, if any, on this instance </summary>
         void ClearLayout();
+
+        /// <summary> Clear the data, if any, on this instance </summary>
+        void ClearData();
 
         /// <summary> Returns the number of pointer indirections on the data referred to by this instance </summary>
         /// <returns> The number of pointer indirections </returns>

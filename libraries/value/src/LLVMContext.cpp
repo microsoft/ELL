@@ -520,6 +520,13 @@ namespace value
 
     struct LLVMContext::FunctionScope
     {
+        FunctionScope(LLVMContext& context, IRFunctionEmitter& emitter) :
+            context(context)
+        {
+            context._functionStack.push(emitter);
+            context._promotedConstantStack.push({});
+        }
+
         template <typename... Args>
         FunctionScope(LLVMContext& context, Args&&... args) :
             context(context)
@@ -1229,6 +1236,45 @@ namespace value
         return EmitExternalCall(func, args);
     }
 
+    void LLVMContext::ParallelizeImpl(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn)
+    {
+        auto& fnEmitter = GetFunctionEmitter();
+
+        std::vector<LLVMValue> capturedValues;
+        capturedValues.reserve(captured.size());
+        std::transform(
+            captured.begin(),
+            captured.end(),
+            std::back_inserter(capturedValues),
+            [this](Value& value) { return ToLLVMValue(EnsureEmittable(value)); });
+
+        std::vector<Value> emptiedCaptures;
+        emptiedCaptures.reserve(captured.size());
+        std::transform(
+            captured.begin(),
+            captured.end(),
+            std::back_inserter(emptiedCaptures),
+            [](Value value) { value.ClearData(); return value; });
+
+        fnEmitter.ParallelFor(
+            numTasks,
+            { numTasks },
+            capturedValues,
+            [this, fn = std::move(fn), emptied = std::move(emptiedCaptures)](IRFunctionEmitter& parFnEmitter, IRLocalScalar iteration, std::vector<LLVMValue> capturedValues) mutable {
+                FunctionScope scope(*this, parFnEmitter);
+
+                assert(emptied.size() == capturedValues.size());
+                Value threadValue(Emittable{ iteration.value }, ScalarLayout);
+
+                for (unsigned i = 0; i < emptied.size(); ++i)
+                {
+                    emptied[i].SetData(Emittable{ capturedValues[i] });
+                }
+
+                fn(threadValue, emptied);
+            });
+    }
+
     void LLVMContext::DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const
     {
         auto realizedValue = Realize(value);
@@ -1246,25 +1292,24 @@ namespace value
 
     Value LLVMContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)
     {
-        static std::unordered_map<FunctionDeclaration, std::function<Value(IRFunctionEmitter&, std::vector<Value>)>> intrinsics =
-            {
-                { AbsFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetAbsFunction) },
-                { CosFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetCosFunction) },
-                { ExpFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetExpFunction) },
-                { LogFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetLogFunction) },
-                { Log10FunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetLog10Function) },
-                { Log2FunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetLog2Function) },
-                { MaxNumFunctionDeclaration, MaxMinIntrinsicFunction(MaxMinIntrinsic::Max) },
-                { MinNumFunctionDeclaration, MaxMinIntrinsicFunction(MaxMinIntrinsic::Min) },
-                { PowFunctionDeclaration, PowFunctionIntrinsic() },
-                { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetSinFunction) },
-                { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetSqrtFunction) },
-                { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetTanhFunction) },
-                { RoundFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetRoundFunction) },
-                { FloorFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetFloorFunction) },
-                { CeilFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetCeilFunction) },
-                { CopySignFunctionDeclaration, CopySignFunctionIntrinsic() },
-            };
+        static std::unordered_map<FunctionDeclaration, std::function<Value(IRFunctionEmitter&, std::vector<Value>)>> intrinsics = {
+            { AbsFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetAbsFunction) },
+            { CosFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetCosFunction) },
+            { ExpFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetExpFunction) },
+            { LogFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetLogFunction) },
+            { Log10FunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetLog10Function) },
+            { Log2FunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetLog2Function) },
+            { MaxNumFunctionDeclaration, MaxMinIntrinsicFunction(MaxMinIntrinsic::Max) },
+            { MinNumFunctionDeclaration, MaxMinIntrinsicFunction(MaxMinIntrinsic::Min) },
+            { PowFunctionDeclaration, PowFunctionIntrinsic() },
+            { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetSinFunction) },
+            { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetSqrtFunction) },
+            { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetTanhFunction) },
+            { RoundFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetRoundFunction) },
+            { FloorFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetFloorFunction) },
+            { CeilFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetCeilFunction) },
+            { CopySignFunctionDeclaration, CopySignFunctionIntrinsic() },
+        };
 
         if (std::all_of(args.begin(), args.end(), [](const auto& value) { return value.IsConstant(); }))
         {

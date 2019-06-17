@@ -219,15 +219,15 @@ namespace value
         }
 
         std::visit(VariantVisitor{ [this](Emittable emittable) {
-                                       auto type = GetContext().GetType(emittable);
-                                       if (type.first != _type.first)
-                                       {
-                                           throw InputException(InputExceptionErrors::typeMismatch);
-                                       }
+                                      auto type = GetContext().GetType(emittable);
+                                      if (type.first != _type.first)
+                                      {
+                                          throw InputException(InputExceptionErrors::typeMismatch);
+                                      }
 
-                                       _data = emittable;
-                                       _type = type;
-                                   },
+                                      _data = emittable;
+                                      _type = type;
+                                  },
                                    [this, &value](auto&& arg) {
                                        if (GetValueType<std::decay_t<decltype(arg)>>() != _type.first)
                                        {
@@ -245,12 +245,10 @@ namespace value
     bool Value::IsEmpty() const
     {
         return std::visit(
-            VariantVisitor {
+            VariantVisitor{
                 [](Emittable data) -> bool { return data.GetDataAs<void*>() == nullptr; },
-                [](auto&& data) -> bool { return data == nullptr; }
-            },
-            _data
-        );
+                [](auto&& data) -> bool { return data == nullptr; } },
+            _data);
     }
 
     bool Value::IsConstant() const { return !std::holds_alternative<Emittable>(_data); }
@@ -266,13 +264,13 @@ namespace value
         {
         case ValueType::Boolean:
             [[fallthrough]];
-        case ValueType::Byte: 
+        case ValueType::Byte:
             [[fallthrough]];
-        case ValueType::Char8: 
+        case ValueType::Char8:
             [[fallthrough]];
-        case ValueType::Int16: 
+        case ValueType::Int16:
             [[fallthrough]];
-        case ValueType::Int32: 
+        case ValueType::Int32:
             [[fallthrough]];
         case ValueType::Int64:
             return true;
@@ -309,15 +307,15 @@ namespace value
 
         switch (_type.first)
         {
-        case ValueType::Boolean: 
+        case ValueType::Boolean:
             [[fallthrough]];
-        case ValueType::Byte: 
+        case ValueType::Byte:
             [[fallthrough]];
-        case ValueType::Int16: 
+        case ValueType::Int16:
             [[fallthrough]];
-        case ValueType::Char8: 
+        case ValueType::Char8:
             [[fallthrough]];
-        case ValueType::Int32: 
+        case ValueType::Int32:
             [[fallthrough]];
         case ValueType::Int64:
             return true;
@@ -357,12 +355,14 @@ namespace value
 
     void Value::ClearLayout() { _layout.reset(); }
 
+    void Value::ClearData() { _data = Emittable{ nullptr }; }
+
     int Value::PointerLevel() const { return _type.second; }
 
     Value::UnderlyingDataType& Value::GetUnderlyingData() { return _data; }
 
     const Value::UnderlyingDataType& Value::GetUnderlyingData() const { return _data; }
-    
+
     namespace detail
     {
         Value StoreConstantData(ConstantData data) { return GetContext().StoreConstantData(data); }

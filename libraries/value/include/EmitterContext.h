@@ -16,6 +16,7 @@
 #include <utilities/include/Boolean.h>
 #include <utilities/include/FunctionUtils.h>
 #include <utilities/include/MemoryLayout.h>
+#include <utilities/include/TupleUtils.h>
 
 #include <functional>
 #include <iosfwd>
@@ -34,7 +35,10 @@ namespace value
     namespace detail
     {
         Scalar CalculateOffset(const utilities::MemoryLayout& layout, std::vector<Scalar> coordinates);
-    }
+
+        template <typename ViewType>
+        Value GetValue(ViewType value);
+    } // namespace detail
 
     class FunctionDeclaration;
     class Vector;
@@ -242,6 +246,13 @@ namespace value
 
         std::optional<Value> Call(FunctionDeclaration func, std::vector<Value> args);
 
+        /// <summary> Runs the provided function, in parallel if possible </summary>
+        /// <param name="numTasks"> The number of tasks that should be created </param>
+        /// <param name="captured"> A list of values to be used inside the function </param>
+        /// <param name="fn"> The function that gets run for each task. The first parameter is the task number for that particular call. The second parameter
+        /// will be filled in with the values provided within the `captured` parameter. </param>
+        void Parallelize(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn);
+
         void DebugDump(Value value, std::string tag, std::ostream* stream) const;
 
     protected:
@@ -280,6 +291,8 @@ namespace value
         virtual IfContext IfImpl(Scalar test, std::function<void()> fn) = 0;
 
         virtual std::optional<Value> CallImpl(FunctionDeclaration func, std::vector<Value> args) = 0;
+
+        virtual void ParallelizeImpl(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn) = 0;
 
         virtual void DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const = 0;
     };
@@ -465,6 +478,23 @@ namespace value
     void ForRange(Scalar start, Scalar end, std::function<void(Scalar)> fn);
     void ForRange(Scalar start, Scalar end, Scalar step, std::function<void(Scalar)> fn);
 
+    /// <summary> Runs the provided function, in parallel if possible </summary>
+    /// <typeparam name="Tys..."> The types that represent the captured values. Must be `Value` or types that provide a member
+    /// function called `GetValue()` which returns a `Value` instance. </typeparam>
+    /// <param name="numTasks"> The number of tasks that should be created </param>
+    /// <param name="captured"> A list of values to be used inside the function </param>
+    /// <param name="fn"> The function that gets run for each task. The first parameter is the task number for that particular call. Subsequent parameters must match the typelist
+    /// `Tys...` and will be filled in with the values provided within the `captured` parameter. </param>
+    template <typename... Tys>
+    void Parallelize(int numTasks, std::tuple<Tys...> captured, std::function<void(Scalar, Tys...)> fn);
+
+    /// <summary> Runs the provided function, in parallel if possible </summary>
+    /// <param name="numTasks"> The number of tasks that should be created </param>
+    /// <param name="captured"> A list of values to be used inside the function </param>
+    /// <param name="fn"> The function that gets run for each task. The first parameter is the task number for that particular call. The second parameter
+    /// will be filled in with the values provided within the `captured` parameter. </param>
+    void Parallelize(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn);
+
     extern FunctionDeclaration AbsFunctionDeclaration;
     extern FunctionDeclaration CosFunctionDeclaration;
     extern FunctionDeclaration CopySignFunctionDeclaration;
@@ -527,6 +557,24 @@ namespace ell
 {
 namespace value
 {
+    namespace detail
+    {
+        template <typename ViewType>
+        Value GetValue(ViewType value)
+        {
+            if constexpr (std::is_same_v<Value, utilities::RemoveCVRefT<ViewType>>)
+            {
+                return value;
+            }
+            else
+            {
+                static_assert(std::is_same_v<decltype(std::declval<ViewType>().GetValue()), Value>,
+                              "Parameter type isn't a valid view type of Value. Must have member function GetValue that returns Value instance.");
+
+                return value.GetValue();
+            }
+        }
+    } // namespace detail
 
     template <typename ContextType, typename Fn, typename ReturnType>
     auto InvokeForContext(Fn&& fn) -> std::conditional_t<std::is_same_v<ReturnType, void>, void, std::optional<ReturnType>>
@@ -550,6 +598,31 @@ namespace value
         {
             return std::nullopt;
         }
+    }
+
+    template <typename... Tys>
+    void Parallelize(int numTasks, std::tuple<Tys...> captured, std::function<void(Scalar, Tys...)> fn)
+    {
+        auto capturedValues = utilities::TupleToVector<Value>([](auto view) { return detail::GetValue(view); }, captured);
+
+        Parallelize(
+            numTasks,
+            capturedValues,
+            [fn = std::move(fn)](Scalar threadIndex, std::vector<Value> captures) {
+                auto fnArgsTuple = [&] {
+                    std::tuple scalarTuple{ threadIndex };
+                    if constexpr (sizeof...(Tys) > 0)
+                    {
+                        auto capturesTuple = utilities::VectorToTuple<Tys...>(captures);
+                        return std::tuple_cat(scalarTuple, capturesTuple);
+                    }
+                    else
+                    {
+                        return scalarTuple;
+                    }
+                }();
+                std::apply(fn, fnArgsTuple);
+            });
     }
 
 } // namespace value

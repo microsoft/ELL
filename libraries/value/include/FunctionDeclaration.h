@@ -89,7 +89,7 @@ namespace value
         /// <returns> A std::optional instance that holds a Value instance with the return value of the call, if it is expected, otherwise empty </returns>
         /// <remarks> If the function is not defined and the context is capable of it, this will emit a call to an external function </remarks>
         template <typename... Types>
-        [[maybe_unused]] std::optional<Value> Call(Types&& ... arguments) const;
+        [[maybe_unused]] std::optional<Value> Call(Types&&... arguments) const;
 
         /// <summary> Gets the final function name, including any decoration if so applicable </summary>
         const std::string& GetFunctionName() const;
@@ -200,24 +200,6 @@ namespace value
                   typename Signature = typename StdFunctionDeductionGuideHelper<decltype(&Functor::operator())>::Type>
         Function(Functor)->Function<Signature>;
 #endif // defined(__APPLE__)
-
-        template <typename ViewType>
-        Value GetValue(ViewType value)
-        {
-            if constexpr (std::is_same_v<Value, utilities::RemoveCVRefT<ViewType>>)
-            {
-                return value;
-            }
-            else
-            {
-                static_assert(std::is_same_v<decltype(std::declval<ViewType>().GetValue()), Value>,
-                              "Parameter type isn't a valid view type of Value. Must have member function GetValue that returns Value instance.");
-
-                return value.GetValue();
-            }
-
-
-        }
 
     } // namespace detail
 

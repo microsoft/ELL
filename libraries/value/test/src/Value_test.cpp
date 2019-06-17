@@ -20,6 +20,7 @@
 #include <math/include/Tensor.h>
 #include <math/include/Vector.h>
 
+#include <utilities/include/Exception.h>
 #include <utilities/include/FunctionUtils.h>
 
 #include <testing/include/testing.h>
@@ -33,6 +34,14 @@
 #include <optional>
 #include <type_traits>
 #include <vector>
+
+#if !defined(WIN32)
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <unistd.h>
+#else
+#include <windows.h>
+#endif // !defined(WIN32)
 
 using namespace ell::emitters;
 using namespace ell::utilities;
@@ -103,6 +112,46 @@ inline std::enable_if_t<std::is_floating_point<T1>::value && std::is_floating_po
 RelativeDifference(T1 a, T2 b)
 {
     return std::fabs((a - b) / std::min<T3>(a, b));
+}
+
+Scalar GetTID()
+{
+    if (auto result = InvokeForContext<ComputeContext>(
+            [](auto&) {
+#if !defined(WIN32)
+                return (int32_t)(pid_t)syscall(SYS_gettid);
+#else
+                return (int32_t)GetCurrentThreadId();
+#endif // !defined(WIN32)
+            });
+        result)
+    {
+        return *result;
+    }
+
+    if (auto result = InvokeForContext<LLVMContext>(
+            [] {
+                return Scalar(
+#if !defined(WIN32)
+                    *DeclareFunction("syscall")
+                         .Decorated(FunctionDecorated::No)
+                         .Returns(Value({ ValueType::Int64, 0 }, ScalarLayout))
+                         .Parameters(
+                             Value({ ValueType::Int64, 0 }, ScalarLayout))
+                         .Call(Scalar{ (int64_t)SYS_gettid })
+#else
+                    *DeclareFunction("GetCurrentThreadId")
+                         .Decorated(FunctionDecorated::No)
+                         .Returns(Value({ ValueType::Int32, 0 }, ScalarLayout))
+                         .Call()
+#endif // !defined(WIN32)
+                );
+            }))
+    {
+        return Cast<int>(*result);
+    }
+
+    throw LogicException(LogicExceptionErrors::notImplemented);
 }
 
 } // namespace
@@ -320,6 +369,10 @@ void ValueGetTests()
 
 Scalar Basic_test()
 {
+    DebugPrint("### Test that debug print is working: ");
+    Vector v(std::vector<int>{ 1, 2, 3, 4 });
+    DebugPrintVector(v);
+    DebugPrint("\n");
     return 0;
 }
 
@@ -1406,6 +1459,61 @@ Scalar ForRangeCasting_test1()
 Scalar ForRangeCasting_test2()
 {
     return ForRangeCasting_test_impl<float>();
+}
+
+Scalar Parallelized_test1()
+{
+    constexpr int NumThreads = 2;
+    constexpr int DataPerThread = 3;
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    auto data = MakeVector<int>(NumThreads * DataPerThread);
+    Parallelize(
+        NumThreads,
+        std::tuple{ data },
+        std::function{ [&](Scalar id, Vector capturedData) {
+            ForRange(DataPerThread, [&](Scalar index) {
+                capturedData[id * DataPerThread + index] = id;
+            });
+        } });
+
+    auto expected = MakeVector<int>(data.Size());
+    for (auto thread = 0; thread < NumThreads; ++thread)
+    {
+        for (auto dataIndex = 0; dataIndex < DataPerThread; ++dataIndex)
+        {
+            expected[thread * DataPerThread + dataIndex] = thread;
+        }
+    }
+
+    If(Verify(data, expected) != 0, [&] {
+        ok = 1;
+    });
+
+    return ok;
+}
+
+Scalar Parallelized_test2()
+{
+    constexpr int NumThreads = 2;
+    constexpr int DataPerThread = 3;
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    auto data = MakeVector<int>(NumThreads * DataPerThread);
+    Parallelize(
+        NumThreads,
+        std::tuple{ data },
+        std::function{ [&](Scalar id, Vector capturedData) {
+            ForRange(DataPerThread, [&](Scalar index) {
+                capturedData[id * DataPerThread + index] = GetTID();
+            });
+        } });
+
+    auto expected = MakeVector<int>(data.Size());
+
+    If(Verify(data, expected) == 0, [&] {
+        ok = 1;
+    });
+
+    return ok;
 }
 
 } // namespace ell

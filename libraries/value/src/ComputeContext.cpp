@@ -11,14 +11,16 @@
 #include "Scalar.h"
 #include "Value.h"
 
-#include <utilities/include/TypeTraits.h>
 #include <utilities/include/TypeName.h>
+#include <utilities/include/TypeTraits.h>
 
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <future>
 #include <iostream>
 #include <string>
+#include <thread>
 
 namespace ell
 {
@@ -329,7 +331,7 @@ namespace value
                     throw InputException(InputExceptionErrors::invalidSize);
                 }
 
-                        const auto& value1 = args[0];
+                const auto& value1 = args[0];
                 const auto& value2 = args[1];
                 if ((value1.IsConstrained() && value1.GetLayout() != ScalarLayout) ||
                     (value2.IsConstrained() && value2.GetLayout() != ScalarLayout))
@@ -541,8 +543,8 @@ namespace value
     bool ComputeContext::IsGlobalValue(Value value)
     {
         return std::visit(VariantVisitor{ [](Emittable) -> bool {
-                                              throw LogicException(LogicExceptionErrors::illegalState);
-                                          },
+                                             throw LogicException(LogicExceptionErrors::illegalState);
+                                         },
                                           [this](auto&& data) -> bool {
                                               using Type = std::decay_t<decltype(data)>;
                                               using RealType = std::remove_pointer_t<Type>;
@@ -602,7 +604,7 @@ namespace value
                     {
                         fnArgs.push_back(Value(arg.GetBaseType(), arg.GetLayout()));
                     }
-                    
+
                     std::copy(args.begin(), args.end(), fnArgs.begin());
 
                     Value returnValue = expectedReturn;
@@ -1040,6 +1042,20 @@ namespace value
         }
 
         throw InputException(InputExceptionErrors::invalidArgument, "Specified function is not defined for this context");
+    }
+
+    void ComputeContext::ParallelizeImpl(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn)
+    {
+        std::vector<std::future<void>> futures;
+        futures.reserve(numTasks);
+        for (int i = 0; i < numTasks; ++i)
+        {
+            futures.push_back(std::async(fn, Scalar{ i }, captured));
+        }
+        for (auto& future : futures)
+        {
+            future.wait();
+        }
     }
 
     void ComputeContext::DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const

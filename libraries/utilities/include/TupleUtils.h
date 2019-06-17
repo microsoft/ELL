@@ -10,6 +10,7 @@
 
 #include <tuple>
 #include <utility> // for integer_sequence
+#include <vector>
 
 namespace ell
 {
@@ -98,5 +99,29 @@ namespace utilities
 
     template <typename WrappedTupleType>
     using UnwrappedTupleType = typename UnwrappedTuple<WrappedTupleType>::type;
+
+    namespace detail
+    {
+        template <typename T, typename Fn, typename... Types, size_t... I>
+        std::vector<T> TupleToVector(Fn&& fn, std::tuple<Types...> tuple, std::index_sequence<I...>)
+        {
+            std::vector<T> v;
+            v.reserve(sizeof...(Types));
+            (v.push_back(fn(std::get<I>(tuple))), ...);
+            return v;
+        }
+    } // namespace detail
+
+    template <typename T, typename Fn, typename... Types>
+    std::vector<T> TupleToVector(Fn&& fn, std::tuple<Types...> tuple)
+    {
+        static_assert(
+            std::conjunction_v<std::is_invocable_r<T, Fn, Types>...>,
+            "Tranformation function Fn does not accept all types within tuple");
+        return detail::TupleToVector<T>(
+            std::forward<Fn>(fn),
+            std::forward<std::tuple<Types...>>(tuple),
+            std::make_index_sequence<sizeof...(Types)>());
+    }
 } // namespace utilities
 } // namespace ell
