@@ -211,8 +211,8 @@ class EllBuildTools:
 
     def compile(self, model_file, func_name, model_name, target, output_dir,
                 use_blas=False, fuse_linear_ops=True, optimize_reorder_data_nodes=True, profile=False, llvm_format="bc",
-                optimize=True, debug=False, is_model_file=False, swig=True, header=False,
-                objext=".o", extra_options=[]):
+                optimize=True, parallelize=True, vectorize=True, debug=False, is_model_file=False, swig=True,
+                header=False, objext=".o", extra_options=[]):
         file_arg = "-imf" if is_model_file else "-imap"
         format_flag = {
             "bc": "--bitcode",
@@ -252,6 +252,10 @@ class EllBuildTools:
             args += ["--optimize", "false"]
         else:
             args += ["--optimize", "true"]
+            if parallelize:
+                args += ["--parallelize", "true"]
+            if vectorize:
+                args += ["--vectorize"]
         if debug:
             args += ["--debug", "true"]
 

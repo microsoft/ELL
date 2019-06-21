@@ -133,6 +133,20 @@ class ModuleBuilder:
             "default": False,
             "help": "disable ELL's compiler from optimizing emitted code"
         },
+        "no_parallelize":
+        {
+            "short": "no_par",
+            "default": False,
+            "help": "disable ELL's compiler from parallelizing emitted code. \
+Only necessary if optimization is enabled"
+        },
+        "no_vectorize":
+        {
+            "short": "no_vec",
+            "default": False,
+            "help": "disable ELL's compiler from generating specially vectorized code. \
+Only necessary if optimization is enabled"
+        },
         "optimization_level":
         {
             "short": "ol",
@@ -169,6 +183,8 @@ If '0' or 'g', opt is not run (default '3')",
         self.profile = False
         self.blas = True
         self.optimize = True
+        self.parallelize = True
+        self.vectorize = True
         self.optimization_level = None
         self.fuse_linear_ops = True
         self.optimize_reorder = True
@@ -248,6 +264,8 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
         self.no_opt_tool = args.no_opt_tool or self.optimization_level in ['0', 'g']
         self.no_llc_tool = args.no_llc_tool
         self.optimize = not args.no_optimize
+        self.parallelize = self.optimize and not args.no_parallelize
+        self.vectorize = self.optimize and not args.no_vectorize
         self.fuse_linear_ops = not args.no_fuse_linear_ops
         self.optimize_reorder = not args.no_optimize_reorder
         self.debug = args.debug
@@ -347,6 +365,8 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
             profile=self.profile,
             llvm_format=self.llvm_format,
             optimize=self.optimize,
+            parallelize=self.parallelize,
+            vectorize=self.vectorize,
             debug=self.debug,
             is_model_file=False,
             swig=self.swig,
