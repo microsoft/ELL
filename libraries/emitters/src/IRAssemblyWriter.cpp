@@ -17,6 +17,8 @@
 #include "IRDiagnosticHandler.h"
 #include "IRModuleEmitter.h"
 
+#include <utilities/include/Logger.h>
+
 #include <llvm/ADT/Triple.h>
 #include <llvm/Analysis/TargetLibraryInfo.h>
 
@@ -48,6 +50,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+
+using namespace ell::logging;
 
 namespace ell
 {
@@ -106,10 +110,21 @@ namespace emitters
         llvm::LLVMContext context;
         context.setDiscardValueNames(false); // Don't throw away names of non-global values
 
-        // Verify module if requested
-        if (ellOptions.verifyModule && llvm::verifyModule(module))
+        std::stringstream sstr;
+        llvm::raw_os_ostream out(sstr);
+        auto verifyResult = llvm::verifyModule(module, &out);
+        if (verifyResult)
         {
-            throw EmitterException(EmitterError::unexpected, "Module verification failed");
+            auto errorString = sstr.str();
+            if (ellOptions.verifyModule)
+            {
+                throw EmitterException(EmitterError::unexpected, "Module verification failed.\n\n" + errorString);
+            }
+            else
+            {
+                Log() << "Warning: Module failed verification\n\n"
+                      << errorString << EOL;
+            }
         }
 
         // Set the triple for the module, and retrieve it as a Triple object
