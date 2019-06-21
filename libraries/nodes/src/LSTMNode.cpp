@@ -21,7 +21,8 @@ namespace nodes
     //
     template <typename ValueType>
     LSTMNode<ValueType>::LSTMNode() :
-        RNNNode<ValueType>()
+        RNNNode<ValueType>(),
+        _outputCellState(this, "outputCellState", 0)
     {
     }
 
@@ -38,6 +39,7 @@ namespace nodes
                                   bool validateWeights) :
         RNNNode<ValueType>(input, resetTrigger, hiddenUnits, inputWeights, hiddenWeights, inputBias, hiddenBias, activation, false),
         _recurrentActivation(recurrentActivation),
+        _outputCellState(this, "outputCellState", hiddenUnits),
         _cellState(hiddenUnits)
     {
         if (validateWeights)
@@ -83,6 +85,7 @@ namespace nodes
         const auto& newHiddenBias = transformer.GetCorrespondingInputs(this->_hiddenBias);
         auto newNode = transformer.AddNode<LSTMNode>(newInput, newResetTrigger, this->_hiddenUnits, newInputWeights, newHiddenWeights, newInputBias, newHiddenBias, this->_activation, this->_recurrentActivation);
         transformer.MapNodeOutput(this->output, newNode->output);
+        transformer.MapNodeOutput(this->outputCellState, newNode->outputCellState);
     }
 
     template <typename ValueType>
@@ -176,6 +179,7 @@ namespace nodes
 
         // copy to output
         this->_output.SetOutput(this->_hiddenState.ToArray());
+        this->outputCellState.SetOutput(this->_cellState.ToArray());
     }
 
     template <typename ValueType>
@@ -209,6 +213,7 @@ namespace nodes
 
         // Get LLVM reference for node output
         auto output = function.LocalArray(compiler.EnsurePortEmitted(this->output));
+        auto outputCellState = function.LocalArray(compiler.EnsurePortEmitted(this->outputCellState));
 
         // Allocate global buffer for hidden state
         emitters::IRModuleEmitter& module = function.GetModule();
@@ -303,6 +308,8 @@ namespace nodes
 
         // Copy hidden state to the output.
         function.MemoryCopy<ValueType>(hiddenState, output, hiddenUnits);
+        // Copy cell state to the output cell state
+        function.MemoryCopy<ValueType>(cellState, outputCellState, hiddenUnits);
 
         // Add the internal reset function
         std::string resetFunctionName = compiler.GetGlobalName(*this, "LSTMNodeReset");
@@ -331,6 +338,7 @@ namespace nodes
         _recurrentActivation.ReadFromArchive(archiver);
 
         this->_cellState.Resize(this->_hiddenUnits);
+        this->_outputCellState.SetSize(this->_hiddenUnits);
     }
 
     // Explicit specialization

@@ -87,10 +87,11 @@ class AudioModelTester:
             else:
                 predictor.total_time = 0
                 _, probability, label, output = predictor.predict(feature_data)
-                if sum_prediction is None:
-                    sum_prediction = output
-                else:
-                    sum_prediction += output
+                if output is not None:
+                    if sum_prediction is None:
+                        sum_prediction = output
+                    else:
+                        sum_prediction += output
                 count += 1
                 elapsed = predictor.total_time * 1000
                 if elapsed != 0:  # hmmm, sometimes python time.time() lies?

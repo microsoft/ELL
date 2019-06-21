@@ -490,6 +490,11 @@ Node Model::AddReorderData(Node input, PortMemoryLayout inputMemoryLayout, PortM
     return builder.AddReorderDataNode(Model(_model), GetDefaultOutput(input), inputMemoryLayout, outputMemoryLayout, order, outputPaddingValue);
 }
 
+Node Model::AddReorderData(Node input, std::vector<int> order)
+{
+    return builder.AddReorderDataNode(Model(_model), GetDefaultOutput(input), order);
+}
+
 Node Model::AddRNN(Node input, Node reset, size_t hiddenUnits, Node inputWeights, Node hiddenWeights, Node inputBias, Node hiddenBias, ell::api::predictors::neural::ActivationType activation)
 {
     return builder.AddRNNNode(Model(_model), GetDefaultOutput(input), GetDefaultOutput(reset), hiddenUnits, GetDefaultOutput(inputWeights), GetDefaultOutput(hiddenWeights), GetDefaultOutput(inputBias), GetDefaultOutput(hiddenBias), activation);

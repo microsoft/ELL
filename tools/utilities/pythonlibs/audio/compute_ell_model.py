@@ -63,3 +63,20 @@ class ComputeModel:
         self.map.Reset()
         if self.state_size:
             self.hidden_state = ell.math.FloatVector(self.state_size)
+
+    def get_metadata(self, name):
+        model = self.map.GetModel()
+        value = self.map.GetMetadataValue(name)
+        if value:
+            return value
+        value = model.GetMetadataValue(name)
+        if value:
+            return value
+        nodes = model.GetNodes()
+        while nodes.IsValid():
+            node = nodes.Get()
+            value = node.GetMetadataValue(name)
+            if value:
+                return value
+            nodes.Next()
+        return None

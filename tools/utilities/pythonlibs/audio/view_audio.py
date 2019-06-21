@@ -37,6 +37,54 @@ import speaker
 import wav_reader
 import vad
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path += [os.path.join(script_dir, "training")]
+import make_vad
+
+
+class SpectrogramImage(Frame):
+    """ A tkinter scrolling spectrogram widget """
+
+    def __init__(self, master, colormap_name="inferno"):
+        self.colormap_name = colormap_name
+        super(SpectrogramImage, self).__init__(master)
+        self.features_figure = Figure(figsize=(5, 4), dpi=100)
+        self.subplot = self.features_figure.add_subplot(111)
+        self.data_shape = None
+        canvas = FigureCanvasTkAgg(self.features_figure, master=self)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
+
+    def begin_animation(self, func):
+        # (30 fps is usually fine)
+        return animation.FuncAnimation(self.features_figure, func, interval=33, blit=True)
+
+    def clear(self, data):
+        self.subplot.clear()
+        self.spectrogram_image = self.subplot.imshow(data, vmin=0,
+                                                     vmax=1, origin="lower", animated=True,
+                                                     cmap=pyplot.get_cmap(self.colormap_name))
+
+    def show(self, data):
+        """ the result of this function is an image object that is animatable """
+        if self.data_shape != data.shape or self.spectrogram_image is None:
+            self.clear(data)
+        else:
+            min_value = np.min(data)
+            max_value = np.max(data)
+            if not np.isfinite(min_value):
+                min_value = 0
+            if not np.isfinite(max_value):
+                max_value = 1
+            eps = 0.1
+            if max_value - min_value < eps:
+                max_value = min_value + eps
+            self.spectrogram_image.set_clim(min_value, max_value)
+            self.spectrogram_image.set_data(data)
+
+        self.data_shape = data.shape
+        return self.spectrogram_image
+
 
 class AudioDemo(Frame):
     """ A demo application class that provides simple GUI for testing featurizer+classifier on
@@ -44,7 +92,8 @@ class AudioDemo(Frame):
 
     def __init__(self, featurizer_model=None, classifier_model=None, auto_scale=True,
                  sample_rate=None, channels=None, input_device=None, categories=None,
-                 image_width=80, threshold=None, wav_file=None, clear=5, serial=None, vad_model=None):
+                 image_width=80, threshold=None, wav_file=None, clear=5, serial=None, vad_model=None,
+                 smoothing=None, ignore_list=None):
         """ Initialize AudioDemo object
         featurizer_model - the path to the ELL featurizer
         classifier_model - the path to the ELL classifier
@@ -58,6 +107,8 @@ class AudioDemo(Frame):
         wav_file - optional wav_file to use  when you click Play
         serial - optional serial input, reading numbers from the given serial port.
         vad_model - optional ELL model containing VoiceActivityDetector
+        smoothing - controls the size of the smoothing window (defaults to 0).
+        ignore_list - list of category labels to ignore (like 'background' or 'silence')
         """
         super().__init__()
 
@@ -71,6 +122,9 @@ class AudioDemo(Frame):
         self.reading_input = False
         self.featurizer_model = None
         self.serial_port = serial
+        self.smoothing = smoothing
+        self.ignore_list = ignore_list
+
         if featurizer_model:
             self.featurizer_model = featurizer_model
             self.settings[self.FEATURIZER_MODEL_KEY] = featurizer_model
@@ -84,11 +138,6 @@ class AudioDemo(Frame):
         elif self.CLASSIFIER_MODEL_KEY in self.settings:
             self.classifier_model = self.settings[self.CLASSIFIER_MODEL_KEY]
 
-        self.vad = None
-        if vad_model:
-            self.vad = vad.VoiceActivityDetector(vad_model)
-            self.previous_vad = 0
-
         self.wav_filename = wav_file
         if self.wav_filename is None and self.WAV_FILE_KEY in self.settings:
             self.wav_filename = self.settings[self.WAV_FILE_KEY]
@@ -100,6 +149,10 @@ class AudioDemo(Frame):
         self.input_device = input_device
         self.num_classifier_features = None
 
+        self.vad = None
+        self.vad_reset = (vad_model is not None)
+        self.previous_vad = 0
+        self.vad_latch = 3  # only reset after 3 vad=0 signals to smooth vad signal a bit.
         if not categories and self.CATEGORY_FILE_KEY in self.settings:
             categories = self.settings[self.CATEGORY_FILE_KEY]
 
@@ -108,10 +161,9 @@ class AudioDemo(Frame):
             self.settings[self.CATEGORY_FILE_KEY] = categories
 
         self.save_settings()  # in case we just changed it.
-        self.min_value = 0.0
-        self.max_value = 1.0
-        self.update_minmax = True
-
+        self.audio_level = 0
+        self.min_level = 0
+        self.max_level = 0
         self.threshold = threshold
 
         self.output_clear_time = int(clear * 1000) if clear else 5000
@@ -122,8 +174,6 @@ class AudioDemo(Frame):
         self.speaker = None
         self.microphone = None
         self.animation = None
-        self.show_spectrogram = True
-        self.colormap_name = "inferno"
         self.show_classifier_output = True
         self.last_prediction = None
         self.probability = 0
@@ -137,7 +187,6 @@ class AudioDemo(Frame):
         # UI components
         self.max_spectrogram_width = image_width
         self.features_entry = None
-        self.spectrogram_image = None
         self.classifier_feature_data = None
         self.spectrogram_image_data = None
 
@@ -148,11 +197,21 @@ class AudioDemo(Frame):
         else:
             self.show_output("Please specify and load a feature model")
 
+        if smoothing == "vad":
+            # smooth up to 1 second worth of predictions
+            self.smoothing = int(self.sample_rate / self.featurizer.input_size)
+            if vad_model is None:
+                vad_model = make_vad.make_vad("vad.ell", self.sample_rate, self.featurizer.input_size,
+                                              self.featurizer.output_size, None)
+
         if self.classifier_model:
             self.load_classifier(self.classifier_model)
             self.setup_spectrogram_image()
         else:
             self.show_output("Please specify and load a classifier model")
+
+        if vad_model:
+            self.vad = vad.VoiceActivityDetector(vad_model)
 
     def get_settings_file_name(self):
         """ this app stores the various UI field values in a settings file in your temp folder
@@ -195,7 +254,9 @@ class AudioDemo(Frame):
     def load_classifier(self, classifier_path):
         """ load the given compiled ELL classifier for use in processing subsequent audio input """
         if classifier_path:
-            self.classifier = classifier.AudioClassifier(classifier_path, self.categories, self.threshold)
+            self.classifier = classifier.AudioClassifier(classifier_path, self.categories, self.threshold,
+                                                         smoothing_window=self.smoothing,
+                                                         ignore_list=self.ignore_list)
             self.show_output("Classifier input size: {}, output size: {}".format(
                 self.classifier.input_size,
                 self.classifier.output_size))
@@ -209,8 +270,8 @@ class AudioDemo(Frame):
         if self.featurizer:
             dim = (self.featurizer.output_size, self.max_spectrogram_width)
             self.spectrogram_image_data = np.zeros(dim, dtype=float)
-            if self.spectrogram_image is not None:
-                self.spectrogram_image.set_data(self.spectrogram_image_data)
+            if self.spectrogram_widget:
+                self.spectrogram_widget.clear(self.spectrogram_image_data)
 
             if self.classifier:
                 self.num_classifier_features = self.classifier.input_size // self.featurizer.output_size
@@ -223,9 +284,26 @@ class AudioDemo(Frame):
             vad_signal = self.vad.predict(feature_data)
             if self.previous_vad != vad_signal:
                 if vad_signal == 0:
-                    self.show_output("--- reset ---")
-                    self.classifier.reset()
-                self.previous_vad = vad_signal
+                    if self.vad_latch > 0:
+                        # wait for 2 more to smooth the vad signal a bit.
+                        self.vad_latch -= 1
+                    else:
+                        self.vad_latch = 3
+                        self.previous_vad = vad_signal
+
+                        if self.vad_reset:
+                            self.show_output("--- reset ---")
+                            self.classifier.reset()
+                        else:
+                            self.show_output("--- clear history ---")
+                            self.classifier.clear_smoothing()
+
+                elif vad_signal == 1:
+                    self.vad_latch = 3
+                    self.previous_vad = vad_signal
+
+        self.audio_level = np.sum([x * x for x in feature_data])
+
         if self.classifier and self.show_classifier_output:
             self.classifier_feature_data = np.vstack((self.classifier_feature_data,
                                                       feature_data))[-self.num_classifier_features:, :]
@@ -238,22 +316,45 @@ class AudioDemo(Frame):
         new_image = np.hstack((image_data, feature_data))[:, -image_data.shape[1]:]
         image_data[:, :] = new_image
 
+    def update_rgb_led(self):
+        # This helper function uses the RGB led UI to give an indication of audio levels (brightness)
+        # and voice activity (red)
+        level = self.audio_level
+        if level < self.min_level:
+            self.min_level = level
+        if level > self.max_level:
+            self.max_level = level
+
+        red = 0.0
+        green = 0.0
+        blue = 0.0
+
+        range = self.max_level - self.min_level
+        if range == 0:
+            range = 1.0
+        brightness = 128 * (level - self.min_level) / range
+        if self.previous_vad:
+            red = brightness + 127
+        else:
+            green = brightness + 127
+        rgb = "#{:02x}{:02x}{:02x}".format(int(red), int(green), int(blue))
+        self.rgb_canvas.itemconfig(self.rgb_oval, fill=rgb)
+
+    def on_ui_update(self):
+        # this is an animation callback to update the UI every 33 milliseconds.
+        self.update_rgb_led()
+        self.process_output()
+        result = self.set_spectrogram_image()
+        if not self.reading_input:
+            self.after(1, self.on_stopped)
+        return (result,)
+
     def set_spectrogram_image(self):
         """ update the spectrogram image and the min/max values """
         self.lock.acquire()  # protect access to the shared state
-        if self.update_minmax and self.show_spectrogram:
-            min_value = np.min(self.spectrogram_image_data)
-            max_value = np.max(self.spectrogram_image_data)
-            if np.isfinite(min_value) and np.isfinite(max_value):
-                self.min_value = min_value
-                self.max_value = max_value
-                eps = 0.1
-                if self.max_value - self.min_value < eps:
-                    self.max_value = self.min_value + eps
-
-            self.spectrogram_image.set_clim(self.min_value, self.max_value)
-        self.spectrogram_image.set_data(self.spectrogram_image_data)
+        result = self.spectrogram_widget.show(self.spectrogram_image_data)
         self.lock.release()
+        return result
 
     def get_correct_shape(self, shape):
         """ for some reason keras stores input shape as (None,80,40), and numpy hates that
@@ -293,12 +394,10 @@ class AudioDemo(Frame):
             prediction, probability, label, _ = self.classifier.predict(self.classifier_feature_data.ravel())
             if prediction is not None:
                 percent = int(100 * probability)
-                if label == "silence":
-                    self.classifier.reset()
-                elif self.last_prediction != prediction or self.probability < probability:
+                if self.last_prediction != prediction or self.probability < probability:
                     self.last_prediction = prediction
                     self.probability = probability
-                    self.show_output("<<< DETECTED ({}) {}% {} >>>".format(prediction, percent, label))
+                    self.show_output(" DETECTED ({}) {}% {}".format(prediction, percent, label))
 
     def start_playing(self, filename):
         """ Play a wav file, and classify the audio. Note we use a background thread to read the
@@ -313,18 +412,14 @@ class AudioDemo(Frame):
         self.wav_file.open(filename, self.featurizer.input_size, self.speaker)
 
         def update_func(frame_index):
-            self.process_output()
-            if not self.reading_input:
-                self.after(1, self.on_stopped)
-            self.set_spectrogram_image()
-            return (self.spectrogram_image,)
+            return self.on_ui_update()
 
         if self.animation:
             self.animation.event_source.stop()
         self.reading_input = True
 
-        # Start animation timer for updating the UI (e.g. spectrogram image) (30 fps is usually fine)
-        self.animation = animation.FuncAnimation(self.features_figure, update_func, interval=33, blit=True)
+        # Start animation timer for updating the UI (e.g. spectrogram image)
+        self.animation = self.spectrogram_widget.begin_animation(update_func)
 
         # start background thread to read and classify the audio.
         self.featurizer.open(self.wav_file)
@@ -355,19 +450,14 @@ class AudioDemo(Frame):
             input_channel = self.microphone
 
         def update_func(frame_index):
-            # this is an animation callback to update the UI every 33 milliseconds.
-            self.process_output()
-            self.set_spectrogram_image()
-            if not self.reading_input:
-                self.after(1, self.on_stopped)
-            return (self.spectrogram_image,)
+            return self.on_ui_update()
 
         if self.animation:
             self.animation.event_source.stop()
 
         self.reading_input = True
-        # Start animation timer for updating the UI (e.g. spectrogram image) (30 fps is usually fine)
-        self.animation = animation.FuncAnimation(self.features_figure, update_func, interval=33, blit=True)
+        # Start animation timer for updating the UI (e.g. spectrogram image)
+        self.animation = self.spectrogram_widget.begin_animation(update_func)
 
         # start background thread to read and classify the recorded audio.
         self.featurizer.open(input_channel)
@@ -386,8 +476,7 @@ class AudioDemo(Frame):
                 else:
                     self.lock.acquire()
                     self.accumulate_feature(feature_data)
-                    if self.show_spectrogram:
-                        self.accumulate_spectrogram_image(feature_data)
+                    self.accumulate_spectrogram_image(feature_data)
                     self.lock.release()
         except:
             errorType, value, traceback = sys.exc_info()
@@ -513,8 +602,14 @@ class AudioDemo(Frame):
         input_frame.pack(fill=X)
         self.play_button = Button(input_frame, text="Play", command=self.on_play_button_click)
         self.play_button.pack(side=RIGHT, padx=4)
+
+        self.rgb_canvas = tk.Canvas(input_frame, width=20, height=20, bd=0)
+        self.rgb_oval = self.rgb_canvas.create_oval(2, 2, 20, 20, fill='#FF0000', width=0)
+        self.rgb_canvas.pack(side=RIGHT, padx=4)
+
         self.rec_button = Button(input_frame, text="Rec", command=self.on_rec_button_click)
         self.rec_button.pack(side=RIGHT, padx=4)
+
         self.wav_filename_entry = Entry(input_frame, width=24)
         self.wav_filename_entry.pack(fill=X)
         self.wav_filename_entry.delete(0, END)
@@ -535,14 +630,8 @@ class AudioDemo(Frame):
         if self.featurizer_model:
             self.features_entry.insert(0, self.featurizer_model)
 
-        viz_frame = Frame(features_frame)
-        viz_frame.pack(fill=X)
-        self.features_figure = Figure(figsize=(5, 4), dpi=100)
-        self.subplot = self.features_figure.add_subplot(111)
-
-        canvas = FigureCanvasTkAgg(self.features_figure, master=viz_frame)
-        canvas.draw()
-        canvas.get_tk_widget().pack(side=TOP, fill=BOTH, expand=True)
+        self.spectrogram_widget = SpectrogramImage(features_frame)
+        self.spectrogram_widget.pack(fill=X)
 
         # Classifier section
         classifier_frame = LabelFrame(self, text="Classifier")
@@ -563,15 +652,12 @@ class AudioDemo(Frame):
         self.output_text.pack(fill=BOTH, padx=4, expand=True)
 
     def setup_spectrogram_image(self):
-        """ this need to be called if you load a new feature model, because the featurizer output size might have
+        """ this needs to be called if you load a new feature model, because the featurizer output size might have
         changed. """
         if self.featurizer:
             dim = (self.featurizer.output_size, self.max_spectrogram_width)
             self.spectrogram_image_data = np.zeros(dim, dtype=float)
-            self.subplot.clear()
-            self.spectrogram_image = self.subplot.imshow(self.spectrogram_image_data, vmin=self.min_value,
-                                                         vmax=self.max_value, origin="lower", animated=True,
-                                                         cmap=pyplot.get_cmap(self.colormap_name))
+            self.spectrogram_widget.show(self.spectrogram_image_data)
 
     def on_load_featurizer_model(self):
         """ called when user clicks the Load button for the feature model """
@@ -592,12 +678,13 @@ class AudioDemo(Frame):
 
 
 def main(featurizer_model=None, classifier=None, auto_scale=True, sample_rate=None, channels=None, input_device=None,
-         categories=None, image_width=80, threshold=None, wav_file=None, clear=5, serial=None, vad_model=None):
+         categories=None, image_width=80, threshold=None, wav_file=None, clear=5, serial=None, vad_model=None,
+         smoothing=None, ignore_list=None):
     """ Main function to create root UI and AudioDemo object, then run the main UI loop """
     root = tk.Tk()
     root.geometry("800x800")
     app = AudioDemo(featurizer_model, classifier, auto_scale, sample_rate, channels, input_device, categories,
-                    image_width, threshold, wav_file, clear, serial, vad_model)
+                    image_width, threshold, wav_file, clear, serial, vad_model, smoothing, ignore_list)
     root.bind("+", app.on_plus_key)
     root.bind("-", app.on_minus_key)
     while True:
@@ -625,22 +712,22 @@ if __name__ == "__main__":
                             default=1, type=int)
     arg_parser.add_argument("--list_devices", help="List available input devices", action="store_true")
 
-    arg_parser.add_argument("--categories", help="Provide categories file that provide labels for each predicted class",
-                            default=None)
-    arg_parser.add_argument("--wav_file", help="Provide an input wav file to test",
-                            default=None)
+    arg_parser.add_argument("--categories", help="Provide categories file that provide labels for each predicted class")
+    arg_parser.add_argument("--wav_file", help="Provide an input wav file to test")
     arg_parser.add_argument("--image_width", help="Provide the display width of spectrogram image",
                             type=int, default=80)
     arg_parser.add_argument("--threshold", help="Ignore predictions below given confidence threshold (0 to 1)",
                             type=float, default=0)
     arg_parser.add_argument("--clear", help="Seconds before clearing output (default 5)",
                             type=float, default=5)
-    arg_parser.add_argument("--serial", help="Name of serial port to read (default None)",
-                            default=None)
+    arg_parser.add_argument("--serial", help="Name of serial port to read (default None)")
     arg_parser.add_argument("--auto_scale", help="Whether to auto scale audio input to range [-1, 1]",
                             action="store_true")
-    arg_parser.add_argument("--vad", help="Use given vad.ell model to determine when to reset the classifier",
-                            default=None)
+    arg_parser.add_argument("--vad", help="Use given vad.ell model to determine when to reset the classifier")
+    arg_parser.add_argument("--smoothing", help="Use a smoothing buffer over preditions specifying 'vad' to smooth "
+                            "based on VAD signal, or with a fixed number of previous N predictions (default None)")
+    arg_parser.add_argument("--ignore_list",
+                            help="comma separated list of category labels to ignore (like 'background' or 'silence')")
     args = arg_parser.parse_args()
 
     if args.serial and args.input_device:
@@ -651,4 +738,5 @@ if __name__ == "__main__":
     else:
         main(args.featurizer, args.classifier, args.auto_scale,
              args.sample_rate, args.channels, args.input_device, args.categories,
-             args.image_width, args.threshold, args.wav_file, args.clear, args.serial, args.vad)
+             args.image_width, args.threshold, args.wav_file, args.clear, args.serial, args.vad, args.smoothing,
+             args.ignore_list)

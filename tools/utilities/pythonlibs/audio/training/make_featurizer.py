@@ -36,7 +36,8 @@ def _get_tensor_shape(shape):
 
 def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, filterbank_size,
                   pre_emphasis=0.97, nfft=None, iir_node=False, log_node=False, dct_node=False,
-                  power_spec=False, log_delta=1.0, filterbank_nfft=None, hamming_window=False):
+                  power_spec=False, log_delta=1.0, filterbank_nfft=None, hamming_window=False,
+                  auto_scale=False):
     builder = ell.model.ModelBuilder()
     ell_model = ell.model.Model()
 
@@ -46,6 +47,8 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
     input_shape = _get_tensor_shape((input_buffer_size, ))
     input_node = builder.AddInputNode(ell_model, input_shape, ell.nodes.PortType.smallReal)
     last_node = input_node
+    if auto_scale:
+        input_node.SetMetadataValue("auto_scale", "True")
 
     # Add optional IIR filter
     if iir_node:
@@ -130,7 +133,8 @@ def _create_model(sample_rate, window_size, input_buffer_size, filterbank_type, 
 
 def make_featurizer(output_filename, sample_rate, window_size, input_buffer_size, filterbank_type,
                     filterbank_size, pre_emphasis=0.97, nfft=None, iir_node=False, log_node=False, dct_node=False,
-                    power_spec=False, log_delta=1.0, filterbank_nfft=None, hamming_window=False):
+                    power_spec=False, log_delta=1.0, filterbank_nfft=None, hamming_window=False,
+                    auto_scale=False):
     """
     Create a new featurizer ELL model:
     output_filename     - the output ELL model file name
@@ -152,7 +156,7 @@ def make_featurizer(output_filename, sample_rate, window_size, input_buffer_size
 
     map = _create_model(sample_rate, window_size, input_buffer_size, filterbank_type,
                         filterbank_size, pre_emphasis, nfft, iir_node, log_node, dct_node, power_spec, log_delta,
-                        filterbank_nfft, hamming_window)
+                        filterbank_nfft, hamming_window, auto_scale)
 
     # print("Saving model {}".format(output_filename))
     map.Save(output_filename)
@@ -167,6 +171,8 @@ if __name__ == "__main__":
     arg_parser.add_argument("--output_filename", "-o", help="Output model filename (default 'featurizer.ell')",
                             default="featurizer.ell")
     arg_parser.add_argument("--sample_rate", "-r", help="Sample rate of input", type=int, default=16000)
+    arg_parser.add_argument("--auto_scale", help="Whether to automatically scale the input to float range [-1,1]",
+                            action="store_true")
     arg_parser.add_argument("--window_size", "-ws", help="Number of samples per FFT frame", type=int, default=512)
     arg_parser.add_argument("--input_buffer_size", "-ib", help="Number of samples per input buffer, this allows you \
 to get overlapping FFT outputs by shifting the previous data left in the window by this amount.  The result is a \
@@ -192,4 +198,5 @@ higher speed classifier that might be better at spotting word boundaries, at the
 
     make_featurizer(args.output_filename, args.sample_rate, args.window_size, args.input_buffer_size,
                     args.filterbank_type, args.filterbank_size, args.pre_emphasis, args.nfft, args.iir, args.log,
-                    args.dct, args.power_spec, args.log_delta, args.filterbank_nfft, args.hamming_window)
+                    args.dct, args.power_spec, args.log_delta, args.filterbank_nfft, args.hamming_window,
+                    args.auto_scale)

@@ -1,3 +1,12 @@
+## 3.0.1*
+- Fix make_vad.py so the VAD model works properly.
+- Fix smoothing of classifier output.
+- Improvements to noise mixing in audio training scripts
+- Use featurizer metadata to get correct defaults for some audio script parameters
+- Improvements and code clean up in view_audio.py
+- make_dataset will fill the featurizer internal buffer before returning features so it doesn't featurize zeros.
+- onnx_importer, fixes to ConstantFill, Reshape, Slice, Transpose, and support for constant folding involving Cast, and Mul and fix handling of nodes with multiple outputs.
+
 ## 3.0.0
 - Improve Python API so Map and CompiledMap have a way of calling compute on models with multiple inputs and outputs (see ComputeList)
 - Improve Python Callback handling so Python apps can handle models with any number of and type of callbacks.

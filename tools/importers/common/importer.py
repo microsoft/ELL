@@ -68,6 +68,7 @@ operation_map = {
     "PReLU": ConvertPReLU,
     "ReLU": ConvertReLU,
     "Region": ConvertRegion,
+    "Reorder": ConvertReorder,
     "Reshape": ConvertReshape,
     "Softmax": ConvertSoftmax,
     "Sigmoid": ConvertSigmoid,
@@ -348,7 +349,7 @@ class ImporterEngine:
             for current_node in pending_nodes:
                 # Find a node which already has all of its input nodes in the ordered list.
                 if current_node.operation_type != "Skip":
-                    if all((input_id in outputs_available) for input_id in current_node.inputs):
+                    if all((input_id in outputs_available) for input_id in current_node.inputs if input_id):
                         pending_nodes.remove(current_node)
                         ordered_nodes.append(current_node)
                         node_processed = True

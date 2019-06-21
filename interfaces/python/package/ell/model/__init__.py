@@ -27,7 +27,7 @@ PortMemoryLayout.__ne__ = PortMemoryLayoutNotEqual
 del PortMemoryLayoutNotEqual
 
 def PortMemoryLayoutToString(m):
-    return "size: {}, extent: {}, offset: {}, order: {}".format(list(m.size), list(m.extent), lisinstance(m.offset), list(m.order))
+    return "size: {}, extent: {}, offset: {}, order: {}".format(list(m.size), list(m.extent), list(m.offset), list(m.order))
 
 PortMemoryLayout.ToString = PortMemoryLayoutToString
 

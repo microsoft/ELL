@@ -33,6 +33,7 @@ namespace nodes
     {
     public:
         using ActivationType = predictors::neural::Activation<ValueType>;
+        const model::OutputPort<ValueType>& outputCellState = _outputCellState;
 
         /// <summary> Default contructor. </summary>
         LSTMNode();
@@ -83,6 +84,8 @@ namespace nodes
         void Copy(model::ModelTransformer& transformer) const override;
 
         ActivationType _recurrentActivation;
+
+        model::OutputPort<ValueType> _outputCellState;
 
     private:
         using VectorType = math::ColumnVector<ValueType>;

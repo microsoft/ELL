@@ -32,7 +32,7 @@ def get_ell_shape(shape: tuple, order: str, padding: int = 0):
     else:
         raise NotImplementedError(
             "Unsupported input shape order: {}".format(order))
-    return ell.math.TensorShape(rows, columns, channels)
+    return ell.math.TensorShape(int(rows), int(columns), int(channels))
 
 
 def get_ell_port_memory_layout(shape: tuple, order: str, padding: int = 0):

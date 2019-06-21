@@ -21,22 +21,34 @@ class AudioClassifier:
     tend to be rather noisy. It also supports a threshold value so any prediction less than this
     probability is ignored.
     """
-    def __init__(self, model_path, categories_file, threshold=0, smoothing_delay=0):
+    def __init__(self, model_path, categories_file, threshold=0, smoothing_window=0, ignore_list=[]):
         """
         Initialize the new AudioClassifier.
         model - the path to the ELL model module to load.
         categories_file - the path to a text file containing strings labels for each prediction
         threshold - threshold for predictions, (default 0).
-        smoothing_delay - controls the size of this window (defaults to 0).
+        smoothing_window - controls the size of the smoothing window (defaults to 0).
+        ignore_list - list of category labels to ignore (like 'background' or 'silence')
         """
-        self.smoothing_delay = smoothing_delay
+        self.smoothing_window = None
+        if smoothing_window is not None:
+            self.smoothing_window = float(smoothing_window)
+
         self.threshold = threshold
         self.categories = None
-        self.ignore_list = []
+
+        if isinstance(ignore_list, str):
+            self.ignore_list = [x.trim() for x in ignore_list.split(',')]
+        elif isinstance(ignore_list, list):
+            self.ignore_list = ignore_list
+        elif ignore_list is None:
+            self.ignore_list = []
+        else:
+            raise Exception("Expecting ignore list to be a comma separated list or a python list of strings")
+
         if categories_file:
             with open(categories_file, "r") as fp:
                 self.categories = [e.strip() for e in fp.readlines()]
-            self.ignore_list += [i for i in self.categories if i.startswith("_")]
 
         self.using_map = False
         if os.path.splitext(model_path)[1] == ".ell":
@@ -54,10 +66,12 @@ class AudioClassifier:
         self.output_shape = (ts.rows, ts.columns, ts.channels)
         self.input_size = int(self.model.input_shape.Size())
         self.output_size = int(self.model.output_shape.Size())
-        self.items = []
-        self.start_time = None
+        self.smoothing_items = []
         self.total_time = 0
         self.count = 0
+
+    def get_metadata(self, name):
+        return self.model.get_metadata(name)
 
     def set_log(self, logfile):
         """ provide optional log file to write the raw un-smoothed predictions to """
@@ -77,7 +91,7 @@ class AudioClassifier:
         if self.logfile:
             self.logfile.write("{}\n".format(",".join([str(x) for x in output])))
 
-        if self.smoothing_delay:
+        if self.smoothing_window:
             output = self._smooth(output)
 
         prediction = self._get_prediction(output)
@@ -92,6 +106,9 @@ class AudioClassifier:
 
     def reset(self):
         self.model.reset()
+
+    def clear_smoothing(self):
+        self.smoothing_window = []
 
     def _get_prediction(self, output):
         """ handles scalar and vector predictions """
@@ -109,21 +126,15 @@ class AudioClassifier:
         return None
 
     def _smooth(self, predictions):
-        """ smooth the predictions over a time delay window """
-        now = time.time()
-        # if we get more than 1 second delay then reset our state
-        if self.start_time is None or now > self.start_time + 1:
-            self.start_time = now
-            self.items = []
+        """ smooth the predictions over a given window size """
 
-        # trim to our delay window
-        new_items = [x for x in self.items if x[0] + self.smoothing_delay >= now]
-        new_items += [(now, predictions)]  # add our new item
-        self.items = new_items
+        self.smoothing_items += [predictions]  # add our new item
+        # trim to our smoothing window size
+        if len(self.smoothing_items) > self.smoothing_window:
+            del self.smoothing_items[0]
 
         # compute summed probabilities over this new sliding window
-        sum = np.sum([p[1] for p in new_items], axis=0)
-        return sum / len(new_items)
+        return np.mean(self.smoothing_items, axis=0)
 
     def avg_time(self):
         """ get the average prediction time """

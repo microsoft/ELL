@@ -867,7 +867,7 @@ class ConvertGRU(ConvertBase):
         recurrentActivation = self.importer_node.attributes["recurrent_activation"]
 
         # Get the port elements for the reset trigger
-        if len(self.importer_node.inputs) > 1:
+        if len(self.importer_node.inputs) > 1 and self.importer_node.inputs[1] != '':
             reset_port_elements, reset_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(
                 self.importer_node, 1)
         else:
@@ -1728,6 +1728,40 @@ class ConvertReshape(ConvertBase):
         # to be the reshape's input node
         input_owner = lookup_table.get_owning_node_for_output(self.importer_node.inputs[0])
         lookup_table.add_imported_ell_node(self.importer_node, input_owner, set_group_id=False)
+
+
+class ConvertReorder(ConvertBase):
+    """
+    Converter for Reshape
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node)
+        self.required_weights = []
+        self.required_attributes = ["order"]
+
+    def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Return the appropriate ELL node
+        """
+        return None
+
+    def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Derived classes override to convert the importer node to appropriate ELL node(s)
+        and insert into the model
+        """
+        model = conversion_parameters["model"]
+        builder = conversion_parameters["builder"]
+        lookup_table = conversion_parameters["lookup_table"]
+
+        input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
+
+        order = list(np.array(self.importer_node.attributes["order"]).astype(np.int))
+        # Create the reorder node
+        reorder_node = builder.AddReorderDataNode(model, input_port_elements, order)
+        # Register the mapping
+        lookup_table.add_imported_ell_node(self.importer_node, reorder_node)
+        input_port_elements = lookup_table.get_output_port_elements_for_node(reorder_node)
 
 
 class ConvertConstant(ConvertBase):

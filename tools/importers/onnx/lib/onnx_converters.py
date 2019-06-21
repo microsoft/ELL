@@ -104,8 +104,8 @@ class OnnxNodeConverter(object):
         node = common.converters.ImporterNode(
             id=name,
             operation_type=self.op_type,
-            inputs=list(id for id in onnx_node.input if id != ''),
-            outputs=list(id for id in onnx_node.output if id != ''),
+            inputs=list(id for id in onnx_node.input),
+            outputs=list(id for id in onnx_node.output),
             metadata={"op_type": self.op_type, "name": name}
         )
         self.node = node
@@ -113,7 +113,7 @@ class OnnxNodeConverter(object):
         # assuming onnx_node is of type: NodeProto, this performs some common conversion operations
         onnx_attributes = Attributes.from_onnx(onnx_node.attribute)
         node.attributes = self.get_attributes(onnx_attributes)
-        node.onnx_attributes = onnx_attributes,
+        node.onnx_attributes = onnx_attributes
         node.onnx_node = onnx_node
         node.input_shapes = self.get_input_shapes()
         node.output_shapes = self.get_output_shapes()
@@ -173,7 +173,13 @@ class OnnxNodeConverter(object):
         return self.converter.get_order(shape)
 
     def get_input_shapes(self):
-        return [self.get_input_shape(id) for id in self.node.inputs]
+        result = []
+        for id in self.node.inputs:
+            if id:
+                result += [self.get_input_shape(id)]
+            else:
+                result += [None]
+        return result
 
     def get_input_shape(self, id: str):
         """ return the shape of this input """
@@ -279,24 +285,28 @@ class OnnxCastConverter(OnnxNodeConverter):
 
     def convert(self, node: NodeProto):
         node = super().convert(node)
+        if self.is_constant_input(node):
+            self.node.operation_type = "Skip"
+            self.constant_cast()  # do it!
         return node
 
     def get_attributes(self, attrs: Attributes):
         attributes = {}
         enum_val = attrs["to"]
-        if enum_val == 1 or enum_val == 10:
+        if enum_val == TensorProto.FLOAT or enum_val == TensorProto.FLOAT16:
             # float or float16
             cast_to = ell.nodes.PortType.smallReal
-        elif enum_val == 11:
+        elif enum_val == TensorProto.DOUBLE:
             cast_to = ell.nodes.PortType.real
-        elif 2 <= enum_val <= 6 or enum_val == 12:
+        elif enum_val in [TensorProto.INT8, TensorProto.UINT8, TensorProto.INT16, TensorProto.UINT16,
+                          TensorProto.INT32, TensorProto.UINT32]:
             # small integer types
             cast_to = ell.nodes.PortType.integer
-        elif enum_val == 7 or enum_val == 13:
+        elif enum_val == TensorProto.INT64 or enum_val == TensorProto.UINT64:
             cast_to = ell.nodes.PortType.bigInt
-        elif enum_val == 9:
+        elif enum_val == TensorProto.BOOL:
             cast_to = ell.nodes.PortType.boolean
-        elif enum_val == 8:
+        elif enum_val == TensorProto.STRING:
             # string
             cast_to = ell.nodes.PortType.categorical
         else:
@@ -306,6 +316,40 @@ class OnnxCastConverter(OnnxNodeConverter):
 
     def get_output_shapes(self):
         return [self.node.input_shapes[0]]
+
+    def constant_cast(self):
+        for t in self.get_input_tensors():
+            t = t[1]
+            enum_val = self.node.onnx_attributes["to"]
+            if enum_val == TensorProto.FLOAT16:
+                t = np.array(t).astype(np.float16)
+            if enum_val == TensorProto.FLOAT:
+                t = np.array(t).astype(np.float32)
+            elif enum_val == TensorProto.DOUBLE:
+                t = np.array(t).astype(np.float64)
+            elif enum_val == TensorProto.INT8:
+                t = np.array(t).astype(np.int8)
+            elif enum_val == TensorProto.UINT8:
+                t = np.array(t).astype(np.uint8)
+            elif enum_val == TensorProto.INT16:
+                t = np.array(t).astype(np.int16)
+            elif enum_val == TensorProto.UINT16:
+                t = np.array(t).astype(np.uint16)
+            elif enum_val == TensorProto.INT32:
+                t = np.array(t).astype(np.int32)
+            elif enum_val == TensorProto.UINT32:
+                t = np.array(t).astype(np.uint32)
+            elif enum_val == TensorProto.INT64:
+                t = np.array(t).astype(np.int64)
+            elif enum_val == TensorProto.UINT64:
+                t = np.array(t).astype(np.uint64)
+            elif enum_val == TensorProto.BOOL:
+                t = np.array(t).astype(np.bool)
+            elif enum_val == TensorProto.STRING:
+                t = np.array(t).astype(np.str)
+            else:
+                raise Exception("Cast type {} is not supported".format(enum_val))
+            self.add_tensor(self.node.id, t)
 
 
 class OnnxPlusConverter(OnnxNodeConverter):
@@ -389,6 +433,13 @@ class OnnxMulConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "ElementwiseMul")
 
+    def convert(self, node: NodeProto):
+        node = super().convert(node)
+        if self.is_constant_input(node):
+            self.node.operation_type = "Skip"
+            self.multiply_constants()  # do it!
+        return node
+
     def get_output_shapes(self):
         input_shapes = self.node.input_shapes
         if len(input_shapes) != 2:
@@ -400,9 +451,22 @@ class OnnxMulConverter(OnnxNodeConverter):
             # use numpy to compute broadcast result
             a = np.zeros(input_shapes[0][0])
             b = np.zeros(input_shapes[1][0])
-            c = np.matmul(a, b)
+            if a.shape == () or b.shape == ():
+                c = np.array(a * b)
+            else:
+                c = np.matmul(a, b)
             s = c.shape
             return [(s, self.get_order(s))]
+
+    def multiply_constants(self):
+        tensors = self.get_input_tensors()
+        a = np.array(tensors[0][1])
+        b = np.array(tensors[1][1])
+        if a.shape == () or b.shape == ():
+            c = np.array(a * b)
+        else:
+            c = np.matmul(a, b)
+        self.add_tensor(self.node.id, c)
 
 
 class OnnxConstantConverter(OnnxNodeConverter):
@@ -517,6 +581,8 @@ class OnnxAtenConverter(OnnxNodeConverter):
 class OnnxConstantFillConverter(OnnxNodeConverter):
     def __init__(self, converter):
         # The operator fills the elements of the output tensor with a constant value specified by the 'value' attribute.
+        # This node type is now obsolete, see:
+        # https://github.com/onnx/onnx/pull/1434/commits/d01874377b311120cc27bd459b2a51f8991c3fdc
         super().init(converter, "Skip")
 
     def get_attributes(self, attrs: Attributes):
@@ -551,35 +617,39 @@ class OnnxConstantFillConverter(OnnxNodeConverter):
 
     def get_output_shapes(self):
         # return the un-transposed shape
-        if "input_as_shape" in self.node.attributes:
-            id = self.node.attributes["input_as_shape"]
-            t = self.converter.get_tensor(str(id))[0]
-            shape = t.shape
-        elif "shape" in self.node.attributes:
-            shape = self.node.attributes["shape"]
-
+        shape = self.get_shape(self.node)
         return [(shape, self.get_order(shape))]
 
     def constant_fill(self, node):
-        if node.attributes["input_as_shape"]:
-            t = self.get_input_tensors()[0][1]
+        shape = self.get_shape(node)
+        value = 0
+        if "value" in node.attributes:
+            value = float(node.attributes["value"])
+        t = np.ones(shape) * value
+        self.add_tensor(node.id, t)
+
+    def get_shape(self, node):
+        if "input_as_shape" in node.attributes:
+            id = node.attributes["input_as_shape"]
+            if len(node.inputs) > 0:
+                id = node.inputs[0]
+            t = self.converter.get_tensor(str(id))[0]
             shape = tuple(t)
-            t = np.zeros(shape)
-            self.add_tensor(node.id, t)
+        elif "shape" in node.attributes:
+            shape = tuple(node.attributes["shape"])
         else:
-            raise Exception("constant_fill not implemented")
+            raise Exception("This version of obsolete ConstantFill is not implemented")
+        return tuple(shape)
 
 
 class OnnxTransposeConverter(OnnxNodeConverter):
     def __init__(self, converter):
-        super().init(converter, "Transpose")
+        super().init(converter, "Reorder")
 
     def convert(self, node: NodeProto):
         node = super().convert(node)
         if self.is_constant_input(node):
             self.transpose_tensor(node)
-        else:
-            raise Exception("non-constant transpose is not yet supported")
         return node
 
     def transpose_tensor(self, node):
@@ -591,7 +661,7 @@ class OnnxTransposeConverter(OnnxNodeConverter):
                 node.operation_type, node.id))
 
         t = input_tensors[0][1]
-        axes = node.attributes['perm']
+        axes = node.attributes['order']
 
         t2 = np.transpose(t, axes)
 
@@ -602,14 +672,16 @@ class OnnxTransposeConverter(OnnxNodeConverter):
 
     def get_attributes(self, attrs: Attributes):
         attributes = {
-            "perm": attrs["perm"]
+            "order": attrs["perm"]
         }
         return attributes
 
     def get_output_shapes(self):
-        # return the un-transposed shape
-        t = self.get_input_tensors()[0][1]
-        return [(t.shape, self.get_order(t.shape))]
+        t = self.node.input_shapes[0][0]
+        test = np.zeros(t)
+        axes = self.node.attributes['order']
+        t2 = np.transpose(test, axes)
+        return [(t2.shape, self.get_order(t2.shape))]
 
 
 class OnnxUnsqueezeConverter(OnnxNodeConverter):
@@ -644,13 +716,8 @@ class OnnxUnsqueezeConverter(OnnxNodeConverter):
         tensor = input_tensors[0][1]
         axes = list(node.attributes["axes"])
         axes.sort(reverse=True)
-        if input_tensors[0][2] == "scalar":
-            # ah, this is a special case created by OnnxGatherConverter, the tensor has
-            # already been unsqueezed.
-            pass
-        else:
-            for axis in axes:
-                tensor = np.expand_dims(tensor, axis)
+        for axis in axes:
+            tensor = np.expand_dims(tensor, axis)
         # turn the node into a constant tensor and the node will be skipped.
         self.add_tensor(node.id, tensor)
         s = tensor.shape
@@ -752,12 +819,8 @@ class OnnxGatherConverter(OnnxNodeConverter):
                 v = 0  # out of bounds
             else:
                 v = tensor[index]
-            # we really need to publish a "constant scalar" here but our
-            # only way of publishing constant values is as a tensor, so we turn
-            # it into a tensor and remember this fact by providing a special
-            # order called "scalar" so the next node can determine this fact.
-            t = np.array([v])
-            self.add_tensor(node.id, t, "scalar")
+            t = np.array(v)
+            self.add_tensor(node.id, t)
         else:
             import torch
             tensor = torch.tensor(tensor)
@@ -816,8 +879,10 @@ class OnnxConstantOfShapeConverter(OnnxNodeConverter):
 
 
 class OnnxSliceConverter(OnnxNodeConverter):
+
     def __init__(self, converter):
         super().init(converter, "Slice")
+        self.INFINITY = 9223372036854775807
 
     def convert(self, node: NodeProto):
         node = super().convert(node)
@@ -826,31 +891,61 @@ class OnnxSliceConverter(OnnxNodeConverter):
             self.slice_tensor(node)
         return node
 
+    def get_output_shapes(self):
+        node = self.node
+        input_shapes = node.input_shapes
+        if len(input_shapes) > 1:
+            raise Exception("Unsupported slice of multiple inputs on node {}_{}".format(
+                node.operation_type, node.id))
+        axes = self.node.attributes["axes"]
+        for i in range(len(axes)):
+            axis = axes[i]
+            shape = list(input_shapes[0][0])
+            starts = node.attributes["starts"][i]
+            ends = node.attributes["ends"][i]
+            if ends == self.INFINITY:
+                shape[axis] -= starts
+            else:
+                shape[axis] = ends - starts
+        shape = tuple(shape)
+        order = self.get_order(shape)
+        return [(shape, order)]
+
     def slice_tensor(self, node):
         input_tensors = self.get_input_tensors()
         if len(input_tensors) > 1:
             raise Exception("Unsupported slice of multiple inputs on node {}_{}".format(
                 node.operation_type, node.id))
         axes = node.attributes["axes"]
-        if len(axes) > 1:
-            raise Exception("Unsupported slice of multiple axes at once on node {}_{}".format(
-                node.operation_type, node.id))
         tensor = input_tensors[0][1]
-        axis = axes[0]
-        starts = node.attributes["starts"][0]
-        ends = node.attributes["ends"][0]
-        # chop the tensor t and add it to the global list of tensors
-        if axis == 0:
-            tensor = tensor[starts:ends, ]
-        elif axis == 1:
-            tensor = tensor[:, starts:ends, ]
-        elif axis == 2:
-            tensor = tensor[:, :, starts:ends, ]
-        elif axis == 3:
-            tensor = tensor[:, :, :, starts:ends, ]
-        else:
-            raise Exception("Unsupported slice of {} dimensiontal tensor in node {}_{}".format(
-                axis, node.operation_type, node.id))
+        for i in range(len(axes)):
+            axis = axes[i]
+            starts = node.attributes["starts"][i]
+            ends = node.attributes["ends"][i]
+            # chop the tensor t and add it to the global list of tensors
+            if axis == 0:
+                if ends == self.INFINITY:
+                    tensor = tensor[starts:, ]
+                else:
+                    tensor = tensor[starts:ends, ]
+            elif axis == 1:
+                if ends == self.INFINITY:
+                    tensor = tensor[:, starts:, ]
+                else:
+                    tensor = tensor[:, starts:ends, ]
+            elif axis == 2:
+                if ends == self.INFINITY:
+                    tensor = tensor[:, :, starts:, ]
+                else:
+                    tensor = tensor[:, :, starts:ends, ]
+            elif axis == 3:
+                if ends == self.INFINITY:
+                    tensor = tensor[:, :, :, starts:ends, ]
+                else:
+                    tensor = tensor[:, :, :, starts:ends, ]
+            else:
+                raise Exception("Unsupported slice of {} dimensional tensor in node {}_{}".format(
+                    axis, node.operation_type, node.id))
 
         # turn the node into a constant tensor and the node will be skipped.
         self.add_tensor(node.id, tensor)
@@ -876,14 +971,27 @@ class OnnxLSTMConverter(OnnxNodeConverter):
             "hidden_size": attrs["hidden_size"],
             # pytorch has fixed activation types
             "activation": ell.neural.ActivationType.tanh,
-            "recurrent_activation": ell.neural.ActivationType.sigmoid
+            "recurrent_activation": ell.neural.ActivationType.sigmoid,
+            "num_directions": 1
         }
+        if "direction" in attrs:
+            attributes["direction"] = attrs["direction"].decode()
+            if attributes["direction"] == "bidirectional":
+                attributes["num_directions"] = 2
         return attributes
 
     def get_output_shapes(self):
         hidden_size = self.node.attributes['hidden_size']
-        shape = (hidden_size,)
-        return [(shape, "channel")]
+        num_directions = self.node.attributes["num_directions"]
+        seq_length, batch_size, input_size = self.node.input_shapes[0][0]
+        if batch_size > 1:
+            raise Exception("ELL only supports a batch size of 1")
+        self.node.attributes["sequence_length"] = seq_length
+        Y_shape = ((seq_length, num_directions, 1, hidden_size), "seq-length,num-directions,batch_size,hidden-size")
+        Y_h_shape = ((num_directions, 1, hidden_size), "num-directions,batch_size,hidden-size")
+        Y_c_shape = Y_h_shape
+        # todo: we are not currently outputing Y_h and Y_c.
+        return [Y_shape, Y_h_shape, Y_c_shape]
 
     def reform_weights(self, weights, axis):
         # onnx layer order is: input, output, forget, cell.
@@ -894,6 +1002,7 @@ class OnnxLSTMConverter(OnnxNodeConverter):
     def get_weights(self):
         node = self.node
         units = int(node.attributes['hidden_size'])
+        num_directions = self.node.attributes["num_directions"]
 
         tensors = self.get_input_tensors()
         result = {}
@@ -907,7 +1016,8 @@ class OnnxLSTMConverter(OnnxNodeConverter):
         # stacked set of (input, forget, cell, output) weights to be applied to the hidden state
         stacked_hidden_weights = self.reform_weights(tensors[1][1], axis=1)
         # the stacked bias comes in as one tensor which we have to then split
-        bias_weights = tensors[2][1].reshape((2, units * 4))
+        size = units * 4 * num_directions
+        bias_weights = tensors[2][1].reshape((2, size))
         # stacked set of (input, forget, cell, output) input biases
         stacked_input_bias = self.reform_weights(bias_weights[0], axis=0)
         # stacked set of (input, forget, cell, output) hidden biases
@@ -945,18 +1055,30 @@ class OnnxGRUConverter(OnnxNodeConverter):
             "hidden_size": attrs["hidden_size"],
             # pytorch has fixed activation types
             "activation": ell.neural.ActivationType.tanh,
-            "recurrent_activation": ell.neural.ActivationType.sigmoid
+            "recurrent_activation": ell.neural.ActivationType.sigmoid,
+            "num_directions": 1
         }
+        if "direction" in attrs:
+            attributes["direction"] = attrs["direction"].decode()
+            if attributes["direction"] == "bidirectional":
+                attributes["num_directions"] = 2
         return attributes
 
     def get_output_shapes(self):
         hidden_size = self.node.attributes['hidden_size']
-        shape = (hidden_size,)
-        return [(shape, "channel")]
+        num_directions = self.node.attributes["num_directions"]
+        seq_length, batch_size, input_size = self.node.input_shapes[0][0]
+        if batch_size > 1:
+            raise Exception("ELL only supports a batch size of 1")
+        self.node.attributes["sequence_length"] = seq_length
+        Y_shape = ((seq_length, num_directions, 1, hidden_size), "seq-length,num-directions,batch_size,hidden-size")
+        Y_h_shape = ((num_directions, 1, hidden_size), "num_directions,batch_size,hidden_size")
+        return [Y_shape, Y_h_shape]
 
     def get_weights(self):
         node = self.node
         units = int(node.attributes['hidden_size'])
+        num_directions = self.node.attributes["num_directions"]
 
         tensors = self.get_input_tensors()
         result = {}
@@ -971,8 +1093,9 @@ class OnnxGRUConverter(OnnxNodeConverter):
         stacked_input_weights = tensors[0][1]
         # stacked set of update, reset, hidden weights to be applied to the hidden state
         stacked_hidden_weights = tensors[1][1]
+        size = units * 3 * num_directions
         # the stacked bias comes in as one tensor which we have to then split
-        bias_weights = tensors[2][1].reshape((2, units * 3))
+        bias_weights = tensors[2][1].reshape((2, size))
         # stacked set of update, reset, hidden input biases
         stacked_input_bias = bias_weights[0]
         # stacked set of update, reset, hidden hidden biases
@@ -1025,7 +1148,12 @@ class OnnxConcatConverter(OnnxNodeConverter):
         node = super().convert(node)
         if self.is_constant_input(node):
             self.node.operation_type = "Skip"
-            self.splice_tensor(node)
+            self.splice_constant(node)
+
+        # we might be concatenating data with constant tensors, and in this case we need to remove the
+        # input tensors.  bugbug: need to fix this mess, the common importer needs to handle input tensors
+        # properly.
+        self.remove_input_tensors(node)
         return node
 
     def get_attributes(self, attrs: Attributes):
@@ -1112,7 +1240,7 @@ class OnnxConcatConverter(OnnxNodeConverter):
 
         return dim
 
-    def splice_tensor(self, node):
+    def splice_constant(self, node):
         axis = node.attributes['axis']
         add = [t[1] for t in self.get_input_tensors()]
         # concat on the given axis.
@@ -1189,10 +1317,25 @@ class OnnxReshapeConverter(OnnxNodeConverter):
     def get_output_shapes(self):
         # second input is the tensor that describes how to reshape the input.
         tensor = self.get_tensor(self.node.inputs[1])[0]
-        a = np.zeros(self.node.input_shapes[0][0])
-        b = a.reshape(tensor)
-        s = b.shape
-        return [(s, self.get_order(s))]
+        input_shape = self.node.input_shapes[0][0]
+        shape = list(tensor)
+        minus_one = None
+        for i in range(len(shape)):
+            if shape[i] == 0:
+                # A dimension could also be 0, in which case the actual dimension value is unchanged
+                # (i.e. taken from the input tensor).
+                shape[i] = input_shape[i]
+            elif shape[i] == -1:
+                # At most one dimension of the new shape can be -1. In this case, the value is inferred from the size
+                # of the tensor and the remaining dimensions.
+                shape[i] = 1
+                minus_one = i
+        if minus_one is not None:
+            # remainder goes into the -1 dimension
+            shape[minus_one] = int(np.product(input_shape) / np.product(shape))
+
+        shape = tuple(shape)
+        return [(shape, self.get_order(shape))]
 
 
 class OnnxMatMulConverter(OnnxNodeConverter):
@@ -1203,13 +1346,31 @@ class OnnxMatMulConverter(OnnxNodeConverter):
         attributes = {"transpose": False}
         return attributes
 
+    def squeeze(self, shape):
+        # remove dimensions of size 1, since ELL can easily reinterpret those away.
+        squeezed = [x for x in list(shape) if x != 1]
+        return tuple(squeezed)
+
     def get_2d_shape(self, shape):
+        shape = self.squeeze(shape)
         if len(shape) == 1:
             return (1, shape[0])
         elif len(shape) == 2:
             return shape
         elif len(shape) == 3:
             raise Exception("3d shape not supported yet")
+
+    def get_input_shapes(self):
+        result = []
+        for id in self.node.inputs:
+            if id:
+                # re-interpret the input shape as a 2d matrix dimension.
+                t = self.get_input_shape(id)
+                shape = self.get_2d_shape(t[0])
+                result += [(shape, self.get_order(shape))]
+            else:
+                result += [None]
+        return result
 
     def get_output_shapes(self):
         # now compute the output size
@@ -1218,8 +1379,8 @@ class OnnxMatMulConverter(OnnxNodeConverter):
             return [self.node.input_shapes[2]]
 
         if len(self.node.input_shapes) == 2:
-            n, m1 = self.get_2d_shape(self.node.input_shapes[0][0])
-            m2, p = self.get_2d_shape(self.node.input_shapes[1][0])
+            n, m1 = self.node.input_shapes[0][0]
+            m2, p = self.node.input_shapes[1][0]
 
             if m1 == m2:
                 pass  # good
@@ -1708,7 +1869,10 @@ class OnnxConverter:
 
         self.nodes.append(node)
         self.model.add_node(node.id, node)
-        self.output_shapes[node.id] = node.output_shapes[0]
+        for i in range(len(node.outputs)):
+            id = node.outputs[i]
+            shape = node.output_shapes[i]
+            self.output_shapes[id] = shape
 
     def define_constant_inputs(self, node):
         for x in node.inputs:
@@ -1774,5 +1938,7 @@ class OnnxConverter:
             return 'channel_row_column'
         elif tensor_len == 2:
             return 'row_column'
-        else:
+        elif tensor_len == 1:
             return 'channel'
+        else:
+            return 'scalar'

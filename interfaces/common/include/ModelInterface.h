@@ -286,6 +286,7 @@ public:
     Node AddNeuralNetworkPredictor(Node input, ell::api::predictors::NeuralNetworkPredictor predictor);
     OutputNode AddOutput(const PortMemoryLayout& memoryLayout, Node input);
     Node AddReinterpretLayout(Node input, PortMemoryLayout outputMemoryLayout);
+    Node AddReorderData(Node input, std::vector<int> order);
     Node AddReorderData(Node input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order = {}, double outputPaddingValue = 0.0);
     Node AddRNN(Node input, Node reset, size_t hiddenUnits, Node inputWeights, Node hiddenWeights, Node inputBias, Node hiddenBias, ell::api::predictors::neural::ActivationType activation);
     SinkNode AddSink(Node input, const PortMemoryLayout& memoryLayout, const std::string& sinkFunctionName, Node trigger = Node());

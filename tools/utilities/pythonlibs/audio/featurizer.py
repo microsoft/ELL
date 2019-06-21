@@ -42,7 +42,20 @@ class AudioTransform:
         self.output_shape = (ts.rows, ts.columns, ts.channels)
         self.input_size = int(self.model.input_shape.Size())
         self.output_size = int(self.model.output_shape.Size())
+
+        # if the featurizer is buffering input internally, then we need
+        # to "prime" the input to that buffer until the buffer is full
+        # so we don't return featurized "zeros" because the buffer not yet full.
+        self.drop_frames = 0
+        value = self.get_metadata("window_size")
+        if value:
+            buffer_size = int(value)
+            self.drop_frames = int(buffer_size / self.input_size)
+        self.dropped = 0
         self.reset()
+
+    def get_metadata(self, name):
+        return self.model.get_metadata(name)
 
     def set_log(self, logfile):
         """ Provide optional log file for saving raw featurizer output """
@@ -53,18 +66,28 @@ class AudioTransform:
         self.audio_source = audio_source
         self.frame_count = 0
         self.total_time = 0
+        self.dropped = 0
+        self.auto_scale = False
+        if hasattr(audio_source, "auto_scale"):
+            self.auto_scale = audio_source.auto_scale
         self.reset()
 
     def read(self):
         """ Read the next output from the featurizer """
         data = self.audio_source.read()
+        while self.dropped < self.drop_frames:
+            data = self.audio_source.read()
+            self.dropped += 1
         if data is None:
             self.eof = True
             if self.output_window_size != 0 and self.frame_count % self.output_window_size != 0:
-                # keep returning zeros until we fill the window size
-                self.frame_count += 1
-                return np.zeros((self.output_size))
-            return None
+                # keep returning low volume random noise until we fill the window size
+                scale = 8.0
+                if self.auto_scale:
+                    scale /= 32767
+                data = np.random.normal(scale=scale, size=self.input_size)
+            else:
+                return None
 
         if self.logfile:
             self.logfile.write("{}\n".format(",".join([str(x) for x in data])))

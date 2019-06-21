@@ -65,14 +65,16 @@ def make_vad(output_filename, sample_rate, input_size, output_size, vad_options)
     vad_options         - JSON file containing VAD parameters
     """
 
-    frame_duration = sample_rate / input_size
+    frame_duration = input_size / sample_rate
 
     # Create output directory if necessary
     output_directory = os.path.dirname(output_filename)
     if output_directory and not os.path.isdir(output_directory):
         os.makedirs(output_directory)
 
-    if isinstance(vad_options, str):
+    if vad_options is None:
+        options = VAD_DEFAULTS
+    elif isinstance(vad_options, str):
         options = load_vad_options(vad_options)
     else:
         options = vad_options

@@ -463,6 +463,29 @@ Node ModelBuilder::AddReorderDataNode(Model model, PortElements input, PortMemor
     return Node(newNode, model.GetModel());
 }
 
+Node ModelBuilder::AddReorderDataNode(Model model, PortElements input, std::vector<int> order)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel()->AddNode<ell::nodes::ReorderDataNode<double>>(
+            ell::model::PortElements<double>(elements),
+            order);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel()->AddNode<ell::nodes::ReorderDataNode<float>>(
+            ell::model::PortElements<float>(elements),
+            order);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create ReorderDataNode of the requested type");
+    }
+    return Node(newNode, model.GetModel());
+}
+
 SinkNode ModelBuilder::AddSinkNode(Model model, PortElements input, const PortMemoryLayout& memoryLayout, const std::string& sinkFunctionName, PortElements trigger)
 {
     auto type = input.GetType();
