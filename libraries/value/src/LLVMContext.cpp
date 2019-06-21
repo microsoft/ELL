@@ -1328,6 +1328,41 @@ namespace value
         }
     }
 
+    void LLVMContext::DebugDumpImpl(FunctionDeclaration fn, std::string tag, std::ostream& stream) const
+    {
+        llvm::raw_os_ostream llvmStream(stream);
+
+        auto& irEmitter = _emitter.GetIREmitter();
+
+        const auto& fnName = fn.GetFunctionName();
+        if (!_emitter.HasFunction(fnName))
+        {
+            const auto& argTypes = fn.GetParameterTypes();
+            const auto& returnType = fn.GetReturnType();
+            auto resultType = [&] {
+                if (returnType)
+                {
+                    return ValueTypeToLLVMType(irEmitter, { returnType->GetBaseType(), returnType->PointerLevel() });
+                }
+                else
+                {
+                    return ValueTypeToLLVMType(irEmitter, { ValueType::Void, 0 });
+                }
+            }();
+
+            std::vector<LLVMType> paramTypes(argTypes.size());
+            std::transform(argTypes.begin(), argTypes.end(), paramTypes.begin(), [&](const auto& value) {
+                return ValueTypeToLLVMType(irEmitter, { value.GetBaseType(), value.PointerLevel() });
+            });
+
+            auto fnType = llvm::FunctionType::get(resultType, paramTypes, false);
+            _emitter.DeclareFunction(fnName, fnType);
+        }
+        auto llvmFn = _emitter.GetFunction(fnName);
+
+        emitters::DebugDump(llvmFn, tag, &llvmStream);
+    }
+
     Value LLVMContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)
     {
         static std::unordered_map<FunctionDeclaration, std::function<Value(IRFunctionEmitter&, std::vector<Value>)>> intrinsics = {
@@ -1379,26 +1414,30 @@ namespace value
         auto& fnEmitter = GetFunctionEmitter();
 
         const auto& returnType = externalFunc.GetReturnType();
-        auto resultType = [&] {
-            if (returnType)
-            {
-                return ValueTypeToLLVMType(irEmitter, { returnType->GetBaseType(), returnType->PointerLevel() });
-            }
-            else
-            {
-                return ValueTypeToLLVMType(irEmitter, { ValueType::Void, 0 });
-            }
-        }();
-
-        std::vector<LLVMType> paramTypes(argTypes.size());
-        std::transform(argTypes.begin(), argTypes.end(), paramTypes.begin(), [&](const auto& value) {
-            return ValueTypeToLLVMType(irEmitter, { value.GetBaseType(), value.PointerLevel() });
-        });
 
         // Create external function declaration
         const auto& fnName = externalFunc.GetFunctionName();
-        auto fnType = llvm::FunctionType::get(resultType, paramTypes, false);
-        _emitter.DeclareFunction(fnName, fnType);
+        if (!_emitter.HasFunction(fnName))
+        {
+            auto resultType = [&] {
+                if (returnType)
+                {
+                    return ValueTypeToLLVMType(irEmitter, { returnType->GetBaseType(), returnType->PointerLevel() });
+                }
+                else
+                {
+                    return ValueTypeToLLVMType(irEmitter, { ValueType::Void, 0 });
+                }
+            }();
+
+            std::vector<LLVMType> paramTypes(argTypes.size());
+            std::transform(argTypes.begin(), argTypes.end(), paramTypes.begin(), [&](const auto& value) {
+                return ValueTypeToLLVMType(irEmitter, { value.GetBaseType(), value.PointerLevel() });
+            });
+
+            auto fnType = llvm::FunctionType::get(resultType, paramTypes, false);
+            _emitter.DeclareFunction(fnName, fnType);
+        }
         auto fn = _emitter.GetFunction(fnName);
 
         // as a first approximation, if the corresponding arg type has a pointer level that's one less

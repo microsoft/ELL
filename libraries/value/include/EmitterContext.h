@@ -258,6 +258,7 @@ namespace value
         void Parallelize(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn);
 
         void DebugDump(Value value, std::string tag, std::ostream* stream) const;
+        void DebugDump(FunctionDeclaration fn, std::string tag, std::ostream* stream) const;
 
     protected:
         const std::vector<std::reference_wrapper<FunctionDeclaration>>& GetIntrinsics() const;
@@ -301,6 +302,7 @@ namespace value
         virtual void ParallelizeImpl(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn) = 0;
 
         virtual void DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const = 0;
+        virtual void DebugDumpImpl(FunctionDeclaration fn, std::string tag, std::ostream& stream) const = 0;
     };
 
     /// <summary> Returns the global instance of EmitterContext </summary>
@@ -470,6 +472,7 @@ namespace value
                               utilities::ScalarLayout);
     }
 
+    void DebugDump(FunctionDeclaration fn, std::string tag = "", std::ostream* stream = nullptr);
     void DebugDump(Value value, std::string tag = "", std::ostream* stream = nullptr);
 
     template <typename ViewType, std::enable_if_t<std::is_same_v<decltype(std::declval<ViewType>().GetValue()), Value>, void*> = nullptr>

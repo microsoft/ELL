@@ -244,6 +244,13 @@ namespace value
         }
     }
 
+    void EmitterContext::DebugDump(FunctionDeclaration fn, std::string tag, std::ostream* stream) const
+    {
+        std::ostream& outStream = stream != nullptr ? *stream : std::cerr;
+
+        DebugDumpImpl(fn, tag, outStream);
+    }
+
     const std::vector<std::reference_wrapper<FunctionDeclaration>>& EmitterContext::GetIntrinsics() const
     {
         static std::vector intrinsics = {
@@ -324,6 +331,11 @@ namespace value
     void ForRange(Scalar start, Scalar end, Scalar step, std::function<void(Scalar)> fn)
     {
         GetContext().For(start, end, step, fn);
+    }
+
+    void DebugDump(FunctionDeclaration fn, std::string tag, std::ostream* stream)
+    {
+        GetContext().DebugDump(fn, tag, stream);
     }
 
     void DebugDump(Value value, std::string tag, std::ostream* stream)

@@ -84,6 +84,7 @@ namespace value
         void ParallelizeImpl(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn) override;
 
         void DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const override;
+        void DebugDumpImpl(FunctionDeclaration fn, std::string tag, std::ostream& stream) const override;
 
         Value IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args);
 

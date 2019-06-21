@@ -1061,28 +1061,68 @@ namespace value
         }
     }
 
+    namespace
+    {
+        void PrintValue(const Value& value, std::ostream& stream)
+        {
+            if (!value.IsEmpty())
+            {
+                std::visit(
+                    [&stream](auto&& data) {
+                        using Type = std::decay_t<decltype(data)>;
+                        if constexpr (std::is_same_v<Type, Emittable>)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            using DataTypeTemp = std::remove_pointer_t<Type>;
+                            using DataType = std::conditional_t<std::is_same_v<DataTypeTemp, utilities::Boolean>, bool, DataTypeTemp>;
+                            stream << utilities::TypeName<DataType>::GetName();
+                        }
+                    },
+                    value.GetUnderlyingData());
+            }
+            else
+            {
+                stream << ToString(value.GetBaseType());
+            }
+            stream << "@(" << value.GetLayout() << ")";
+        }
+    } // namespace
+
     void ComputeContext::DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const
     {
-        std::visit(
-            [&tag, &stream, &value](auto&& data) {
-                using Type = std::decay_t<decltype(data)>;
-                if constexpr (std::is_same_v<Type, Emittable>)
-                {
-                    return;
-                }
-                else
-                {
-                    using DataTypeTemp = std::remove_pointer_t<Type>;
-                    using DataType = std::conditional_t<std::is_same_v<DataTypeTemp, utilities::Boolean>, bool, DataTypeTemp>;
-                    stream << utilities::TypeName<DataType>::GetName() << " (" << value.GetLayout() << ")";
-                    if (!tag.empty())
-                    {
-                        stream << " [tag = " << tag << "]";
-                    }
-                    stream << "\n";
-                }
-            },
-            value.GetUnderlyingData());
+        PrintValue(value, stream);
+        if (!tag.empty())
+        {
+            stream << " [tag = " << tag << "]";
+        }
+        stream << "\n";
+    }
+
+    void ComputeContext::DebugDumpImpl(FunctionDeclaration fn, std::string tag, std::ostream& stream) const
+    {
+        stream << (IsFunctionDefined(fn) ? "Defined " : "Undefined ") << "function: " << fn.GetFunctionName() << "(";
+        if (const auto& paramTypes = fn.GetParameterTypes(); !paramTypes.empty())
+        {
+            for (auto it = paramTypes.begin(); it != paramTypes.end() - 1; ++it)
+            {
+                PrintValue(*it, stream);
+                stream << ", ";
+            }
+            PrintValue(paramTypes.back(), stream);
+        }
+        stream << ") -> ";
+        if (const auto& returnType = fn.GetReturnType(); returnType)
+        {
+            PrintValue(*returnType, stream);
+        }
+        else
+        {
+            stream << "void";
+        }
+        stream << "\n";
     }
 
     Value ComputeContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)

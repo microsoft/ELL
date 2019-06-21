@@ -332,7 +332,7 @@ namespace utilities
         const auto numDim = NumDimensions();
         std::vector<int> result(numDim);
         int offset = static_cast<int>(index);
-        for(int d = 0; d < numDim; ++d)
+        for (int d = 0; d < numDim; ++d)
         {
             const int thisExtent = static_cast<int>(GetCumulativeIncrement(d));
             const int x = offset / thisExtent;
@@ -341,7 +341,7 @@ namespace utilities
         }
         return result;
     }
-    
+
     MemoryCoordinates MemoryLayout::GetLogicalCoordinates(const MemoryCoordinates& physicalCoordinates) const
     {
         if (NumDimensions() != physicalCoordinates.NumDimensions())
@@ -684,9 +684,16 @@ namespace utilities
 
     std::ostream& operator<<(std::ostream& out, const utilities::MemoryLayout& layout)
     {
-        out << "active size (physical): " << layout.GetActiveSize();
-        out << " memory size (physical): " << layout.GetExtent();
-        out << " memory strides (physical): " << layout.GetCumulativeIncrement();
+        if (layout == ScalarLayout)
+        {
+            out << "scalar layout";
+        }
+        else
+        {
+            out << "active size (physical): " << layout.GetActiveSize();
+            out << " memory size (physical): " << layout.GetExtent();
+            out << " memory strides (physical): " << layout.GetCumulativeIncrement();
+        }
         return out;
     }
 

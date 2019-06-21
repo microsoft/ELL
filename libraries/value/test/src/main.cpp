@@ -226,9 +226,13 @@ void ComputeTest(std::string testName, std::function<Scalar()> defineFunction)
     // Run the test in the ComputeContext
     ContextGuard<ComputeContext> guard("Value_test_compute");
 
-    auto fn = DeclareFunction(testName)
-                  .Returns(Value(ValueType::Int32, ScalarLayout))
-                  .Define(defineFunction);
+    auto fnDecl = DeclareFunction(testName)
+                      .Returns(Value(ValueType::Int32, ScalarLayout));
+    auto fn = fnDecl.Define(defineFunction);
+
+#if 0 // Useful for debugging, dumps to stderr
+    DebugDump(fn);
+#endif // 0
 
     auto rc = fn().Get<int>();
     std::string msg = testName + ": Compute returned %d";
@@ -251,7 +255,11 @@ void LLVMJitTest(std::string testName, std::function<Scalar()> defineFunction)
 
     fn.Define(defineFunction);
 
-#if 0 // Useful for debugging
+#if 0 // Useful for debugging, dumps to stderr
+    DebugDump(fn);
+#endif // 0
+
+#if 0 // Useful for debugging, saves to file
     std::string llFilename = testName + ".ll";
     moduleEmitter.WriteToFile(llFilename, ell::emitters::ModuleOutputFormat::ir);
 #endif // 0
