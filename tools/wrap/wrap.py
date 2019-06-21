@@ -242,7 +242,7 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
 
         self.verbose = self.logger.getVerbose() or args.verbose
         if args.verbose:
-            self.logger.setLevel(logging.INFO)
+            self.logger.logger.setLevel(logging.INFO)
         self.llvm_format = args.llvm_format
         self.optimization_level = args.optimization_level
         self.no_opt_tool = args.no_opt_tool or self.optimization_level in ['0', 'g']
