@@ -1062,7 +1062,7 @@ class ConvertLSTM(ConvertBase):
         recurrentActivation = self.importer_node.attributes["recurrent_activation"]
 
         # Get the port elements for the reset trigger
-        if len(self.importer_node.inputs) > 1:
+        if len(self.importer_node.inputs) > 1 and self.importer_node.inputs[1] != '':
             reset_port_elements, reset_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(
                 self.importer_node, 1)
         else:
