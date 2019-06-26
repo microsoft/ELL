@@ -1294,6 +1294,15 @@ class ConvertCoordinatewiseMultiply(ConvertBinaryOperation):
         super().__init__(node, ell.nodes.BinaryOperationType.multiply)
 
 
+class ConvertCoordinatewiseDivide(ConvertBinaryOperation):
+
+    """
+    Converter for CoordinatewiseDivide which is doing element-wise division of two inputs.
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.BinaryOperationType.divide)
+
+
 class ConvertPooling(ConvertBase):
     """
     Converter for Pooling

@@ -52,6 +52,7 @@ operation_map = {
     "Cos": ConvertCos,
     "ElementTimes": ConvertScaling,
     "ElementwiseMul": ConvertCoordinatewiseMultiply,
+    "ElementwiseDiv": ConvertCoordinatewiseDivide,
     "Exp": ConvertExp,
     "FullyConnected": [ConvertFullyConnected, OptionalConvertBias, OptionalConvertActivation],
     "GRU": ConvertGRU,

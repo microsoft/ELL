@@ -469,6 +469,50 @@ class OnnxMulConverter(OnnxNodeConverter):
         self.add_tensor(self.node.id, c)
 
 
+class OnnxDivConverter(OnnxNodeConverter):
+    def __init__(self, converter):
+        super().init(converter, "ElementwiseDiv")
+
+    def convert(self, node: NodeProto):
+        node = super().convert(node)
+        if self.is_constant_input(node):
+            self.node.operation_type = "Skip"
+            self.divide_constants()  # do it!
+        return node
+
+    def get_output_shapes(self):
+        input_shapes = self.node.input_shapes
+        if len(input_shapes) != 2:
+            raise Exception("ElementwiseDiv requires 2 inputs")
+        # output shape depends on behavior of broadcasting.
+        if input_shapes[0] == input_shapes[1]:
+            return [input_shapes[0]]
+        else:
+            # use numpy to compute broadcast result
+            a = np.zeros(input_shapes[0][0])
+            b = np.ones(input_shapes[1][0])
+            if a.shape == () or b.shape == ():
+                c = np.array(a / b)
+            elif(a.shape == b.shape):
+                c = np.true_divide(a, b)
+            else:
+                raise Exception("ElementwiseDiv requires both inputs with same dimentions")
+            s = c.shape
+            return [(s, self.get_order(s))]
+
+    def divide_constants(self):
+        tensors = self.get_input_tensors()
+        a = np.array(tensors[0][1])
+        b = np.array(tensors[1][1])
+        if a.shape == () or b.shape == ():
+            c = np.array(a / b)
+        elif a.shape == b.shape:
+            c = np.true_divide(a, b)
+        else:
+            raise Exception("ElementwiseDiv requires both inputs with same dimentions")
+        self.add_tensor(self.node.id, c)
+
+
 class OnnxConstantConverter(OnnxNodeConverter):
     def __init__(self, converter):
         super().init(converter, "Constant")
@@ -1736,6 +1780,7 @@ ONNX_OP_TYPE_TO_CONVERTER_MAP = {
     "ConstantFill"            : OnnxConstantFillConverter,  # noqa E203
     "ConstantOfShape"         : OnnxConstantOfShapeConverter,  # noqa E203
     "Cos"                     : OnnxCosConverter,  # noqa E203
+    "Div"                     : OnnxDivConverter,  # noqa E203
     "Dropout"                 : OnnxPassthroughConverter,  # noqa E203
     "Exp"                     : OnnxExpConverter,  # noqa E203
     "Flatten"                 : OnnxFlattenConverter,  # noqa E203
