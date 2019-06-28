@@ -12,6 +12,7 @@
 #include "LLVMUtilities.h"
 
 #include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Instructions.h>
 
 namespace ell
 {
@@ -22,6 +23,14 @@ namespace emitters
     /// <summary> Base class for loop emitters. </summary>
     class IRLoopEmitter
     {
+    public:
+        virtual ~IRLoopEmitter() = default;
+    
+    protected:
+        IRLoopEmitter(IRFunctionEmitter& functionEmitter);
+        void AddLoopMetadata(llvm::BranchInst* branch, bool unroll, bool parallel);
+
+        IRFunctionEmitter& _functionEmitter; // Loop written into this function
     };
 
     /// <summary> Class that simplifies for loop creation. </summary>
@@ -90,7 +99,6 @@ namespace emitters
         void EmitIncrement(LLVMValue pIncrementValue);
         llvm::BasicBlock* PrepareBody();
 
-        IRFunctionEmitter& _functionEmitter; // Loop written into this function
         llvm::BasicBlock* _pInitializationBlock = nullptr; // The for loop is set up in this block - such as initializing iteration variables
         llvm::BasicBlock* _pConditionBlock = nullptr; // Here we do the loop termination check
         llvm::BasicBlock* _pBodyBlock = nullptr; // The body of the for loop
@@ -138,7 +146,6 @@ namespace emitters
         void EmitCondition(std::function<LLVMValue(IRFunctionEmitter&)> condition);
         llvm::BasicBlock* PrepareBody();
 
-        IRFunctionEmitter& _functionEmitter; // Loop written into this function
         llvm::BasicBlock* _pInitializationBlock = nullptr; // The loop is set up in this block
         llvm::BasicBlock* _pConditionBlock = nullptr; // Here we do the loop termination check
         llvm::BasicBlock* _pBodyBlock = nullptr; // The body of the loop

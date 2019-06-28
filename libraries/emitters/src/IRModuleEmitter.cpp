@@ -41,7 +41,7 @@ namespace ell
 namespace emitters
 {
     using namespace utilities::logging;
-    using utilities::logging::Log; 
+    using utilities::logging::Log;
     using namespace ell::utilities;
 
     //
@@ -860,11 +860,21 @@ namespace emitters
         auto compilerOptions = GetCompilerOptions();
         if (compilerOptions.optimize)
         {
+            std::stringstream sstr;
+            if (CheckForErrors(sstr))
+            {
+                auto errorString = sstr.str();
+                throw EmitterException(EmitterError::unexpected, "Module verification failed.\n\n" + errorString);
+            }
+
+            optimizer.BeginOptimizeFunctions();
             auto module = GetLLVMModule();
             for (auto& function : *module)
             {
                 optimizer.OptimizeFunction(&function);
             }
+            optimizer.EndOptimizeFunctions();
+
             optimizer.OptimizeModule(module);
         }
     }
@@ -946,13 +956,14 @@ namespace emitters
         auto relocModel = parameters.targetDevice.IsWindows() ? OutputRelocationModel::Static : OutputRelocationModel::PIC_;
         const llvm::TargetOptions options;
         const llvm::CodeModel::Model codeModel = llvm::CodeModel::Small;
-        return target->createTargetMachine(parameters.targetDevice.triple,
-                                           parameters.targetDevice.cpu,
-                                           parameters.targetDevice.features,
-                                           options,
-                                           relocModel,
-                                           codeModel,
-                                           llvm::CodeGenOpt::Level::Default);
+        auto tm = target->createTargetMachine(llvm::Triple::normalize(parameters.targetDevice.triple),
+                                              parameters.targetDevice.cpu,
+                                              parameters.targetDevice.features,
+                                              options,
+                                              relocModel,
+                                              codeModel,
+                                              parameters.optimize ? llvm::CodeGenOpt::Level::Aggressive : llvm::CodeGenOpt::Level::Default);
+        return tm;
     }
 
     std::unique_ptr<llvm::Module> IRModuleEmitter::TransferOwnership()
@@ -964,7 +975,7 @@ namespace emitters
 
     void IRModuleEmitter::SetTargetTriple(const std::string& triple)
     {
-        GetLLVMModule()->setTargetTriple(triple);
+        GetLLVMModule()->setTargetTriple(llvm::Triple::normalize(triple));
     }
 
     const llvm::DataLayout& IRModuleEmitter::GetTargetDataLayout() const
@@ -1116,17 +1127,39 @@ namespace emitters
 
         // Initialize all of the optimization passes (probably unnecessary)
         llvm::initializeCore(*registry);
-        llvm::initializeTransformUtils(*registry);
+        llvm::initializeCoroutines(*registry);
         llvm::initializeScalarOpts(*registry);
-        // llvm::initializeObjCARCOpts(*registry);
+        llvm::initializeObjCARCOpts(*registry);
         llvm::initializeVectorization(*registry);
-        llvm::initializeInstCombine(*registry);
-        llvm::initializeIPO(*registry); // IPO == interprocedural optimizations
-        llvm::initializeInstrumentation(*registry);
+        llvm::initializeIPO(*registry);
         llvm::initializeAnalysis(*registry);
-        llvm::initializeCodeGen(*registry);
-        llvm::initializeGlobalISel(*registry);
+        llvm::initializeTransformUtils(*registry);
+        llvm::initializeInstCombine(*registry);
+        llvm::initializeAggressiveInstCombine(*registry);
+        llvm::initializeInstrumentation(*registry);
         llvm::initializeTarget(*registry);
+        // For codegen passes, only passes that do IR to IR transformation are
+        // supported.
+        llvm::initializeExpandMemCmpPassPass(*registry);
+        llvm::initializeScalarizeMaskedMemIntrinPass(*registry);
+        llvm::initializeCodeGenPreparePass(*registry);
+        llvm::initializeAtomicExpandPass(*registry);
+        llvm::initializeRewriteSymbolsLegacyPassPass(*registry);
+        llvm::initializeWinEHPreparePass(*registry);
+        llvm::initializeDwarfEHPreparePass(*registry);
+        llvm::initializeSafeStackLegacyPassPass(*registry);
+        llvm::initializeSjLjEHPreparePass(*registry);
+        llvm::initializePreISelIntrinsicLoweringLegacyPassPass(*registry);
+        llvm::initializeGlobalMergePass(*registry);
+        llvm::initializeIndirectBrExpandPassPass(*registry);
+        llvm::initializeInterleavedLoadCombinePass(*registry);
+        llvm::initializeInterleavedAccessPass(*registry);
+        llvm::initializeEntryExitInstrumenterPass(*registry);
+        llvm::initializePostInlineEntryExitInstrumenterPass(*registry);
+        llvm::initializeUnreachableBlockElimLegacyPassPass(*registry);
+        llvm::initializeExpandReductionsPass(*registry);
+        llvm::initializeWasmEHPreparePass(*registry);
+        llvm::initializeWriteBitcodePassPass(*registry);
 
         return registry;
     }
@@ -1164,10 +1197,9 @@ namespace emitters
     /// <summary> Returns true if the CallbackRegistry objects contain some functions. </summary>
     bool IRModuleEmitter::HasCallbackFunctions() const
     {
-        return _floatCallbacks.HasCallbackFunctions() || _doubleCallbacks.HasCallbackFunctions() || _intCallbacks.HasCallbackFunctions() || 
-            _int64Callbacks.HasCallbackFunctions() || _boolCallbacks.HasCallbackFunctions();
+        return _floatCallbacks.HasCallbackFunctions() || _doubleCallbacks.HasCallbackFunctions() || _intCallbacks.HasCallbackFunctions() ||
+               _int64Callbacks.HasCallbackFunctions() || _boolCallbacks.HasCallbackFunctions();
     }
-
 
     //
     // Functions

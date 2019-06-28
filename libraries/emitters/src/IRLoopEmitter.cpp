@@ -19,6 +19,40 @@ namespace emitters
     const std::string LoopIncBlockName = "loop.inc";
     const std::string LoopAfterBlockName = "loop.after";
 
+    IRLoopEmitter::IRLoopEmitter(IRFunctionEmitter& functionEmitter) :
+        _functionEmitter(functionEmitter) {}
+
+    void IRLoopEmitter::AddLoopMetadata(llvm::BranchInst* branch, bool unroll, bool vectorize)
+    {
+        // Add metadata
+        auto& context = _functionEmitter.GetEmitter().GetContext();
+        std::vector<llvm::Metadata*> metadataElements;
+
+        // Reserve operand 0 for loop id self reference.
+        auto tempNode = llvm::MDNode::getTemporary(context, {});
+        metadataElements.push_back(tempNode.get());
+
+        if (unroll)
+        {
+            llvm::Metadata* vals[] = { llvm::MDString::get(context, "llvm.loop.unroll.enable"),
+                                       llvm::ConstantAsMetadata::get(llvm::ConstantInt::get(
+                                           llvm::Type::getInt1Ty(context), true)) };
+            metadataElements.push_back(llvm::MDNode::get(context, vals));
+        }
+
+        if (vectorize)
+        {
+            llvm::Metadata* vals[] = { llvm::MDString::get(context, "llvm.loop.vectorize.enable"),
+                                       llvm::ConstantAsMetadata::get(llvm::ConstantInt::get(
+                                           llvm::Type::getInt1Ty(context), true)) };
+            metadataElements.push_back(llvm::MDNode::get(context, vals));
+        }
+
+        auto loopID = llvm::MDNode::get(context, metadataElements);
+        loopID->replaceOperandWith(0, loopID);
+        branch->setMetadata("llvm.loop", loopID);
+    }
+
     // Blocks used in a for loop:
     //
     // _pInitializationBlock -- setup
@@ -29,7 +63,7 @@ namespace emitters
     //
 
     IRForLoopEmitter::IRForLoopEmitter(IRFunctionEmitter& functionEmitter) :
-        _functionEmitter(functionEmitter) {}
+        IRLoopEmitter(functionEmitter) {}
 
     void IRForLoopEmitter::CreateBlocks()
     {
@@ -88,9 +122,11 @@ namespace emitters
     {
         _functionEmitter.Branch(_pConditionBlock);
         _functionEmitter.SetCurrentBlock(_pConditionBlock);
-        {
-            _functionEmitter.Branch(comparison, _functionEmitter.Load(_pIterationVariable), pTestValue, _pBodyBlock, _pAfterBlock); // TODO: add loop metadata to the branch instruction
-        }
+        auto branchInst = _functionEmitter.Branch(comparison, _functionEmitter.Load(_pIterationVariable), pTestValue, _pBodyBlock, _pAfterBlock);
+        
+        bool unroll = false;
+        bool vectorize = false;
+        AddLoopMetadata(branchInst, unroll, vectorize);
     }
 
     void IRForLoopEmitter::EmitIncrement(LLVMValue pIncrementValue)
@@ -133,7 +169,7 @@ namespace emitters
     // IRWhileLoopEmitter
     //
     IRWhileLoopEmitter::IRWhileLoopEmitter(IRFunctionEmitter& functionEmitter) :
-        _functionEmitter(functionEmitter) {}
+        IRLoopEmitter(functionEmitter) {}
 
     void IRWhileLoopEmitter::CreateBlocks()
     {
@@ -189,9 +225,12 @@ namespace emitters
         _functionEmitter.Branch(_pConditionBlock);
         _functionEmitter.SetCurrentBlock(_pConditionBlock);
         auto conditionValue = condition(_functionEmitter);
-        _functionEmitter.Branch(conditionValue,
-                                _pBodyBlock,
-                                _pAfterBlock);
+        auto branchInst = _functionEmitter.Branch(conditionValue,
+                                                 _pBodyBlock,
+                                                 _pAfterBlock);
+        bool unroll = false;
+        bool vectorize = false;
+        AddLoopMetadata(branchInst, unroll, vectorize);
     }
 
     llvm::BasicBlock* IRWhileLoopEmitter::PrepareBody()

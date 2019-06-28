@@ -246,7 +246,7 @@ namespace emitters
 
             emitters::DebugDump(_pFunction, "", &out);
 
-            throw emitters::EmitterException(emitters::EmitterError::badFunctionDefinition, "Function verification failed for function" + _name + ":\n" + sstr.str());
+            throw emitters::EmitterException(emitters::EmitterError::badFunctionDefinition, "Function verification failed for function " + _name + ":\n" + sstr.str());
         }
     }
 
@@ -446,24 +446,24 @@ namespace emitters
         });
     }
 
-    void IRFunctionEmitter::Branch(llvm::BasicBlock* pDestinationBlock)
+    llvm::BranchInst* IRFunctionEmitter::Branch(llvm::BasicBlock* pDestinationBlock)
     {
         assert(pDestinationBlock != nullptr);
-        GetEmitter().Branch(pDestinationBlock);
+        return GetEmitter().Branch(pDestinationBlock);
     }
 
-    void IRFunctionEmitter::Branch(LLVMValue pConditionValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
+    llvm::BranchInst* IRFunctionEmitter::Branch(LLVMValue pConditionValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
     {
-        GetEmitter().Branch(pConditionValue, pThenBlock, pElseBlock);
+        return GetEmitter().Branch(pConditionValue, pThenBlock, pElseBlock);
     }
 
-    void IRFunctionEmitter::Branch(TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
+    llvm::BranchInst* IRFunctionEmitter::Branch(TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
     {
         LLVMValue pResult = Comparison(comparison, pValue, pTestValue);
-        Branch(pResult, pThenBlock, pElseBlock);
+        return Branch(pResult, pThenBlock, pElseBlock);
     }
 
-    void IRFunctionEmitter::Branch(LLVMValue pValue, bool testValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
+    llvm::BranchInst* IRFunctionEmitter::Branch(LLVMValue pValue, bool testValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock)
     {
         return Branch(GetEmitter().Comparison(pValue, testValue), pThenBlock, pElseBlock);
     }
@@ -1329,11 +1329,6 @@ namespace emitters
             }
             return tasks;
         }
-    }
-
-    void IRFunctionEmitter::Optimize(IROptimizer& optimizer)
-    {
-        optimizer.OptimizeFunction(GetFunction());
     }
 
     LLVMValue IRFunctionEmitter::Malloc(VariableType type, int64_t size)

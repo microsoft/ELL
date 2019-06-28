@@ -1464,7 +1464,7 @@ Scalar Parallelized_test1()
     Parallelize(
         NumThreads,
         std::tuple{ data },
-        std::function{ [&](Scalar id, Vector capturedData) {
+        std::function<void(Scalar, Vector)>{ [&](Scalar id, Vector capturedData) {
             ForRange(DataPerThread, [&](Scalar index) {
                 capturedData[id * DataPerThread + index] = id;
             });
@@ -1495,7 +1495,7 @@ Scalar Parallelized_test2()
     Parallelize(
         NumThreads,
         std::tuple{ data },
-        std::function{ [&](Scalar id, Vector capturedData) {
+        std::function<void(Scalar, Vector)>{ [&](Scalar id, Vector capturedData) {
             ForRange(DataPerThread, [&](Scalar index) {
                 capturedData[id * DataPerThread + index] = GetTID();
             });
@@ -1523,7 +1523,7 @@ Scalar Prefetch_test1()
     Parallelize(
         NumThreads,
         std::tuple{ A, B },
-        std::function{ [&](Scalar id, Vector A, Vector B) {
+        std::function<void(Scalar, Vector, Vector)>{ [&](Scalar id, Vector A, Vector B) {
             ForRange(DataPerThread, [&](Scalar index) {
                 A[id * DataPerThread + index] = GetTID();
                 B[id * DataPerThread + index] = GetTID() / 2;

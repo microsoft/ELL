@@ -466,14 +466,18 @@ namespace emitters
         /// <summary> Emit an unconditional branch to the given block. </summary>
         ///
         /// <param name="pDestinationBlock"> Pointer to the destination block. </param>
-        void Branch(llvm::BasicBlock* pDestinationBlock);
+        ///
+        /// <returns> Pointer to a llvm::BranchInst that represents the branch. </returns>
+        llvm::BranchInst* Branch(llvm::BasicBlock* pDestinationBlock);
 
         /// <summary> Emit a conditional branch. </summary>
         ///
         /// <param name="pConditionValue"> Pointer to the condition value. A nonzero value is interpreted as true, and zero as false. </param>
         /// <param name="pThenBlock"> Pointer to the THEN block. </param>
         /// <param name="pElseBlock"> Pointer to the ELSE block. </param>
-        void Branch(LLVMValue pConditionValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
+        ///
+        /// <returns> Pointer to a llvm::BranchInst that represents the branch. </returns>
+        llvm::BranchInst* Branch(LLVMValue pConditionValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
 
         /// <summary> Emit a conditional branch. </summary>
         ///
@@ -482,7 +486,9 @@ namespace emitters
         /// <param name="pTestValue"> Pointer to the test value, which is compared to PValue. </param>
         /// <param name="pThenBlock"> Pointer to the THEN block. </param>
         /// <param name="pElseBlock"> Pointer to the ELSE block. </param>
-        void Branch(TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
+        ///
+        /// <returns> Pointer to a llvm::BranchInst that represents the branch. </returns>
+        llvm::BranchInst* Branch(TypedComparison comparison, LLVMValue pValue, LLVMValue pTestValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
 
         /// <summary> Emit a branch to the THEN block if value matches the boolean testValue, else branch to ELSE. </summary>
         ///
@@ -490,7 +496,9 @@ namespace emitters
         /// <param name="testValue"> The boolean compared to PValue. </param>
         /// <param name="pThenBlock"> Pointer to the THEN block. </param>
         /// <param name="pElseBlock"> Pointer to the ELSE block. </param>
-        void Branch(LLVMValue pValue, bool testValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
+        ///
+        /// <returns> Pointer to a llvm::BranchInst that represents the branch. </returns>
+        llvm::BranchInst* Branch(LLVMValue pValue, bool testValue, llvm::BasicBlock* pThenBlock, llvm::BasicBlock* pElseBlock);
 
         /// <summary> Emit a logical AND. </summary>
         ///
@@ -1434,11 +1442,6 @@ namespace emitters
         //
         // Optimizations
         //
-
-        /// <summary> Applies an optimizer. </summary>
-        ///
-        /// <param name="optimizer"> The optimizer to apply. </param>
-        void Optimize(IROptimizer& optimizer);
 
         //
         // Inline common code generators

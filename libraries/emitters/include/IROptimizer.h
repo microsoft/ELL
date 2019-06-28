@@ -34,7 +34,9 @@ namespace emitters
         /// <summary> Optimize the given function. </summary>
         ///
         /// <param name="pFunction"> pointer to the function to optimize. </param>
+        void BeginOptimizeFunctions();
         void OptimizeFunction(LLVMFunction pFunction);
+        void EndOptimizeFunctions();
 
         /// <summary> Optimize the module. </summary>
         void OptimizeModule(llvm::Module* pModule);

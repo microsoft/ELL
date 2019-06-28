@@ -910,14 +910,14 @@ namespace emitters
 
         /// <summary> Emits an instruction to load a value referenced by a pointer into a register. </summary>
         ///
-        /// <param name="pPointer"> Pointer to the adress being. </param>
+        /// <param name="pPointer"> Pointer to the address being. </param>
         ///
         /// <returns> Pointer to the resulting llvm::LoadInst. </returns>
         llvm::LoadInst* Load(LLVMValue pPointer);
 
         /// <summary> Emits an instruction to load the value referenced by a pointer into a named register. </summary>
         ///
-        /// <param name="pPointer"> Pointer to the adress being loaded. </param>
+        /// <param name="pPointer"> Pointer to the address being loaded. </param>
         /// <param name="name"> The register name. </param>
         ///
         /// <returns> Pointer to the resulting llvm::LoadInst. </returns>
@@ -925,7 +925,7 @@ namespace emitters
 
         /// <summary> Emits an instruction to store a value into a given address. </summary>
         ///
-        /// <param name="pPointer"> Pointer to the adress where the value is being stored. </param>
+        /// <param name="pPointer"> Pointer to the address where the value is being stored. </param>
         /// <param name="pValue"> Pointer to the value being stored. </param>
         ///
         /// <returns> Pointer to the resulting llvm::StoreInst. </returns>
