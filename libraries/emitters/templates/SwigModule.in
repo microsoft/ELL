@@ -1,4 +1,4 @@
-u8R"(%module(directors="1") @@MODULE@@
+u8R"(%module(directors="1", moduleimport="import $module") @@MODULE@@
 %feature("autodoc", "3");
 
 %include "stdint.i"

@@ -2,16 +2,17 @@
 # Licensed under the MIT license. See LICENSE.md file in the project root
 # for full license information.
 # ==============================================================================
- 
+
 # Make sure the binaries can be imported
 
 import os
 import sys
 
-
-sys.path.append(os.path.join(os.path.dirname(__file__), 'Release'))
-sys.path.append(os.path.join(os.path.dirname(__file__), 'RelWithDebInfo'))
-sys.path.append(os.path.join(os.path.dirname(__file__), 'Debug'))
+saved = list(sys.path)
+sys.path += [os.path.join(os.path.dirname(__file__)),
+             os.path.join(os.path.dirname(__file__), 'Release'),
+             os.path.join(os.path.dirname(__file__), 'RelWithDebInfo'),
+             os.path.join(os.path.dirname(__file__), 'Debug')]
 
 __this_file_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -39,9 +40,9 @@ def ensure_openblas():
                 os.putenv("PATH", path)
                 return
             head,tail = os.path.split(head)
-    
+
 ensure_openblas()
-    
+
 # The SWIG generated wrappers are divided into pseudo-namespace sub packages.
 from . import data
 from . import math
@@ -61,5 +62,7 @@ except ImportError:
 # must come after we initialize rpi_magic.
 from . import util
 
+# restore path now that all ELL modules have been loaded.
+sys.path = saved
 del os
 del sys

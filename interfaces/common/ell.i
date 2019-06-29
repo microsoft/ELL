@@ -14,7 +14,7 @@
     %include "ELL_javascript_pre.i"
 #endif // SWIGPYTHON
 
-%module(directors="1") "ell"
+%module(directors="1", moduleimport="import $module") "ell"
 
 // Generate decent docstrings from types and method signatures
 %feature("autodoc", "3");

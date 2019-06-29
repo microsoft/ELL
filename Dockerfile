@@ -26,9 +26,9 @@ RUN apt-get update \
     && apt-get clean all
 
 # SWIG
-RUN curl -O --location http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz \
-    && tar zxvf swig-3.0.12.tar.gz \
-    && cd swig-3.0.12 \
+RUN curl -O --location http://prdownloads.sourceforge.net/swig/swig-4.0.0.tar.gz \
+    && tar zxvf swig-4.0.0.tar.gz \
+    && cd swig-4.0.0 \
     && ./configure --without-pcre \
     && make \
     && make install

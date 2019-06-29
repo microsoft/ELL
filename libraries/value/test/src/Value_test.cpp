@@ -226,6 +226,26 @@ namespace
         }
     }
 
+    Scalar EqualEpsilon(Scalar x, Scalar y, double epsilon)
+    {
+        if (x.GetType() == ValueType::Int32)
+        {
+            return x == y;
+        }
+        Scalar e = Allocate(ValueType::Double, ScalarLayout);
+        e = epsilon;
+        Scalar tens = Floor(Log10(Cast(x, ValueType::Double)));
+        If(tens > 0.0, [&] {
+            // then we have some precision already on the left hand side of the decimal place, so remove that from epsilon
+            e *= Pow(10.0, tens);
+        });
+        Scalar rx = Allocate(ValueType::Double, ScalarLayout);
+        Scalar ry = Allocate(ValueType::Double, ScalarLayout);
+        rx = Floor(Cast(x, ValueType::Double) / e) * e;
+        ry = Floor(Cast(y, ValueType::Double) / e) * e;
+        return rx == ry;
+    }
+
     Scalar NotEqualEpsilon(Scalar x, Scalar y, double epsilon)
     {
         if (x.GetType() == ValueType::Int32)
@@ -280,6 +300,30 @@ namespace
         return ok;
     }
 
+    Scalar VerifyDifferent(Vector actual, Vector expected, double epsilon = 1e-7)
+    {
+        Scalar fail = 1;
+        Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+        ok = 0;
+        For(actual, [&](Scalar index) {
+            Scalar x = actual(index);
+            Scalar y = expected(index);
+            If(EqualEpsilon(x, y, epsilon), [&] {
+                ok = fail;
+            });
+        });
+        If(ok != 0, [&] {
+            DebugPrint("## Vector are not different\n");
+            DebugPrint("  Expected: ");
+            DebugPrintVector(expected);
+            DebugPrint("\n");
+            DebugPrint("  Actual:   ");
+            DebugPrintVector(actual);
+            DebugPrint("\n");
+        });
+        return ok;
+    }
+
     Scalar Verify(Matrix actual, Matrix expected, double epsilon = 1e-7)
     {
         Scalar fail = 1;
@@ -293,7 +337,7 @@ namespace
             });
         });
         If(ok != 0, [&] {
-            DebugPrint("## Matrix compare failed\n");
+            DebugPrint("## Matrices are different \n");
             InvokeForContext<ComputeContext>([&] {
                 std::cout << "Expected: \n";
                 PrintMatrix("   ", expected);
@@ -315,7 +359,7 @@ namespace
             Scalar x = actual(row, col, ch);
             Scalar y = expected(row, col, ch);
             If(NotEqualEpsilon(x, y, epsilon), [&] {
-                DebugPrint("## Tensor compare failed\n");
+                DebugPrint("## Tensors are different\n");
                 ok = fail;
             });
         });
@@ -1503,7 +1547,11 @@ Scalar Parallelized_test2()
 
     auto expected = MakeVector<int>(data.Size());
 
-    If(Verify(data, expected) == 0, [&] {
+    DebugPrint("  Parallelized_test2 result:   ");
+    DebugPrintVector(data);
+    DebugPrint("\n");
+
+    If(VerifyDifferent(data, expected) == 1, [&] {
         ok = 1;
     });
 

@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     ModelBuilderInterface.h (interfaces)
-//  Authors:  Chuck Jacobs, Kirk Olynyk
+//  Authors:  Chuck Jacobs, Kirk Olynyk, Chris Lovett
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once

@@ -47,13 +47,13 @@ xcode-select --install
 
 If you already have LLVM installed, ensure that you have version 6.0. Note that CMake assumes that the LLVM binary files are located in the standard Homebrew location, which is `/usr/local/opt`.
 
-### CMake 3.8, SWIG 3.0.12, OpenBLAS, and Doxygen via Homebrew
+### CMake 3.8, SWIG 4.0.0, OpenBLAS, and Doxygen via Homebrew
 
 ELL uses the [*CMake*](https://cmake.org/) build system, version 3.8 or newer.
 
 Optionally, ELL can take advantage of these additional tools:
 
-* [*SWIG*](http://swig.org) version 3.0.12 - a tool that generates Python interfaces to C++ libraries. Required if you intend to use ELL from Python.
+* [*SWIG*](http://swig.org) version 4.0.0 - a tool that generates Python interfaces to C++ libraries. Required if you intend to use ELL from Python.
 * [*OpenBLAS*](http://www.openblas.net/) - version 0.2.19.3 - fast linear algebra. OpenBLAS can make models execute up to 10 times faster.
 * [*Doxygen*](www.doxygen.org/) -  version 1.8.13 - it is used to generate nice code documentation for the ELL API.
 

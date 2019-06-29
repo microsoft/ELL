@@ -14,7 +14,7 @@ requirements:
   - requests
   - paramiko
   - llvmdev >=6.0,<7.0
-  - swig ==3.0.12
+  - swig ==4.0.0
   - opencv
   - github
 

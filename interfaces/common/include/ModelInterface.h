@@ -194,7 +194,7 @@ class SourceNode : public Node
 {
 public:
     SourceNode(const SourceNode& node, std::shared_ptr<ell::model::Model> model);
-    
+
     using Node::GetInputPort;
     using Node::GetOutputPort;
 
@@ -217,7 +217,7 @@ class SinkNode : public Node
 {
 public:
     SinkNode(const SinkNode& node, std::shared_ptr<ell::model::Model> model);
-    
+
     using Node::GetInputPort;
     using Node::GetOutputPort;
 
@@ -361,7 +361,7 @@ public:
 
     // Simple non callback API assumes you only have one input and one output.
     // Each language can decide to add more, for example, model_python_post.i adds a ComputeMultiple metehod
-    // that supports multiple heterogenously typed inputs and outputs.
+    // that supports multiple heterogeneously typed inputs and outputs.
     std::vector<double> ComputeDouble(const AutoDataVector& inputData);
     std::vector<double> ComputeDouble(const std::vector<double>& inputData);
     std::vector<float> ComputeFloat(const std::vector<float>& inputData);

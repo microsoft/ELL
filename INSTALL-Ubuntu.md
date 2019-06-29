@@ -72,13 +72,13 @@ This works on Ubuntu 18.04 Bionic Beaver.  If you have some other Linux version 
 sudo apt-get install -y curl
 ```
 
-### SWIG 3.0.12
+### SWIG 4.0.0
 
-[*SWIG*](http://swig.org) is a tool that generates Python interfaces to C++ libraries. If you intend to use ELL from Python, you must install SWIG version 3.0.12. At the time of writing this document, `apt-get` doesn't yet have the latest version of `SWIG`, so it must be installed manually
+[*SWIG*](http://swig.org) is a tool that generates Python interfaces to C++ libraries. If you intend to use ELL from Python, you must install SWIG version 4.0.0. At the time of writing this document, `apt-get` doesn't yet have the latest version of `SWIG`, so it must be installed manually
 
 ```shell
-curl -O --location http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
-tar zxvf swig-3.0.12.tar.gz && cd swig-3.0.12
+curl -O --location http://prdownloads.sourceforge.net/swig/swig-4.0.0.tar.gz
+tar zxvf swig-4.0.0.tar.gz && cd swig-4.0.0
 ./configure --without-pcre && make && sudo make install
 ```
 

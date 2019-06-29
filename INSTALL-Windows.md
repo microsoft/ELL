@@ -23,7 +23,7 @@ c:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\Commo
 ```
 You may also download new versions of cmake from <https://cmake.org/download/> if you want to.
 
-### LLVM 6.0, SWIG 3.0.12, OpenBLAS 0.2.19.3, and Doxygen 1.8.13 via NuGet
+### LLVM 6.0, SWIG 4.0.0, OpenBLAS 0.2.19.3, and Doxygen 1.8.13 via NuGet
 
 The easiest way to get prebuilt 64-bit versions of these packages is to use the [*NuGet*](https://www.nuget.org/) package manager, version 3.5 or newer. The relevant NuGet packages are specified in `ELL/external/packages.config`. The NuGet command line tool called `NuGet CLI` can be downloaded from <https://docs.nuget.org/ndocs/guides/install-nuget>. After downloading and installing NuGet CLI, open a command prompt, change to the repository's root directory (`ELL`) and type
 
@@ -36,7 +36,7 @@ NuGet will download the prerequisites into the `ELL/external` directory and you 
 Here's more information in case you need to install things manually.
 
 * [*LLVM*](http://llvm.org/) is a C++ compiler framework, ELL depends on version 6.0.
-* [*SWIG*](http://swig.org) version 3.0.12 - a tool that generates Python interfaces to C++ libraries. Required if you intend to use ELL from Python.
+* [*SWIG*](http://swig.org) version 4.0.0 - a tool that generates Python interfaces to C++ libraries. Required if you intend to use ELL from Python.
 * [*OpenBLAS*](http://www.openblas.net/) version 0.2.19.3 - fast linear algebra. This is optional but can make models execute up to 10 times faster.
 * [*Doxygen*](www.doxygen.org/) version 1.8.13 - this is optional, it is used to generate nice code documentation for the ELL API.
 

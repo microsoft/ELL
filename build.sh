@@ -32,8 +32,8 @@ if [[ ! -f "/usr/bin/llvm-config-8" ]]; then
     exit 1
 fi
 
-if printf '%s\n%s\n' "$(swig -version | grep -e 'SWIG Version' | cut -d" " -f3 | awk '{print $NF}')" 3.0.11 | sort -CV; then
-    echo "Your swig version is less than the required 3.0.12"
+if printf '%s\n%s\n' "$(swig -version | grep -e 'SWIG Version' | cut -d" " -f3 | awk '{print $NF}')" 3.0.12 | sort -CV; then
+    echo "Your swig version is less than the required 4.0.0"
     echo "See INSTALL-Ubuntu.md for information on how to install swig"
     exit 1
 fi

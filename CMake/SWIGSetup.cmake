@@ -22,7 +22,7 @@
 #
 
 if(WIN32)
-  set(SWIG_VERSION "3.0.12")
+  set(SWIG_VERSION "4.0.0")
   if(EXISTS "${PACKAGE_ROOT}/swigwintools.${SWIG_VERSION}/tools/swigwin-${SWIG_VERSION}/swig.exe")
     set(SWIG_FOLDER "${PACKAGE_ROOT}/swigwintools.${SWIG_VERSION}/tools/swigwin-${SWIG_VERSION}")
     set(SWIG_LIB "${SWIG_FOLDER}/Lib")
@@ -31,7 +31,7 @@ if(WIN32)
   endif()
 endif()
 
-find_package(SWIG 3.0.12)
+find_package(SWIG 4.0.0)
 
 if(NOT SWIG_FOUND)
     message(WARNING "SWIG not found, interfaces and projects that depend on them will not build properly. \
