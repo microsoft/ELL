@@ -21,8 +21,8 @@ if ! grep -q "^deb .*ubuntu-toolchain-r/test" /etc/apt/sources.list /etc/apt/sou
 fi
 
 echo === Adding LLVM 8 package repositories ===
-sudo sh -c 'echo deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main >> /etc/apt/sources.list'
-sudo sh -c 'echo deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main >> /etc/apt/sources.list'
+sudo sh -c 'echo deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main >> /etc/apt/sources.list'
+sudo sh -c 'echo deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main >> /etc/apt/sources.list'
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
 
 echo === Update packages ===
