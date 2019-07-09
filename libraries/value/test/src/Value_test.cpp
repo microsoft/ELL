@@ -628,6 +628,25 @@ Scalar Vector_test2()
     return ok;
 }
 
+Scalar Vector_test3()
+{
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+    Vector v = std::vector<float>{ 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+    Vector i = std::vector<float>{ 2, 2, 2 };
+
+    Vector s = v.SubVector(7, 3);
+    s = i;  // copy the i vector to the end of the v vector.
+
+    Vector e = std::vector<float>{ 1, 1, 1, 1, 1, 1, 2, 2, 2 };
+
+    If(Verify(v, e) != 0, [&] {
+        DebugPrint("## Vector_test3 subvector assignment failed\n");
+        ok = 1;
+    });
+    return ok;
+}
+
 namespace
 {
     template <MatrixLayout layout>

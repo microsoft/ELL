@@ -20,6 +20,7 @@ HingeLoss, \
 IntCallbackBase, \
 Int8CallbackBase, \
 IntVector, \
+Int64Vector, \
 Int8Vector, \
 LogLoss, \
 SquaredLoss, \

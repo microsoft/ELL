@@ -61,6 +61,8 @@ void TestMultipleOutputNodes();
 void TestShapeFunctionGeneration();
 void TestCompilableClockNode();
 void TestCompilableFFTNode();
+template<typename ElementType>
+void TestBufferNode();
 
 //
 // mathy nodes

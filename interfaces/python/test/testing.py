@@ -24,7 +24,7 @@ class Testing(object):
         return list(a)
 
     @staticmethod
-    def IsEqual(a, b, tol=1.0e-8):
+    def IsEqual(a, b, tol=1.0e-8, verbose=False):
         # Instances of the same swig proxy types (e.g. DoubleVector) resolve to different type()'s
         a = Testing.ToList(a)
         b = Testing.ToList(b)
@@ -34,6 +34,9 @@ class Testing(object):
             return True
         for i in range(len(a)):
             if not Testing.IsEqualWithinTolerance(a[i], b[i], tol):
+                if verbose:
+                    print("expect: {}".format(a))
+                    print("actual: {}".format(b))
                 return False
         return True
 

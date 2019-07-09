@@ -21,6 +21,7 @@ value::Scalar Value_test1();
 value::Scalar Scalar_test1();
 value::Scalar Vector_test1();
 value::Scalar Vector_test2();
+value::Scalar Vector_test3();
 value::Scalar Matrix_test1();
 value::Scalar Matrix_test2();
 value::Scalar Matrix_test3();

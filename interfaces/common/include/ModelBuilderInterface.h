@@ -81,8 +81,6 @@ public:
     Node AddScalingLayerNode(Model model, PortElements input, const ell::api::predictors::neural::ScalingLayer& layer);
     Node AddSoftmaxLayerNode(Model model, PortElements input, const ell::api::predictors::neural::SoftmaxLayer& layer);
 
-    void ResetInput(Node node, PortElements input, std::string input_port_name = "input");
-
 private:
 #ifndef SWIG
     template <typename ElementType>

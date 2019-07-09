@@ -144,9 +144,11 @@ class EllBuildTools:
                 '-c++',
                 '-Fmicrosoft']
         if language == "python":
-            args = args + ["-py3"]
+            args += ["-py3"]
         if language == "javascript":
-            args = args + ["-v8"]
+            args += ["-v8"]
+        if os.name == 'nt':
+            args += ["-DWIN32"]
         args = args + ['-outdir', output_dir] + ['-I' + d for d in self.swig_header_dirs()] + [
             '-o', os.path.join(output_dir, model_name + language.upper() + '_wrap.cxx'),
             os.path.join(output_dir, model_name + ".i")

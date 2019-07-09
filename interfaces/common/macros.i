@@ -131,7 +131,8 @@ import numpy as np
         if (view_.format[0] != 'f')
         {
             PyErr_Clear();
-            SWIG_exception_fail(res, "Expected an array of BUFFER_TYPE");
+            auto msg = std::string("Buffer format is ") + view_.format + ", but expected an array of BUFFER_TYPE";
+            SWIG_exception_fail(res, msg.c_str());
         }
     }
     else if (typeid(BUFFER_TYPE) == typeid(double))
@@ -139,23 +140,46 @@ import numpy as np
         if (view_.format[0] != 'd')
         {
             PyErr_Clear();
-            SWIG_exception_fail(res, "Expected an array of BUFFER_TYPE");
+            auto msg = std::string("Buffer format is '") + view_.format + "', but expected an array of BUFFER_TYPE";
+            SWIG_exception_fail(res, msg.c_str());
         }
     }
     else if (typeid(BUFFER_TYPE) == typeid(int))
     {
-        if (strchr("iIlL", view_.format[0]) == nullptr)
+        if (sizeof(long) == sizeof(int))
         {
+            if (strchr("iIlL", view_.format[0]) == nullptr)
+            {
+                PyErr_Clear();
+                auto msg = std::string("Buffer format is '") + view_.format + "', but expected an array of BUFFER_TYPE";
+                SWIG_exception_fail(res, msg.c_str());
+            }
+        }
+        else if (strchr("iI", view_.format[0]) == nullptr)
+        {
+            std::cout << "sizeof(long)=" << sizeof(long) << "\n";
+            std::cout << "sizeof(int)=" << sizeof(int) << "\n";
             PyErr_Clear();
-            SWIG_exception_fail(res, "Expected an array of BUFFER_TYPE");
+            auto msg = std::string("Buffer format is '") + view_.format + "', but expected an array compatible with BUFFER_TYPE";
+            SWIG_exception_fail(res, msg.c_str());
         }
     }
     else if (typeid(BUFFER_TYPE) == typeid(int64_t))
     {
-        if (strchr("qQ", view_.format[0]) == nullptr)
+        if (sizeof(long) == sizeof(int64_t))
+        {
+            if (strchr("qQlL", view_.format[0]) == nullptr)
+            {
+                PyErr_Clear();
+                auto msg = std::string("Buffer format is '") + view_.format + "', but expected an array of BUFFER_TYPE";
+                SWIG_exception_fail(res, msg.c_str());
+            }
+        }
+        else if (strchr("qQ", view_.format[0]) == nullptr)
         {
             PyErr_Clear();
-            SWIG_exception_fail(res, "Expected an array of BUFFER_TYPE");
+            auto msg = std::string("Buffer format is '") + view_.format + "', but expected an array compatible with BUFFER_TYPE";
+            SWIG_exception_fail(res, msg.c_str());
         }
     }
     else if (typeid(BUFFER_TYPE) == typeid(bool))
@@ -163,7 +187,8 @@ import numpy as np
         if (view_.format[0] != '?')
         {
             PyErr_Clear();
-            SWIG_exception_fail(res, "Expected an array of BUFFER_TYPE");
+            auto msg = std::string("Buffer format is '") + view_.format + "', but expected an array of BUFFER_TYPE";
+            SWIG_exception_fail(res, msg.c_str());
         }
     }
 
@@ -295,8 +320,8 @@ def copy_from(self, a):
         copy_from_vector_double_to_## ELEMENT_TYPE(self, a)
     elif isinstance(a, IntVector):
         copy_from_vector_int_to_## ELEMENT_TYPE(self, a)
-    #elif isinstance(a, Int64Vector):
-    #    copy_from_vector_int64_to_## ELEMENT_TYPE(self, a)
+    elif isinstance(a, Int64Vector):
+        copy_from_vector_int64_to_## ELEMENT_TYPE(self, a)
     elif isinstance(a, Int8Vector):
         copy_from_vector_int8_to_## ELEMENT_TYPE(self, a)
     else:

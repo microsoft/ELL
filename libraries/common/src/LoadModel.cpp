@@ -210,7 +210,7 @@ namespace common
 
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastLinearFunctionNode<int>>();
 
-        context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<bool>>();
+        // context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<bool>>(); // bugbug: Vector of 'bool' doesn't work.
         context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<int>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BufferNode<int64_t>>();
 

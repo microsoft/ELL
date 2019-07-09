@@ -56,6 +56,7 @@ set(_sources
     common/ELL_python_pre.i
     common/evaluators.i
     common/functions.i
+    common/integer.i
     common/math.i
     common/math_javascript_post.i
     common/math_javascript_pre.i

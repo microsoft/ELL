@@ -15,7 +15,7 @@
 #endif // SWIGPYTHON
 
 // stl
-%include "stdint.i"
+%include "integer.i"
 %include "vector.i"
 
 // ELL API
@@ -35,8 +35,7 @@
 %template(DoubleCallbackBase) ell::api::CallbackBase<double>;
 %template(FloatCallbackBase) ell::api::CallbackBase<float>;
 %template(IntCallbackBase) ell::api::CallbackBase<int>;
-// bugbug: doesn't compile with GCC and CLang.
-//%template(Int64CallbackBase) ell::api::CallbackBase<int64_t>;
+%template(Int64CallbackBase) ell::api::CallbackBase<int64_t>;
 %template(Int8CallbackBase) ell::api::CallbackBase<int8_t>;
 #endif
 

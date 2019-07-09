@@ -37,6 +37,7 @@
 #include <nodes/include/BinaryOperationNode.h>
 #include <nodes/include/BinaryPredicateNode.h>
 #include <nodes/include/BroadcastOperationNodes.h>
+#include <nodes/include/BufferNode.h>
 #include <nodes/include/ClockNode.h>
 #include <nodes/include/ConcatenationNode.h>
 #include <nodes/include/ConstantNode.h>
@@ -90,6 +91,7 @@
 
 #include <utilities/include/Logger.h>
 #include <utilities/include/RandomEngines.h>
+#include <utilities/include/TypeName.h>
 
 #include <algorithm>
 #include <iostream>
@@ -489,6 +491,78 @@ std::vector<std::vector<bool>> GetExpectedUnaryOperationOutput(std::vector<std::
     }
     return result;
 }
+
+template<typename ElementType>
+class Buffer
+{
+public:
+    Buffer(size_t size)
+        : _buffer(size)
+    {
+    }
+    std::vector<ElementType>& Compute(std::vector<ElementType> input)
+    {
+        auto inputSize = input.size();
+        if (inputSize > _buffer.size())
+        {
+            inputSize = _buffer.size();
+        }
+        auto offset = _buffer.size() - inputSize;
+        if (offset > 0)
+        {
+            // shift the buffer left by the input size to make room for new input
+            std::copy_n(_buffer.begin() + inputSize, offset, _buffer.begin());
+        }
+
+        // Copy input to right hand side of the buffer        
+        std::copy_n(input.begin(), inputSize, _buffer.begin() + offset);
+        return _buffer;
+    }
+private:
+    std::vector<ElementType> _buffer;
+};
+
+template<typename ElementType>
+void TestBufferNode()
+{
+    model::Model model;
+    int inputSize = 10;
+    int bufferSize = 33;
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
+    auto& testOutput = ell::nodes::AddBufferNode<ElementType>(inputNode->output, bufferSize);
+    auto outputNode = model.AddNode<model::OutputNode<ElementType>>(model::PortElements<ElementType>{ testOutput }, model::MemoryShape{ bufferSize });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", outputNode->output } });
+
+    std::string name = "BufferNode_" + utilities::TypeName<ElementType>::GetName();
+    TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
+        model::IRMapCompiler compiler;
+        auto compiledMap = compiler.Compile(map);
+
+        Buffer<ElementType> buffer(bufferSize);
+        std::vector<std::vector<ElementType>> signal;
+        std::vector<std::vector<ElementType>> expected;
+        for (int i = 0; i < 10; i++)
+        {
+            std::vector<ElementType> input;
+            for (int j = 0; j < inputSize; j++)
+            {
+                input.push_back((i * 10) + j);
+            }
+            signal.push_back(input);
+            auto result = buffer.Compute(input);
+            expected.push_back(result);
+        }
+
+        // compare output
+        VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
+    });
+}
+
+template void TestBufferNode<float>();
+template void TestBufferNode<double>();
+template void TestBufferNode<int>();
+template void TestBufferNode<int64_t>();
+
 
 void TestCompilableUnaryOperationNode()
 {

@@ -145,12 +145,14 @@ def test_callbacks(testing):
                             testing.IsEqual(np.array(sinkOutput), expected))
 
 
+
 def test():
     # this test only tests the model interface.  If you are testing node types then use nodes_test.py
     testing = Testing()
     test_callbacks(testing)
     test_multiple(testing)
     test_bitcode(testing)
+
     if testing.DidTestFail():
         return 1
     else:

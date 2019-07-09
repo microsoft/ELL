@@ -9,6 +9,7 @@
 #pragma once
 
 #include "TypeTraits.h"
+#include "Boolean.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -152,6 +153,16 @@ namespace utilities
         ///
         /// <returns> The serialization name. </returns>
         static std::string GetName() { return "bool"; }
+    };
+
+    /// <summary> Class used to get information about the Boolean type. </summary>
+    template <>
+    struct TypeName<Boolean>
+    {
+        /// <summary> Gets the serialization name of the type. </summary>
+        ///
+        /// <returns> The serialization name. </returns>
+        static std::string GetName() { return "Boolean"; }
     };
 
     /// <summary> Class used to get information about the 8-bit integer type. </summary>

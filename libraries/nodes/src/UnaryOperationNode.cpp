@@ -142,6 +142,7 @@ namespace nodes
     template class UnaryOperationNode<float>;
     template class UnaryOperationNode<double>;
     template class UnaryOperationNode<int>;
+    template class UnaryOperationNode<int64_t>;
     template class UnaryOperationNode<bool>;
 } // namespace nodes
 } // namespace ell

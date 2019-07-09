@@ -111,12 +111,12 @@ def CompiledMap_Compute(self, inputData):
         if isinstance(inputData, IntVector):
             return self.ComputeInt(inputData)
         else:
-            return self.ComputeInt(IntVector(np.asarray(inputData).astype(np.int)))
-    #elif dtype == ell.nodes.PortType.bigInt:
-    #    if isinstance(inputData, Int64Vector):
-    #        return self.ComputeInt64(inputData)
-    #    else:
-    #        return self.ComputeInt64(Int64Vector(np.asarray(inputData).astype(np.int64)))
+            return self.ComputeInt(IntVector(np.asarray(inputData).astype(np.int32)))
+    elif dtype == ell.nodes.PortType.bigInt:
+        if isinstance(inputData, Int64Vector):
+            return self.ComputeInt64(inputData)
+        else:
+            return self.ComputeInt64(Int64Vector(np.asarray(inputData).astype(np.int64)))
     else:
         raise TypeError("Cannot Compute model on input type : " + str(dtype))
 
@@ -149,7 +149,12 @@ def Map_Compute(self, inputData):
         if isinstance(inputData, IntVector):
             return self.ComputeInt(inputData)
         else:
-            return self.ComputeInt(IntVector(np.asarray(inputData).astype(np.int)))
+            return self.ComputeInt(IntVector(np.asarray(inputData).astype(np.int32)))
+    elif dtype == ell.nodes.PortType.bigInt:
+        if isinstance(inputData, Int64Vector):
+            return self.ComputeInt64(inputData)
+        else:
+            return self.ComputeInt64(Int64Vector(np.asarray(inputData).astype(np.int64)))
     else:
         raise TypeError("Model has unsupported input type : " + str(dtype))
 
@@ -212,7 +217,7 @@ def SourceNode_RegisterCallback(self, function):
                 self.func(data)
                 return True
         self.wrapper = SourceNodeFloatCallbackBase(function)  # must stay alive
-        self.RegisterCallbackDouble(self.wrapper)
+        self.RegisterCallbackFloat(self.wrapper)
     elif portType == ell.nodes.PortType.integer:      
         class SourceNodeIntCallbackBase(ell.math.IntCallbackBase):
             def __init__(self, function):
@@ -222,17 +227,17 @@ def SourceNode_RegisterCallback(self, function):
                 self.func(data)
                 return True
         self.wrapper = SourceNodeIntCallbackBase(function)  # must stay alive
-        self.RegisterCallbackDouble(self.wrapper)
-    #elif portType == ell.nodes.PortType.bigInt:     
-    #    class SourceNodeInt64CallbackBase(ell.math.Int64CallbackBase):
-    #        def __init__(self, function):
-    #            super(SourceNodeInt64CallbackBase, self).__init__()
-    #            self.func = function
-    #        def Run(self, data):
-    #            self.func(data)
-    #            return True
-    #    self.wrapper = SourceNodeInt64CallbackBase(function)  # must stay alive
-    #    self.RegisterCallbackDouble(self.wrapper)
+        self.RegisterCallbackInt(self.wrapper)
+    elif portType == ell.nodes.PortType.bigInt:     
+        class SourceNodeInt64CallbackBase(ell.math.Int64CallbackBase):
+            def __init__(self, function):
+                super(SourceNodeInt64CallbackBase, self).__init__()
+                self.func = function
+            def Run(self, data):
+                self.func(data)
+                return True
+        self.wrapper = SourceNodeInt64CallbackBase(function)  # must stay alive
+        self.RegisterCallbackInt64(self.wrapper)
     elif portType == ell.nodes.PortType.boolean:
         class SourceNodeInt8CallbackBase(ell.math.Int8CallbackBase):
             def __init__(self, function):
@@ -242,7 +247,7 @@ def SourceNode_RegisterCallback(self, function):
                 self.func(data)
                 return True
         self.wrapper = SourceNodeInt8CallbackBase(function)  # must stay alive
-        self.RegisterCallbackDouble(self.wrapper)
+        self.RegisterCallbackBoolean(self.wrapper)
     else:
         raise Exception("portType {} not supported".format(portType))
 
@@ -277,7 +282,7 @@ def SinkNode_RegisterCallback(self, function):
                 self.func(data)
                 return True
         self.wrapper = SinkNodeFloatCallbackBase(function)  # must stay alive
-        self.RegisterCallbackDouble(self.wrapper)
+        self.RegisterCallbackFloat(self.wrapper)
     elif portType == ell.nodes.PortType.integer:      
         class SinkNodeIntCallbackBase(ell.math.IntCallbackBase):
             def __init__(self, function):
@@ -287,17 +292,17 @@ def SinkNode_RegisterCallback(self, function):
                 self.func(data)
                 return True
         self.wrapper = SinkNodeIntCallbackBase(function)  # must stay alive
-        self.RegisterCallbackDouble(self.wrapper)
-    #elif portType == ell.nodes.PortType.bigInt:     
-    #    class SinkNodeInt64CallbackBase(ell.math.Int64CallbackBase):
-    #        def __init__(self, function):
-    #            super(SinkNodeInt64CallbackBase, self).__init__()
-    #            self.func = function
-    #        def Run(self, data):
-    #            self.func(data)
-    #            return True
-    #    self.wrapper = SinkNodeInt64CallbackBase(function)  # must stay alive
-    #    self.RegisterCallbackDouble(self.wrapper)
+        self.RegisterCallbackInt(self.wrapper)
+    elif portType == ell.nodes.PortType.bigInt:     
+        class SinkNodeInt64CallbackBase(ell.math.Int64CallbackBase):
+            def __init__(self, function):
+                super(SinkNodeInt64CallbackBase, self).__init__()
+                self.func = function
+            def Run(self, data):
+                self.func(data)
+                return True
+        self.wrapper = SinkNodeInt64CallbackBase(function)  # must stay alive
+        self.RegisterCallbackInt64(self.wrapper)
     elif portType == ell.nodes.PortType.boolean:
         class SinkNodeInt8CallbackBase(ell.math.Int8CallbackBase):
             def __init__(self, function):
@@ -307,7 +312,7 @@ def SinkNode_RegisterCallback(self, function):
                 self.func(data)
                 return True
         self.wrapper = SinkNodeInt8CallbackBase(function)  # must stay alive
-        self.RegisterCallbackDouble(self.wrapper)
+        self.RegisterCallbackBoolean(self.wrapper)
     else:
         raise Exception("portType {} not supported".format(portType))
 
@@ -402,28 +407,26 @@ std::vector<void*> GetInputBuffersFromList(std::shared_ptr<ell::model::Map> map,
                 args.push_back(ptr->data());
             }
             break;
-        // case ell::model::Port::PortType::bigInt:
-        //     {
-        //         auto item = PyList_GetItem(list, i);
-        //         std::vector<int64_t>* ptr = nullptr;
-        //         auto res = swig::asptr(item, &ptr);
-        //         if (!SWIG_IsOK(res)) 
-        //         {                        
-        //             throw std::invalid_argument(ell::utilities::FormatString("List argument %zu is the wrong type, expecting 'int64_t*'", i));
-        //         }
-        //         auto argSize = map->GetInputSize(i);
-        //         if (argSize != ptr->size())
-        //         {
-        //             throw std::invalid_argument(ell::utilities::FormatString("List argument %zu is the wrong size, expecting '%zu'", i, argSize));
-        //         }
-        //         args.push_back(ptr->data());
-        //     }
-        //     break;
-            // todo: doesn't compile on GCC and CLang
-            throw std::invalid_argument(ell::utilities::FormatString("List argument %zu type PortType::bigInt is not yet supported'", i));
+        case ell::model::Port::PortType::bigInt:
+            {
+                auto item = PyList_GetItem(list, i);
+                std::vector<int64_t>* ptr = nullptr;
+                auto res = swig::asptr(item, &ptr);
+                if (!SWIG_IsOK(res)) 
+                {                        
+                    throw std::invalid_argument(ell::utilities::FormatString("List argument %zu is the wrong type, expecting 'int64_t*'", i));
+                }
+                auto argSize = map->GetInputSize(i);
+                if (argSize != ptr->size())
+                {
+                    throw std::invalid_argument(ell::utilities::FormatString("List argument %zu is the wrong size, expecting '%zu'", i, argSize));
+                }
+                args.push_back(ptr->data());
+            }
+            break;          
         case ell::model::Port::PortType::categorical:
             // todo
-            throw std::invalid_argument(ell::utilities::FormatString("List argument %zu type PortType::categorical is not yet supported'", i));
+            throw std::invalid_argument(ell::utilities::FormatString("List argument %zu type PortType::categorical is not yet supported", i));
         case ell::model::Port::PortType::boolean:
             {
                 auto item = PyList_GetItem(list, i);
@@ -442,7 +445,7 @@ std::vector<void*> GetInputBuffersFromList(std::shared_ptr<ell::model::Map> map,
             }
             break;
         default:
-            throw std::invalid_argument(ell::utilities::FormatString("List argument %zu type has unsupported type'", i)); 
+            throw std::invalid_argument(ell::utilities::FormatString("List argument %zu type has unsupported type %d", i, (int)portType)); 
         }
     }
     
@@ -523,25 +526,23 @@ std::vector<void*> GetOutputBuffersFromList(std::shared_ptr<ell::model::Map> map
                 args.push_back(ptr->data());
             }
             break;
-        //case ell::model::Port::PortType::bigInt:
-        //    {
-        //        auto item = PyList_GetItem(list, i);
-        //        std::vector<int64_t>* ptr = nullptr;
-        //        auto res = swig::asptr(item, &ptr);
-        //        if (!SWIG_IsOK(res)) 
-        //        {                        
-        //            throw std::invalid_argument(ell::utilities::FormatString("List argument %zu is the wrong type, expecting 'int64_t*'", i));
-        //        }
-        //        auto argSize = map->GetOutputSize(i);
-        //        if (argSize != ptr->size())
-        //        {
-        //            throw std::invalid_argument(ell::utilities::FormatString("List argument %zu is the wrong size, expecting '%zu'", i, argSize));
-        //        }
-        //        args.push_back(ptr->data());
-        //    }
-        //    break;
-            // todo: there is no Swig BigIntVector wrapper...
-            throw std::invalid_argument(ell::utilities::FormatString("List argument %zu type PortType::bigInt is not yet supported'", i));
+        case ell::model::Port::PortType::bigInt:
+            {
+                auto item = PyList_GetItem(list, i);
+                std::vector<int64_t>* ptr = nullptr;
+                auto res = swig::asptr(item, &ptr);
+                if (!SWIG_IsOK(res)) 
+                {                        
+                    throw std::invalid_argument(ell::utilities::FormatString("List argument %zu is the wrong type, expecting 'int64_t*'", i));
+                }
+                auto argSize = map->GetOutputSize(i);
+                if (argSize != ptr->size())
+                {
+                    throw std::invalid_argument(ell::utilities::FormatString("List argument %zu is the wrong size, expecting '%zu'", i, argSize));
+                }
+                args.push_back(ptr->data());
+            }
+            break;
         case ell::model::Port::PortType::categorical:
             // todo
             throw std::invalid_argument(ell::utilities::FormatString("List argument %zu type PortType::categorical is not yet supported'", i));
@@ -562,7 +563,7 @@ std::vector<void*> GetOutputBuffersFromList(std::shared_ptr<ell::model::Map> map
                 args.push_back(ptr->data());
             }
         default:
-            throw std::invalid_argument(ell::utilities::FormatString("List argument %zu type has unsupported type'", i)); 
+            throw std::invalid_argument(ell::utilities::FormatString("List argument %zu type has unsupported type %d", i, (int)portType)); 
         }
     }
     return args;

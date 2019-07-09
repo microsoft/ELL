@@ -24,6 +24,11 @@ using namespace ell::predictors::neural;
 
 void TestIRCompiler()
 {
+    TestBufferNode<float>();
+    TestBufferNode<double>();
+    TestBufferNode<int>();
+    TestBufferNode<int64_t>();
+
     TestReinterpretLayoutNode();
     TestBroadcastLinearFunctionNode();
 

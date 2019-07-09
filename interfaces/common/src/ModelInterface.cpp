@@ -23,6 +23,7 @@
 
 #include <model/include/InputNode.h>
 #include <model/include/Map.h>
+#include <model/include/ModelEditor.h>
 #include <model/include/OutputNode.h>
 
 #include <utilities/include/JsonArchiver.h>
@@ -35,6 +36,20 @@ using namespace ell::utilities;
 
 namespace ELL_API
 {
+
+PortElements GetDefaultOutputPort(Node node)
+{
+    OutputPortIterator iter = node.GetOutputPorts();
+    if (iter.IsValid())
+    {
+        auto port = iter.Get();
+        return PortElements(port);
+    }
+    else
+    {
+        throw std::out_of_range("node has no output port");
+    }
+}
 
 //
 // NodeIterator
@@ -198,6 +213,61 @@ void Node::CopyMetadataFrom(const Node& other)
     const_cast<ell::model::Node*>(_node)->GetMetadata() = other._node->GetMetadata();
 }
 
+template <typename ElementType>
+void InternalResetInput(Node& node, PortElements& input, const std::string& input_port_name)
+{
+    using namespace ell::predictors::neural;
+    using namespace ell::nodes;
+    auto elements = input.GetPortElements();
+    const ell::model::Node* innerNode = node.GetNode();
+
+    ell::model::PortElements<ElementType> innerElements(elements);
+    if (!innerElements.IsFullPortOutput())
+    {
+        throw std::invalid_argument("Error: new input must be have a single range");
+    }
+
+    auto inputPort = innerNode->GetInputPort(input_port_name);
+    if (!inputPort)
+    {
+        throw std::invalid_argument("Error: input port named '" + input_port_name + "' was not found on this node");
+    }
+
+    ell::model::ModelEditor::ResetInputPort(
+        innerNode->GetInputPort(input_port_name),
+        *innerElements.GetElement(0).ReferencedPort());
+}
+
+void Node::ResetInput(PortElements newInput, std::string input_port_name)
+{
+    auto type = newInput.GetType();
+    switch (type)
+    {
+    case PortType::real:
+        InternalResetInput<double>(*this, newInput, input_port_name);
+        break;
+    case PortType::smallReal:
+        InternalResetInput<float>(*this, newInput, input_port_name);
+        break;
+    case PortType::integer:
+        InternalResetInput<int>(*this, newInput, input_port_name);
+        break;
+    case PortType::bigInt:
+        InternalResetInput<int64_t>(*this, newInput, input_port_name);
+        break;
+    case PortType::boolean:
+        InternalResetInput<bool>(*this, newInput, input_port_name);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not ResetInput of the requested type");
+    }
+}
+
+void Node::ResetInput(Node newInput, std::string input_port_name)
+{
+    return ResetInput(GetDefaultOutputPort(newInput), input_port_name);
+}
+
 //
 // InputNode
 //
@@ -358,34 +428,20 @@ std::string Model::GetJson() const
 
 ModelBuilder builder;
 
-PortElements GetDefaultOutput(Node node)
-{
-    OutputPortIterator iter = node.GetOutputPorts();
-    if (iter.IsValid())
-    {
-        auto port = iter.Get();
-        return PortElements(port);
-    }
-    else
-    {
-        throw std::out_of_range("node has no output port");
-    }
-}
-
 // This provides a simpler version of ModelBuilder that hides Ports
 Node Model::AddBinaryOperation(Node input1, Node input2, BinaryOperationType operation)
 {
-    return builder.AddBinaryOperationNode(Model(_model), GetDefaultOutput(input1), GetDefaultOutput(input2), operation);
+    return builder.AddBinaryOperationNode(Model(_model), GetDefaultOutputPort(input1), GetDefaultOutputPort(input2), operation);
 }
 
 Node Model::AddBuffer(Node input, int windowSize)
 {
-    return builder.AddBufferNode(Model(_model), GetDefaultOutput(input), windowSize);
+    return builder.AddBufferNode(Model(_model), GetDefaultOutputPort(input), windowSize);
 }
 
 Node Model::AddClock(Node input, double interval, double lagThreshold, const std::string& lagNotificationName)
 {
-    return builder.AddClockNode(Model(_model), GetDefaultOutput(input), interval, lagThreshold, lagNotificationName);
+    return builder.AddClockNode(Model(_model), GetDefaultOutputPort(input), interval, lagThreshold, lagNotificationName);
 }
 
 Node Model::AddConcatenation(const PortMemoryLayout& outputMemoryLayout, const std::vector<Node>& inputs)
@@ -394,7 +450,7 @@ Node Model::AddConcatenation(const PortMemoryLayout& outputMemoryLayout, const s
     std::vector<PortElements*> elements;
     for (const auto node : inputs)
     {
-        elements_list.push_back(GetDefaultOutput(node));
+        elements_list.push_back(GetDefaultOutputPort(node));
         elements.push_back(&elements_list.back());
     }
     return builder.AddConcatenationNode(Model(_model), outputMemoryLayout, elements);
@@ -412,37 +468,37 @@ Node Model::AddConstant(std::vector<double> values, PortType type)
 
 Node Model::AddDCT(Node input, int numFilters)
 {
-    return builder.AddDCTNode(Model(_model), GetDefaultOutput(input), numFilters);
+    return builder.AddDCTNode(Model(_model), GetDefaultOutputPort(input), numFilters);
 }
 
 Node Model::AddDotProduct(Node input1, Node input2)
 {
-    return builder.AddDotProductNode(Model(_model), GetDefaultOutput(input1), GetDefaultOutput(input2));
+    return builder.AddDotProductNode(Model(_model), GetDefaultOutputPort(input1), GetDefaultOutputPort(input2));
 }
 
 Node Model::AddDTW(std::vector<std::vector<double>> prototype, Node input)
 {
-    return builder.AddDTWNode(Model(_model), prototype, GetDefaultOutput(input));
+    return builder.AddDTWNode(Model(_model), prototype, GetDefaultOutputPort(input));
 }
 
 Node Model::AddFFT(Node input, int nfft)
 {
-    return builder.AddFFTNode(Model(_model), GetDefaultOutput(input), nfft);
+    return builder.AddFFTNode(Model(_model), GetDefaultOutputPort(input), nfft);
 }
 
 Node Model::AddGRU(Node input, Node reset, size_t hiddenUnits, Node inputWeights, Node hiddenWeights, Node inputBias, Node hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
 {
-    return builder.AddGRUNode(Model(_model), GetDefaultOutput(input), GetDefaultOutput(reset), hiddenUnits, GetDefaultOutput(inputWeights), GetDefaultOutput(hiddenWeights), GetDefaultOutput(inputBias), GetDefaultOutput(hiddenBias), activation, recurrentActivation);
+    return builder.AddGRUNode(Model(_model), GetDefaultOutputPort(input), GetDefaultOutputPort(reset), hiddenUnits, GetDefaultOutputPort(inputWeights), GetDefaultOutputPort(hiddenWeights), GetDefaultOutputPort(inputBias), GetDefaultOutputPort(hiddenBias), activation, recurrentActivation);
 }
 
 Node Model::AddHammingWindow(Node input)
 {
-    return builder.AddHammingWindowNode(Model(_model), GetDefaultOutput(input));
+    return builder.AddHammingWindowNode(Model(_model), GetDefaultOutputPort(input));
 }
 
 Node Model::AddIIRFilter(Node input, std::vector<double> bCoeffs, std::vector<double> aCoeffs)
 {
-    return builder.AddIIRFilterNode(Model(_model), GetDefaultOutput(input), bCoeffs, aCoeffs);
+    return builder.AddIIRFilterNode(Model(_model), GetDefaultOutputPort(input), bCoeffs, aCoeffs);
 }
 
 InputNode Model::AddInput(const PortMemoryLayout& memoryLayout, PortType type)
@@ -452,52 +508,57 @@ InputNode Model::AddInput(const PortMemoryLayout& memoryLayout, PortType type)
 
 Node Model::AddLinearFilterBank(Node input, double sampleRate, int numFilters, int numFiltersToUse, double offset)
 {
-    return builder.AddLinearFilterBankNode(Model(_model), GetDefaultOutput(input), sampleRate, numFilters, numFiltersToUse, offset);
+    return builder.AddLinearFilterBankNode(Model(_model), GetDefaultOutputPort(input), sampleRate, numFilters, numFiltersToUse, offset);
 }
 
 Node Model::AddLSTM(Node input, Node reset, size_t hiddenUnits, Node inputWeights, Node hiddenWeights, Node inputBias, Node hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation)
 {
-    return builder.AddLSTMNode(Model(_model), GetDefaultOutput(input), GetDefaultOutput(reset), hiddenUnits, GetDefaultOutput(inputWeights), GetDefaultOutput(hiddenWeights), GetDefaultOutput(inputBias), GetDefaultOutput(hiddenBias), activation, recurrentActivation);
+    return builder.AddLSTMNode(Model(_model), GetDefaultOutputPort(input), GetDefaultOutputPort(reset), hiddenUnits, GetDefaultOutputPort(inputWeights), GetDefaultOutputPort(hiddenWeights), GetDefaultOutputPort(inputBias), GetDefaultOutputPort(hiddenBias), activation, recurrentActivation);
 }
 
 Node Model::AddMatrixMultiply(Node input1, Node input2)
 {
-    return builder.AddMatrixMultiplyNode(Model(_model), GetDefaultOutput(input1), GetDefaultOutput(input2));
+    return builder.AddMatrixMultiplyNode(Model(_model), GetDefaultOutputPort(input1), GetDefaultOutputPort(input2));
 }
 
 Node Model::AddMelFilterBank(Node input, double sampleRate, int fftSize, int numFilters, int numFiltersToUse, double offset)
 {
-    return builder.AddMelFilterBankNode(Model(_model), GetDefaultOutput(input), sampleRate, fftSize, numFilters, numFiltersToUse, offset);
+    return builder.AddMelFilterBankNode(Model(_model), GetDefaultOutputPort(input), sampleRate, fftSize, numFilters, numFiltersToUse, offset);
 }
 
 Node Model::AddNeuralNetworkPredictor(Node input, ell::api::predictors::NeuralNetworkPredictor predictor)
 {
-    return builder.AddNeuralNetworkPredictorNode(Model(_model), GetDefaultOutput(input), predictor);
+    return builder.AddNeuralNetworkPredictorNode(Model(_model), GetDefaultOutputPort(input), predictor);
 }
 
 OutputNode Model::AddOutput(const PortMemoryLayout& memoryLayout, Node input)
 {
-    return builder.AddOutputNode(Model(_model), memoryLayout, GetDefaultOutput(input));
+    return builder.AddOutputNode(Model(_model), memoryLayout, GetDefaultOutputPort(input));
+}
+
+OutputNode Model::AddOutput(Node input)
+{
+    return builder.AddOutputNode(Model(_model), GetDefaultOutputPort(input).GetMemoryLayout(), GetDefaultOutputPort(input));
 }
 
 Node Model::AddReinterpretLayout(Node input, PortMemoryLayout outputMemoryLayout)
 {
-    return builder.AddReinterpretLayoutNode(Model(_model), GetDefaultOutput(input), outputMemoryLayout);
+    return builder.AddReinterpretLayoutNode(Model(_model), GetDefaultOutputPort(input), outputMemoryLayout);
 }
 
 Node Model::AddReorderData(Node input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order, double outputPaddingValue)
 {
-    return builder.AddReorderDataNode(Model(_model), GetDefaultOutput(input), inputMemoryLayout, outputMemoryLayout, order, outputPaddingValue);
+    return builder.AddReorderDataNode(Model(_model), GetDefaultOutputPort(input), inputMemoryLayout, outputMemoryLayout, order, outputPaddingValue);
 }
 
 Node Model::AddReorderData(Node input, std::vector<int> order)
 {
-    return builder.AddReorderDataNode(Model(_model), GetDefaultOutput(input), order);
+    return builder.AddReorderDataNode(Model(_model), GetDefaultOutputPort(input), order);
 }
 
 Node Model::AddRNN(Node input, Node reset, size_t hiddenUnits, Node inputWeights, Node hiddenWeights, Node inputBias, Node hiddenBias, ell::api::predictors::neural::ActivationType activation)
 {
-    return builder.AddRNNNode(Model(_model), GetDefaultOutput(input), GetDefaultOutput(reset), hiddenUnits, GetDefaultOutput(inputWeights), GetDefaultOutput(hiddenWeights), GetDefaultOutput(inputBias), GetDefaultOutput(hiddenBias), activation);
+    return builder.AddRNNNode(Model(_model), GetDefaultOutputPort(input), GetDefaultOutputPort(reset), hiddenUnits, GetDefaultOutputPort(inputWeights), GetDefaultOutputPort(hiddenWeights), GetDefaultOutputPort(inputBias), GetDefaultOutputPort(hiddenBias), activation);
 }
 
 SinkNode Model::AddSink(Node input, const PortMemoryLayout& memoryLayout, const std::string& sinkFunctionName, Node trigger)
@@ -505,14 +566,14 @@ SinkNode Model::AddSink(Node input, const PortMemoryLayout& memoryLayout, const 
     PortElements triggerElements;
     if (trigger.GetNode() != nullptr)
     {
-        triggerElements = GetDefaultOutput(trigger);
+        triggerElements = GetDefaultOutputPort(trigger);
     }
-    return builder.AddSinkNode(Model(_model), GetDefaultOutput(input), memoryLayout, sinkFunctionName, triggerElements);
+    return builder.AddSinkNode(Model(_model), GetDefaultOutputPort(input), memoryLayout, sinkFunctionName, triggerElements);
 }
 
 SourceNode Model::AddSource(Node input, PortType outputType, const PortMemoryLayout& memoryLayout, const std::string& sourceFunctionName)
 {
-    return builder.AddSourceNode(Model(_model), GetDefaultOutput(input), outputType, memoryLayout, sourceFunctionName);
+    return builder.AddSourceNode(Model(_model), GetDefaultOutputPort(input), outputType, memoryLayout, sourceFunctionName);
 }
 
 Node Model::AddSplice(const std::vector<Node>& inputs)
@@ -521,7 +582,7 @@ Node Model::AddSplice(const std::vector<Node>& inputs)
     std::vector<PortElements*> elements;
     for (const auto node : inputs)
     {
-        elements_list.push_back(GetDefaultOutput(node));
+        elements_list.push_back(GetDefaultOutputPort(node));
         elements.push_back(&elements_list.back());
     }
     return builder.AddSpliceNode(Model(_model), elements);
@@ -529,17 +590,17 @@ Node Model::AddSplice(const std::vector<Node>& inputs)
 
 Node Model::AddTypeCast(Node input, PortType outputType)
 {
-    return builder.AddTypeCastNode(Model(_model), GetDefaultOutput(input), outputType);
+    return builder.AddTypeCastNode(Model(_model), GetDefaultOutputPort(input), outputType);
 }
 
 Node Model::AddUnaryOperation(Node input, UnaryOperationType operation)
 {
-    return builder.AddUnaryOperationNode(Model(_model), GetDefaultOutput(input), operation);
+    return builder.AddUnaryOperationNode(Model(_model), GetDefaultOutputPort(input), operation);
 }
 
 Node Model::AddVoiceActivityDetector(Node input, double sampleRate, double frameDuration, double tauUp, double tauDown, double largeInput, double gainAtt, double thresholdUp, double thresholdDown, double levelThreshold)
 {
-    return builder.AddVoiceActivityDetectorNode(Model(_model), GetDefaultOutput(input), sampleRate, frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold);
+    return builder.AddVoiceActivityDetectorNode(Model(_model), GetDefaultOutputPort(input), sampleRate, frameDuration, tauUp, tauDown, largeInput, gainAtt, thresholdUp, thresholdDown, levelThreshold);
 }
 
 std::string Model::GetMetadataValue(const std::string& key)
@@ -613,7 +674,7 @@ Map::Map(Model model, InputNode inputNode, PortElements output)
 
 Map::Map(Model model, InputNode inputNode, OutputNode outputNode)
 {
-    auto output = GetDefaultOutput(outputNode);
+    auto output = GetDefaultOutputPort(outputNode);
     const ell::model::InputNodeBase* innerInputNode = inputNode.GetInputNode();
     std::string name = innerInputNode->GetFriendlyName();
     if (name.empty())
@@ -679,7 +740,7 @@ Map::Map(Model model, const std::vector<InputNode*> inputNodes, const std::vecto
     ell::utilities::UniqueNameList outputScope;
     for (auto& outputNode : outputNodes)
     {
-        auto output = GetDefaultOutput(*outputNode);
+        auto output = GetDefaultOutputPort(*outputNode);
         const ell::model::PortElementsBase& innerPortElements = output.GetPortElements();
         auto name = outputScope.Add(GetVariableName(innerPortElements, "output"));
         mapOutputs.push_back({ name, ellModel->SimplifyOutputs(innerPortElements) });
@@ -865,6 +926,16 @@ std::vector<float> Map::ComputeFloat(const std::vector<float>& inputData)
     return _map->Compute<float>(inputData);
 }
 
+std::vector<int> Map::ComputeInt(const std::vector<int>& inputData)
+{
+    return _map->Compute<int>(inputData);
+}
+
+std::vector<int64_t> Map::ComputeInt64(const std::vector<int64_t>& inputData)
+{
+    return _map->Compute<int64_t>(inputData);
+}
+
 CompiledMap Map::Compile(const std::string& targetDevice, const std::string& moduleName, const std::string& functionName, const MapCompilerOptions& compilerSettings, const ModelOptimizerOptions& optimizerSettings) const
 {
     ell::model::MapCompilerOptions settings;
@@ -1023,15 +1094,15 @@ std::vector<int> CompiledMap::ComputeInt(const std::vector<int>& inputData)
     }
     return {};
 }
-//
-//std::vector<int64_t> CompiledMap::ComputeInt64(const std::vector<int64_t>& inputData)
-//{
-//    if (_compiledMap != nullptr)
-//    {
-//        return _compiledMap->Compute<int64_t>(inputData);
-//    }
-//    return {};
-//}
+
+std::vector<int64_t> CompiledMap::ComputeInt64(const std::vector<int64_t>& inputData)
+{
+    if (_compiledMap != nullptr)
+    {
+        return _compiledMap->Compute<int64_t>(inputData);
+    }
+    return {};
+}
 
 void CompiledMap::Reset()
 {

@@ -10,6 +10,7 @@
 #include "Node.h"
 
 #include <utilities/include/StringUtil.h>
+#include <utilities/include/Boolean.h>
 
 #include <cctype>
 
@@ -55,6 +56,12 @@ namespace model
 
     template <>
     Port::PortType Port::GetPortType<bool>()
+    {
+        return Port::PortType::boolean;
+    }
+
+    template <>
+    Port::PortType Port::GetPortType<utilities::Boolean>()
     {
         return Port::PortType::boolean;
     }

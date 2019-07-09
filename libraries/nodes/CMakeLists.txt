@@ -11,6 +11,7 @@ set(src
     src/BiasLayerNode.cpp
     src/BinaryConvolutionalLayerNode.cpp
     src/BroadcastOperationNodes.cpp
+    src/BufferNode.cpp
     src/ClockNode.cpp
     src/ConstantNode.cpp
     src/ConvolutionalLayerNode.cpp

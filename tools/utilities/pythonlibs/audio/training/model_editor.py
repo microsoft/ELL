@@ -48,7 +48,7 @@ class ModelEditor:
                                                                           threshold_down, level_threshold)
             # make the vad node the "resetTrigger" input of this rnn node
             reset_output = ell.nodes.PortElements(self.vad_node.GetOutputPort("output"))
-            self.builder.ResetInput(rnn, reset_output, "resetTrigger")
+            rnn.ResetInput(reset_output, "resetTrigger")
             return True
         return False
 

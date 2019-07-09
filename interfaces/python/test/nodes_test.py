@@ -461,6 +461,18 @@ def test_fftnode_size(testing, inputSize, fftSize):
     test_with_serialization(testing, map, "test_fftnode ({})".format(fftSize), fftnode_callback)
 
 
+def cast_to_port_type(a, portType):
+    if portType == ell.nodes.PortType.real:
+        return a.astype(np.float)
+    elif portType == ell.nodes.PortType.smallReal:
+        return a.astype(np.float32)
+    elif portType == ell.nodes.PortType.integer:
+        return a.astype(np.int32)
+    elif portType == ell.nodes.PortType.bigInt:
+        return a.astype(np.int64)
+    raise Exception("Unsupported type")
+
+
 class TypeCastInfo:
     def __init__(self, name, t):
         self.name = name
@@ -478,23 +490,14 @@ class TypeCastInfo:
         raise Exception("Unsupported type")
 
     def cast_vector(self, a):
-        if self.t == ell.nodes.PortType.real:
-            return a.astype(np.float)
-        elif self.t == ell.nodes.PortType.smallReal:
-            return a.astype(np.float32)
-        elif self.t == ell.nodes.PortType.integer:
-            return a.astype(np.int)
-        elif self.t == ell.nodes.PortType.bigInt:
-            return a.astype(np.int64)
-        raise Exception("Unsupported type")
-
+        return cast_to_port_type(a, self.t)
 
 def test_typecast(testing):
     # Test a model that has differen types callbacks.
     for t in [TypeCastInfo("real", ell.nodes.PortType.real),
               TypeCastInfo("smallReal", ell.nodes.PortType.smallReal),
               TypeCastInfo("integer", ell.nodes.PortType.integer),
-              # TypeCastInfo("bigInt", ell.nodes.PortType.bigInt)
+              TypeCastInfo("bigInt", ell.nodes.PortType.bigInt)
               ]:
 
         model = ell.model.Model()
@@ -525,6 +528,58 @@ def test_typecast(testing):
                             testing.IsEqual(np.array(o), expected))
 
 
+def get_porttype_name(portType):
+    if portType == ell.nodes.PortType.smallReal:
+        return "smallReal"
+    if portType == ell.nodes.PortType.real:
+        return "real"
+    if portType == ell.nodes.PortType.integer:
+        return "integer"
+    if portType == ell.nodes.PortType.bigInt:
+        return "bigInt"
+    if portType == ell.nodes.PortType.categorical:
+        return "categorical"
+    if portType == ell.nodes.PortType.boolean:
+        return "boolean"
+    return "unknown"
+
+
+def test_buffer(testing, portType):
+    model = ell.model.Model()
+    input_size = 10
+    output_size = 57
+    input = model.AddInput(ell.model.PortMemoryLayout([input_size]), portType)
+    buffer = model.AddBuffer(input, output_size)
+    output = model.AddOutput(buffer)
+    map = ell.model.Map(model, input, output)
+    compiled = map.Compile("host", "test", "predict")
+
+    portTypeName = get_porttype_name(portType)
+
+    expected = np.zeros((output_size))
+    for i in range(10):
+        input = cast_to_port_type(np.array(range(10)) + (i * input_size), portType)
+        out1 = map.Compute(input)
+        out2 = compiled.Compute(input)
+        expected = np.concatenate((expected[input_size:], input))
+        testing.ProcessTest("Testing test_buffer on {}, iteration {} compute".format(portTypeName, i),
+                            testing.IsEqual(out1, expected, verbose=True))
+        testing.ProcessTest("Testing test_buffer on {}, iteration {} compiled".format(portTypeName, i),
+                            testing.IsEqual(out2, expected, verbose=True))
+
+    # test reset works
+    map.Reset()
+    compiled.Reset()
+    input = cast_to_port_type(np.array(range(10)), portType)
+    out1 = map.Compute(input)
+    out2 = compiled.Compute(input)
+    expected = np.concatenate((np.zeros(output_size - input_size), input))
+    testing.ProcessTest("Testing test_buffer on {}, reset compute".format(portTypeName),
+                        testing.IsEqual(out1, expected))
+    testing.ProcessTest("Testing test_buffer on {}, reset compiled".format(portTypeName),
+                        testing.IsEqual(out2, expected))
+
+
 def test_fftnode(testing):
     try:
         test_fftnode_size(testing, 100, 100)
@@ -540,6 +595,10 @@ def test_fftnode(testing):
 
 def test():
     testing = Testing()
+    test_buffer(testing, ell.nodes.PortType.smallReal)
+    test_buffer(testing, ell.nodes.PortType.real)
+    test_buffer(testing, ell.nodes.PortType.integer)
+    test_buffer(testing, ell.nodes.PortType.bigInt)
     test_reorder(testing)
     test_typecast(testing)
     test_unary(testing)

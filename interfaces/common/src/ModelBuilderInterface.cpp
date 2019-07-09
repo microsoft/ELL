@@ -19,7 +19,6 @@
 
 #include <model/include/InputNode.h>
 #include <model/include/InputNodeBase.h>
-#include <model/include/ModelEditor.h>
 #include <model/include/OutputNode.h>
 #include <model/include/SpliceNode.h>
 
@@ -57,6 +56,7 @@
 #include <predictors/neural/include/RegionDetectionLayer.h>
 #include <predictors/neural/include/ScalingLayer.h>
 
+#include <utilities/include/Boolean.h>
 #include <utilities/include/Exception.h>
 
 #include <algorithm>
@@ -139,6 +139,9 @@ InputNode ModelBuilder::AddInputNode(Model model, const PortMemoryLayout& memory
     case PortType::integer:
         newNode = model.GetModel()->AddNode<ell::model::InputNode<int>>(outputLayout);
         break;
+    case PortType::bigInt:
+        newNode = model.GetModel()->AddNode<ell::model::InputNode<int64_t>>(outputLayout);
+        break;
     case PortType::real:
         newNode = model.GetModel()->AddNode<ell::model::InputNode<double>>(outputLayout);
         break;
@@ -166,14 +169,14 @@ OutputNode ModelBuilder::AddOutputNode(Model model, const PortMemoryLayout& memo
     case PortType::integer:
         newNode = model.GetModel()->AddNode<ell::model::OutputNode<int>>(ell::model::PortElements<int>(elements), outputShape);
         break;
+    case PortType::bigInt:
+        newNode = model.GetModel()->AddNode<ell::model::OutputNode<int64_t>>(ell::model::PortElements<int64_t>(elements), outputShape);
+        break;
     case PortType::real:
         newNode = model.GetModel()->AddNode<ell::model::OutputNode<double>>(ell::model::PortElements<double>(elements), outputShape);
         break;
     case PortType::smallReal:
         newNode = model.GetModel()->AddNode<ell::model::OutputNode<float>>(ell::model::PortElements<float>(elements), outputShape);
-        break;
-    case PortType::bigInt:
-        newNode = model.GetModel()->AddNode<ell::model::OutputNode<int64_t>>(ell::model::PortElements<int64_t>(elements), outputShape);
         break;
     default:
         throw std::invalid_argument(std::string("Error: could not create OutputNode of the requested type") + typeid(type).name());
@@ -344,6 +347,9 @@ Node ModelBuilder::AddConcatenationNode(Model model, const PortMemoryLayout& out
     case PortType::integer:
         newNode = model.GetModel()->AddNode<ell::nodes::ConcatenationNode<int>>(GetPortElementsFromList<int>(inputs), outputMemoryLayout.Get());
         break;
+    case PortType::bigInt:
+        newNode = model.GetModel()->AddNode<ell::nodes::ConcatenationNode<int64_t>>(GetPortElementsFromList<int64_t>(inputs), outputMemoryLayout.Get());
+        break;
     case PortType::real:
         newNode = model.GetModel()->AddNode<ell::nodes::ConcatenationNode<double>>(GetPortElementsFromList<double>(inputs), outputMemoryLayout.Get());
         break;
@@ -384,6 +390,9 @@ Node ModelBuilder::AddSpliceNode(Model model, const std::vector<PortElements*>& 
     case PortType::integer:
         newNode = model.GetModel()->AddNode<ell::model::SpliceNode<int>>(GeOutputPortElementsFromList(inputs));
         break;
+    case PortType::bigInt:
+        newNode = model.GetModel()->AddNode<ell::model::SpliceNode<int64_t>>(GeOutputPortElementsFromList(inputs));
+        break;
     case PortType::real:
         newNode = model.GetModel()->AddNode<ell::model::SpliceNode<double>>(GeOutputPortElementsFromList(inputs));
         break;
@@ -415,6 +424,9 @@ Node ModelBuilder::AddReinterpretLayoutNode(Model model, PortElements input, Por
         break;
     case PortType::integer:
         newNode = model.GetModel()->AddNode<ell::nodes::ReinterpretLayoutNode<int>>(ell::model::PortElements<int>(elements), outputLayout);
+        break;
+    case PortType::bigInt:
+        newNode = model.GetModel()->AddNode<ell::nodes::ReinterpretLayoutNode<int64_t>>(ell::model::PortElements<int64_t>(elements), outputLayout);
         break;
     case PortType::real:
         newNode = model.GetModel()->AddNode<ell::nodes::ReinterpretLayoutNode<double>>(ell::model::PortElements<double>(elements), outputLayout);
@@ -596,14 +608,14 @@ Node ModelBuilder::AddConstantNode(Model model, std::vector<double> values, Port
     case PortType::integer:
         newNode = model.GetModel()->AddNode<ell::nodes::ConstantNode<int>>(CastVector<int>(values));
         break;
+    case PortType::bigInt:
+        newNode = model.GetModel()->AddNode<ell::nodes::ConstantNode<int64_t>>(CastVector<int64_t>(values));
+        break;
     case PortType::real:
         newNode = model.GetModel()->AddNode<ell::nodes::ConstantNode<double>>(CastVector<double>(values));
         break;
     case PortType::smallReal:
         newNode = model.GetModel()->AddNode<ell::nodes::ConstantNode<float>>(CastVector<float>(values));
-        break;
-    case PortType::bigInt:
-        newNode = model.GetModel()->AddNode<ell::nodes::ConstantNode<int64_t>>(CastVector<int64_t>(values));
         break;
     default:
         throw std::invalid_argument("Error: could not create ConstantNode of the requested type");
@@ -623,14 +635,14 @@ Node ModelBuilder::AddConstantNode(Model model, std::vector<double> values, cons
     case PortType::integer:
         newNode = model.GetModel()->AddNode<ell::nodes::ConstantNode<int>>(CastVector<int>(values), outputLayout);
         break;
+    case PortType::bigInt:
+        newNode = model.GetModel()->AddNode<ell::nodes::ConstantNode<int64_t>>(CastVector<int64_t>(values), outputLayout);
+        break;
     case PortType::real:
         newNode = model.GetModel()->AddNode<ell::nodes::ConstantNode<double>>(values, outputLayout);
         break;
     case PortType::smallReal:
         newNode = model.GetModel()->AddNode<ell::nodes::ConstantNode<float>>(CastVector<float>(values), outputLayout);
-        break;
-    case PortType::bigInt:
-        newNode = model.GetModel()->AddNode<ell::nodes::ConstantNode<int64_t>>(CastVector<int64_t>(values), outputLayout);
         break;
     default:
         throw std::invalid_argument("Error: could not create ConstantNode of the requested type");
@@ -652,6 +664,9 @@ Node ModelBuilder::AddUnaryOperationNode(Model model, PortElements input, UnaryO
         break;
     case PortType::integer:
         newNode = model.GetModel()->AddNode<ell::nodes::UnaryOperationNode<int>>(ell::model::PortElements<int>(elements), operation);
+        break;
+    case PortType::bigInt:
+        newNode = model.GetModel()->AddNode<ell::nodes::UnaryOperationNode<int64_t>>(ell::model::PortElements<int64_t>(elements), operation);
         break;
     case PortType::real:
         newNode = model.GetModel()->AddNode<ell::nodes::UnaryOperationNode<double>>(ell::model::PortElements<double>(elements), operation);
@@ -686,6 +701,9 @@ Node ModelBuilder::AddBinaryOperationNode(Model model, PortElements input1, Port
         case PortType::integer:
             newNode = model.GetModel()->AddNode<ell::nodes::BroadcastBinaryOperationNode<int>>(ell::model::PortElements<int>(elements1), ell::model::PortElements<int>(elements2), operation);
             break;
+        case PortType::bigInt:
+            newNode = model.GetModel()->AddNode<ell::nodes::BroadcastBinaryOperationNode<int64_t>>(ell::model::PortElements<int64_t>(elements1), ell::model::PortElements<int64_t>(elements2), operation);
+            break;
         case PortType::real:
             newNode = model.GetModel()->AddNode<ell::nodes::BroadcastBinaryOperationNode<double>>(ell::model::PortElements<double>(elements1), ell::model::PortElements<double>(elements2), operation);
             break;
@@ -705,6 +723,9 @@ Node ModelBuilder::AddBinaryOperationNode(Model model, PortElements input1, Port
             break;
         case PortType::integer:
             newNode = model.GetModel()->AddNode<ell::nodes::BinaryOperationNode<int>>(ell::model::PortElements<int>(elements1), ell::model::PortElements<int>(elements2), operation);
+            break;
+        case PortType::bigInt:
+            newNode = model.GetModel()->AddNode<ell::nodes::BinaryOperationNode<int64_t>>(ell::model::PortElements<int64_t>(elements1), ell::model::PortElements<int64_t>(elements2), operation);
             break;
         case PortType::real:
             newNode = model.GetModel()->AddNode<ell::nodes::BinaryOperationNode<double>>(ell::model::PortElements<double>(elements1), ell::model::PortElements<double>(elements2), operation);
@@ -750,10 +771,13 @@ Node ModelBuilder::AddBufferNode(Model model, PortElements input, int windowSize
     switch (type)
     {
     case PortType::boolean:
-        newNode = model.GetModel()->AddNode<ell::nodes::BufferNode<bool>>(ell::model::PortElements<bool>(elements), windowSize);
+        newNode = model.GetModel()->AddNode<ell::nodes::BufferNode<Boolean>>(ell::model::PortElements<Boolean>(elements), windowSize);
         break;
     case PortType::integer:
         newNode = model.GetModel()->AddNode<ell::nodes::BufferNode<int>>(ell::model::PortElements<int>(elements), windowSize);
+        break;
+    case PortType::bigInt:
+        newNode = model.GetModel()->AddNode<ell::nodes::BufferNode<int64_t>>(ell::model::PortElements<int64_t>(elements), windowSize);
         break;
     case PortType::real:
         newNode = model.GetModel()->AddNode<ell::nodes::BufferNode<double>>(ell::model::PortElements<double>(elements), windowSize);
@@ -1523,50 +1547,6 @@ Node ModelBuilder::AddDTWNode(Model model, std::vector<std::vector<double>> prot
         throw std::invalid_argument("Error: could not create DCTNode of the requested type");
     }
     return Node(newNode, model.GetModel());
-}
-
-void ModelBuilder::ResetInput(Node node, PortElements input, std::string input_port_name)
-{
-    auto type = input.GetType();
-    switch (type)
-    {
-    case PortType::real:
-        InternalResetInput<double>(node, input, input_port_name);
-        break;
-    case PortType::smallReal:
-        InternalResetInput<float>(node, input, input_port_name);
-        break;
-    case PortType::integer:
-        InternalResetInput<int>(node, input, input_port_name);
-        break;
-    default:
-        throw std::invalid_argument("Error: could not ResetInput of the requested type");
-    }
-}
-
-template <typename ElementType>
-void ModelBuilder::InternalResetInput(Node node, PortElements input, std::string input_port_name)
-{
-    using namespace ell::predictors::neural;
-    using namespace ell::nodes;
-    auto elements = input.GetPortElements();
-    const ell::model::Node* innerNode = node.GetNode();
-
-    ell::model::PortElements<ElementType> innerElements(elements);
-    if (!innerElements.IsFullPortOutput())
-    {
-        throw std::invalid_argument("Error: new input must be have a single range");
-    }
-
-    auto inputPort = innerNode->GetInputPort(input_port_name);
-    if (!inputPort)
-    {
-        throw std::invalid_argument("Error: input port named '" + input_port_name + "' was not found on this node");
-    }
-
-    ell::model::ModelEditor::ResetInputPort(
-        innerNode->GetInputPort(input_port_name),
-        *innerElements.GetElement(0).ReferencedPort());
 }
 
 // explicit instantiations

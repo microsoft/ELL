@@ -44,13 +44,13 @@ std::vector<void*> GetOutputBuffersFromList(std::shared_ptr<ell::model::Map> map
 %template(RegisterCallbackDouble) ELL_API::SinkNode::RegisterCallback<double>;
 %template(RegisterCallbackFloat) ELL_API::SinkNode::RegisterCallback<float>;
 %template(RegisterCallbackInt) ELL_API::SinkNode::RegisterCallback<int>;
-//%template(RegisterCallbackInt64) ELL_API::SinkNode::RegisterCallback<int64_t>;
+%template(RegisterCallbackInt64) ELL_API::SinkNode::RegisterCallback<int64_t>;
 %template(RegisterCallbackBoolean) ELL_API::SinkNode::RegisterCallback<bool>;
 
 %template(RegisterCallbackDouble) ELL_API::SourceNode::RegisterCallback<double>;
 %template(RegisterCallbackFloat) ELL_API::SourceNode::RegisterCallback<float>;
 %template(RegisterCallbackInt) ELL_API::SourceNode::RegisterCallback<int>;
-//%template(RegisterCallbackInt64) ELL_API::SourceNode::RegisterCallback<int64_t>;
+%template(RegisterCallbackInt64) ELL_API::SourceNode::RegisterCallback<int64_t>;
 %template(RegisterCallbackBoolean) ELL_API::SourceNode::RegisterCallback<bool>;
 
 %template(StepDouble) ELL_API::Map::Step<double>;

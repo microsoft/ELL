@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     ModelInterface.h (interfaces)
-//  Authors:  Chuck Jacobs, Kirk Olynyk
+//  Authors:  Chuck Jacobs, Kirk Olynyk, Chris Lovett
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma once
@@ -141,6 +141,8 @@ public:
     std::string GetMetadataValue(const std::string& key);
     void SetMetadataValue(const std::string& key, const std::string& value);
     void CopyMetadataFrom(const Node& other);
+    void ResetInput(PortElements newInput, std::string input_port_name = "input");
+    void ResetInput(Node newInput, std::string input_port_name = "input");
 #ifndef SWIG
     Node(const ell::model::Node* other, std::shared_ptr<ell::model::Model> model);
     const ell::model::Node* GetNode() const { return _node; }
@@ -285,6 +287,7 @@ public:
     Node AddMelFilterBank(Node input, double sampleRate, int fftSize, int numFilters, int numFiltersToUse, double offset = 0);
     Node AddNeuralNetworkPredictor(Node input, ell::api::predictors::NeuralNetworkPredictor predictor);
     OutputNode AddOutput(const PortMemoryLayout& memoryLayout, Node input);
+    OutputNode AddOutput(Node input);
     Node AddReinterpretLayout(Node input, PortMemoryLayout outputMemoryLayout);
     Node AddReorderData(Node input, std::vector<int> order);
     Node AddReorderData(Node input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order = {}, double outputPaddingValue = 0.0);
@@ -365,6 +368,8 @@ public:
     std::vector<double> ComputeDouble(const AutoDataVector& inputData);
     std::vector<double> ComputeDouble(const std::vector<double>& inputData);
     std::vector<float> ComputeFloat(const std::vector<float>& inputData);
+    std::vector<int> ComputeInt(const std::vector<int>& inputData);
+    std::vector<int64_t> ComputeInt64(const std::vector<int64_t>& inputData);
 
 #ifndef SWIG
     std::shared_ptr<ell::model::Map> GetInnerMap() const { return _map; }
@@ -426,8 +431,7 @@ public:
     std::vector<double> ComputeDouble(const std::vector<double>& inputData);
     std::vector<float> ComputeFloat(const std::vector<float>& inputData);
     std::vector<int> ComputeInt(const std::vector<int>& inputData);
-    // bugbug: not working on GCC, Clang
-    //std::vector<int64_t> ComputeInt64(const std::vector<int64_t>& inputData);
+    std::vector<int64_t> ComputeInt64(const std::vector<int64_t>& inputData);
 
     void Reset();
 
