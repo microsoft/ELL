@@ -42,7 +42,7 @@ namespace nodes
     UnaryOperationNode<ValueType>::UnaryOperationNode(const model::OutputPort<ValueType>& input, UnaryOperationType operation) :
         CompilableCodeNode("UnaryOperationNode", { &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
-        _output(this, defaultOutputPortName, _input.Size()),
+        _output(this, defaultOutputPortName, _input.GetMemoryLayout()),
         _operation(operation)
     {
     }

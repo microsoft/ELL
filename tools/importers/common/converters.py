@@ -665,7 +665,8 @@ class ConvertBinaryConvolution(ConvertBase):
             input_node = lookup_table.get_ell_node_from_importer_node_id(owning_node_for_input.id)
             port_elements = lookup_table.get_output_port_elements_for_node(input_node)
             shape_entry = owning_node_for_input.output_shapes[0]
-            input_memory_layout = memory_shapes.get_ell_port_memory_layout(shape_entry[0], shape_entry[1], 0)
+            input_memory_layout = memory_shapes.get_ell_port_memory_layout(
+                shape_entry[0], shape_entry[1], owning_node_for_input.output_padding["size"])
             output_memory_layout = memory_shapes.get_ell_port_memory_layout(shape_entry[0], shape_entry[1], padding)
             # Create the reorder node
             reorder_node = builder.AddReorderDataNode(model, port_elements, input_memory_layout, output_memory_layout,
@@ -727,7 +728,8 @@ class ConvertConvolution(ConvertBase):
             input_node = lookup_table.get_ell_node_from_importer_node_id(owning_node_for_input.id)
             port_elements = lookup_table.get_output_port_elements_for_node(input_node)
             shape_entry = owning_node_for_input.output_shapes[0]
-            input_memory_layout = memory_shapes.get_ell_port_memory_layout(shape_entry[0], shape_entry[1], 0)
+            input_memory_layout = memory_shapes.get_ell_port_memory_layout(
+                shape_entry[0], shape_entry[1], owning_node_for_input.output_padding["size"])
             output_memory_layout = memory_shapes.get_ell_port_memory_layout(shape_entry[0], shape_entry[1], padding)
             # Create the reorder node
             reorder_node = builder.AddReorderDataNode(model, port_elements, input_memory_layout, output_memory_layout,

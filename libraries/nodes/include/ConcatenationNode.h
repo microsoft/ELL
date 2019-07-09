@@ -145,7 +145,7 @@ namespace nodes
     void ConcatenationNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         const auto& newPortElements = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<ConcatenationNode<ValueType>>(newPortElements, GetShape());
+        auto newNode = transformer.AddNode<ConcatenationNode<ValueType>>(newPortElements, _output.GetMemoryLayout());
         transformer.MapNodeOutput(output, newNode->output);
     }
 
