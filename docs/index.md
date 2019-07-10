@@ -24,7 +24,7 @@ laptop or desktop computer. If you intend to deploy models onto a Raspberry Pi, 
 A great place to start is our [tutorials section](/ELL/tutorials). As we develop and release new functionality in ELL, we also publish tutorials that showcase that functionality. Currently, our tutorials are focused on simple embedded computer vision tasks on Raspberry Pi, but we expect the scope to grow with time. Have fun!
 
 ## The ELL Gallery
-Our [gallery](/ELL/gallery) is a collection of bits and pieces that you can download and use in your projects. Currently, the gallery includes a handful of pre-trained computer vision models, some keyword spotting audio models, and instructions for 3D printing an [active cooling attachment](/ELL/gallery/Raspberry-Pi-3-Fan-Mount) for your Raspberry Pi.
+Our [gallery](/docs/gallery/index.md) is a collection of bits and pieces that you can download and use in your projects. Currently, the gallery includes a handful of pre-trained computer vision models, some keyword spotting audio models, and instructions for 3D printing an [active cooling attachment](/ELL/gallery/Raspberry-Pi-3-Fan-Mount) for your Raspberry Pi.
 
 ## License
 The ELL code and sample code in our tutorials are released under the [MIT Open Source License](https://github.com/Microsoft/ELL/blob/master/LICENSE.txt). Some of the other content on this website, such as the 3D models in our gallery, are released under the [Creative Commons Attribution 4.0 license](https://creativecommons.org/licenses/by/4.0/).
