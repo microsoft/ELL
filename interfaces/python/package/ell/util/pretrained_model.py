@@ -109,6 +109,12 @@ class PretrainedModel:
             print('compiled model up to date')
             return cmakefile
 
+    def get_vs_version(self):
+        vscmdver = os.getenv("VSCMD_VER")
+        if vscmdver:
+            return vscmdver.split('.')[0]
+        return ""
+
     def build(self, target='host'):
         orig_dir = os.getcwd()
         try:
@@ -123,8 +129,16 @@ class PretrainedModel:
             if not os.path.exists('include'):
                 shutil.copytree(os.path.join(pkg_dir, 'include'), 'include')
             if _is_windows(target):
-                _buildtools.run(['cmake', '-G', 'Visual Studio 15 2017 Win64', '-Thost=x64', '-DPROCESSOR_HINT=haswell', '.'],
-                                shell=True)
+                vsver = self.get_vs_version()
+                if vsver == "15":
+                    _buildtools.run(['cmake', '-G', 'Visual Studio 15 2017 Win64', '-Thost=x64', '-DPROCESSOR_HINT=haswell', '.'],
+                                    shell=True)                
+                elif vsver == "16":
+                    _buildtools.run(['cmake', '-G', 'Visual Studio 16 2019', '-A', 'x64', '-Thost=x64', '-DPROCESSOR_HINT=haswell', '.'],
+                                    shell=True)
+                else:
+                    raise Exception("Unsupported version of Visual Studio or Visual Studio not found")
+
                 _buildtools.run(['cmake', '--build', '.', '--config', 'Release'], shell=True)
             else:
                 _buildtools.run('cmake .', shell=True)

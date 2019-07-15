@@ -71,7 +71,7 @@ setlocal EnableDelayedExpansion
 
 if %dev_cmd% equ true (
     REM Start a new window for VS dev cmd
-    for /f "delims=" %%i in ('%ext_path%\vswhere.2.1.3\tools\vswhere.exe -prerelease -latest -property installationPath') do (
+    for /f "delims=" %%i in ('%ext_path%\vswhere.2.6.7\tools\vswhere.exe -prerelease -latest -property installationPath') do (
         if exist "%%i\Common7\Tools\vsdevcmd.bat" (
             echo == Load VS Developer Command Prompt ==
             start %comspec% /k "%%i\Common7\Tools\vsdevcmd.bat"
@@ -143,8 +143,8 @@ if %PROCESSOR_ARCHITECTURE% == AMD64 (
 goto AddNugetPath
 
 :AddNugetPath
-set PATH=%PATH%;%ext_path%\Doxygen.1.8.13\tools;%ext_path%\vswhere.2.1.3\tools;%ext_path%\swigwintools.4.0.0\tools\swigwin-4.0.0;%ext_path%\LLVMNativeWindowsLibs.x64.8.0.2\llvm-8.0\bin
-setx PATH "%ext_path%\Doxygen.1.8.13\tools;%ext_path%\vswhere.2.1.3\tools;%ext_path%\swigwintools.4.0.0\tools\swigwin-4.0.0;%ext_path%\LLVMNativeWindowsLibs.x64.8.0.2\llvm-8.0\bin;%PATH%" /M
+set PATH=%PATH%;%ext_path%\Doxygen.1.8.13\tools;%ext_path%\vswhere.2.6.7\tools;%ext_path%\swigwintools.4.0.0\tools\swigwin-4.0.0;%ext_path%\LLVMNativeWindowsLibs.x64.8.0.2\llvm-8.0\bin
+setx PATH "%ext_path%\Doxygen.1.8.13\tools;%ext_path%\vswhere.2.6.7\tools;%ext_path%\swigwintools.4.0.0\tools\swigwin-4.0.0;%ext_path%\LLVMNativeWindowsLibs.x64.8.0.2\llvm-8.0\bin;%PATH%" /M
 setlocal EnableDelayedExpansion
 goto NugetAvailable
 

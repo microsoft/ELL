@@ -81,8 +81,16 @@ class EllBuildTools:
         if self.optexe == "":
             raise Exception(ELL_TOOLS_JSON + " is missing opt info")
 
-        if ("blas" in self.tools):
+        if "blas" in self.tools:
             self.blas = self.tools['blas']  # this one can be empty.
+
+        self.cmake_generator = None
+        if "cmake_generator" in self.tools:
+            self.cmake_generator = self.tools['cmake_generator']
+
+        self.cmake_version = None
+        if "cmake_version" in self.tools:
+            self.cmake_version = self.tools['cmake_version']
 
     def logstream(self, stream):
         try:
@@ -272,3 +280,31 @@ class EllBuildTools:
         self.logger.info("compiling model...")
         self.run(args)
         return out_file
+
+    def get_vs_version(self):
+        vscmdver = os.getenv("VSCMD_VER")
+        if vscmdver:
+            return vscmdver.split('.')[0]
+        return ""
+
+    def cmake_generate(self, path):
+        cmake = ["cmake", path]
+        if os.name == 'nt' and self.cmake_generator is None:
+            vsver = self.get_vs_version()
+            if vsver == "15":
+                self.cmake_generator = "Visual Studio 15 2017 Win64"
+            elif vsver == "16":
+                self.cmake_generator = "Visual Studio 16 2019"
+            else:
+                raise Exception("Unsupported version of Visual Studio or Visual Studio not found")
+
+        if self.cmake_generator:
+            if "Visual Studio" in self.cmake_generator:
+                if "Win64" in self.cmake_generator:
+                    cmake = ["cmake", "-G", self.cmake_generator, "-Thost=x64", path]
+                else:
+                    cmake = ["cmake", "-G", self.cmake_generator, "-A", "x64", "-Thost=x64", path]
+            else:
+                cmake = ["cmake", "-G", self.cmake_generator, path]
+
+        self.run(cmake, print_output=True)

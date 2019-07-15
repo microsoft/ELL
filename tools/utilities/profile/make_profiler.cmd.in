@@ -6,7 +6,7 @@ REM   - create subdirectory (w/name of model)
 REM   - run compile on model and save model .h and .o to subdirectory
 REM   - copy c++ and cmake files to subdirectory
 
-REM Usage: make_profiler.cmd model_file <compile options> 
+REM Usage: make_profiler.cmd model_file <compile options>
 
 set script_dir=%~dp0
 
@@ -34,7 +34,8 @@ REM Platform-specific options
 REM pi3_llc_opts="-relocation-model=pic -mtriple=armv7-linux-gnueabihf -mcpu=cortex-a53"
 set llc_opts="-relocation-model=pic"
 
-mkdir %profiler_directory%
+set win_profiler_directory=%profiler_directory:/=\%
+if not exist %win_profiler_directory% mkdir %win_profiler_directory%
 @COMPILE_EXECUTABLE@ -imap %model_file% --profile --ir --objectCode --header -od %profiler_directory% -ob compiled_model %*
 @COMPILE_EXECUTABLE@ -imap %model_file% --ir --objectCode --header -od %profiler_directory% -ob compiled_model_noprofile %*
 

@@ -20,7 +20,7 @@ if(${PYTHON_ENABLED})
         wrap.py
         README.md)
 
-    set (template_src 
+    set (template_src
         templates/__init__.py.in
         templates/CMakeLists.cpp.txt.in
         templates/CMakeLists.python.txt.in)
@@ -48,12 +48,12 @@ if(${PYTHON_ENABLED})
 
     set(OUTPUT_DIR ${CMAKE_BINARY_DIR})
 
-    set(JSON "{ \"llc\": \"${LLC_EXECUTABLE}\", \"swig\": \"${SWIG_EXECUTABLE}\", \"compile\": \"${GLOBAL_BIN_DIR}/compile\", \"blas\": \"${BLAS_LIBS}\", \"opt\": \"${OPT_EXECUTABLE}\" }")
+    set(JSON "{ \"llc\": \"${LLC_EXECUTABLE}\", \"swig\": \"${SWIG_EXECUTABLE}\", \"compile\": \"${GLOBAL_BIN_DIR}/compile\", \"blas\": \"${BLAS_LIBS}\", \"opt\": \"${OPT_EXECUTABLE}\", \"cmake_generator\": \"${CMAKE_GENERATOR}\", \"cmake_version\": \"${CMAKE_VERSION}\" }")
     file(WRITE "${OUTPUT_DIR}/ell_build_tools.json" "${JSON}")
 
     file(TO_NATIVE_PATH "${BLAS_DLL_DIR}" OPENBLAS_DLL_DIR)
     file(WRITE "${OUTPUT_DIR}/openblas.cmd" "set PATH=%PATH%;${OPENBLAS_DLL_DIR}")
-    
+
     # run flake8
     flake8(${module_name})
 

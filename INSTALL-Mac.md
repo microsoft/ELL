@@ -121,6 +121,12 @@ Optionally, build Python interfaces by typing
 make _ELL_python
 ```
 
+You can test that the python interface is working by running the following test:
+
+```shell
+ctest . --build-config release -R ell-python-interface-test
+```
+
 The generated executables will appear in `ELL/build/bin`.
 
 ## Troubleshooting

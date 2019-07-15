@@ -14,16 +14,16 @@ git clone https://github.com/Microsoft/ELL.git
 
 ELL requires a C++ compiler. On Windows, you can use *Visual Studio 2017 with C++ Desktop Development Workload*. A free version of Visual Studio 2017 is available at <https://www.visualstudio.com/vs/community/> (make sure to select *Desktop Development with C++* during installation).
 
-### CMake 3.8
+### CMake 3.12
 
-ELL uses the [*CMake*](https://cmake.org/) build system and requires version 3.8 or newer. A version of CMake that satisfies this requirement is already provided with Visual Studio 2017. You can find it if you
+ELL uses the [*CMake*](https://cmake.org/) build system and requires version 3.12 or newer. A version of CMake that satisfies this requirement is already provided with Visual Studio 2017. You can find it if you
 use the "Developer Command Prompt' that is installed by Visual Studio.  It lives here:
 ```
 c:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe
 ```
 You may also download new versions of cmake from <https://cmake.org/download/> if you want to.
 
-### LLVM 6.0, SWIG 4.0.0, OpenBLAS 0.2.19.3, and Doxygen 1.8.13 via NuGet
+### LLVM 8.0, SWIG 4.0.0, OpenBLAS 0.2.19.3, and Doxygen 1.8.13 via NuGet
 
 The easiest way to get prebuilt 64-bit versions of these packages is to use the [*NuGet*](https://www.nuget.org/) package manager, version 3.5 or newer. The relevant NuGet packages are specified in `ELL/external/packages.config`. The NuGet command line tool called `NuGet CLI` can be downloaded from <https://docs.nuget.org/ndocs/guides/install-nuget>. After downloading and installing NuGet CLI, open a command prompt, change to the repository's root directory (`ELL`) and type
 
@@ -35,7 +35,7 @@ NuGet will download the prerequisites into the `ELL/external` directory and you 
 
 Here's more information in case you need to install things manually.
 
-* [*LLVM*](http://llvm.org/) is a C++ compiler framework, ELL depends on version 6.0.
+* [*LLVM*](http://llvm.org/) is a C++ compiler framework, ELL depends on version 8.0.
 * [*SWIG*](http://swig.org) version 4.0.0 - a tool that generates Python interfaces to C++ libraries. Required if you intend to use ELL from Python.
 * [*OpenBLAS*](http://www.openblas.net/) version 0.2.19.3 - fast linear algebra. This is optional but can make models execute up to 10 times faster.
 * [*Doxygen*](www.doxygen.org/) version 1.8.13 - this is optional, it is used to generate nice code documentation for the ELL API.
@@ -82,11 +82,11 @@ cd build
 Invoke CMake as follows
 
 ```shell
-cmake -G "Visual Studio 15 2017 Win64" -Thost=x64 ..
+cmake -G "Visual Studio 15 2017 Win64" -T host=x64 -D ONNX=ON ..
 ```
-Don't forget the two dots (..) at the end of the command! This command creates a solution file named `ELL.sln`, and other files, in the `build` directory.
+Don't forget the two dots (..) at the end of the command! This command creates a Visual Studio solution file named `ELL.sln`, and the associated project files in the `build` directory.
 
-After creating the Visual Studio solution, build ELL by typing
+After creating the Visual Studio solution, build ELL by typing:
 
 ```shell
 cmake --build . --config Release
@@ -96,6 +96,12 @@ The project executables will appear in `ELL/build/bin`. Finally, to build ELL's 
 
 ```shell
 cmake --build . --target _ELL_python --config Release
+```
+
+You can test that the python interface is working by running the following test:
+
+```shell
+ctest . --build-config release -R ell-python-interface-test
 ```
 
 ## Path Environment

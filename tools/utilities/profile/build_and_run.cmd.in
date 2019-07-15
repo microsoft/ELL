@@ -12,7 +12,12 @@ REM Create build directory and build project
 if EXIST build rd /s /q build
 mkdir build
 cd build
-cmake -G "@CMAKE_GENERATOR@" ..
+set GENERATOR=@CMAKE_GENERATOR@
+if "%GENERATOR:Win64=%"=="%GENERATOR%" (
+    cmake -G "%GENERATOR%" -A X64 ..
+) else (
+    cmake -G "%GENERATOR%" ..
+)
 if ERRORLEVEL 1 exit /b 1
 cmake --build . --config Release -- /v:m
 if ERRORLEVEL 1 exit /b 1

@@ -7,7 +7,7 @@ if(COMMAND_RESULT)
 endif()
 
 # Run make_profiler script
-message(STATUS "Generating profiler project")
+message(STATUS "Generating profiler project using ${MAKE_PROFILE_SCRIPT}")
 execute_process(COMMAND ${MAKE_PROFILE_SCRIPT} ${MODEL_FILE} ${PROFILE_DIRECTORY} --target host RESULT_VARIABLE COMMAND_RESULT WORKING_DIRECTORY ${BUILD_DIR})
 if(COMMAND_RESULT)
   message(FATAL_ERROR "Error running make_profiler: " ${COMMAND_RESULT})

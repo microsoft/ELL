@@ -139,6 +139,12 @@ make _ELL_python
 
 The generated executables will appear in `ELL/build/bin`.
 
+You can test that the python interface is working by running the following test:
+
+```shell
+ctest . --build-config release -R ell-python-interface-test
+```
+
 # Advanced Installation
 
 The instructions above are enough to start using ELL. For more advanced topics, like testing and generating documentation, please see our [advanced installation instructions](INSTALL-Advanced.md).
