@@ -8,7 +8,7 @@
 # On Linux and Mac, this can be done by call *make* on the specific language wrapper e.g.
 # make _ELL_python
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
 set(GLOBAL_BIN_DIR "${CMAKE_BINARY_DIR}/bin")
 if(WIN32)
@@ -73,7 +73,8 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
         configure_file(${file} ${file} COPYONLY)
     endforeach()
 
-    set(CMAKE_SWIG_FLAGS -c++ -Fmicrosoft) # for debugging type-related problems, try adding these flags: -debug-classes -debug-typedef  -debug-template)
+    set(CMAKE_SWIG_FLAGS -Fmicrosoft) # for debugging type-related problems, try adding these flags: -debug-classes -debug-typedef  -debug-template)
+
     if(${language} STREQUAL "javascript")
       # Note: if compiling against older version of node, we may have to specify the
       # V8 version explicitly. For instance, when building against electron 0.36.7,
@@ -128,14 +129,33 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
       endif()
       add_custom_target(${module_name}
         DEPENDS ${generated_sources})
+
     else()
+
       if(SWIG_FOUND)
-        swig_add_module(${module_name} ${LANGUAGE_NAME} ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE}) # ${EXTRA_INTERFACE})
-        swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES} ${INTERFACE_LIBRARIES} common evaluators functions model nodes predictors trainers utilities emitters math)
+
+        set_property(SOURCE ${INTERFACE_MAIN} PROPERTY CPLUSPLUS ON)
+        set_property(SOURCE ${INTERFACE_SRC} PROPERTY CPLUSPLUS ON)
+        set_property(SOURCE ${INTERFACE_INCLUDE} PROPERTY CPLUSPLUS ON)
+        swig_add_library(${module_name} 
+              LANGUAGE ${LANGUAGE_NAME} 
+              SOURCES ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE}) # ${EXTRA_INTERFACE})
+          
+        swig_link_libraries(${module_name} ${INTERFACE_LIBRARIES} common data dsp emittable_functions emitters evaluators functions math model nodes optimization passes predictors trainers utilities value)
+
+        if(${language} STREQUAL "python" AND APPLE)
+          # TODO: only set this property (and omit ${LANGUAGE_LIBRARIES} from the swig_link_libraries call) if we're
+          # using a python interpreter that statically links the python libraries (e.g., Anaconda on a Mac (?))
+          set_target_properties( ${PREPEND_TARGET}${module_name} PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+        else()
+          swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES})
+        endif()          
 
       else()
+
         add_custom_target(${PREPEND_TARGET}${module_name}
           DEPENDS ${generated_sources})
+      
       endif()
       set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}${TARGET_NAME})
       set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES EXCLUDE_FROM_ALL TRUE)
