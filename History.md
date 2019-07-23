@@ -5,7 +5,7 @@
 - Use featurizer metadata to get correct defaults for some audio script parameters
 - Improvements and code clean up in view_audio.py
 - make_dataset will fill the featurizer internal buffer before returning features so it doesn't featurize zeros.
-- onnx_importer, fixes to ConstantFill, Reshape, Slice, Transpose, and support for constant folding involving Cast, and Mul and fix handling of nodes with multiple outputs.
+- onnx_importer: fixes to ConstantFill, Reshape, Slice, Transpose, and support for constant folding involving Cast, and Mul and fix handling of nodes with multiple outputs.
 - Fix bug causing OptimizeReorderDataNodesTransformation to fail caused by input port and memory layout mismatch
 - move to SWIG 4.0.0.
 
