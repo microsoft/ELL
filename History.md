@@ -1,4 +1,4 @@
-## 3.0.1*
+## 3.0.1
 - Fix make_vad.py so the VAD model works properly.
 - Fix smoothing of classifier output.
 - Improvements to noise mixing in audio training scripts
