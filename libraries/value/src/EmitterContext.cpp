@@ -251,6 +251,11 @@ namespace value
         DebugDumpImpl(fn, tag, outStream);
     }
 
+    void EmitterContext::DebugPrint(std::string message)
+    {
+        DebugPrintImpl(message);
+    }
+
     const std::vector<std::reference_wrapper<FunctionDeclaration>>& EmitterContext::GetIntrinsics() const
     {
         static std::vector intrinsics = {

@@ -381,6 +381,7 @@ std::vector<std::vector<double>> GetExpectedUnaryOperationOutput(std::vector<std
 {
     SigmoidActivationFunction<double> sigmoid;
     HardSigmoidActivationFunction<double> hardSigmoid;
+    HardTanhActivationFunction<double> hardTanh;
 
     std::vector<std::vector<double>> result;
     for (auto v : signal)
@@ -417,6 +418,9 @@ std::vector<std::vector<double>> GetExpectedUnaryOperationOutput(std::vector<std
                     break;
                 case UnaryOperationType::hardSigmoid:
                     d = hardSigmoid.Compute(d);
+                    break;
+                case UnaryOperationType::hardTanh:
+                    d = hardTanh.Compute(d);
                     break;
                 case UnaryOperationType::log:
                     d = std::log(d);
@@ -574,6 +578,7 @@ void TestCompilableUnaryOperationNode()
         MAP_OP(abs),
         MAP_OP(exp),
         MAP_OP(hardSigmoid),
+        MAP_OP(hardTanh),
         MAP_OP(log),
         MAP_OP(sign),
         MAP_OP(sin),
@@ -2630,6 +2635,11 @@ void TestActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize, 
 void TestHardSigmoidActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
 {
     TestActivationLayerNode<double>(inputPaddingSize, outputPaddingSize, new HardSigmoidActivation<double>());
+}
+
+void TestHardTanhActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    TestActivationLayerNode<double>(inputPaddingSize, outputPaddingSize, new HardTanhActivation<double>());
 }
 
 void TestReLUActivationLayerNode(size_t inputPaddingSize, size_t outputPaddingSize)

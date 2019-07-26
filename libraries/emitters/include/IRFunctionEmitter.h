@@ -1520,6 +1520,23 @@ namespace emitters
         template <typename ValueType>
         void CallGEMV(int m, int n, ValueType alpha, LLVMValue A, int lda, LLVMValue x, int incx, ValueType beta, LLVMValue y, int incy);
 
+        /// <summary> Call the matrix-vector multiply routine that computes y = alpha*A*x + beta*y </summary>
+        ///
+        /// <typeparam name="ValueType"> The datatype to use (must be `float` or `double`) </typeparam>
+        /// <param name="transposeA"> If `true`, use A' instead of A in the above equation </param>
+        /// <param name="m"> The number of rows in the matrix A and the output vector y </param>
+        /// <param name="n"> The number of columns in the matrix A and the vector x </param>
+        /// <param name="alpha"> The scalar to multiply with the A*x product </param>
+        /// <param name="A"> The matrix to multiply with a vector </param>
+        /// <param name="lda"> The stride of the matrix -- the number of elements between rows </param>
+        /// <param name="x"> The input vector x </param>
+        /// <param name="incx"> The increment between values of x </param>
+        /// <param name="beta"> The scalar to multiply with y before adding to the alpha*A*x product </param>
+        /// <param name="y"> The output vector y </param>
+        /// <param name="incy"> The increment between values of y </param>
+        template <typename ValueType>
+        void CallGEMV(bool transposeA, int m, int n, ValueType alpha, LLVMValue A, int lda, LLVMValue x, int incx, ValueType beta, LLVMValue y, int incy);
+
         /// <summary> Call the matrix-matrix multiply routine that computes the matrix product C = A*B </summary>
         ///
         /// <typeparam name="ValueType"> The datatype to use (must be `float` or `double`) </typeparam>

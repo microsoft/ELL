@@ -491,6 +491,11 @@ Node Model::AddGRU(Node input, Node reset, size_t hiddenUnits, Node inputWeights
     return builder.AddGRUNode(Model(_model), GetDefaultOutputPort(input), GetDefaultOutputPort(reset), hiddenUnits, GetDefaultOutputPort(inputWeights), GetDefaultOutputPort(hiddenWeights), GetDefaultOutputPort(inputBias), GetDefaultOutputPort(hiddenBias), activation, recurrentActivation);
 }
 
+Node Model::AddFastGRNN(Node input, Node reset, size_t hiddenUnits, size_t wRank, size_t uRank, Node W1, Node W2, Node U1, Node U2, Node biasGate, Node biasUpdate, Node zeta, Node nu, ell::api::predictors::neural::ActivationType gateNonlinearity, ell::api::predictors::neural::ActivationType updateNonLinearity)
+{
+    return builder.AddFastGRNNNode(Model(_model), GetDefaultOutputPort(input), GetDefaultOutputPort(reset), hiddenUnits, wRank, uRank, GetDefaultOutputPort(W1), GetDefaultOutputPort(W2), GetDefaultOutputPort(U1), GetDefaultOutputPort(U2), GetDefaultOutputPort(biasGate), GetDefaultOutputPort(biasUpdate), GetDefaultOutputPort(zeta), GetDefaultOutputPort(nu), gateNonlinearity, updateNonLinearity);
+}
+
 Node Model::AddHammingWindow(Node input)
 {
     return builder.AddHammingWindowNode(Model(_model), GetDefaultOutputPort(input));

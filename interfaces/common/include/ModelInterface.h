@@ -69,6 +69,7 @@ enum class UnaryOperationType
     abs = (int)ell::nodes::UnaryOperationType::abs,
     exp = (int)ell::nodes::UnaryOperationType::exp,
     hardSigmoid = (int)ell::nodes::UnaryOperationType::hardSigmoid,
+    hardTanh = (int)ell::nodes::UnaryOperationType::hardTanh,
     log = (int)ell::nodes::UnaryOperationType::log,
     logicalNot = (int)ell::nodes::UnaryOperationType::logicalNot,
     sin = (int)ell::nodes::UnaryOperationType::sin,
@@ -276,6 +277,7 @@ public:
     Node AddDCT(Node input, int numFilters);
     Node AddDotProduct(Node input1, Node input2);
     Node AddDTW(std::vector<std::vector<double>> prototype, Node input);
+    Node AddFastGRNN(Node input, Node reset, size_t hiddenUnits, size_t wRank, size_t uRank, Node W1, Node W2, Node U1, Node U2, Node biasGate, Node biasUpdate, Node zeta, Node nu, ell::api::predictors::neural::ActivationType gateNonlinearity, ell::api::predictors::neural::ActivationType updateNonlinearity);
     Node AddFFT(Node input, int nfft = 0);
     Node AddGRU(Node input, Node reset, size_t hiddenUnits, Node inputWeights, Node hiddenWeights, Node inputBias, Node hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
     Node AddHammingWindow(Node input);

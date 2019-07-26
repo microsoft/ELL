@@ -33,6 +33,13 @@ namespace value
         return result;
     }
 
+    Vector ToVector(Value data)
+    {
+        Value flat = data;
+        flat.SetLayout(data.GetLayout().Flatten());
+        return flat;
+    }
+
     Scalar Dot(Vector v1, Vector v2)
     {
         if (v1.Size() != v2.Size())
@@ -221,6 +228,15 @@ namespace value
         return copy *= s;
     }
 
+    Vector operator*(Vector v, Vector u)
+    {
+        Vector copy = v.Copy();
+        For(copy, [&](Scalar index) {
+            copy(index) = copy(index) * u(index);
+        });
+        return copy;
+    }
+
     Vector operator/(Scalar s, Vector v)
     {
         Vector copy = v.Copy();
@@ -234,6 +250,15 @@ namespace value
     {
         Vector copy = v.Copy();
         return copy /= s;
+    }
+
+    Vector operator/(Vector v, Vector u)
+    {
+        Vector copy = v.Copy();
+        For(copy, [&](Scalar index) {
+            copy(index) = copy(index) / u(index);
+        });
+        return copy;
     }
 
 } // namespace value

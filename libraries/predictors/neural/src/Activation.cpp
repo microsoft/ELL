@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "HardSigmoidActivation.h"
+#include "HardTanhActivation.h"
 #include "LeakyReLUActivation.h"
 #include "ParametricReLUActivation.h"
 #include "ReLUActivation.h"
@@ -32,6 +33,9 @@ namespace predictors
 
             auto hardSigmoid = dynamic_cast<const predictors::neural::HardSigmoidActivation<ValueType>*>(ptr);
             if (hardSigmoid) return std::make_unique<HardSigmoidActivationFunction<ValueType>>();
+
+            auto hardTanh = dynamic_cast<const predictors::neural::HardTanhActivation<ValueType>*>(ptr);
+            if (hardTanh) return std::make_unique<HardTanhActivationFunction<ValueType>>();
 
             auto leakyReLU = dynamic_cast<const predictors::neural::LeakyReLUActivation<ValueType>*>(ptr);
             if (leakyReLU) return std::make_unique<LeakyReLUActivationFunction<ValueType>>(leakyReLU->GetLeakyFactor());

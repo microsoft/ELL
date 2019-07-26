@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     TanhActivation.h (neural)
-//  Authors:  James Devine
+//  File:     HardTanhActivation.h (neural)
+//  Authors:  Yash Gaurkar
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -23,9 +23,9 @@ namespace predictors
 {
     namespace neural
     {
-        /// <summary> Implements the hyperbolic tangent function: tanh(x) = 2 . sigmoid(2x) - 1 </summary>
+        /// <summary> Implements the hyperbolic tangent function: hardtanh(x) = clip(x, -1, 1) </summary>
         template <typename ElementType>
-        class TanhActivation : public ActivationImpl<ElementType>
+        class HardTanhActivation : public ActivationImpl<ElementType>
         {
         public:
             /// <summary> Returns the output as a function of the input. </summary>
@@ -43,7 +43,7 @@ namespace predictors
             /// <summary> Gets the name of this type. </summary>
             ///
             /// <returns> The name of this type. </returns>
-            static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("TanhActivation"); }
+            static std::string GetTypeName() { return utilities::GetCompositeTypeName<ElementType>("HardTanhActivation"); }
 
             /// <summary> Gets the name of this type (for serialization). </summary>
             ///
@@ -68,21 +68,29 @@ namespace predictors
     namespace neural
     {
         template <typename ElementType>
-        ElementType TanhActivation<ElementType>::Apply(const ElementType input) const
+        ElementType HardTanhActivation<ElementType>::Apply(const ElementType input) const
         {
-            return std::tanh(input);
+            return ((input < -1) ? -1 : (input > 1) ? 1 : input);
         }
 
         template <typename ElementType>
-        value::Scalar TanhActivation<ElementType>::Apply(value::Scalar input) const
+        value::Scalar HardTanhActivation<ElementType>::Apply(value::Scalar input) const
         {
-            return value::Tanh(input);
+            value::Scalar result;
+            If(input < -1, [&] {
+                result = value::Cast<ElementType>(-1);
+            }).ElseIf(input > 1, [&] {
+                result = value::Cast<ElementType>(1);
+            }).Else([&] {
+                result = input;
+            });
+            return result;
         }
 
         template <typename ElementType>
-        std::unique_ptr<ActivationImpl<ElementType>> TanhActivation<ElementType>::Copy() const
+        std::unique_ptr<ActivationImpl<ElementType>> HardTanhActivation<ElementType>::Copy() const
         {
-            return std::make_unique<TanhActivation<ElementType>>();
+            return std::make_unique<HardTanhActivation<ElementType>>();
         }
     } // namespace neural
 } // namespace predictors

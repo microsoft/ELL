@@ -22,6 +22,9 @@ namespace value
     class Matrix;
     class Vector;
 
+    /// <summary> Reinterprets the given data value as a matrix of the given size </summary>
+	Matrix ToMatrix(Value data, int numRows, int numCols);
+    
     Scalar Sum(Matrix matrix, Scalar initialValue);
 
     /// <summary> Creates a for loop over the matrix </summary>

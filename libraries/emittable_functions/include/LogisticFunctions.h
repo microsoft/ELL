@@ -24,6 +24,8 @@ namespace emittable_functions
 
     value::Scalar HardSigmoid(value::Scalar s);
 
+    value::Scalar HardTanh(value::Scalar s);
+
 
 } // namespace emittable_functions
 } // namespace ell

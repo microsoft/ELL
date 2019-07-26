@@ -35,6 +35,7 @@
 #include <llvm/Transforms/Utils/ModuleUtils.h>
 
 #include <algorithm>
+#include <vector>
 
 namespace ell
 {
@@ -882,6 +883,34 @@ namespace emitters
     //
     // Helpers, standard C Runtime functions, and debug support
     //
+
+    LLVMFunction IRModuleEmitter::DeclareDebugPrint()
+    {
+        auto functionName = "DebugPrint";
+        LLVMFunction function;
+        if (_functions.find(functionName) == _functions.end())
+        {
+            function = DeclareFunction(functionName, VariableType::Void, NamedVariableTypeList{ { "message", VariableType::Char8Pointer } });
+            function->setLinkage(llvm::GlobalValue::LinkageTypes::ExternalLinkage);
+            InsertFunctionMetadata(function, c_callbackFunctionTagName, { "global" });
+        }
+        else
+        {
+            function = GetFunction(functionName);
+        }
+        return function;
+    }
+
+    void IRModuleEmitter::DebugPrint(std::string message)
+    {
+        std::string globalName = GetModuleName() + "_debug_message_" + std::to_string(_globalStringIndex++);
+        llvm::GlobalVariable* msg = ConstantArray(globalName, std::vector<char>(message.c_str(), message.c_str() + message.size() + 1));
+        auto& context = _emitter.GetContext();
+        auto charPointerType = llvm::Type::getInt8Ty(context)->getPointerTo();
+        llvm::Value* msgptr = _emitter.CastPointer(msg, charPointerType);
+        auto function = DeclareDebugPrint();
+        _emitter.Call(function, msgptr);
+    }
 
     void IRModuleEmitter::DeclarePrintf()
     {

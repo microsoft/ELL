@@ -61,6 +61,25 @@ namespace nodes
     }
 
     //
+    // Hard Tanh activation function
+    //
+    template <typename ValueType>
+    ValueType HardTanhActivationFunction<ValueType>::Compute(ValueType x) const
+    {
+        return x <= -1 ? -1 : x >= 1 ? 1 : x;
+    }
+
+    template <typename ValueType>
+    emitters::LLVMValue HardTanhActivationFunction<ValueType>::Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue xValue) const
+    {
+        auto x = function.LocalScalar(xValue);
+        auto lowBound = function.LocalScalar<ValueType>(-1);
+        auto highBound = function.LocalScalar<ValueType>(1);
+        auto result = function.Select(x <= lowBound, lowBound, function.Select(x >= highBound, highBound, x));
+        return result;
+    }
+
+    //
     // ReLU activation function
     //
     template <typename ValueType>
@@ -170,6 +189,8 @@ namespace nodes
     // Explicit instantiation
     template class HardSigmoidActivationFunction<float>;
     template class HardSigmoidActivationFunction<double>;
+    template class HardTanhActivationFunction<float>;
+    template class HardTanhActivationFunction<double>;
     template class LeakyReLUActivationFunction<float>;
     template class LeakyReLUActivationFunction<double>;
     template class ParametricReLUActivationFunction<float>;

@@ -72,5 +72,22 @@ namespace emittable_functions
         return result;
     }
 
+    value::Scalar HardTanh(value::Scalar x)
+    {
+        // y = clip (x) to [-1,1]
+
+        Scalar result = x;
+
+        Scalar lowBound = Cast(-1.0, x.GetType());
+        Scalar highBound = Cast(1.0, x.GetType());
+
+        If(result < lowBound, [&] {
+            result = lowBound;
+        }).ElseIf(result > highBound, [&] {
+            result = highBound;
+        });
+        return result;
+    }
+
 } // namespace emittable_functions
 } // namespace ell

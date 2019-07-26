@@ -14,6 +14,7 @@
 #include <predictors/include/NeuralNetworkPredictor.h>
 
 #include <predictors/neural/include/HardSigmoidActivation.h>
+#include <predictors/neural/include/HardTanhActivation.h>
 #include <predictors/neural/include/LeakyReLUActivation.h>
 #include <predictors/neural/include/MaxPoolingFunction.h>
 #include <predictors/neural/include/MeanPoolingFunction.h>
@@ -164,6 +165,9 @@ namespace api
             case ell::api::predictors::neural::ActivationType::hardSigmoid:
                 activation = std::make_unique<underlying::HardSigmoidActivation<ElementType>>();
                 break;
+            case ell::api::predictors::neural::ActivationType::hardTanh:
+                activation = std::make_unique<underlying::HardTanhActivation<ElementType>>();
+                break;
             case ell::api::predictors::neural::ActivationType::sigmoid:
                 activation = std::make_unique<underlying::SigmoidActivation<ElementType>>();
                 break;
@@ -191,6 +195,7 @@ namespace api
             {
             case neural::ActivationType::relu:
             case neural::ActivationType::hardSigmoid:
+            case neural::ActivationType::hardTanh:
             case neural::ActivationType::sigmoid:
             case neural::ActivationType::tanh:
                 activation = neural::ActivationLayer::CreateActivation<ElementType>(layer.activation);

@@ -22,6 +22,7 @@
 #include <llvm/Transforms/Utils/Cloning.h>
 
 #include <sstream>
+#include <iostream>
 
 extern "C" {
     // This is implementing the Source and SinkNode callback thunks which are used to provide support for std::function callbacks.

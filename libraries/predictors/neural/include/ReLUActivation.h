@@ -30,6 +30,13 @@ namespace predictors
             /// <returns> The computed output. </param>
             ElementType Apply(const ElementType input) const override;
 
+            /// <summary> Returns the output as a function of the input. </summary>
+            ///
+            /// <param name="input"> The input value as a value library Scalar. </param>
+            ///
+            /// <returns> The computed output. </param>
+            value::Scalar Apply(value::Scalar input) const override;
+
             /// <summary> Gets the name of this type. </summary>
             ///
             /// <returns> The name of this type. </returns>
@@ -61,6 +68,18 @@ namespace predictors
         ElementType ReLUActivation<ElementType>::Apply(const ElementType input) const
         {
             return ((input > 0) ? input : 0);
+        }
+
+        template <typename ElementType>
+        value::Scalar ReLUActivation<ElementType>::Apply(value::Scalar input) const
+        {
+            value::Scalar result;
+            If(input > 0, [&] {
+                result = input;
+            }).Else([&] {
+                result = value::Cast<ElementType>(0);
+            });
+            return result;
         }
 
         template <typename ElementType>

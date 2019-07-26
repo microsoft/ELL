@@ -155,6 +155,10 @@ void TestIRCompiler()
     TestHardSigmoidActivationLayerNode(0, 1);
     TestHardSigmoidActivationLayerNode(0, 2);
 
+    TestHardTanhActivationLayerNode();
+    TestHardTanhActivationLayerNode(0, 1);
+    TestHardTanhActivationLayerNode(0, 2);
+
     TestReLUActivationLayerNode();
     TestReLUActivationLayerNode(0, 1);
     TestReLUActivationLayerNode(0, 2);

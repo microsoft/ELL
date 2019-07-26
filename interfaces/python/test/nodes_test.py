@@ -9,7 +9,8 @@ import ell
 script_path = os.path.dirname(os.path.abspath(__file__))
 
 
-def test_with_serialization(testing, map, test_name, callback):
+def test_with_serialization(testing, map, test_name, callback, context):
+    result = []
     for i in range(3):
         if i > 0:
             filename = "{}{}.json".format(test_name, i)
@@ -21,7 +22,8 @@ def test_with_serialization(testing, map, test_name, callback):
                 raise Exception("### ELL model is not valid json: {}".format(e))
             map = ell.model.Map(filename)
 
-        callback(testing, map, i)
+        result += [callback(testing, map, i, context)]
+    return result
 
 
 def test_reorder(testing):
@@ -92,6 +94,14 @@ def hard_sigmoid(x):
     return (scale * x) + bias
 
 
+def hard_tanh(x):
+    if x < -1:
+        return -1
+    elif x > 1:
+        return 1
+    return x
+
+
 def sigmoid(x):
     return 1.0 / (math.exp(-x) + 1)
 
@@ -114,6 +124,7 @@ def test_unary(testing):
                  UnaryTest("cos", ell.nodes.UnaryOperationType.cos, lambda x: math.cos(x)),
                  UnaryTest("exp", ell.nodes.UnaryOperationType.exp, lambda x: math.exp(x)),
                  UnaryTest("hardSigmoid", ell.nodes.UnaryOperationType.hardSigmoid, lambda x: hard_sigmoid(x)),
+                 UnaryTest("hardTanh", ell.nodes.UnaryOperationType.hardTanh, lambda x: hard_tanh(x)),
                  UnaryTest("log", ell.nodes.UnaryOperationType.log, lambda x: math.log(x)),
                  UnaryTest("sigmoid", ell.nodes.UnaryOperationType.sigmoid, lambda x: sigmoid(x)),
                  UnaryTest("sign", ell.nodes.UnaryOperationType.sign, lambda x: sign(x)),
@@ -161,7 +172,7 @@ def load_vad_data():
     return dataset
 
 
-def test_voice_activity_node(testing):
+def add_vad_node(builder, ell_model, input_node):
     sample_rate = 8000  # this is the same rate used to generate VadData.txt
     frame_duration = 0.032
     tau_up = 1.54
@@ -172,6 +183,27 @@ def test_voice_activity_node(testing):
     threshold_down = 0.931252
     level_threshold = 0.007885
 
+    return builder.AddVoiceActivityDetectorNode(
+        ell_model, ell.nodes.PortElements(input_node.GetOutputPort("output")), sample_rate, frame_duration,
+        tau_up, tau_down, large_input, gain_att, threshold_up, threshold_down, level_threshold)
+
+
+def add_vad_node2(model, input_node):
+    sample_rate = 8000  # this is the same rate used to generate VadData.txt
+    frame_duration = 0.032
+    tau_up = 1.54
+    tau_down = 0.074326
+    large_input = 2.400160
+    gain_att = 0.002885
+    threshold_up = 3.552713
+    threshold_down = 0.931252
+    level_threshold = 0.007885
+
+    return model.AddVoiceActivityDetector(input_node, sample_rate, frame_duration, tau_up, tau_down, large_input,
+                                          gain_att, threshold_up, threshold_down, level_threshold)
+
+
+def test_voice_activity_node(testing):
     builder = ell.model.ModelBuilder()
     ell_model = ell.model.Model()
 
@@ -182,9 +214,8 @@ def test_voice_activity_node(testing):
     output_shape = ell.model.PortMemoryLayout([1])
 
     input_node = builder.AddInputNode(ell_model, input_shape, ell.nodes.PortType.real)
-    vad_node = builder.AddVoiceActivityDetectorNode(
-        ell_model, ell.nodes.PortElements(input_node.GetOutputPort("output")), sample_rate, frame_duration,
-        tau_up, tau_down, large_input, gain_att, threshold_up, threshold_down, level_threshold)
+    vad_node = add_vad_node(builder, ell_model, input_node)
+
     # cast the integer output of VAD to double since our CompiledMap doesn't yet support having
     # different input and output types.
     cast_node = builder.AddTypeCastNode(ell_model, ell.nodes.PortElements(vad_node.GetOutputPort("output")),
@@ -224,15 +255,6 @@ def create_tensor(value, size, rows, columns, channels):
 
 
 def test_gru_node_with_vad_reset(testing):
-    sample_rate = 8000  # this is the same rate used to generate VadData.txt
-    frame_duration = 0.032
-    tau_up = 1.54
-    tau_down = 0.074326
-    large_input = 2.400160
-    gain_att = 0.002885
-    threshold_up = 3.552713
-    threshold_down = 0.931252
-    level_threshold = 0.007885
 
     hidden_units = 10
     errors = 0
@@ -248,10 +270,7 @@ def test_gru_node_with_vad_reset(testing):
     dataType = ell.nodes.PortType.smallReal
 
     input_node = builder.AddInputNode(ell_model, input_shape, dataType)
-    vad_node = builder.AddVoiceActivityDetectorNode(
-        ell_model,
-        ell.nodes.PortElements(input_node.GetOutputPort("output")), sample_rate, frame_duration,
-        tau_up, tau_down, large_input, gain_att, threshold_up, threshold_down, level_threshold)
+    vad_node = add_vad_node(builder, ell_model, input_node)
 
     numRows = hidden_units * 3
     numCols = input_size
@@ -321,7 +340,89 @@ def test_gru_node_with_vad_reset(testing):
     testing.ProcessTest("test_gru_node_with_vad_reset, errors={}".format(errors), errors == 0)
 
 
-def hamming_callback(testing, map, iteration):
+def fastgrnn_serialization_callback(testing, map, iteration, dataset):
+
+    compiler_settings = ell.model.MapCompilerOptions()
+    compiler_settings.useBlas = False  # not resolvable on our Linux test machines...
+    optimizer_options = ell.model.ModelOptimizerOptions()
+    compiled_map = map.Compile("host", "test_fastgrnn_node", "predict", compiler_settings, optimizer_options)
+    compiled_map.WriteIR("test_fastgrnn_node.ll")
+    errors = 0
+    input_size = dataset.NumFeatures()
+    for i in range(dataset.NumExamples()):
+        row = dataset.GetExample(i)
+        data = row.GetData().ToArray()
+        # watch out for AutoDataVector compression
+        if len(data) < input_size:
+            data.resize(input_size)
+        computed_value = np.array(map.Compute(data))
+        compiled_value = np.array(compiled_map.Compute(data))
+        if not testing.IsEqual(computed_value, compiled_value, tol=1e-6):
+           errors += 1
+           if errors == 1:
+               print("### mismatch between compiled and computed value of FastGRNN node")
+               print("computed:", list(computed_value))
+               print("compiled:", list(compiled_value))
+
+    testing.ProcessTest("test_fastgrnn_node, iteration={}, errors={}".format(iteration, errors), errors == 0)
+    return compiled_value
+
+
+def test_fastgrnn_node(testing):
+
+    hidden_units = 10
+    wRank = 0
+    uRank = 0
+
+    model = ell.model.Model()
+
+    dataset = load_vad_data()
+    input_size = dataset.NumFeatures()
+
+    input_shape = ell.model.PortMemoryLayout([int(input_size)])
+    output_shape = ell.model.PortMemoryLayout([hidden_units])
+    dataType = ell.nodes.PortType.smallReal
+
+    input_node = model.AddInput(input_shape, dataType)
+
+    numRows = hidden_units
+    numCols = input_size
+    input_weights1 = np.ones(numRows * numCols) * 0.01
+    input_weights2 = np.ones(1) * 0.01
+    numCols = hidden_units
+    hidden_weights1 = np.ones(numRows * numCols) * 0.1
+    hidden_weights2 = np.ones(1) * 0.1
+    bias_gate = np.ones(hidden_units) * 0.01
+    bias_update = np.ones(hidden_units) * 0.02
+    zeta = 1
+    nu = 0.5
+
+    reset_node = add_vad_node2(model, input_node)
+    input_weights1_node = model.AddConstant(input_weights1, dataType)
+    input_weights2_node = model.AddConstant(input_weights2, dataType)
+    hidden_weights1_node = model.AddConstant(hidden_weights1, dataType)
+    hidden_weights2_node = model.AddConstant(hidden_weights2, dataType)
+    bias_gate_node = model.AddConstant(bias_gate, dataType)
+    bias_update_node = model.AddConstant(bias_update, dataType)
+    zeta_node = model.AddConstant([zeta], dataType)
+    nu_node = model.AddConstant([nu], dataType)
+
+    fast_grnn = model.AddFastGRNN(input_node, reset_node, hidden_units, wRank, uRank, input_weights1_node,
+                                  input_weights2_node, hidden_weights1_node, hidden_weights2_node, bias_gate_node,
+                                  bias_update_node, zeta_node, nu_node, ell.neural.ActivationType.sigmoid,
+                                  ell.neural.ActivationType.tanh)
+
+    output_node = model.AddOutput(output_shape, fast_grnn)
+
+    map = ell.model.Map(model, input_node, ell.nodes.PortElements(output_node.GetOutputPort("output")))
+
+    result = test_with_serialization(testing, map, "test_fastgrnn_node", fastgrnn_serialization_callback, dataset)
+
+    testing.ProcessTest("test_fastgrnn_node iterations match",
+                        np.allclose(result[0], result[1]) and np.allclose(result[1], result[2]))
+
+
+def hamming_callback(testing, map, iteration, context):
     size = map.GetInputShape().Size()
     expected = np.hamming(size)
     input = np.ones(size)
@@ -336,6 +437,7 @@ def hamming_callback(testing, map, iteration):
     compiled_output = compiled_map.Compute(input)
     testing.ProcessTest("test_hamming_node compiled iteration {}".format(iteration),
                         np.allclose(compiled_output, expected))
+    return compiled_output
 
 
 def test_hamming_node(testing):
@@ -353,22 +455,18 @@ def test_hamming_node(testing):
 
     map = ell.model.Map(model, input_node, ell.nodes.PortElements(outputNode.GetOutputPort("output")))
 
-    test_with_serialization(testing, map, "test_hamming_node", hamming_callback)
+    test_with_serialization(testing, map, "test_hamming_node", hamming_callback, None)
 
 
-def mel_filterbank_callback(testing, map, iteration):
-    size = 512
-    window_size = 512
-    num_filters = 13
-    sample_rate = 16000
-
+def mel_filterbank_callback(testing, map, iteration, context):
+    size, num_filters, sample_rate = context
     try:
         from python_speech_features import get_filterbanks
     except:
         print("### skiping test_mel_filterbank because 'python_speech_features' module is not available")
         return
 
-    fbanks = get_filterbanks(num_filters, window_size, sample_rate)
+    fbanks = get_filterbanks(num_filters, size, sample_rate)
     input = np.array(range(size)).astype(np.float)
 
     chopped = input[0:fbanks.shape[1]]
@@ -385,6 +483,7 @@ def mel_filterbank_callback(testing, map, iteration):
     compiled_output = compiled_map.Compute(input)
     testing.ProcessTest("test_mel_filterbank compiled iteration {}".format(iteration),
                         np.allclose(compiled_output, expected))
+    return compiled_output
 
 
 def test_mel_filterbank(testing):
@@ -406,10 +505,11 @@ def test_mel_filterbank(testing):
 
     map = ell.model.Map(model, input_node, ell.nodes.PortElements(outputNode.GetOutputPort("output")))
 
-    test_with_serialization(testing, map, "test_mel_filterbank", mel_filterbank_callback)
+    test_with_serialization(testing, map, "test_mel_filterbank", mel_filterbank_callback,
+                            (size, num_filters, sample_rate))
 
 
-def fftnode_callback(testing, map, iteration):
+def fftnode_callback(testing, map, iteration, context):
     inputSize = int(map.GetMetadataValue("inputSize"))
     fftSize = int(map.GetMetadataValue("fftSize"))
     if fftSize == 0:
@@ -437,6 +537,7 @@ def fftnode_callback(testing, map, iteration):
     compiled_output = compiled_map.Compute(signal)
 
     testing.ProcessTest("test_fftnode compiled iteration {}".format(iteration), np.allclose(compiled_output, output))
+    return compiled_output
 
 
 def test_fftnode_size(testing, inputSize, fftSize):
@@ -458,7 +559,7 @@ def test_fftnode_size(testing, inputSize, fftSize):
     map.SetMetadataValue("inputSize", str(inputSize))
     map.SetMetadataValue("fftSize", str(fftSize))
 
-    test_with_serialization(testing, map, "test_fftnode ({})".format(fftSize), fftnode_callback)
+    test_with_serialization(testing, map, "test_fftnode ({})".format(fftSize), fftnode_callback, None)
 
 
 def cast_to_port_type(a, portType):
@@ -491,6 +592,7 @@ class TypeCastInfo:
 
     def cast_vector(self, a):
         return cast_to_port_type(a, self.t)
+
 
 def test_typecast(testing):
     # Test a model that has differen types callbacks.
@@ -608,6 +710,7 @@ def test():
     test_hamming_node(testing)
     test_mel_filterbank(testing)
     test_fftnode(testing)
+    test_fastgrnn_node(testing)
     return 0
 
 

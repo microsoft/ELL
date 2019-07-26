@@ -67,6 +67,7 @@ public:
     Node AddVoiceActivityDetectorNode(Model model, PortElements input, double sampleRate, double frameDuration, double tauUp, double tauDown, double largeInput, double gainAtt, double thresholdUp, double thresholdDown, double levelThreshold);
     Node AddRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation);
     Node AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
+    Node AddFastGRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, size_t wRank, size_t uRank, PortElements W1, PortElements W2, PortElements U1, PortElements U2, PortElements biasGate, PortElements biasUpdate, PortElements zeta, PortElements nu, ell::api::predictors::neural::ActivationType gateNonlinearity, ell::api::predictors::neural::ActivationType updateNonlinearity);
     Node AddLSTMNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
 
     // Layer nodes (going away...)
@@ -124,6 +125,9 @@ private:
 
     template <typename ElementType>
     Node AddGRUNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, PortElements inputWeights, PortElements hiddenWeights, PortElements inputBias, PortElements hiddenBias, ell::api::predictors::neural::ActivationType activation, ell::api::predictors::neural::ActivationType recurrentActivation);
+
+    template <typename ElementType>
+    Node AddFastGRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, size_t wRank, size_t uRank, PortElements W1, PortElements W2, PortElements U1, PortElements U2, PortElements biasGate, PortElements biasUpdate, PortElements zeta, PortElements nu, ell::api::predictors::neural::ActivationType gateNonlinearity, ell::api::predictors::neural::ActivationType updateNonlinearity);
 
     template <typename ElementType>
     void InternalResetInput(Node node, PortElements input, std::string input_port_name);

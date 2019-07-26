@@ -35,6 +35,7 @@ class UnaryOperationType:
     cos = UnaryOperationType_cos
     exp = UnaryOperationType_exp
     hardSigmoid = UnaryOperationType_hardSigmoid
+    hardTanh = UnaryOperationType_hardTanh
     log = UnaryOperationType_log
     logicalNot = UnaryOperationType_logicalNot
     sigmoid = UnaryOperationType_sigmoid
@@ -51,6 +52,7 @@ del UnaryOperationType_abs
 del UnaryOperationType_cos
 del UnaryOperationType_exp
 del UnaryOperationType_hardSigmoid
+del UnaryOperationType_hardTanh
 del UnaryOperationType_log
 del UnaryOperationType_logicalNot
 del UnaryOperationType_sigmoid

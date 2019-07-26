@@ -1125,6 +1125,11 @@ namespace value
         stream << "\n";
     }
 
+    void ComputeContext::DebugPrintImpl(std::string message)
+    {
+        std::cout << message;
+    }
+
     Value ComputeContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)
     {
         static std::unordered_map<FunctionDeclaration, std::function<Value(std::vector<Value>)>> intrinsics = {

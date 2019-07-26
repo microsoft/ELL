@@ -31,6 +31,7 @@ set(neural_include
     neural/include/ConvolutionalLayer.h
     neural/include/FullyConnectedLayer.h
     neural/include/HardSigmoidActivation.h
+    neural/include/HardTanhActivation.h
     neural/include/InputLayer.h
     neural/include/Layer.h
     neural/include/LeakyReLUActivation.h
@@ -56,7 +57,7 @@ source_group("neural\\src" FILES ${neural_src})
 
 add_library(${library_name} ${src} ${include} ${neural_src} ${neural_include})
 target_include_directories(${library_name} PRIVATE include neural/include ${ELL_LIBRARIES_DIR})
-target_link_libraries(${library_name} data dsp math utilities)
+target_link_libraries(${library_name} data dsp math utilities value emittable_functions)
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")
 
@@ -85,7 +86,7 @@ source_group("include" FILES ${test_include})
 add_executable(${test_name} ${test_src} ${test_include})
 target_include_directories(${test_name} PRIVATE test/include ${ELL_LIBRARIES_DIR})
 
-target_link_libraries(${test_name} common data predictors testing )
+target_link_libraries(${test_name} common data predictors testing value emittable_functions)
 copy_shared_libraries(${test_name})
 
 set_property(TARGET ${test_name} PROPERTY FOLDER "tests")

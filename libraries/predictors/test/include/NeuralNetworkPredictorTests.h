@@ -65,6 +65,7 @@ void BinaryConvolutionalArchiveTest();
 
 #include <predictors/include/NeuralNetworkPredictor.h>
 #include <predictors/neural/include/HardSigmoidActivation.h>
+#include <predictors/neural/include/HardTanhActivation.h>
 #include <predictors/neural/include/LeakyReLUActivation.h>
 #include <predictors/neural/include/MaxPoolingFunction.h>
 #include <predictors/neural/include/ParametricReLUActivation.h>
@@ -114,6 +115,19 @@ void ActivationTest()
         }
     }
     testing::ProcessTest("Testing HardSigmoidActivation", Equals(T1(0, 0, 0), 0.7) && Equals(T1(0, 1, 0), 0.1) && T1(1, 0, 1) == 1 && T1(1, 1, 1) == 0 && T1(0, 0, 1) == 0.5 && T1(0, 1, 1) == 0.5 && T1(1, 0, 0) == 0.5 && T1(1, 1, 0) == 0.5);
+
+    auto hardTanh = HardTanhActivation<ElementType>();
+    for (size_t i = 0; i < T0.NumRows(); ++i)
+    {
+        for (size_t j = 0; j < T0.NumColumns(); ++j)
+        {
+            for (size_t k = 0; k < T0.NumChannels(); ++k)
+            {
+                T1(i, j, k) = hardTanh.ApplyIndex(T0(i, j, k), { i, j, k });
+            }
+        }
+    }
+    testing::ProcessTest("Testing HardTanhActivation", Equals(T1(0, 0, 0), 1.0) && Equals(T1(0, 1, 0), -1) && T1(1, 0, 1) == 1 && T1(1, 1, 1) == -1 && T1(0, 0, 1) == 0 && T1(0, 1, 1) == 0 && T1(1, 0, 0) == 0 && T1(1, 1, 0) == 0);
 
     auto relu = ReLUActivation<ElementType>();
     for (size_t i = 0; i < T0.NumRows(); ++i)

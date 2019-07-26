@@ -21,11 +21,33 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.autograd import Variable
+from torch.autograd import Variable, Function
 import torch.onnx
 from torch.utils.data import Dataset, DataLoader
 
 from training_config import TrainingConfig
+from rnn import *
+
+
+def onnx_exportable_fastgrnn(*fargs, output, hidden_size, wRank, uRank, gate_nonlinearity, update_nonlinearity):
+    class RNNSymbolic(Function):
+        @staticmethod
+        def symbolic(g, *fargs):
+            # NOTE: args/kwargs contain RNN parameters
+            return g.op("FastGRNN", *fargs, outputs=1,
+                        hidden_size_i=hidden_size, wRank_i=wRank, uRank_i=uRank,
+                        gate_nonlinearity_s=gate_nonlinearity, update_nonlinearity_s=update_nonlinearity)
+
+        @staticmethod
+        def forward(ctx, *fargs):
+            return output
+
+        @staticmethod
+        def backward(ctx, *gargs, **gkwargs):
+            raise RuntimeError("FIXME: Traced RNNs don't support backward")
+
+    output_temp = RNNSymbolic.apply(*fargs)
+    return output_temp
 
 
 class TriangularLR(optim.lr_scheduler._LRScheduler):
@@ -73,6 +95,8 @@ class KeywordSpotter(nn.Module):
         self.input_dim = input_dim
         self.num_keywords = num_keywords
         self.batch_first = batch_first
+        self.training = False
+        self.tracking = False
 
         self.init_hidden()
 
@@ -90,10 +114,12 @@ class KeywordSpotter(nn.Module):
     def export(self, name, device):
         """ Export the model to the ONNX file format """
         self.init_hidden()
+        self.tracking = True
         dummy_input = Variable(torch.randn(1, 1, self.input_dim))
         if device:
             dummy_input = dummy_input.to(device)
         torch.onnx.export(self, dummy_input, name, verbose=True)
+        self.tracking = False
 
     def batch_accuracy(self, scores, labels):
         """ Compute the training accuracy of the results of a single mini-batch """
@@ -108,18 +134,27 @@ class KeywordSpotter(nn.Module):
                 passed += 1
         return (float(passed) * 100.0 / float(batch_size), passed, results)
 
-    def fit(self, training_data, validation_data, options, device=None, detail=False):
+    def fit(self, training_data, validation_data, options, model, device=None, detail=False, run=None):
         """
         Perform the training.  This is not called "train" because the base class already defines
         that method with a different meaning.  The base class "train" method puts the Module into
         "training mode".
         """
         print("Training {} using {} rows of featurized training input...".format(self.name(), training_data.num_rows))
+
+        if training_data.mean is not None:
+            self.mean = torch.from_numpy(np.array([[training_data.mean]])).to(device)
+            self.std = torch.from_numpy(np.array([[training_data.std]])).to(device)
+        else:
+            self.mean = None
+            self.std = None
+
         start = time.time()
         loss_function = nn.NLLLoss()
         initial_rate = options.learning_rate
         lr_scheduler = options.lr_scheduler
         oo = options.optimizer_options
+        self.training = True
 
         if options.optimizer == "Adadelta":
             optimizer = optim.Adadelta(self.parameters(), lr=initial_rate, weight_decay=oo.weight_decay,
@@ -178,10 +213,36 @@ class KeywordSpotter(nn.Module):
 
         # optimizer = optim.Adam(model.parameters(), lr=0.0001)
         log = []
+        if options.rolling:
+            rolling_length = 2
+            max_rolling_length = int(ticks)
+            if max_rolling_length > options.max_rolling_length:
+                max_rolling_length = options.max_rolling_length
+            bag_count = 100
+            hidden_bag_size = batch_size * bag_count
 
         for epoch in range(num_epochs):
             self.train()
-            iteration = 0
+            if options.rolling:
+                rolling_length += 1
+                if rolling_length < max_rolling_length:
+                    hidden1_bag = torch.from_numpy(np.zeros([1, hidden_bag_size, model.hidden_units],
+                                                            dtype=np.float32)).to(device)
+                    if model.architecture == 'LSTM':
+                        cell1_bag = torch.from_numpy(np.zeros([1, hidden_bag_size, model.hidden_units],
+                                                              dtype=np.float32)).to(device)
+                    if model.num_layers >= 2:
+                        hidden2_bag = torch.from_numpy(np.zeros([1, hidden_bag_size, model.hidden_units],
+                                                                dtype=np.float32)).to(device)
+                        if model.architecture == 'LSTM':
+                            cell2_bag = torch.from_numpy(np.zeros([1, hidden_bag_size, model.hidden_units],
+                                                                  dtype=np.float32)).to(device)
+                    if model.num_layers == 3:
+                        hidden3_bag = torch.from_numpy(np.zeros([1, hidden_bag_size, training_data.num_keywords],
+                                                                dtype=np.float32)).to(device)
+                        if model.architecture == 'LSTM':
+                            cell3_bag = torch.from_numpy(np.zeros([1, hidden_bag_size, training_data.num_keywords],
+                                                                  dtype=np.float32)).to(device)
             for i_batch, (audio, labels) in enumerate(training_data.get_data_loader(batch_size)):
                 if not self.batch_first:
                     audio = audio.transpose(1, 0)  # GRU wants seq,batch,feature
@@ -192,7 +253,36 @@ class KeywordSpotter(nn.Module):
 
                 # Also, we need to clear out the hidden state,
                 # detaching it from its history on the last instance.
-                self.init_hidden()
+                if options.rolling:
+                    if rolling_length < max_rolling_length:
+                        if (i_batch + 1) % rolling_length == 0:
+                            self.init_hidden()
+                            break
+                    shuffled_indices = list(range(hidden_bag_size))
+                    np.random.shuffle(shuffled_indices)
+                    temp_indices = shuffled_indices[:batch_size]
+                    if model.architecture == 'LSTM':
+                        if self.hidden1 is not None:
+                            hidden1_bag[:, temp_indices, :], cell1_bag[:, temp_indices, :] = self.hidden1
+                            self.hidden1 = (hidden1_bag[:, 0:batch_size, :], cell1_bag[:, 0:batch_size, :])
+                            if model.num_layers >= 2:
+                                hidden2_bag[:, temp_indices, :], cell2_bag[:, temp_indices, :] = self.hidden2
+                                self.hidden2 = (hidden2_bag[:, 0:batch_size, :], cell2_bag[:, 0:batch_size, :])
+                            if model.num_layers == 3:
+                                hidden3_bag[:, temp_indices, :], cell3_bag[:, temp_indices, :] = self.hidden3
+                                self.hidden3 = (hidden3_bag[:, 0:batch_size, :], cell3_bag[:, 0:batch_size, :])
+                    else:
+                        if self.hidden1 is not None:
+                            hidden1_bag[:, temp_indices, :] = self.hidden1
+                            self.hidden1 = hidden1_bag[:, 0:batch_size, :]
+                            if model.num_layers >= 2:
+                                hidden2_bag[:, temp_indices, :] = self.hidden2
+                                self.hidden2 = hidden2_bag[:, 0:batch_size, :]
+                            if model.num_layers == 3:
+                                hidden3_bag[:, temp_indices, :] = self.hidden3
+                                self.hidden3 = hidden3_bag[:, 0:batch_size, :]
+                else:
+                    self.init_hidden()
 
                 # Before the backward pass, use the optimizer object to zero all of the
                 # gradients for the variables it will update (which are the learnable
@@ -200,6 +290,10 @@ class KeywordSpotter(nn.Module):
                 # accumulated in buffers( i.e, not overwritten) whenever .backward()
                 # is called. Checkout docs of torch.autograd.backward for more details.
                 optimizer.zero_grad()
+
+                # optionally normalize the audio
+                if self.mean is not None:
+                    audio = (audio - self.mean) / self.std
 
                 # Run our forward pass.
                 keyword_scores = self(audio)
@@ -212,7 +306,6 @@ class KeywordSpotter(nn.Module):
                 # in Tensors with requires_grad=True, so this call will compute gradients for
                 # all learnable parameters in the model.
                 loss.backward()
-
                 # move to next learning rate
                 if scheduler:
                     scheduler.step()
@@ -225,16 +318,22 @@ class KeywordSpotter(nn.Module):
                 if detail:
                     learning_rate = optimizer.param_groups[0]['lr']
                     log += [{'iteration': iteration, 'loss': loss.item(), 'learning_rate': learning_rate}]
-                iteration += 1
-
             # Find the best prediction in each sequence and return it's accuracy
             passed, total, rate = self.evaluate(validation_data, batch_size, device)
             learning_rate = optimizer.param_groups[0]['lr']
-            print("Epoch {}, Loss {}, Validation Accuracy {:.3f}, Learning Rate {}".format(
-                  epoch, loss.item(), rate * 100, learning_rate))
-            log += [{'epoch': epoch, 'loss': loss.item(), 'accuracy': rate, 'learning_rate': learning_rate}]
+            current_loss = float(loss.item())
+            print("Epoch {}, Loss {:.3f}, Validation Accuracy {:.3f}, Learning Rate {}".format(
+                  epoch, current_loss, rate * 100, learning_rate))
+            log += [{'epoch': epoch, 'loss': current_loss, 'accuracy': rate, 'learning_rate': learning_rate}]
+            if run is not None:
+                run.log('progress', epoch / num_epochs)
+                run.log('epoch', epoch)
+                run.log('accuracy', rate)
+                run.log('loss', current_loss)
+                run.log('learning_rate', learning_rate)
 
         end = time.time()
+        self.training = False
         print("Trained in {:.2f} seconds".format(end - start))
         return log
 
@@ -245,6 +344,14 @@ class KeywordSpotter(nn.Module):
         self.eval()
         passed = 0
         total = 0
+
+        if test_data.mean is not None:
+            mean = torch.from_numpy(np.array([[test_data.mean]])).to(device)
+            std = torch.from_numpy(np.array([[test_data.std]])).to(device)
+        else:
+            mean = None
+            std = None
+
         self.zero_grad()
         results = []
         with torch.no_grad():
@@ -254,6 +361,8 @@ class KeywordSpotter(nn.Module):
                 if device:
                     audio = audio.to(device)
                     labels = labels.to(device)
+                if mean is not None:
+                    audio = (audio - mean) / std
                 total += batch_size
                 self.init_hidden()
                 keyword_scores = self(audio)
@@ -272,28 +381,28 @@ class KeywordSpotter(nn.Module):
 class GRUKeywordSpotter(KeywordSpotter):
     """This class is a PyTorch Module that implements a 1, 2 or 3 layer GRU based audio classifier"""
 
-    def __init__(self, input_dim, num_keywords, hidden_dim, num_layers):
+    def __init__(self, input_dim, num_keywords, model):
         """
         Initialize the KeywordSpotter with the following parameters:
         input_dim - the size of the input audio frame in # samples.
-        hidden_dim - the size of the hidden state of the GRU nodes
+        hidden_units - the size of the hidden state of the GRU nodes
         num_keywords - the number of predictions to come out of the model.
         num_layers - the number of GRU layers to use (1, 2 or 3)
         """
-        self.hidden_dim = hidden_dim
-        self.num_layers = num_layers
+        self.hidden_units = model.hidden_units
+        self.num_layers = model.num_layers
         super(GRUKeywordSpotter, self).__init__(input_dim, num_keywords)
 
         # The GRU takes audio sequences as input, and outputs hidden states
-        # with dimensionality hidden_dim.
-        self.gru1 = nn.GRU(input_dim, hidden_dim)
+        # with dimensionality hidden_units.
+        self.gru1 = nn.GRU(input_dim, self.hidden_units)
         self.gru2 = None
-        if num_layers > 1:
-            self.gru2 = nn.GRU(hidden_dim, hidden_dim)
+        if self.num_layers > 1:
+            self.gru2 = nn.GRU(self.hidden_units, self.hidden_units)
         self.gru3 = None
-        last_output_size = hidden_dim
-        if num_layers > 2:
-            self.gru3 = nn.GRU(hidden_dim, num_keywords)
+        last_output_size = self.hidden_units
+        if self.num_layers > 2:
+            self.gru3 = nn.GRU(self.hidden_units, num_keywords)
             last_output_size = num_keywords
 
         # The linear layer is a fully connected layer that maps from hidden state space
@@ -302,7 +411,7 @@ class GRUKeywordSpotter(KeywordSpotter):
         self.init_hidden()
 
     def name(self):
-        return "{} layer GRU {}".format(self.num_layers, self.hidden_dim)
+        return "{} layer GRU {}".format(self.num_layers, self.hidden_units)
 
     def init_hidden(self):
         """ Clear the hidden state for the GRU nodes """
@@ -313,51 +422,67 @@ class GRUKeywordSpotter(KeywordSpotter):
     def forward(self, input):
         """ Perform the forward processing of the given input and return the prediction """
         # input is shape: [seq,batch,feature]
+        if self.tracking:
+            if self.mean is not None:
+                input = (input - self.mean) / self.std
         gru_out, self.hidden1 = self.gru1(input, self.hidden1)
+        # we have to detach the hidden states because we may keep them longer than 1 iteration.
+        self.hidden1 = self.hidden1.detach()
         if self.gru2 is not None:
             gru_out, self.hidden2 = self.gru2(gru_out, self.hidden2)
+            self.hidden2 = self.hidden2.detach()
         if self.gru3 is not None:
             gru_out, self.hidden3 = self.gru3(gru_out, self.hidden3)
+            self.hidden3 = self.hidden3.detach()
 
-        keyword_space = self.hidden2keyword(gru_out)
-        result = F.log_softmax(keyword_space, dim=2)
-        # return the mean across the sequence length to produce the
-        # best prediction of which word exists in that sequence.
-        # we can do that because we know each window_size sequence in
-        # the training dataset contains at most one word.
-        result = result.mean(dim=0)
+        # If we train taking the mean of all the prediction then it has higher chance to get triggered when a
+        # similar word is spoken.  So by taking only the prediction at the end of the word is better way to
+        # perform keyword spotting. So that rnn will get chance to run on complete keyword and make prediction.
+        keyword_space = self.hidden2keyword(gru_out[-1, :, :])
+        result = F.log_softmax(keyword_space, dim=1)
         return result
 
 
-class LSTMKeywordSpotter(KeywordSpotter):
-    """This class is a PyTorch Module that implements a 1, 2 or 3 layer LSTM based audio classifier"""
+class FastGRNNKeywordSpotter(KeywordSpotter):
+    """This class is a PyTorch Module that implements a 1, 2 or 3 layer GRU based audio classifier"""
 
-    def __init__(self, input_dim, num_keywords, hidden_dim, num_layers):
+    def __init__(self, input_dim, num_keywords, model):
         """
         Initialize the KeywordSpotter with the following parameters:
         input_dim - the size of the input audio frame in # samples.
-        hidden_dim - the size of the hidden state of the LSTM nodes
+        hidden_units - the size of the hidden state of the FastGrnn nodes
         num_keywords - the number of predictions to come out of the model.
-        num_layers - the number of LSTM layers to use (1, 2 or 3)
+        num_layers - the number of FastGrnn layers to use (1, 2 or 3)
         """
-        self.hidden_dim = hidden_dim
-        self.num_layers = num_layers
-        self.input_dim = input_dim
-        super(LSTMKeywordSpotter, self).__init__(input_dim, num_keywords)
+        self.hidden_units = model.hidden_units
+        self.num_layers = model.num_layers
+        self.num_keywords = num_keywords
+        self.wRank = model.wRank
+        self.uRank = model.uRank
+        self.gate_nonlinearity = model.gate_nonlinearity
+        self.update_nonlinearity = model.update_nonlinearity
 
-        # The LSTM takes audio sequences as input, and outputs hidden states
-        # with dimensionality hidden_dim.
-        self.lstm1 = nn.LSTM(input_dim, hidden_dim)
-        self.lstm2 = None
-        if num_layers > 1:
-            self.lstm2 = nn.LSTM(hidden_dim, hidden_dim)
-        self.lstm3 = None
-        last_output_size = hidden_dim
-        if num_layers > 2:
-            # layer 3 can reduce output to num_keywords, this makes for a smaller
-            # layer and a much smaller Linear layer below so we get some of the
-            # size back.
-            self.lstm3 = nn.LSTM(hidden_dim, num_keywords)
+        super(FastGRNNKeywordSpotter, self).__init__(input_dim, num_keywords)
+
+        # The FastGRNN takes audio sequences as input, and outputs hidden states
+        # with dimensionality hidden_units.
+        self.fastgrnn1 = FastGRNN(input_dim, self.hidden_units,
+                                  gate_nonlinearity=self.gate_nonlinearity,
+                                  update_nonlinearity=self.update_nonlinearity,
+                                  wRank=self.wRank, uRank=self.uRank)
+        self.fastgrnn2 = None
+        if self.num_layers > 1:
+            self.fastgrnn2 = FastGRNN(self.hidden_units, self.hidden_units,
+                                      gate_nonlinearity=self.gate_nonlinearity,
+                                      update_nonlinearity=self.update_nonlinearity,
+                                      wRank=self.wRank, uRank=self.uRank)
+        self.fastgrnn3 = None
+        last_output_size = self.hidden_units
+        if self.num_layers > 2:
+            self.fastgrnn3 = FastGRNN(self.hidden_units, num_keywords,
+                                      gate_nonlinearity=self.gate_nonlinearity,
+                                      update_nonlinearity=self.update_nonlinearity,
+                                      wRank=self.wRank, uRank=self.uRank)
             last_output_size = num_keywords
 
         # The linear layer is a fully connected layer that maps from hidden state space
@@ -366,7 +491,124 @@ class LSTMKeywordSpotter(KeywordSpotter):
         self.init_hidden()
 
     def name(self):
-        return "{} layer LSTM {}".format(self.num_layers, self.hidden_dim)
+        return "{} layer FastGRNN {}".format(self.num_layers, self.hidden_units)
+
+    def init_hidden(self):
+        """ Clear the hidden state for the GRU nodes """
+        self.hidden1 = None
+        self.hidden2 = None
+        self.hidden3 = None
+
+    def forward(self, input):
+        """ Perform the forward processing of the given input and return the prediction """
+        # input is shape: [seq,batch,feature]
+        if self.tracking:
+            if self.mean is not None:
+                input = (input - self.mean) / self.std
+        fastgrnn_out1 = self.fastgrnn1(input, hiddenState=self.hidden1, batch_first=False)
+        fastgrnn_output = fastgrnn_out1
+        # we have to detach the hidden states because we may keep them longer than 1 iteration.
+        self.hidden1 = fastgrnn_out1.detach()[-1, :, :]
+        if self.tracking:
+            if self.wRank is None:
+                W, U, bias_gate, bias_update, zeta, nu = self.fastgrnn1.getWeights()
+                fastgrnn_out1 = onnx_exportable_fastgrnn(input, W, U, bias_gate, bias_update, zeta, nu,
+                                                         output=fastgrnn_out1, hidden_size=self.hidden_units,
+                                                         wRank=self.wRank, uRank=self.uRank,
+                                                         gate_nonlinearity=self.gate_nonlinearity,
+                                                         update_nonlinearity=self.update_nonlinearity)
+            else:
+                W1, W2, U1, U2, bias_gate, bias_update, zeta, nu = self.fastgrnn1.getWeights()
+                fastgrnn_out1 = onnx_exportable_fastgrnn(input, W1, W2, U1, U2, bias_gate, bias_update, zeta, nu,
+                                                         output=fastgrnn_out1, hidden_size=self.hidden_units,
+                                                         wRank=self.wRank, uRank=self.uRank,
+                                                         gate_nonlinearity=self.gate_nonlinearity,
+                                                         update_nonlinearity=self.update_nonlinearity)
+            fastgrnn_output = fastgrnn_out1
+        if self.fastgrnn2 is not None:
+            fastgrnn_out2 = self.fastgrnn2(fastgrnn_out1, hiddenState=self.hidden2, batch_first=False)
+            self.hidden2 = fastgrnn_out2.detach()[-1, :, :]
+            if self.tracking:
+                if self.wRank is None:
+                    W, U, bias_gate, bias_update, zeta, nu = self.fastgrnn2.getWeights()
+                    fastgrnn_out2 = onnx_exportable_fastgrnn(fastgrnn_out1, W, U, bias_gate, bias_update, zeta, nu,
+                                                             output=fastgrnn_out2, hidden_size=self.hidden_units,
+                                                             wRank=self.wRank, uRank=self.uRank,
+                                                             gate_nonlinearity=self.gate_nonlinearity,
+                                                             update_nonlinearity=self.update_nonlinearity)
+                else:
+                    W1, W2, U1, U2, bias_gate, bias_update, zeta, nu = self.fastgrnn2.getWeights()
+                    fastgrnn_out2 = onnx_exportable_fastgrnn(fastgrnn_out1, W1, W2, U1, U2, bias_gate,
+                                                             bias_update, zeta, nu,
+                                                             output=fastgrnn_out2, hidden_size=self.hidden_units,
+                                                             wRank=self.wRank, uRank=self.uRank,
+                                                             gate_nonlinearity=self.gate_nonlinearity,
+                                                             update_nonlinearity=self.update_nonlinearity)
+            fastgrnn_output = fastgrnn_out2
+        if self.fastgrnn3 is not None:
+            fastgrnn_out3 = self.fastgrnn3(fastgrnn_out2, hiddenState=self.hidden3, batch_first=False)
+            self.hidden3 = fastgrnn_out3.detach()[-1, :, :]
+            if self.tracking:
+                if self.wRank is None:
+                    W, U, bias_gate, bias_update, zeta, nu = self.fastgrnn3.getWeights()
+                    fastgrnn_out3 = onnx_exportable_fastgrnn(fastgrnn_out2, W, U, bias_gate, bias_update, zeta, nu,
+                                                             output=fastgrnn_out3, hidden_size=self.num_keywords,
+                                                             wRank=self.wRank, uRank=self.uRank,
+                                                             gate_nonlinearity=self.gate_nonlinearity,
+                                                             update_nonlinearity=self.update_nonlinearity)
+                else:
+                    W1, W2, U1, U2, bias_gate, bias_update, zeta, nu = self.fastgrnn3.getWeights()
+                    fastgrnn_out3 = onnx_exportable_fastgrnn(fastgrnn_out2, W1, W2, U1, U2, bias_gate,
+                                                             bias_update, zeta, nu,
+                                                             output=fastgrnn_out3, hidden_size=self.num_keywords,
+                                                             wRank=self.wRank, uRank=self.uRank,
+                                                             gate_nonlinearity=self.gate_nonlinearity,
+                                                             update_nonlinearity=self.update_nonlinearity)
+            fastgrnn_output = fastgrnn_out3
+        keyword_space = self.hidden2keyword(fastgrnn_output[-1, :, :])
+
+        result = F.log_softmax(keyword_space, dim=1)
+        return result
+
+
+class LSTMKeywordSpotter(KeywordSpotter):
+    """This class is a PyTorch Module that implements a 1, 2 or 3 layer LSTM based audio classifier"""
+
+    def __init__(self, input_dim, num_keywords, model):
+        """
+        Initialize the KeywordSpotter with the following parameters:
+        input_dim - the size of the input audio frame in # samples.
+        hidden_units - the size of the hidden state of the LSTM nodes
+        num_keywords - the number of predictions to come out of the model.
+        num_layers - the number of LSTM layers to use (1, 2 or 3)
+        """
+        self.hidden_units = model.hidden_units
+        self.num_layers = model.num_layers
+        self.input_dim = input_dim
+        super(LSTMKeywordSpotter, self).__init__(input_dim, num_keywords)
+
+        # The LSTM takes audio sequences as input, and outputs hidden states
+        # with dimensionality hidden_units.
+        self.lstm1 = nn.LSTM(input_dim, self.hidden_units)
+        self.lstm2 = None
+        if self.num_layers > 1:
+            self.lstm2 = nn.LSTM(self.hidden_units, self.hidden_units)
+        self.lstm3 = None
+        last_output_size = self.hidden_units
+        if self.num_layers > 2:
+            # layer 3 can reduce output to num_keywords, this makes for a smaller
+            # layer and a much smaller Linear layer below so we get some of the
+            # size back.
+            self.lstm3 = nn.LSTM(self.hidden_units, num_keywords)
+            last_output_size = num_keywords
+
+        # The linear layer is a fully connected layer that maps from hidden state space
+        # to number of expected keywords
+        self.hidden2keyword = nn.Linear(last_output_size, num_keywords)
+        self.init_hidden()
+
+    def name(self):
+        return "{} layer LSTM {}".format(self.num_layers, self.hidden_units)
 
     def init_hidden(self):
         """ Clear the hidden state for the LSTM nodes """
@@ -377,19 +619,23 @@ class LSTMKeywordSpotter(KeywordSpotter):
     def forward(self, input):
         """ Perform the forward processing of the given input and return the prediction """
         # input is shape: [seq,batch,feature]
+        if self.tracking:
+            if self.mean is not None:
+                input = (input - self.mean) / self.std
         lstm_out, self.hidden1 = self.lstm1(input, self.hidden1)
+        hidden, cell = self.hidden1
+        # we have to detach the hidden states because we may keep them longer than 1 iteration.
+        self.hidden1 = (hidden.detach(), cell.detach())
         if self.lstm2 is not None:
             lstm_out, self.hidden2 = self.lstm2(lstm_out, self.hidden2)
+            hidden, cell = self.hidden2
+            self.hidden2 = (hidden.detach(), cell.detach())
         if self.lstm3 is not None:
             lstm_out, self.hidden3 = self.lstm3(lstm_out, self.hidden3)
-
-        keyword_space = self.hidden2keyword(lstm_out)
-        result = F.log_softmax(keyword_space, dim=2)
-        # return the mean across the sequence length to produce the
-        # best prediction of which word exists in that sequence.
-        # we can do that because we know each window_size sequence in
-        # the training dataset contains at most one word.
-        result = result.mean(dim=0)
+            hidden, cell = self.hidden3
+            self.hidden3 = (hidden.detach(), cell.detach())
+        keyword_space = self.hidden2keyword(lstm_out[-1, :, :])
+        result = F.log_softmax(keyword_space, dim=1)
         return result
 
 
@@ -399,7 +645,7 @@ class AudioDataset(Dataset):
     mini-batch training.
     """
 
-    def __init__(self, filename, keywords):
+    def __init__(self, filename, config, keywords):
         """ Initialize the AudioDataset from the given *.npz file """
         self.dataset = np.load(filename)
 
@@ -413,6 +659,17 @@ class AudioDataset(Dataset):
         self.features = self.dataset["features"].astype(np.float32)
         self.num_rows = len(self.features)
         self.features = self.features.reshape((self.num_rows, self.window_size, self.input_size))
+
+        if config.normalize:
+            mean = self.features.mean(axis=0)
+            std = self.features.std(axis=0)
+            self.mean = mean.mean(axis=0).astype(np.float32)
+            std = std.mean(axis=0)
+            # self.std is a divisor, so make sure it contains no zeros
+            self.std = np.array(np.where(std == 0, 1, std)).astype(np.float32)
+        else:
+            self.mean = None
+            self.std = None
         self.label_names = self.dataset["labels"]
         self.keywords = keywords
         self.num_keywords = len(self.keywords)
@@ -442,11 +699,13 @@ class AudioDataset(Dataset):
         return sample
 
 
-def create_model(arch, input_size, num_keywords, hidden_units, num_layers):
-    if arch == "GRU":
-        return GRUKeywordSpotter(input_size, num_keywords, hidden_units, num_layers)
-    elif arch == "LSTM":
-        return LSTMKeywordSpotter(input_size, num_keywords, hidden_units, num_layers)
+def create_model(model, input_size, num_keywords):
+    if model.architecture == "GRU":
+        return GRUKeywordSpotter(input_size, num_keywords, model)
+    elif model.architecture == "FastGRNN":
+        return FastGRNNKeywordSpotter(input_size, num_keywords, model)
+    elif model.architecture == "LSTM":
+        return LSTMKeywordSpotter(input_size, num_keywords, model)
     else:
         raise Exception("Model architecture '{}' not supported".format(arch))
 
@@ -456,7 +715,7 @@ def save_json(obj, filename):
         json.dump(obj, f, indent=2)
 
 
-def train(config, evaluate_only=False, outdir=".", detail=False):
+def train(config, evaluate_only=False, outdir=".", detail=False, azureml=False):
 
     filename = config.model.filename
     categories_file = config.dataset.categories
@@ -466,6 +725,16 @@ def train(config, evaluate_only=False, outdir=".", detail=False):
     architecture = config.model.architecture
     num_layers = config.model.num_layers
     use_gpu = config.training.use_gpu
+
+    run = None
+
+    if azureml:
+        from azureml.core.run import Run
+        run = Run.get_context()
+        if run is None:
+            print("### Run.get_context() returned None")
+        else:
+            print("### Running in Azure Context")
 
     valid_layers = [1, 2, 3]
     if num_layers not in valid_layers:
@@ -516,24 +785,37 @@ def train(config, evaluate_only=False, outdir=".", detail=False):
             print("### CUDA not available!!")
 
     print("Loading {}...".format(testing_file))
-    test_data = AudioDataset(testing_file, keywords)
+    test_data = AudioDataset(testing_file, config.dataset, keywords)
 
     log = None
     if not evaluate_only:
         print("Loading {}...".format(training_file))
-        training_data = AudioDataset(training_file, keywords)
+        training_data = AudioDataset(training_file, config.dataset, keywords)
 
         print("Loading {}...".format(validation_file))
-        validation_data = AudioDataset(validation_file, keywords)
+        validation_data = AudioDataset(validation_file, config.dataset, keywords)
+
+        if training_data.mean is not None:
+            fname = os.path.join(outdir, "mean.npy")
+            print("Saving {}".format(fname))
+            np.save(fname, training_data.mean)
+            fname = os.path.join(outdir, "std.npy")
+            print("Saving {}".format(fname))
+            np.save(fname, training_data.std)
+
+            # use the training_data mean and std variation
+            test_data.mean = training_data.mean
+            test_data.std = training_data.std
+            validation_data.mean = training_data.mean
+            validation_data.std = training_data.std
 
         print("Training model {}".format(filename))
-        model = create_model(architecture, training_data.input_size, training_data.num_keywords, hidden_units,
-                             num_layers)
+        model = create_model(config.model, training_data.input_size, training_data.num_keywords)
         if device.type == 'cuda':
             model.cuda()  # move the processing to GPU
 
         start = time.time()
-        log = model.fit(training_data, validation_data, config.training, device, detail)
+        log = model.fit(training_data, validation_data, config.training, config.model, device, detail, run)
         end = time.time()
 
         passed, total, rate = model.evaluate(training_data, batch_size, device)
@@ -546,8 +828,8 @@ def train(config, evaluate_only=False, outdir=".", detail=False):
     if model is None:
         msg = "Loading trained model with input size {}, hidden units {} and num keywords {}"
         print(msg.format(test_data.input_size, hidden_units, test_data.num_keywords))
-        model = create_model(architecture, test_data.input_size, test_data.num_keywords, hidden_units, num_layers)
-        model.load_state_dict(torch.load(filename))
+        model = create_model(config.model, test_data.input_size, test_data.num_keywords)
+        model.load_dict(torch.load(filename))
         if model and device.type == 'cuda':
             model.cuda()  # move the processing to GPU
 
@@ -580,9 +862,11 @@ def train(config, evaluate_only=False, outdir=".", detail=False):
     return rate, log
 
 
-def str2bool(s):
-    s = s.lower()
-    return s in ["t", "true", "yes", "1"]
+def str2bool(v):
+    if v is None:
+        return False
+    lower = v.lower()
+    return lower in ["t", "1", "true", "yes"]
 
 
 if __name__ == '__main__':
@@ -597,15 +881,28 @@ if __name__ == '__main__':
     parser.add_argument("--lr_min", help="Minimum learning rate for the schedulers", type=float)
     parser.add_argument("--lr_peaks", help="Number of peaks for triangle and cosine schedules", type=float)
     parser.add_argument("--batch_size", "-bs", help="Batch size of training", type=int)
-    parser.add_argument("--architecture", help="Specify model architecture (GRU, LSTM)")
+    parser.add_argument("--architecture", help="Specify model architecture (GRU, LSTM, FastGRNN)")
     parser.add_argument("--num_layers", type=int, help="Number of RNN layers (1, 2 or 3)")
     parser.add_argument("--hidden_units", "-hu", type=int, help="Number of hidden units in the GRU layers")
-    parser.add_argument("--use_gpu", help="Whether to use GPU for training")
+    parser.add_argument("--use_gpu", help="Whether to use GPU for training", action="store_true")
+    parser.add_argument("--normalize", help="Whether to normalize audio dataset", action="store_true")
+    parser.add_argument("--rolling", help="Whether to train model in rolling fashion or not", action="store_true")
+    parser.add_argument("--max_rolling_length", help="Max number of epochs you want to roll the rolling training"
+                        " default is 100", type=int)
+
+    # arguments for fastgrnn
+    parser.add_argument("--wRank", "-wr", help="Rank of W in FastGRNN default is None", type=int)
+    parser.add_argument("--uRank", "-ur", help="Rank of U in FastGRNN default is None", type=int)
+    parser.add_argument("--gate_nonlinearity", "-gnl", help="Gate Non-Linearity in FastGRNN default is sigmoid"
+                        " use between [sigmoid, quantSigmoid, tanh, quantTanh]")
+    parser.add_argument("--update_nonlinearity", "-unl", help="Update Non-Linearity in FastGRNN default is Tanh"
+                        " use between [sigmoid, quantSigmoid, tanh, quantTanh]")
 
     # or you can just specify an options file.
     parser.add_argument("--config", help="Use json file containing all these options (as per 'training_config.py')")
 
     # and some additional stuff ...
+    parser.add_argument("--azureml", help="Tells script we are running in Azure ML context")
     parser.add_argument("--eval", "-e", help="No training, just evaluate existing model", action='store_true')
     parser.add_argument("--filename", "-o", help="Name of model file to generate")
     parser.add_argument("--categories", "-c", help="Name of file containing keywords")
@@ -617,6 +914,8 @@ if __name__ == '__main__':
 
     if args.config:
         config.load(args.config)
+
+    azureml = str2bool(args.azureml)
 
     # then any user defined options overrides these defaults
     if args.epochs:
@@ -631,6 +930,10 @@ if __name__ == '__main__':
         config.training.lr_scheduler = args.lr_scheduler
     if args.batch_size:
         config.training.batch_size = args.batch_size
+    if args.rolling:
+        config.training.rolling = args.rolling
+    if args.max_rolling_length:
+        config.training.max_rolling_length = args.max_rolling_length
     if args.architecture:
         config.model.architecture = args.architecture
     if args.num_layers:
@@ -640,13 +943,23 @@ if __name__ == '__main__':
     if args.filename:
         config.model.filename = args.filename
     if args.use_gpu:
-        config.training.use_gpu = str2bool(args.use_gpu)
+        config.training.use_gpu = args.use_gpu
+    if args.normalize:
+        config.dataset.normalize = args.normalize
     if args.categories:
         config.dataset.categories = args.categories
     if args.dataset:
         config.dataset.path = args.dataset
+    if args.wRank:
+        config.model.wRank = args.wRank
+    if args.uRank:
+        config.model.uRank = args.wRank
+    if args.gate_nonlinearity:
+        config.model.gate_nonlinearity = args.gate_nonlinearity
+    if args.update_nonlinearity:
+        config.model.update_nonlinearity = args.update_nonlinearity
 
     if not os.path.isfile("config.json"):
         config.save("config.json")
 
-    train(config, args.eval, args.outdir, args.detail)
+    train(config, args.eval, args.outdir, args.detail, azureml)

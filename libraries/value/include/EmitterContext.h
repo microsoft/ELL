@@ -260,6 +260,11 @@ namespace value
         void DebugDump(Value value, std::string tag, std::ostream* stream) const;
         void DebugDump(FunctionDeclaration fn, std::string tag, std::ostream* stream) const;
 
+        /// <summary> Emit a debug print message.  This assumes the application 
+        /// on the target platform implements a "void DebugPrint(char* message)" function.  This function will be
+        /// defined for you when running in JIT or Compute mode.  </summary>
+        void DebugPrint(std::string message);
+
     protected:
         const std::vector<std::reference_wrapper<FunctionDeclaration>>& GetIntrinsics() const;
 
@@ -303,6 +308,8 @@ namespace value
 
         virtual void DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const = 0;
         virtual void DebugDumpImpl(FunctionDeclaration fn, std::string tag, std::ostream& stream) const = 0;
+
+        virtual void DebugPrintImpl(std::string message) = 0;
     };
 
     /// <summary> Returns the global instance of EmitterContext </summary>

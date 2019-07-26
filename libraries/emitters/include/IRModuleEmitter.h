@@ -555,6 +555,18 @@ namespace emitters
         // Helpers, standard C Runtime functions, and debug support
         //
 
+        /// <summary> For platforms that don't support printf, this is a lower level debug print function.
+        /// The calling application needs to define this function, it's signature will be:
+        ///    void DebugPrint(const char* message);
+        /// If running in JIT mode the function will be automatically defined by the IRExecutionEngine.
+        /// </summary>
+        LLVMFunction DeclareDebugPrint();
+
+        /// <summary> Call the DebugPrint function declared by DeclareDebugPrint. The message will become
+        /// stored as a global literal with a uniquely generated name.
+        /// </summary>
+        void DebugPrint(std::string message);
+
         /// <summary> Emit declaration of extern printf. </summary>
         void DeclarePrintf();
 
@@ -777,6 +789,7 @@ namespace emitters
         IRRuntime _runtime; // Manages emission of runtime functions
         IRThreadPool _threadPool; // A pool of worker threads -- gets initialized the first time it's used (?)
         IRProfiler _profiler;
+        int _globalStringIndex = 0;
 
         // Info to modify how code is written out
         std::vector<std::pair<std::string, std::string>> _preprocessorDefinitions;

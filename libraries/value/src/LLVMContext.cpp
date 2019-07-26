@@ -551,7 +551,7 @@ namespace value
         _promotedConstantStack.push({});
     }
 
-    const IRModuleEmitter& LLVMContext::GetModuleEmitter() const { return _emitter; }
+    IRModuleEmitter& LLVMContext::GetModuleEmitter() const { return _emitter; }
 
     Value LLVMContext::AllocateImpl(ValueType type, MemoryLayout layout)
     {
@@ -1361,6 +1361,11 @@ namespace value
         auto llvmFn = _emitter.GetFunction(fnName);
 
         emitters::DebugDump(llvmFn, tag, &llvmStream);
+    }
+
+    void LLVMContext::DebugPrintImpl(std::string message)
+    {
+        _emitter.DebugPrint(message);
     }
 
     Value LLVMContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)

@@ -30,6 +30,7 @@
 #include <nodes/include/DiagonalConvolutionNode.h>
 #include <nodes/include/DotProductNode.h>
 #include <nodes/include/ExtremalValueNode.h>
+#include <nodes/include/FastGRNNNode.h>
 #include <nodes/include/FFTNode.h>
 #include <nodes/include/FilterBankNode.h>
 #include <nodes/include/ForestPredictorNode.h>
@@ -65,6 +66,7 @@
 #include <predictors/include/SingleElementThresholdPredictor.h>
 
 #include <predictors/neural/include/HardSigmoidActivation.h>
+#include <predictors/neural/include/HardTanhActivation.h>
 #include <predictors/neural/include/LeakyReLUActivation.h>
 #include <predictors/neural/include/ParametricReLUActivation.h>
 #include <predictors/neural/include/ReLUActivation.h>
@@ -98,6 +100,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ArgMinNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BinaryOperationNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<ElementType, nodes::HardSigmoidActivationFunction<ElementType>>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<ElementType, nodes::HardTanhActivationFunction<ElementType>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<ElementType, nodes::LeakyReLUActivationFunction<ElementType>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<ElementType, nodes::ReLUActivationFunction<ElementType>>>();
         context.GetTypeFactory().AddType<model::Node, nodes::BroadcastUnaryFunctionNode<ElementType, nodes::SigmoidActivationFunction<ElementType>>>();
@@ -113,6 +116,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::DiagonalConvolutionComputeNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DotProductNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::DTWDistanceNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::FastGRNNNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::FFTNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::GRUNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::HammingWindowNode<ElementType>>();
@@ -164,6 +168,7 @@ namespace common
 
         // Activations
         context.GetTypeFactory().AddType<predictors::neural::ActivationImpl<ElementType>, predictors::neural::HardSigmoidActivation<ElementType>>();
+        context.GetTypeFactory().AddType<predictors::neural::ActivationImpl<ElementType>, predictors::neural::HardTanhActivation<ElementType>>();
         context.GetTypeFactory().AddType<predictors::neural::ActivationImpl<ElementType>, predictors::neural::LeakyReLUActivation<ElementType>>();
         context.GetTypeFactory().AddType<predictors::neural::ActivationImpl<ElementType>, predictors::neural::ParametricReLUActivation<ElementType>>();
         context.GetTypeFactory().AddType<predictors::neural::ActivationImpl<ElementType>, predictors::neural::ReLUActivation<ElementType>>();

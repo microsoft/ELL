@@ -217,6 +217,37 @@ namespace nodes
     };
 
     template <typename ValueType>
+    class HardTanhActivationFunction : public ActivationFunction<ValueType>
+    {
+    public:
+        /// <summary> Computes the hardtanh activation function (on the host machine) </summary>
+        ///
+        /// <param name="x"> The value </param>
+        ///
+        /// <returns> The value of the function hardtanh(x) </returns>
+        ValueType Compute(ValueType x) const override;
+        using BroadcastUnaryFunctionType<ValueType>::Compute;
+
+        /// <summary> Emits IR to compute the hardtanh activation function </summary>
+        ///
+        /// <param name="x"> The value </param>
+        ///
+        /// <returns> The value of the function hardtanh(x) </returns>
+        emitters::LLVMValue Compile(emitters::IRFunctionEmitter& function, emitters::LLVMValue x) const override;
+        using BroadcastUnaryFunctionType<ValueType>::Compile;
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("HardTanhActivationFunction"); }
+
+        /// <summary> Gets the name of this type (for serialization). </summary>
+        ///
+        /// <returns> The name of this type. </returns>
+        std::string GetRuntimeTypeName() const { return GetTypeName(); }
+    };
+
+    template <typename ValueType>
     class ParametricReLUActivationFunction
     {
     public:

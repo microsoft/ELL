@@ -26,6 +26,7 @@ namespace nodes
             cos,
             exp,
             hardSigmoid,
+            hardTanh,
             log,
             logicalNot,
             sigmoid,
@@ -108,6 +109,9 @@ namespace nodes
         class HardSigmoidFunction;
 
         template <typename ValueType>
+        class HardTanhFunction;
+
+        template <typename ValueType>
         class LogFunction;
 
         template <typename ValueType>
@@ -181,6 +185,7 @@ namespace nodes
                 ADD_TO_STRING_ENTRY(UnaryOperationType, cos);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, exp);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, hardSigmoid);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, hardTanh);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, log);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, logicalNot);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, sigmoid);
@@ -205,6 +210,7 @@ namespace nodes
             ADD_FROM_STRING_ENTRY(UnaryOperationType, cos);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, exp);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, hardSigmoid);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, hardTanh);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, log);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, logicalNot);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, sigmoid);

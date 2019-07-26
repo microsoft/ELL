@@ -13,6 +13,18 @@
 
 #include <memory>
 #include <string>
+#include <iostream>
+
+extern "C"
+{
+    void DebugPrintImpl(char* message)
+    {
+        if (message != nullptr)
+        {
+            std::cout << message;
+        }
+    }
+}
 
 namespace ell
 {
@@ -31,6 +43,8 @@ namespace emitters
 
     IRExecutionEngine::IRExecutionEngine(std::unique_ptr<llvm::Module> pModule, bool verify)
     {
+        auto debugPrintFunction = pModule->getFunction("DebugPrint");
+
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
 
@@ -44,6 +58,13 @@ namespace emitters
             llvm::remove_fatal_error_handler();
             llvm::install_fatal_error_handler(&FatalErrorHandler, nullptr);
         }
+
+        // If DeclareDebugPrint was called, then define it here.
+        if (debugPrintFunction)
+        {
+            DefineFunction(debugPrintFunction, reinterpret_cast<uintptr_t>(&DebugPrintImpl));
+        }
+
     }
 
     IRExecutionEngine::~IRExecutionEngine()

@@ -25,6 +25,8 @@ value::Scalar Vector_test3();
 value::Scalar Matrix_test1();
 value::Scalar Matrix_test2();
 value::Scalar Matrix_test3();
+value::Scalar Reshape_test();
+value::Scalar GEMV_test();
 value::Scalar Tensor_test1();
 value::Scalar Tensor_test2();
 value::Scalar Tensor_test3();
@@ -43,8 +45,8 @@ value::Scalar Parallelized_test1();
 value::Scalar Parallelized_test2();
 value::Scalar Prefetch_test1();
 
-void DebugPrint(std::string message);
 void DebugPrint(value::Vector message); // expecting null terminated ValueType::Char8
 void DebugPrintVector(value::Vector data);
+void DebugPrintScalar(value::Scalar value);
 
 } // namespace ell

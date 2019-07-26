@@ -197,7 +197,10 @@ namespace utilities
         static std::string GetTypeName() { return "MemoryCoordinates"; }
     };
 
-    /// <summary> A class representing layout of a block of data in memory. </summary>
+    /// <summary> A class representing layout of a block of data in memory where the block can also
+    /// contain padding such that a certain offset is required to access the "active" memory inside the
+    /// padded block.  Coordinates that can only see the "active" region are called "logical" coordinates, and 
+    /// coordinates that include the padding are called "physical" coordinates. </summary>
     class MemoryLayout : public utilities::IArchivable
     {
     public:
@@ -319,7 +322,7 @@ namespace utilities
         /// Returns the offsets to the "active" area of memory.
         /// </summary>
         ///
-        /// <returns> A `MemoryShape` object containing the offset to the active part of memory for that dimension. </returns>
+        /// <returns> A `MemoryShape` object containing the offset to the active part of memory for each dimension. </returns>
         const MemoryShape& GetOffset() const { return _offset; }
 
         /// <summary>
@@ -545,6 +548,10 @@ namespace utilities
         ///
         /// <returns> The name of this type. </returns>
         std::string GetRuntimeTypeName() const override { return GetTypeName(); }
+
+        /// <summary> If the layout is contiguous, return a new layout that interprets this block as 
+        /// a simple one dimensional vector, otherwise throws an exception. </summary>
+        MemoryLayout Flatten() const;
 
     protected:
         size_t GetDataOffset() const; // offset for physical entry {0,0,0...}

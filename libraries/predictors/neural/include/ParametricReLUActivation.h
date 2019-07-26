@@ -42,6 +42,13 @@ namespace predictors
             /// <returns> The computed output. </param>
             ElementType Apply(const ElementType input) const override;
 
+            /// <summary> Returns the output as a function of the input. </summary>
+            ///
+            /// <param name="input"> The input value as a value library Scalar. </param>
+            ///
+            /// <returns> The computed output. </param>
+            value::Scalar Apply(value::Scalar input) const override;
+
             /// <summary> Make a copy of this activation. </summary>
             ///
             /// <returns> The copy in a unique pointer. </param>
@@ -107,6 +114,14 @@ namespace predictors
 
         template <typename ElementType>
         ElementType ParametricReLUActivation<ElementType>::Apply(const ElementType input) const
+        {
+            UNUSED(input);
+            // we want people to call the ApplyIndex method in this case.
+            throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented);
+        }
+
+        template <typename ElementType>
+        value::Scalar ParametricReLUActivation<ElementType>::Apply(value::Scalar input) const
         {
             UNUSED(input);
             // we want people to call the ApplyIndex method in this case.

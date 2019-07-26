@@ -18,6 +18,7 @@
 #include <predictors/neural/include/SigmoidActivation.h>
 #include <predictors/neural/include/HardSigmoidActivation.h>
 #include <predictors/neural/include/TanhActivation.h>
+#include <predictors/neural/include/HardTanhActivation.h>
 
 namespace ell
 {
@@ -47,6 +48,7 @@ namespace nodes
 
         // hmmm, now we have the opposite problem, unless we push the same idea down into BroadcastUnaryFunctionNode...
         auto hardSigmoid = dynamic_cast<predictors::neural::HardSigmoidActivation<ValueType>*>(ptr);
+        auto hardTanh = dynamic_cast<predictors::neural::HardTanhActivation<ValueType>*>(ptr);
         auto leakyReLU = dynamic_cast<predictors::neural::LeakyReLUActivation<ValueType>*>(ptr);
         auto sigmoid = dynamic_cast<predictors::neural::SigmoidActivation<ValueType>*>(ptr);
         auto relu = dynamic_cast<predictors::neural::ReLUActivation<ValueType>*>(ptr);
@@ -60,6 +62,10 @@ namespace nodes
         if (hardSigmoid)
         {
             computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, HardSigmoidActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout, HardSigmoidActivationFunction<ValueType>{});
+        }
+        else if (hardTanh)
+        {
+            computeNode = transformer.AddNode<BroadcastUnaryFunctionNode<ValueType, HardTanhActivationFunction<ValueType>>>(newInput, inputLayout, outputLayout, HardTanhActivationFunction<ValueType>{});
         }
         else if (leakyReLU)
         {

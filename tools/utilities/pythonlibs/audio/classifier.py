@@ -38,7 +38,7 @@ class AudioClassifier:
         self.categories = None
 
         if isinstance(ignore_list, str):
-            self.ignore_list = [x.trim() for x in ignore_list.split(',')]
+            self.ignore_list = [x.strip() for x in ignore_list.split(',')]
         elif isinstance(ignore_list, list):
             self.ignore_list = ignore_list
         elif ignore_list is None:

@@ -138,6 +138,7 @@ class ActivationType:
     tanh = ActivationType_tanh
     prelu = ActivationType_prelu
     hardSigmoid = ActivationType_hardSigmoid
+    hardTanh = ActivationType_hardTanh
 
 # Remove flat defines so callers only see the class above
 del ActivationType_relu
@@ -146,6 +147,7 @@ del ActivationType_sigmoid
 del ActivationType_tanh
 del ActivationType_prelu
 del ActivationType_hardSigmoid
+del ActivationType_hardTanh
 
 # Python friendly class for PoolingType
 class PoolingType:

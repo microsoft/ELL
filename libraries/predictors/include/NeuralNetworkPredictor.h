@@ -23,6 +23,7 @@
 #include <predictors/neural/include/ConvolutionalLayer.h>
 #include <predictors/neural/include/FullyConnectedLayer.h>
 #include <predictors/neural/include/HardSigmoidActivation.h>
+#include <predictors/neural/include/HardTanhActivation.h>
 #include <predictors/neural/include/InputLayer.h>
 #include <predictors/neural/include/Layer.h>
 #include <predictors/neural/include/LeakyReLUActivation.h>
@@ -337,6 +338,7 @@ namespace predictors
         // Map the old type names to the new ones for compatibility reasons.
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,SigmoidActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,HardSigmoidActivation<float>>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,HardTanhActivation<float>>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,ReLUActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,LeakyReLUActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<float>>("ActivationLayer<float,TanhActivation>");
@@ -344,6 +346,7 @@ namespace predictors
 
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,SigmoidActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,HardSigmoidActivation<double>>");
+        context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,HardTanhActivation<double>>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,ReLUActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,LeakyReLUActivation>");
         context.GetTypeFactory().AddType<neural::Layer<ElementType>, neural::ActivationLayer<double>>("ActivationLayer<double,TanhActivation>");

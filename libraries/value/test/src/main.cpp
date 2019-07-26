@@ -53,12 +53,8 @@ void PrintIR(TestLLVMContext& context)
 #endif // PRINT_IR
 }
 
-extern "C" {
-void JittedDebugPrint(char* message)
+extern "C" 
 {
-    std::cout << message;
-}
-
 void JittedDebugPrintInts(int* ints, int* len)
 {
     std::cout << std::setprecision(6);
@@ -107,11 +103,8 @@ ell::emitters::LLVMFunction printIntsFunction;
 void DeclarDebugPrintFunctions(ell::emitters::IRModuleEmitter& module)
 {
     auto& context = module.GetIREmitter().GetContext();
-    auto type = llvm::FunctionType::get(
-        llvm::Type::getInt32Ty(context),
-        { llvm::Type::getInt8PtrTy(context) },
-        false);
-    printFunction = module.DeclareFunction("DebugPrint", type);
+
+    printFunction = module.DeclareDebugPrint();
 
     auto type2 = llvm::FunctionType::get(
         llvm::Type::getInt32Ty(context),
@@ -132,9 +125,8 @@ void DeclarDebugPrintFunctions(ell::emitters::IRModuleEmitter& module)
     printIntsFunction = module.DeclareFunction("DebugPrintInts", type4);
 }
 
-void DefineDebugPrintFunctions(ell::emitters::LLVMFunction debugPrintFunction, ell::emitters::IRExecutionEngine& jitter)
+void DefineDebugPrintFunctions(ell::emitters::IRExecutionEngine& jitter)
 {
-    jitter.DefineFunction(debugPrintFunction, reinterpret_cast<uintptr_t>(&JittedDebugPrint));
     jitter.DefineFunction(printFloatsFunction, reinterpret_cast<uintptr_t>(&JittedDebugPrintFloats));
     jitter.DefineFunction(printDoublesFunction, reinterpret_cast<uintptr_t>(&JittedDebugPrintDoubles));
     jitter.DefineFunction(printIntsFunction, reinterpret_cast<uintptr_t>(&JittedDebugPrintInts));
@@ -142,35 +134,6 @@ void DefineDebugPrintFunctions(ell::emitters::LLVMFunction debugPrintFunction, e
 
 namespace ell
 {
-void DebugPrint(std::string message)
-{
-    InvokeForContext<ComputeContext>([&] {
-        std::cout << message;
-    });
-
-    InvokeForContext<TestLLVMContext>([&](auto& context) {
-        auto function = context.GetFunctionEmitter();
-        auto arg = function.Literal(message.c_str());
-        function.Call(printFunction, { arg });
-    });
-}
-
-void DebugPrint(Vector message)
-{
-    InvokeForContext<ComputeContext>([&] {
-        char* ptr = message.GetValue().Get<char*>();
-        std::cout << ptr;
-    });
-
-    InvokeForContext<LLVMContext>([&](auto& context) {
-        auto printFunction = FunctionDeclaration("DebugPrint")
-                                 .Parameters(Value(ValueType::Char8, MemoryLayout{ { static_cast<int>(message.Size()) } }))
-                                 .Decorated(FunctionDecorated::No);
-
-        printFunction.Call(message);
-    });
-}
-
 void DebugPrintVector(Vector message)
 {
     int size = static_cast<int>(message.Size());
@@ -208,7 +171,7 @@ void DebugPrintVector(Vector message)
             fnName += "Ints";
             break;
         default:
-            DebugPrint("DebugPrintVector not implemented on type: " + ToString(message.GetType()));
+            context.DebugPrint("DebugPrintVector not implemented on type: " + ToString(message.GetType()));
             return;
         }
         auto printFunction = FunctionDeclaration(fnName)
@@ -217,6 +180,55 @@ void DebugPrintVector(Vector message)
                                      Value(ValueType::Int32, ScalarLayout))
                                  .Decorated(FunctionDecorated::No);
         printFunction.Call(message, Scalar{ size });
+    });
+}
+
+void DebugPrintScalar(Scalar value)
+{
+    InvokeForContext<ComputeContext>([&] {
+        std::visit(
+            [](auto&& data) {
+            using Type = std::decay_t<decltype(data)>;
+            if constexpr (IsOneOf<Type, Emittable, Boolean*>)
+            {
+                throw LogicException(LogicExceptionErrors::notImplemented);
+            }
+            else
+            {
+                std::copy(
+                    data,
+                    data + 1,
+                    std::ostream_iterator<std::remove_pointer_t<Type>>(std::cout, ", "));
+            }
+        },
+            value.GetValue().GetUnderlyingData());
+    });
+
+    InvokeForContext<LLVMContext>([&](auto& context) {
+        std::string fnName = "DebugPrint";
+        Vector vector = Allocate(value.GetType(), 1);
+        vector[0] = value;
+        switch (value.GetType())
+        {
+        case ValueType::Float:
+            fnName += "Floats";
+            break;
+        case ValueType::Double:
+            fnName += "Doubles";
+            break;
+        case ValueType::Int32:
+            fnName += "Ints";
+            break;
+        default:
+            context.DebugPrint("DebugPrintScalar not implemented on type: " + ToString(value.GetType()));
+            return;
+        }
+        auto printFunction = FunctionDeclaration(fnName)
+            .Parameters(
+                Value(value.GetType(), MemoryLayout{ { 1 } }),
+                Value(ValueType::Int32, ScalarLayout))
+            .Decorated(FunctionDecorated::No);
+        printFunction.Call(vector, Scalar{ 1 });
     });
 }
 } // namespace ell
@@ -259,14 +271,17 @@ void LLVMJitTest(std::string testName, std::function<Scalar()> defineFunction)
     DebugDump(fn);
 #endif // 0
 
-#if 0 // Useful for debugging, saves to file
-    std::string llFilename = testName + ".ll";
-    moduleEmitter.WriteToFile(llFilename, ell::emitters::ModuleOutputFormat::ir);
-#endif // 0
+    bool save = false;
+    if (save)
+    {
+        // Useful for debugging, saves to file
+        std::string llFilename = testName + ".ll";
+        moduleEmitter.WriteToFile(llFilename, ell::emitters::ModuleOutputFormat::ir);
+    }
 
     // moduleEmitter.DebugDump();
     ell::emitters::IRExecutionEngine engine(std::move(moduleEmitter), true);
-    DefineDebugPrintFunctions(printFunction, engine);
+    DefineDebugPrintFunctions(engine);
     auto functionPointer = engine.ResolveFunctionAddress(fn.GetFunctionName());
     auto jitFn = reinterpret_cast<int* (*)(void)>(functionPointer);
     int rc = *jitFn();
@@ -301,6 +316,8 @@ int main()
         ADD_TEST_FUNCTION(Matrix_test1);
         ADD_TEST_FUNCTION(Matrix_test2);
         ADD_TEST_FUNCTION(Matrix_test3);
+        ADD_TEST_FUNCTION(Reshape_test);
+        ADD_TEST_FUNCTION(GEMV_test);
         ADD_TEST_FUNCTION(Tensor_test1);
         ADD_TEST_FUNCTION(Tensor_test2);
         ADD_TEST_FUNCTION(Tensor_test3);

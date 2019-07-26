@@ -30,6 +30,7 @@
 #include <nodes/include/DCTNode.h>
 #include <nodes/include/DTWDistanceNode.h>
 #include <nodes/include/DotProductNode.h>
+#include <nodes/include/FastGRNNNode.h>
 #include <nodes/include/FFTNode.h>
 #include <nodes/include/FilterBankNode.h>
 #include <nodes/include/GRUNode.h>
@@ -1066,6 +1067,7 @@ Node ModelBuilder::AddActivationLayerNode(Model model, PortElements input, const
     {
     case ActivationType::relu:
     case ActivationType::hardSigmoid:
+    case ActivationType::hardTanh:
     case ActivationType::sigmoid:
     case ActivationType::tanh:
     {
@@ -1492,6 +1494,47 @@ Node ModelBuilder::AddGRUNode(Model model, PortElements input, PortElements rese
         ell::model::PortElements<ElementType>(hiddenBias.GetPortElements()),
         ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(activation),
         ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(recurrentActivation));
+    return Node(newNode, model.GetModel());
+}
+
+Node ModelBuilder::AddFastGRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, size_t wRank, size_t uRank, PortElements W1, PortElements W2, PortElements U1, PortElements U2, PortElements biasGate, PortElements biasUpdate, PortElements zeta, PortElements nu, ell::api::predictors::neural::ActivationType gateNonlinearity, ell::api::predictors::neural::ActivationType updateNonlinearity)
+{
+    auto type = input.GetType();
+    switch (type)
+    {
+    case PortType::real:
+        return AddFastGRNNNode<double>(model, input, reset, hiddenUnits, wRank, uRank, W1, W2, U1, U2, biasGate, biasUpdate, zeta, nu, gateNonlinearity, updateNonlinearity);
+        break;
+    case PortType::smallReal:
+        return AddFastGRNNNode<float>(model, input, reset, hiddenUnits, wRank, uRank, W1, W2, U1, U2, biasGate, biasUpdate, zeta, nu, gateNonlinearity, updateNonlinearity);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create FastGRNNNode of the requested type");
+    }
+}
+
+template <typename ElementType>
+Node ModelBuilder::AddFastGRNNNode(Model model, PortElements input, PortElements reset, size_t hiddenUnits, size_t wRank, size_t uRank, PortElements W1, PortElements W2, PortElements U1, PortElements U2, PortElements biasGate, PortElements biasUpdate, PortElements zeta, PortElements nu, ell::api::predictors::neural::ActivationType gateNonlinearity, ell::api::predictors::neural::ActivationType updateNonlinearity)
+{
+    using namespace ell::predictors::neural;
+    using namespace ell::nodes;
+
+    ell::model::Node* newNode = model.GetModel()->AddNode<ell::nodes::FastGRNNNode<ElementType>>(
+        ell::model::PortElements<ElementType>(input.GetPortElements()),
+        reset.GetPortElements(),
+        hiddenUnits,
+        wRank,
+        uRank,
+        ell::model::PortElements<ElementType>(W1.GetPortElements()),
+        ell::model::PortElements<ElementType>(W2.GetPortElements()),
+        ell::model::PortElements<ElementType>(U1.GetPortElements()),
+        ell::model::PortElements<ElementType>(U2.GetPortElements()),
+        ell::model::PortElements<ElementType>(biasGate.GetPortElements()),
+        ell::model::PortElements<ElementType>(biasUpdate.GetPortElements()),
+        ell::model::PortElements<ElementType>(zeta.GetPortElements()),
+        ell::model::PortElements<ElementType>(nu.GetPortElements()),
+        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(gateNonlinearity),
+        ell::api::predictors::neural::ActivationLayer::CreateActivation<ElementType>(updateNonlinearity));
     return Node(newNode, model.GetModel());
 }
 

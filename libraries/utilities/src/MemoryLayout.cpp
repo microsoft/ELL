@@ -697,6 +697,19 @@ namespace utilities
         return out;
     }
 
+    MemoryLayout MemoryLayout::Flatten() const
+    {
+        if (IsContiguous())
+        {
+            return MemoryLayout{ { _extent.NumElements() } };
+        }
+        else
+        {
+            throw InputException(InputExceptionErrors::invalidArgument,
+                "Cannot flatten a discontiguous MemoryLayout.");
+        }
+    }
+
     /*extern*/ MemoryLayout ScalarLayout{};
 
 } // namespace utilities

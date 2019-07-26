@@ -15,6 +15,9 @@
 #include <math/include/Tensor.h>
 #include <math/include/Vector.h>
 
+#include <value/include/Scalar.h>
+#include <value/include/Vector.h>
+
 #include <memory>
 
 namespace ell
@@ -37,6 +40,13 @@ namespace predictors
             ///
             /// <returns> The computed output. </param>
             virtual ElementType Apply(const ElementType input) const = 0;
+
+            /// <summary> Returns the output as a function of the input. </summary>
+            ///
+            /// <param name="input"> The input value as a value library Scalar. </param>
+            ///
+            /// <returns> The computed output. </param>
+            virtual value::Scalar Apply(value::Scalar input) const = 0;
 
             /// <summary> Make a copy of this activation. </summary>
             ///
@@ -112,6 +122,13 @@ namespace predictors
             /// <returns> The computed output. </param>
             virtual ElementType Apply(const ElementType input) const;
 
+            /// <summary> Returns the output as a function of the input. </summary>
+            ///
+            /// <param name="input"> The input value as a value library Scalar. </param>
+            ///
+            /// <returns> The computed output. </param>
+            virtual value::Scalar Apply(value::Scalar input) const;
+
             /// <summary> Applies the activation to the input vector in-place. </summary>
             ///
             /// <param name="input"> The input value. </param>
@@ -119,7 +136,12 @@ namespace predictors
 
             /// <summary> Applies the activation to the input vector in-place. </summary>
             ///
-            /// <param name="input"> The input value. </param>
+            /// <param name="input"> The input vector. </param>
+            virtual void Apply(value::Vector input) const;
+
+            /// <summary> Applies the activation to the input vector in-place. </summary>
+            ///
+            /// <param name="input"> The input vector. </param>
             virtual void Apply(math::ColumnVector<ElementType>& input) const;
 
             /// <summary> Returns the output as a function of the input. </summary>
@@ -220,6 +242,12 @@ namespace predictors
         }
 
         template <typename ElementType>
+        value::Scalar Activation<ElementType>::Apply(value::Scalar input) const
+        {
+            return _impl->Apply(input);
+        }
+
+        template <typename ElementType>
         ElementType Activation<ElementType>::operator()(const ElementType input) const
         {
             return _impl->Apply(input);
@@ -235,6 +263,14 @@ namespace predictors
         void Activation<ElementType>::Apply(math::ColumnVector<ElementType>& input) const
         {
             input.Transform([this](ElementType value) { return _impl->Apply(value); });
+        }
+
+        template <typename ElementType>
+        void Activation<ElementType>::Apply(value::Vector input) const
+        {
+            For(input, [&](value::Scalar index) {
+                input[index] = _impl->Apply(input[index]);
+            });
         }
 
         template <typename ElementType>

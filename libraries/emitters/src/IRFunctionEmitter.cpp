@@ -1507,6 +1507,12 @@ namespace emitters
     template <typename ValueType>
     void IRFunctionEmitter::CallGEMV(int m, int n, ValueType alpha, LLVMValue A, int lda, LLVMValue x, int incx, ValueType beta, LLVMValue y, int incy)
     {
+        CallGEMV(false, m, n, alpha, A, lda, x, incx, beta, y, incy);
+    }
+
+    template <typename ValueType>
+    void IRFunctionEmitter::CallGEMV(bool transposeA, int m, int n, ValueType alpha, LLVMValue A, int lda, LLVMValue x, int incx, ValueType beta, LLVMValue y, int incy)
+    {
         auto useBlas = CanUseBlas();
         LLVMFunction gemv = GetModule().GetRuntime().GetGEMVFunction<ValueType>(useBlas);
         if (gemv == nullptr)
@@ -1516,8 +1522,9 @@ namespace emitters
 
         const auto CblasRowMajor = 101;
         const auto CblasNoTrans = 111;
+        const auto CblasTrans = 112;
         emitters::IRValueList args{ Literal(CblasRowMajor),
-                                    Literal(CblasNoTrans), // transpose
+                                    Literal(transposeA ? CblasTrans : CblasNoTrans), // transposeA
                                     Literal(m),
                                     Literal(n),
                                     Literal(alpha),

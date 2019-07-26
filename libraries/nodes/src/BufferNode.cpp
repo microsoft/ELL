@@ -38,20 +38,13 @@ namespace nodes
     {
     }
 
-    Vector FlattenVector(Value data)
-    {
-        Value flat = data;
-        flat.SetLayout(utilities::MemoryLayout{ { static_cast<int>(data.GetLayout().GetMemorySize()) } });
-        return flat;
-    }
-
     template <typename ValueType>
     void BufferNode<ValueType>::Define(FunctionDeclaration& fn)
     {
         fn.Define([this](const Value data, Value result) {
             // flatten the MemoryLayout so we can accept any shaped input data and produce any shape result.
-            Vector input = FlattenVector(data);
-            Vector output = FlattenVector(result);
+            Vector input = ToVector(data);
+            Vector output = ToVector(result);
             int inputSize = static_cast<int>(input.Size());
             int windowSize = static_cast<int>(_windowSize);
             _buffer = StaticAllocate("buffer", GetValueType<ValueType>(), MemoryLayout({ _windowSize }));

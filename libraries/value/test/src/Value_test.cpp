@@ -160,6 +160,11 @@ namespace ell
 {
 namespace
 {
+    void DebugPrint(std::string message)
+    {
+        GetContext().DebugPrint(message);
+    }
+
     void PrintMatrix(std::string indent, Matrix e)
     {
         if (!e.GetValue().IsConstant())
@@ -252,6 +257,7 @@ namespace
         {
             return x != y;
         }
+        Scalar ep = epsilon;
         Scalar e = Allocate(ValueType::Double, ScalarLayout);
         e = epsilon;
         Scalar tens = Floor(Log10(Cast(x, ValueType::Double)));
@@ -263,17 +269,17 @@ namespace
         Scalar ry = Allocate(ValueType::Double, ScalarLayout);
         rx = Floor(Cast(x, ValueType::Double) / e) * e;
         ry = Floor(Cast(y, ValueType::Double) / e) * e;
+        Scalar diff = Abs(rx - ry);
         InvokeForContext<ComputeContext>([&] {
             double t = tens.Get<double>();
-            double dx = rx.Get<double>();
-            double dy = ry.Get<double>();
-            if (dx != dy)
+            double dx = diff.Get<double>();
+            if (dx > epsilon)
             {
                 std::cout << std::setprecision(10);
-                std::cout << "  NotEqualEpsilon failed: t=" << t << ": " << dx << " != " << dy << "\n";
+                std::cout << "  NotEqualEpsilon failed: t=" << t << ": " << dx << " >  " << epsilon << "\n";
             }
         });
-        return rx != ry;
+        return diff > ep;
     }
 
     Scalar Verify(Vector actual, Vector expected, double epsilon = 1e-7)
@@ -313,7 +319,7 @@ namespace
             });
         });
         If(ok != 0, [&] {
-            DebugPrint("## Vector are not different\n");
+            DebugPrint("## Vectors are not different\n");
             DebugPrint("  Expected: ");
             DebugPrintVector(expected);
             DebugPrint("\n");
@@ -413,10 +419,6 @@ void ValueGetTests()
 
 Scalar Basic_test()
 {
-    DebugPrint("### Test that debug print is working: ");
-    Vector v(std::vector<int>{ 1, 2, 3, 4 });
-    DebugPrintVector(v);
-    DebugPrint("\n");
     return 0;
 }
 
@@ -426,6 +428,7 @@ Scalar DebugPrint_test()
     Vector v(std::vector<int>{ 1, 2, 3, 4 });
     DebugPrintVector(v);
     DebugPrint("\n");
+    GetContext().DebugPrint("### Test that the emitter library DebugPrint is working\n");
     return 0;
 }
 
@@ -841,6 +844,56 @@ Scalar Matrix_test3()
     }
     return ok;
 }
+
+Scalar Reshape_test()
+{
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+
+    Matrix m = std::vector<std::vector<float>>{
+        std::vector<float>{ 1, 2, 3 },
+        std::vector<float>{ 4, 5, 6 }
+    };
+
+    Vector v = std::vector<float>{ 1, 2, 3, 4, 5, 6 };
+
+    If(0 != Verify(ToVector(m.GetValue()), v), [&] {
+        DebugPrint("Reshape_test matrix into a vector failed \n");
+        ok = 1;
+    });
+
+    If(0 != Verify(ToMatrix(v.GetValue(), 2, 3), m), [&] {
+        DebugPrint("Reshape_test vector into a matrix failed \n");
+        ok = 1;
+    });
+
+    return ok;
+}
+
+Scalar GEMV_test()
+{
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+
+    Matrix m = std::vector<std::vector<float>>{
+        std::vector<float>{ 1.2f, 2.3f },
+        std::vector<float>{ 3.4f, 4.5f }
+    };
+
+    Vector v(std::vector<float>{ 2.0f, 3.0f });
+    
+    Vector actual = GEMV(m, v);
+
+    Vector expected(std::vector<float>{ 9.3f, 20.3f });
+
+    If(0 != Verify(actual, expected, 1e-5), [&] {
+        DebugPrint("GEMV_test - failed \n");
+        ok = 1;
+    });
+    return ok;
+}
+
+
 Scalar Tensor_test1()
 {
     Scalar ok = Allocate(ValueType::Int32, ScalarLayout);

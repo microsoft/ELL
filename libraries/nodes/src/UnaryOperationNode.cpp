@@ -110,6 +110,9 @@ namespace nodes
                     case UnaryOperationType::hardSigmoid:
                         v = emittable_functions::HardSigmoid(v);
                         break;
+                    case UnaryOperationType::hardTanh:
+                        v = emittable_functions::HardTanh(v);
+                        break;
                     default:
                         throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown unary operation type");
                     }

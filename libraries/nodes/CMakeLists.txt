@@ -17,6 +17,7 @@ set(src
     src/ConvolutionalLayerNode.cpp
     src/DCTNode.cpp
     src/DiagonalConvolutionNode.cpp
+    src/FastGRNNNode.cpp
     src/FFTNode.cpp
     src/FilterBankNode.cpp
     src/FullyConnectedLayerNode.cpp
@@ -66,6 +67,7 @@ set(include
     include/DotProductNode.h
     include/DTWDistanceNode.h
     include/ExtremalValueNode.h
+    include/FastGRNNNode.h
     include/FFTNode.h
     include/FilterBankNode.h
     include/ForestPredictorNode.h

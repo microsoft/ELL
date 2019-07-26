@@ -14,6 +14,8 @@
 
 #include <nodes/include/ActivationFunctions.h>
 
+#include <emittable_functions/include/LogisticFunctions.h>
+
 namespace ell
 {
 namespace predictors
@@ -31,6 +33,13 @@ namespace predictors
             ///
             /// <returns> The computed output. </param>
             ElementType Apply(const ElementType input) const override;
+
+            /// <summary> Returns the output as a function of the input. </summary>
+            ///
+            /// <param name="input"> The input value as a value library Scalar. </param>
+            ///
+            /// <returns> The computed output. </param>
+            value::Scalar Apply(value::Scalar input) const override;
 
             /// <summary> Gets the name of this type. </summary>
             ///
@@ -66,6 +75,12 @@ namespace predictors
         {
             ell::nodes::SigmoidActivationFunction<ElementType> sigmoid;
             return sigmoid.Compute(input);
+        }
+
+        template <typename ElementType>
+        value::Scalar SigmoidActivation<ElementType>::Apply(value::Scalar input) const
+        {
+            return emittable_functions::Sigmoid(input);
         }
 
         template <typename ElementType>

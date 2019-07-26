@@ -891,6 +891,103 @@ class ConvertGRU(ConvertBase):
         lookup_table.add_imported_ell_node(self.importer_node, ell_node)
 
 
+class ConvertFastGRNN(ConvertBase):
+    """
+    Converter for Fast Gated Recurrent Neural Network (FastGRNN). If the FastGRNN node has 2 inputs,
+    the second input is used as the trigger, otherwise a constant node is inserted as the
+    trigger.
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node)
+        self.required_weights = ['W1', 'W2', 'U1', 'U2', 'bias_gate', 'bias_update', 'zeta', 'nu']
+        self.required_attributes = ["hidden_size", "gate_nonlinearity", "update_nonlinearity", "wRank", "uRank"]
+
+    def convert(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Return the appropriate ELL layer
+        """
+        raise Exception("No corresponding ELL layer for FastGRNN. Use node instead.")
+
+    def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
+        """
+        Derived classes override to convert the importer node to appropriate ELL node(s)
+        and insert into the model
+        """
+        model = conversion_parameters["model"]
+        builder = conversion_parameters["builder"]
+        lookup_table = conversion_parameters["lookup_table"]
+
+        # Get the port elements from the input
+        input_port_elements = lookup_table.get_port_elements_for_input(self.importer_node)
+
+        # create constant nodes for the weights
+        W1 = self.get_ell_tensor(
+            self.importer_node.weights["W1"][0], conversion_parameters)
+        W2 = self.get_ell_tensor(
+            self.importer_node.weights["W2"][0], conversion_parameters)
+        U1 = self.get_ell_tensor(
+            self.importer_node.weights["U1"][0], conversion_parameters)
+        U2 = self.get_ell_tensor(
+            self.importer_node.weights["U2"][0], conversion_parameters)
+        bias_gate = self.get_ell_tensor(
+            self.importer_node.weights["bias_gate"][0], conversion_parameters)
+        bias_update = self.get_ell_tensor(
+            self.importer_node.weights["bias_update"][0], conversion_parameters)
+        zeta = self.get_ell_tensor(
+            self.importer_node.weights["zeta"][0], conversion_parameters)
+        nu = self.get_ell_tensor(
+            self.importer_node.weights["nu"][0], conversion_parameters)
+
+        W1_node = builder.AddConstantNode(model, W1.data, ell.nodes.PortType.smallReal)
+        W2_node = builder.AddConstantNode(model, W2.data, ell.nodes.PortType.smallReal)
+        U1_node = builder.AddConstantNode(model, U1.data, ell.nodes.PortType.smallReal)
+        U2_node = builder.AddConstantNode(model, U2.data, ell.nodes.PortType.smallReal)
+        bias_gate_node = builder.AddConstantNode(model, bias_gate.data, ell.nodes.PortType.smallReal)
+        bias_update_node = builder.AddConstantNode(model, bias_update.data, ell.nodes.PortType.smallReal)
+        zeta_node = builder.AddConstantNode(model, zeta.data, ell.nodes.PortType.smallReal)
+        nu_node = builder.AddConstantNode(model, nu.data, ell.nodes.PortType.smallReal)
+
+        hidden_size = self.importer_node.attributes["hidden_size"]
+        wRank = self.importer_node.attributes["wRank"]
+        uRank = self.importer_node.attributes["uRank"]
+        gate_nonlinearity = self.importer_node.attributes["gate_nonlinearity"]
+        update_nonlinearity = self.importer_node.attributes["update_nonlinearity"]
+
+        # Get the port elements for the reset trigger
+        if len(self.importer_node.inputs) > 1 and self.importer_node.inputs[1] != '':
+            reset_port_elements, reset_memory_layout = lookup_table.get_port_elements_and_memory_layout_for_input(
+                self.importer_node, 1)
+        else:
+            # Create a constant node as the trigger. The trigger fires on value change,
+            # so will never fire in this case.
+            reset_node = builder.AddConstantNode(model, [0], ell.nodes.PortType.integer)
+            reset_port_elements = ell.nodes.PortElements(reset_node.GetOutputPort("output"))
+
+        # Add the GRUNode to the model
+        ell_node = builder.AddFastGRNNNode(
+            model, input_port_elements, reset_port_elements, hidden_size, wRank, uRank,
+            ell.nodes.PortElements(W1_node.GetOutputPort("output")),
+            ell.nodes.PortElements(W2_node.GetOutputPort("output")),
+            ell.nodes.PortElements(U1_node.GetOutputPort("output")),
+            ell.nodes.PortElements(U2_node.GetOutputPort("output")),
+            ell.nodes.PortElements(bias_gate_node.GetOutputPort("output")),
+            ell.nodes.PortElements(bias_update_node.GetOutputPort("output")),
+            ell.nodes.PortElements(zeta_node.GetOutputPort("output")),
+            ell.nodes.PortElements(nu_node.GetOutputPort("output")),
+            gate_nonlinearity, update_nonlinearity)
+
+        # Register the mappings
+        lookup_table.add_imported_ell_node(self.importer_node, W1_node)
+        lookup_table.add_imported_ell_node(self.importer_node, W2_node)
+        lookup_table.add_imported_ell_node(self.importer_node, U1_node)
+        lookup_table.add_imported_ell_node(self.importer_node, U2_node)
+        lookup_table.add_imported_ell_node(self.importer_node, bias_gate_node)
+        lookup_table.add_imported_ell_node(self.importer_node, bias_update_node)
+        lookup_table.add_imported_ell_node(self.importer_node, zeta_node)
+        lookup_table.add_imported_ell_node(self.importer_node, nu_node)
+        lookup_table.add_imported_ell_node(self.importer_node, ell_node)
+
+
 class ConvertInput(ConvertBase):
     """
     Converter for Input
@@ -1030,7 +1127,7 @@ class ConvertLSTM(ConvertBase):
         """
         Return the appropriate ELL layer
         """
-        raise Exception("No corresponding ELL layer for GRU. Use node instead.")
+        raise Exception("No corresponding ELL layer for LSTM. Use node instead.")
 
     def convert_node(self, conversion_parameters: typing.Mapping[str, typing.Any]):
         """
@@ -1073,7 +1170,7 @@ class ConvertLSTM(ConvertBase):
             reset_node = builder.AddConstantNode(model, [0], ell.nodes.PortType.integer)
             reset_port_elements = ell.nodes.PortElements(reset_node.GetOutputPort("output"))
 
-        # Add the GRUNode to the model
+        # Add the LSTMNode to the model
         ell_node = builder.AddLSTMNode(
             model, input_port_elements, reset_port_elements, hidden_size,
             ell.nodes.PortElements(input_weights_node.GetOutputPort("output")),
@@ -1560,6 +1657,14 @@ class ConvertTanh(ConvertUnaryOperation):
     """
     def __init__(self, node: ImporterNode):
         super().__init__(node, ell.nodes.UnaryOperationType.tanh)
+
+
+class ConvertHardTanh(ConvertUnaryOperation):
+    """
+    Converter for Sigmoid operation
+    """
+    def __init__(self, node: ImporterNode):
+        super().__init__(node, ell.nodes.UnaryOperationType.hardTanh)
 
 
 class ConvertAbs(ConvertUnaryOperation):

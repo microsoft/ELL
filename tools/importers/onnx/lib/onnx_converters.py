@@ -100,7 +100,6 @@ class OnnxNodeConverter(object):
             # the name must match the output id so we can match this up with other nodes 'inputs' list.
             # bugbug: what if there is more than one output?
             name = onnx_node.output[0]
-
         node = common.converters.ImporterNode(
             id=name,
             operation_type=self.op_type,
@@ -404,6 +403,17 @@ class OnnxSubtractConverter(OnnxNodeConverter):
             # first input is a constant, so our output shape is probably the second input
             return [self.node.input_shapes[1]]
         return [self.node.input_shapes[0]]
+
+
+class OnnxHardTanhConverter(OnnxNodeConverter):
+    def __init__(self, converter):
+        super().init(converter, "HardTanh")
+
+    def get_attributes(self, attrs: Attributes):
+        attributes = {
+            'activation': ell.neural.ActivationType.hardTanh
+        }
+        return attributes
 
 
 class OnnxReLuConverter(OnnxNodeConverter):
@@ -1074,6 +1084,125 @@ class OnnxLSTMConverter(OnnxNodeConverter):
             'hidden_weights': stacked_hidden_weights,
             'input_bias': stacked_input_bias,
             'hidden_bias': stacked_hidden_bias
+        }
+
+        # register these as global tensors so the importer can find them.
+        for key in tensors:
+            t = tensors[key]
+            id = unique_id + key
+            self.add_tensor(id, t)
+            result[key] = (id, t, self.get_order(t))
+
+        # remove all the old inputs since we have reshaped them and created new tensors for them, the only input
+        # that survives is the input buffer.
+        self.remove_input_tensors(node)
+
+        return result
+
+
+class OnnxFastGRNNConverter(OnnxNodeConverter):
+    def __init__(self, converter):
+        super().init(converter, "FastGRNN")
+
+    def get_nonlinearity(self, nonlinearity):
+        if nonlinearity == "sigmoid":
+            return ell.neural.ActivationType.sigmoid
+        elif nonlinearity == "tanh":
+            return ell.neural.ActivationType.tanh
+        # we need to add these activations
+        elif nonlinearity == "hardSigmoid":
+            return ell.neural.ActivationType.hardSigmoid
+        elif nonlinearity == "hardTanh":
+            return ell.neural.ActivationType.hardTanh
+
+    def get_attributes(self, attrs: Attributes):
+        attributes = {
+            "hidden_size": attrs["hidden_size"],
+            "gate_nonlinearity": self.get_nonlinearity(attrs["gate_nonlinearity"].decode()),
+            "update_nonlinearity": self.get_nonlinearity(attrs["update_nonlinearity"].decode()),
+            "num_directions": 1
+        }
+        if "wRank" in attrs:
+            attributes["wRank"] = attrs["wRank"]
+        else:
+            attributes["wRank"] = 0
+        if "uRank" in attrs:
+            attributes["uRank"] = attrs["uRank"]
+        else:
+            attributes["uRank"] = 0
+        if "direction" in attrs:
+            attributes["direction"] = attrs["direction"].decode()
+            if attributes["direction"] == "bidirectional":
+                attributes["num_directions"] = 2
+        return attributes
+
+    def get_output_shapes(self):
+        hidden_size = self.node.attributes['hidden_size']
+        num_directions = self.node.attributes["num_directions"]
+        input_shape = self.node.input_shapes[0][0]
+        if len(input_shape) == 3:
+            seq_length, batch_size, input_size = input_shape
+        elif len(input_shape) == 4:
+            seq_length, num_directions, batch_size, input_size = input_shape
+        if batch_size > 1:
+            raise Exception("ELL only supports a batch size of 1")
+        self.node.attributes["sequence_length"] = seq_length
+        Y_shape = ((seq_length, num_directions, 1, hidden_size), "seq-length,num-directions,batch_size,hidden-size")
+        Y_h_shape = ((num_directions, 1, hidden_size), "num_directions,batch_size,hidden_size")
+        return [Y_shape, Y_h_shape]
+
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+
+    def get_weights(self):
+        node = self.node
+        tensors = self.get_input_tensors()
+        result = {}
+
+        if len(tensors) < 6:
+            raise Exception("Expecting 6 weight tensors on FastGRNN node but found {}".format(len(tensors)))
+
+        # weights to be applied to the input, transformed so it can be used in GEMV operation (W * input)
+        i = 0
+        W1 = tensors[i][1]
+        i += 1
+        if node.attributes["wRank"] != 0:
+            W2 = tensors[i][1]
+            i += 1
+        else:
+            W2 = np.array([[0]])
+        # weights to be applied to the hidden state, transformed so it can be used in GEMV operation.
+        U1 = tensors[i][1]
+        i += 1
+        if node.attributes["uRank"] != 0:
+            U2 = tensors[i][1]
+            i += 1
+        else:
+            U2 = np.array([[0]])
+        # the stacked bias comes in as one tensor which we have to then split
+        bias_gate = tensors[i][1]
+        i += 1
+        # input biases
+        bias_update = tensors[i][1]
+        i += 1
+        # hidden biases
+        zeta = self.sigmoid(tensors[i][1])
+        i += 1
+        nu = self.sigmoid(tensors[i][1])
+
+        # ONNX order is update, reset, hidden
+
+        # we have to invent new unique id's for the tensors since we created more than we had in input_tensors.
+        unique_id = "{}_{}_".format(node.operation_type, node.id)
+        tensors = {
+            'W1': W1,
+            'W2': W2,
+            'U1': U1,
+            'U2': U2,
+            'bias_gate': bias_gate,
+            'bias_update': bias_update,
+            'zeta': zeta,
+            'nu': nu
         }
 
         # register these as global tensors so the importer can find them.
@@ -1783,6 +1912,7 @@ ONNX_OP_TYPE_TO_CONVERTER_MAP = {
     "Div"                     : OnnxDivConverter,  # noqa E203
     "Dropout"                 : OnnxPassthroughConverter,  # noqa E203
     "Exp"                     : OnnxExpConverter,  # noqa E203
+    "FastGRNN"                : OnnxFastGRNNConverter,  # noqa E203
     "Flatten"                 : OnnxFlattenConverter,  # noqa E203
     "Gather"                  : OnnxGatherConverter,  # noqa E203
     "Gemm"                    : OnnxGemmConverter,  # noqa E203
@@ -1790,6 +1920,7 @@ ONNX_OP_TYPE_TO_CONVERTER_MAP = {
     "Greater"                 : OnnxPassthroughConverter,  # noqa E203
     "GRU"                     : OnnxGRUConverter,  # noqa E203
     "HardSigmoid"             : OnnxHardSigmoidConverter,  # noqa E203
+    "HardTanh"                : OnnxHardTanhConverter,  # noqa E203
     "Identity"                : OnnxIdentityConverter,  # noqa E203
     "Input"                   : OnnxInputConverter,  # noqa E203
     "InputNode"               : OnnxInputConverter,  # noqa E203
@@ -1899,7 +2030,6 @@ class OnnxConverter:
     def add_node(self, node):
         if node.id in self.model.nodes:
             raise Exception("Already added node '{}'".format(node.id))
-
         self.define_constant_inputs(node)
 
         optype = node.operation_type

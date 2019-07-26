@@ -8,6 +8,10 @@ class ModelOptions:
         self.num_layers = 2
         self.hidden_units = 128
         self.filename = ""
+        self.wRank = None
+        self.uRank = None
+        self.gate_nonlinearity = "sigmoid"
+        self.update_nonlinearity = "tanh"
 
 
 class DatasetOptions:
@@ -17,6 +21,7 @@ class DatasetOptions:
         self.categories = "categories.txt"
         self.path = ""
         self.auto_scale = True
+        self.normalize = False
 
 
 class OptimizerOptions:
@@ -49,6 +54,8 @@ class TrainingOptions:
         self.optimizer = "RMSprop"
         self.optimizer_options = OptimizerOptions()
         self.use_gpu = True
+        self.rolling = False
+        self.max_rolling_length = 100
 
 
 class TrainingConfig:

@@ -40,7 +40,7 @@ namespace value
         /// <param name="emitter"> A reference to an IRModuleEmitter that will be used to emit LLVM IR </param>
         LLVMContext(emitters::IRModuleEmitter& emitter);
 
-        const emitters::IRModuleEmitter& GetModuleEmitter() const;
+        emitters::IRModuleEmitter& GetModuleEmitter() const;
 
         emitters::IRFunctionEmitter& GetFunctionEmitter() const;
 
@@ -85,6 +85,7 @@ namespace value
 
         void DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const override;
         void DebugDumpImpl(FunctionDeclaration fn, std::string tag, std::ostream& stream) const override;
+        void DebugPrintImpl(std::string message) override;
 
         Value IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args);
 

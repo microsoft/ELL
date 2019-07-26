@@ -40,6 +40,13 @@ namespace predictors
             /// <returns> The computed output. </param>
             ElementType Apply(const ElementType input) const override;
 
+            /// <summary> Returns the output as a function of the input. </summary>
+            ///
+            /// <param name="input"> The input value as a value library Scalar. </param>
+            ///
+            /// <returns> The computed output. </param>
+            value::Scalar Apply(value::Scalar input) const override;
+
             /// <summary> Gets the leaky factor parameter. </summary>
             ///
             /// <returns> The leaky factor parameter. </returns>
@@ -90,6 +97,20 @@ namespace predictors
         {
             return ((input > 0) ? input : _leakyFactor * input);
         }
+
+        template <typename ElementType>
+        value::Scalar LeakyReLUActivation<ElementType>::Apply(value::Scalar input) const
+        {
+            value::Scalar result;
+            If(input > 0, [&] {
+                result = input;
+            }).Else([&] {
+                value::Scalar s = value::Cast<ElementType>(_leakyFactor);
+                result = input * s;
+            });
+            return result;
+        }
+
 
         template <typename ElementType>
         void LeakyReLUActivation<ElementType>::WriteToArchive(utilities::Archiver& archiver) const

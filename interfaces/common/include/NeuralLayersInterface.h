@@ -111,7 +111,8 @@ namespace api
                 sigmoid,
                 tanh,
                 prelu,
-                hardSigmoid
+                hardSigmoid,
+                hardTanh
             };
 
             class ActivationLayer : public Layer
