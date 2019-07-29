@@ -56,7 +56,7 @@ namespace value
 
     Scalar operator++(Scalar s)
     {
-        if (!s.GetValue().IsIntegral() && !s.GetValue().IsIntegralPointer())
+        if (!s.GetValue().IsIntegral())
         {
             throw LogicException(LogicExceptionErrors::illegalState);
         }
@@ -66,7 +66,7 @@ namespace value
 
     Scalar operator++(Scalar s, int)
     {
-        if (!s.GetValue().IsIntegral() && !s.GetValue().IsIntegralPointer())
+        if (!s.GetValue().IsIntegral())
         {
             throw LogicException(LogicExceptionErrors::illegalState);
         }
@@ -78,7 +78,7 @@ namespace value
 
     Scalar operator--(Scalar s)
     {
-        if (!s.GetValue().IsIntegral() && !s.GetValue().IsIntegralPointer())
+        if (!s.GetValue().IsIntegral())
         {
             throw LogicException(LogicExceptionErrors::illegalState);
         }
@@ -88,7 +88,7 @@ namespace value
 
     Scalar operator--(Scalar s, int)
     {
-        if (!s.GetValue().IsIntegral() && !s.GetValue().IsIntegralPointer())
+        if (!s.GetValue().IsIntegral())
         {
             throw LogicException(LogicExceptionErrors::illegalState);
         }

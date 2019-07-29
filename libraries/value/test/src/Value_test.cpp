@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     Value_test.cpp (value)
-//  Authors:  Kern Handa
+//  Authors:  Kern Handa, Mason Remy
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -12,6 +12,7 @@
 #include <value/include/FunctionDeclaration.h>
 #include <value/include/LLVMContext.h>
 #include <value/include/Matrix.h>
+#include <value/include/Reference.h>
 #include <value/include/Tensor.h>
 #include <value/include/Value.h>
 #include <value/include/Vector.h>
@@ -639,7 +640,7 @@ Scalar Vector_test3()
     Vector i = std::vector<float>{ 2, 2, 2 };
 
     Vector s = v.SubVector(7, 3);
-    s = i;  // copy the i vector to the end of the v vector.
+    s = i; // copy the i vector to the end of the v vector.
 
     Vector e = std::vector<float>{ 1, 1, 1, 1, 1, 1, 2, 2, 2 };
 
@@ -881,7 +882,7 @@ Scalar GEMV_test()
     };
 
     Vector v(std::vector<float>{ 2.0f, 3.0f });
-    
+
     Vector actual = GEMV(m, v);
 
     Vector expected(std::vector<float>{ 9.3f, 20.3f });
@@ -892,7 +893,6 @@ Scalar GEMV_test()
     });
     return ok;
 }
-
 
 Scalar Tensor_test1()
 {
@@ -1655,8 +1655,266 @@ Scalar Prefetch_test1()
     Scalar result = Dot(A, B);
 
     Scalar ok = Allocate<int>(ScalarLayout);
-    If(result == 0, [&]{ ok = 1; });
+    If(result == 0, [&] { ok = 1; });
 
+    return ok;
+}
+
+Scalar ScalarRefTest()
+{
+    Scalar result = Allocate<int>(ScalarLayout);
+    Scalar x = Allocate<int>(ScalarLayout);
+    x = 100;
+
+    Scalar expected = Allocate<int>(ScalarLayout);
+    expected = 100;
+
+    auto scalarPtr = x.GetValue().Reference();
+
+    Scalar scalar = scalarPtr.Dereference();
+
+    If(scalar != expected, [&] { result = 1; });
+    return result;
+}
+
+Scalar ScalarRefRefTest()
+{
+    Scalar result = Allocate<int>(ScalarLayout);
+    Scalar x = Allocate<int>(ScalarLayout);
+    x = 100;
+
+    Scalar expected = Allocate<int>(ScalarLayout);
+    expected = 100;
+
+    auto scalarPtr = x.GetValue().Reference();
+    auto scalarPtrPtr = scalarPtr.Reference();
+
+    auto tmpValPtr = scalarPtrPtr.Dereference();
+    Scalar scalar = tmpValPtr.Dereference();
+
+    If(scalar != expected, [&] { result = 1; });
+    return result;
+}
+
+Scalar ScalarRefRefRefTest()
+{
+    Scalar result = Allocate<int>(ScalarLayout);
+    Scalar x = Allocate<int>(ScalarLayout);
+    x = 100;
+
+    Scalar expected = Allocate<int>(ScalarLayout);
+    expected = 100;
+
+    auto scalarPtr = x.GetValue().Reference();
+    auto scalarPtrPtr = scalarPtr.Reference();
+    auto scalarPtrPtrPtr = scalarPtrPtr.Reference();
+
+    auto tmpValPtrPtr = scalarPtrPtrPtr.Dereference();
+    auto tmpValPtr = tmpValPtrPtr.Dereference();
+    Scalar scalar = tmpValPtr.Dereference();
+
+    If(scalar != expected, [&] { result = 1; });
+    return result;
+}
+
+Scalar MatrixReferenceTest()
+{
+    const int N = 4;
+    const int kernelSize = 2;
+    const int offsetRows = 0;
+    const int offsetCols = 1;
+
+    auto A = MakeMatrix<int>(N, N);
+
+    // Initialize A to this matrix:
+    // [ 0, -1, -2, -3 ]
+    // [ 1,  0, -1, -2 ]
+    // [ 2,  1,  0, -1 ]
+    // [ 3,  2,  1,  0 ]
+
+    // Expected matrix is the upper right quadrant of A:
+    // [ -1, -2 ]
+    // [  0, -1 ]
+    auto expected = MakeMatrix<int>(kernelSize, kernelSize);
+
+    ForRange(N, [&](Scalar i) {
+        ForRange(N, [&](Scalar j) {
+            A(i, j) = i - j;
+        });
+    });
+    ForRange(offsetRows, offsetRows + kernelSize, [&](Scalar i) {
+        ForRange(offsetCols, offsetCols + kernelSize, [&](Scalar j) {
+            expected(i - offsetRows, j - offsetCols) = i - j;
+        });
+    });
+
+    auto tmpA = A.GetValue();
+    tmpA.SetLayout({ { (int)A.Size() } });
+    DebugPrintVector(tmpA);
+
+    Scalar kernelSizeScalar = kernelSize;
+    Scalar zeroScalar = 0;
+    auto temp = A.SubMatrix(offsetRows, offsetCols, kernelSize, kernelSize).GetValue();
+    auto valueCachePtrPtr = temp.Reference();
+
+    Matrix valueCachePtr = valueCachePtrPtr.Dereference();
+
+    Scalar ok = Allocate<int>(ScalarLayout);
+    ok = 1;
+    If(
+        Verify(valueCachePtr, expected) == 0,
+        [&] {
+            ok = 0;
+        })
+        .Else([&] {
+            auto value = valueCachePtr.GetValue();
+            value.SetLayout({ { (int)valueCachePtr.Size() } });
+            DebugPrintVector(value);
+            DebugPrint("\n");
+            auto expectedValue = expected.GetValue();
+            expectedValue.SetLayout({ { (int)expected.Size() } });
+            DebugPrintVector(expectedValue);
+            DebugPrint("\n");
+        });
+    return ok;
+}
+
+Scalar RefScalarRefTest()
+{
+    Scalar result = Allocate<int>(ScalarLayout);
+    Scalar x = Allocate<int>(ScalarLayout);
+    x = 100;
+
+    Scalar expected = Allocate<int>(ScalarLayout);
+    expected = 100;
+
+    Ref<Scalar> scalarPtr = x;
+
+    Scalar scalar = *scalarPtr;
+
+    If(scalar != expected, [&] { result = 1; });
+    return result;
+}
+
+Scalar RefScalarRefCtorsTest()
+{
+    Scalar result = Allocate<int>(ScalarLayout);
+    Scalar x = Allocate<int>(ScalarLayout);
+    x = 100;
+
+    Scalar expected = Allocate<int>(ScalarLayout);
+    expected = 100;
+    testing::ProcessTest("Value initial pointer level", expected.GetValue().PointerLevel() == 1);
+    Ref<Scalar> scalarPtr = x;
+    testing::ProcessTest("Ref ctor", scalarPtr.GetValue().PointerLevel() == 2);
+    Ref<Scalar> scalarPtrCopy = x;
+    testing::ProcessTest("Ref copy semantics", scalarPtr.GetValue().PointerLevel() == scalarPtrCopy.GetValue().PointerLevel());
+    Ref<Scalar> scalarPtrMove = std::move(scalarPtr);
+    testing::ProcessTest("Ref move semantics", !scalarPtr.GetValue().IsDefined() && scalarPtrMove.GetValue().PointerLevel() == 2);
+
+    return result;
+}
+
+Scalar RefScalarRefRefTest()
+{
+    Scalar result = Allocate<int>(ScalarLayout);
+    Scalar x = Allocate<int>(ScalarLayout);
+    x = 100;
+
+    Scalar expected = Allocate<int>(ScalarLayout);
+    expected = 100;
+
+    Ref<Scalar> scalarPtr = x;
+    Ref<Scalar> scalarPtr2 = scalarPtr;
+    Ref<Ref<Scalar>> scalarPtrPtr = scalarPtr;
+
+    Ref<Scalar> tmpValPtr = *scalarPtrPtr;
+    Scalar scalar = *tmpValPtr;
+
+    If(scalar != expected, [&] { result = 1; });
+    return result;
+}
+
+Scalar RefScalarRefRefRefTest()
+{
+    Scalar result = Allocate<int>(ScalarLayout);
+    Scalar x = Allocate<int>(ScalarLayout);
+    x = 100;
+
+    Scalar expected = Allocate<int>(ScalarLayout);
+    expected = 100;
+
+    Ref<Scalar> scalarPtr = x;
+    Ref<Ref<Scalar>> scalarPtrPtr = scalarPtr;
+    Ref<Ref<Ref<Scalar>>> scalarPtrPtrPtr = scalarPtrPtr;
+
+    Ref<Ref<Scalar>> tmpValPtrPtr = *scalarPtrPtrPtr;
+    Ref<Scalar> tmpValPtr = *tmpValPtrPtr;
+    Scalar scalar = *tmpValPtr;
+
+    If(scalar != expected, [&] { result = 1; });
+    return result;
+}
+
+Scalar RefMatrixReferenceTest()
+{
+    const int N = 4;
+    const int kernelSize = 2;
+    const int offsetRows = 0;
+    const int offsetCols = 1;
+
+    auto A = MakeMatrix<int>(N, N);
+
+    // Initialize A to this matrix:
+    // [ 0, -1, -2, -3 ]
+    // [ 1,  0, -1, -2 ]
+    // [ 2,  1,  0, -1 ]
+    // [ 3,  2,  1,  0 ]
+
+    // Expected matrix is the upper right quadrant of A:
+    // [ -1, -2 ]
+    // [  0, -1 ]
+    auto expected = MakeMatrix<int>(kernelSize, kernelSize);
+
+    ForRange(N, [&](Scalar i) {
+        ForRange(N, [&](Scalar j) {
+            A(i, j) = i - j;
+        });
+    });
+    ForRange(offsetRows, offsetRows + kernelSize, [&](Scalar i) {
+        ForRange(offsetCols, offsetCols + kernelSize, [&](Scalar j) {
+            expected(i - offsetRows, j - offsetCols) = i - j;
+        });
+    });
+
+    auto tmpA = A.GetValue();
+    tmpA.SetLayout({ { (int)A.Size() } });
+    DebugPrintVector(tmpA);
+
+    Scalar kernelSizeScalar = kernelSize;
+    Scalar zeroScalar = 0;
+    auto temp = A.SubMatrix(offsetRows, offsetCols, kernelSize, kernelSize);
+    Ref<Matrix> valueCachePtrPtr = temp;
+
+    Matrix valueCachePtr = *valueCachePtrPtr;
+
+    Scalar ok = Allocate<int>(ScalarLayout);
+    ok = 1;
+    If(
+        Verify(valueCachePtr, expected) == 0,
+        [&] {
+            ok = 0;
+        })
+        .Else([&] {
+            auto value = valueCachePtr.GetValue();
+            value.SetLayout({ { (int)valueCachePtr.Size() } });
+            DebugPrintVector(value);
+            DebugPrint("\n");
+            auto expectedValue = expected.GetValue();
+            expectedValue.SetLayout({ { (int)expected.Size() } });
+            DebugPrintVector(expectedValue);
+            DebugPrint("\n");
+        });
     return ok;
 }
 

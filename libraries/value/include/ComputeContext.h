@@ -57,6 +57,10 @@ namespace value
 
         Value OffsetImpl(Value begin, Value index) override;
 
+        Value ReferenceImpl(Value source) override;
+
+        Value DereferenceImpl(Value source) override;
+
         Value UnaryOperationImpl(ValueUnaryOperation op, Value destination) override;
 
         Value BinaryOperationImpl(ValueBinaryOperation op, Value destination, Value source) override;

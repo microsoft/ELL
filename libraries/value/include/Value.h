@@ -219,7 +219,8 @@ namespace value
 
         /// <summary> Sets the data on an empty Value instance </summary>
         /// <param name="value"> The Value instance from which to get the data </param>
-        void SetData(Value value);
+        /// <param name="force"> Disable all type checks when setting the underlying data </param>
+        void SetData(Value value, bool force = false);
 
         /// <summary> Resets the instance to an undefined, unconstrained, and empty state </summary>
         void Reset();
@@ -310,46 +311,52 @@ namespace value
         /// <summary> Returns true if the instance's type is a double </summary>
         bool IsDouble() const;
 
-        /// <summary> Returns true if the instance's type is a pointer </summary>
-        bool IsPointer() const;
+        /// <summary> Returns true if the instance's type is a reference </summary>
+        bool IsReference() const;
 
         /// <summary> Returns true if the instance's pointer level is greater than one and
         /// type is an integral type (non-floating point) </summary>
-        bool IsIntegralPointer() const;
+        bool IsIntegralReference() const;
 
         /// <summary> Returns true if the instance's pointer level is greater than one and
         /// type is a boolean </summary>
-        bool IsBooleanPointer() const;
+        bool IsBooleanReference() const;
 
         /// <summary> Returns true if the instance's pointer level is greater than one and
         /// type is a short </summary>
-        bool IsShortPointer() const;
+        bool IsShortReference() const;
 
         /// <summary> Returns true if the instance's pointer level is greater than one and
         /// type is a 32-bit int </summary>
-        bool IsInt32Pointer() const;
+        bool IsInt32Reference() const;
 
         /// <summary> Returns true if the instance's pointer level is greater than one and
         /// type is a 64-bit int </summary>
-        bool IsInt64Pointer() const;
+        bool IsInt64Reference() const;
 
         /// <summary> Returns true if the instance's pointer level is greater than one and
         /// type is a floating point type </summary>
-        bool IsFloatingPointPointer() const;
+        bool IsFloatingPointReference() const;
 
         /// <summary> Returns true if the instance's pointer level is greater than one and
         /// type is a 32-bit float </summary>
-        bool IsFloat32Pointer() const;
+        bool IsFloat32Reference() const;
 
         /// <summary> Returns true if the instance's pointer level is greater than one and
         /// type is a double </summary>
-        bool IsDoublePointer() const;
+        bool IsDoubleReference() const;
 
         /// <summary> Returns true if the instance has a MemoryLayout </summary>
         bool IsConstrained() const;
 
         /// <summary> Returns the MemoryLayout if the instance has one, throws otherwise </summary>
         const MemoryLayout& GetLayout() const;
+
+        /// <summary> Returns a reference to this instance </summary>
+        Value Reference() const;
+
+        /// <summary> Dereferences this instance and returns the resulting value </summary>
+        Value Dereference() const;
 
         /// <summary> Returns a new Value instance that's offset by the specified index </summary>
         /// <param name="index"> The value to offset by </param>
@@ -362,6 +369,12 @@ namespace value
         /// <returns> A new Value instance offset from this instance's memory location by the specified index </returns>
         /// <remarks> This operation is not bounds checked against the layout </remarks>
         Value Offset(Scalar index) const;
+
+        /// <summary> Returns a new Value instance that's offset by the specified indices </summary>
+        /// <param name="indices"> The index values to offset by in each dimension </param>
+        /// <returns> A new Value instance offset from this instance's memory location by the specified indices </returns>
+        /// <remarks> This operation is not bounds checked against the layout </remarks>
+        Value Offset(const std::vector<Scalar>& indices) const;
 
         /// <summary> Returns the type of data represented by this instance </summary>
         ValueType GetBaseType() const;

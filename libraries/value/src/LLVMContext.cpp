@@ -231,7 +231,7 @@ namespace value
                     auto offset = static_cast<int>(returnLayout.GetLogicalEntryOffset(logicalCoordinates));
 
                     LLVMValue resultValue = nullptr;
-                    if (value.IsFloatingPoint() || value.IsFloatingPointPointer())
+                    if (value.IsFloatingPoint())
                     {
                         resultValue = fnEmitter.Call(llvmFunc, { fnEmitter.ValueAt(inputLLVMValue, offset) });
                     }
@@ -290,7 +290,7 @@ namespace value
                 auto maxCoordinate = returnLayout.GetActiveSize().ToVector();
                 decltype(maxCoordinate) coordinate(maxCoordinate.size());
                 auto expLLVMValue = [&] {
-                    if (value2.IsFloatingPoint() || value2.IsFloatingPointPointer())
+                    if (value2.IsFloatingPoint())
                     {
                         return fnEmitter.ValueAt(ToLLVMValue(value2), 0);
                     }
@@ -307,7 +307,7 @@ namespace value
                     auto offset = static_cast<int>(returnLayout.GetLogicalEntryOffset(logicalCoordinates));
 
                     LLVMValue resultValue = nullptr;
-                    if (value1.IsFloatingPoint() || value1.IsFloatingPointPointer())
+                    if (value1.IsFloatingPoint())
                     {
                         resultValue = fnEmitter.Call(llvmFunc, { fnEmitter.ValueAt(baseLLVMValue, offset), expLLVMValue });
                     }
@@ -896,6 +896,50 @@ namespace value
         }
     }
 
+    Value LLVMContext::ReferenceImpl(Value sourceValue)
+    {
+        auto source = Realize(sourceValue);
+        if (source.IsConstant())
+        {
+            return _computeContext.Reference(source);
+        }
+
+        auto llvmSourceValue = ToLLVMValue(source);
+
+        auto& fn = GetFunctionEmitter();
+        auto& irEmitter = fn.GetEmitter();
+
+        auto llvmType = ValueTypeToLLVMType(irEmitter, { source.GetBaseType(), source.PointerLevel() });
+        assert(llvmType->isPointerTy());
+        auto allocatedVariable = fn.Variable(llvmType, 1, Variable::VariableFlags::hasInitValue);
+
+        fn.SetValueAt(allocatedVariable, 0, llvmSourceValue);
+        return { Emittable{ allocatedVariable }, source.GetLayout() };
+    }
+
+    Value LLVMContext::DereferenceImpl(Value sourceValue)
+    {
+        auto source = Realize(sourceValue);
+        if (source.IsConstant())
+        {
+            return _computeContext.Dereference(source);
+        }
+
+        auto llvmSourceValue = ToLLVMValue(source);
+
+        auto& fn = GetFunctionEmitter();
+        auto& irEmitter = fn.GetEmitter();
+
+        auto llvmLoadedValue = fn.ValueAt(llvmSourceValue);
+
+        auto newPointerLevel = source.PointerLevel() - 1;
+        auto llvmType = ValueTypeToLLVMType(irEmitter, { source.GetBaseType(), newPointerLevel });
+        auto allocatedVariable = fn.Variable(llvmType, 1, Variable::VariableFlags::hasInitValue);
+
+        fn.SetValueAt(allocatedVariable, 0, llvmLoadedValue);
+        return { Emittable{ fn.ValueAt(allocatedVariable) }, source.GetLayout() };
+    }
+
     Value LLVMContext::UnaryOperationImpl(ValueUnaryOperation op, Value destination)
     {
         throw LogicException(LogicExceptionErrors::notImplemented);
@@ -1034,7 +1078,7 @@ namespace value
         }
 
         auto comparisonOp = TypedComparison::none;
-        bool isFp = source1.IsFloatingPoint() || source1.IsFloatingPointPointer();
+        bool isFp = source1.IsFloatingPoint();
         switch (op)
         {
         case ValueLogicalOperation::equality:

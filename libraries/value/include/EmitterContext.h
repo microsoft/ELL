@@ -227,6 +227,10 @@ namespace value
         /// <remarks> source must be constrained and the number of items in offset must match the degree of source </remarks>
         Value Offset(Value source, std::vector<Scalar> offset);
 
+        Value Reference(Value source);
+
+        Value Dereference(Value source);
+
         /// <summary> Performs a unary operation </summary>
         /// <param name="op"> The unary operation to perform </param>
         /// <param name="destination"> The data over which to perform the operation and store the result </param>
@@ -290,6 +294,9 @@ namespace value
         virtual void CopyDataImpl(const Value& source, Value& destination) = 0;
 
         virtual Value OffsetImpl(Value source, Value offset) = 0;
+
+        virtual Value ReferenceImpl(Value source) = 0;
+        virtual Value DereferenceImpl(Value source) = 0;
 
         virtual Value UnaryOperationImpl(ValueUnaryOperation op, Value destination) = 0;
         virtual Value BinaryOperationImpl(ValueBinaryOperation op, Value destination, Value source) = 0;

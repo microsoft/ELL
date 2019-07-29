@@ -10,8 +10,8 @@
 
 #include <value/include/EmitterContext.h>
 
-#include <memory>
 #include <functional>
+#include <memory>
 
 namespace ell
 {
@@ -44,6 +44,15 @@ value::Scalar ForRangeCasting_test2();
 value::Scalar Parallelized_test1();
 value::Scalar Parallelized_test2();
 value::Scalar Prefetch_test1();
+value::Scalar ScalarRefTest();
+value::Scalar ScalarRefRefTest();
+value::Scalar ScalarRefRefRefTest();
+value::Scalar MatrixReferenceTest();
+value::Scalar RefScalarRefTest();
+value::Scalar RefScalarRefCtorsTest();
+value::Scalar RefScalarRefRefTest();
+value::Scalar RefScalarRefRefRefTest();
+value::Scalar RefMatrixReferenceTest();
 
 void DebugPrint(value::Vector message); // expecting null terminated ValueType::Char8
 void DebugPrintVector(value::Vector data);

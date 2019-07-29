@@ -66,6 +66,10 @@ namespace value
 
         void CopyDataImpl(const Value& source, Value& destination) override;
 
+        Value ReferenceImpl(Value source) override;
+
+        Value DereferenceImpl(Value source) override;
+
         Value OffsetImpl(Value begin, Value offset) override;
 
         Value UnaryOperationImpl(ValueUnaryOperation op, Value destination) override;

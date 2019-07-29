@@ -158,6 +158,22 @@ namespace value
 
     void EmitterContext::CopyData(const Value& source, Value& destination) { return CopyDataImpl(source, destination); }
 
+    Value EmitterContext::Reference(Value source) { return ReferenceImpl(source); }
+
+    Value EmitterContext::Dereference(Value source)
+    {
+        if (source.PointerLevel() < 1)
+        {
+            throw LogicException(LogicExceptionErrors::illegalState, "Pointer level is less than the expected minimum of 1");
+        }
+        else if (source.PointerLevel() == 1)
+        {
+            throw LogicException(LogicExceptionErrors::illegalState, "Attempted to dereference Value that is not a reference");
+        }
+
+        return DereferenceImpl(source);
+    }
+
     Value EmitterContext::Offset(Value begin, Value index) { return OffsetImpl(begin, index); }
 
     Value EmitterContext::Offset(Value begin, std::vector<Scalar> coordinates)

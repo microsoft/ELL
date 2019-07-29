@@ -740,6 +740,88 @@ namespace value
             start.GetValue().GetUnderlyingData());
     }
 
+    Value ComputeContext::ReferenceImpl(Value source)
+    {
+        return std::visit(
+            [&](auto&& data) -> Value {
+                using DecayedType = std::decay_t<decltype(data)>;
+                using Type = std::remove_pointer_t<DecayedType>;
+                if constexpr (std::is_same_v<Type, Emittable>)
+                {
+                    throw LogicException(LogicExceptionErrors::illegalState);
+                }
+                else
+                {
+                    auto pointerCount = source.PointerLevel() + 1;
+                    auto type = source.GetBaseType();
+                    auto layout = source.GetLayout();
+                    detail::ValueTypeDescription typeDesc{ type, pointerCount };
+                    Value value{ typeDesc, layout };
+                    value.SetData(reinterpret_cast<intptr_t>(data), true);
+                    return value;
+                }
+            },
+            source.GetUnderlyingData());
+    }
+
+    Value ComputeContext::DereferenceImpl(Value source)
+    {
+        return std::visit(
+            [&](auto&& data) -> Value {
+                using DecayedType = std::decay_t<decltype(data)>;
+                using Type = std::remove_pointer_t<DecayedType>;
+                if constexpr (std::is_same_v<Type, Emittable>)
+                {
+                    throw LogicException(LogicExceptionErrors::illegalState);
+                }
+                else if constexpr (std::is_same_v<Type, intptr_t>)
+                {
+                    [[maybe_unused]] auto type = source.GetBaseType();
+                    auto layout = source.GetLayout();
+                    if (auto pointerCount = source.PointerLevel(); pointerCount > 2)
+                    {
+                        auto address = *data;
+
+                        detail::ValueTypeDescription typeDesc{ type, pointerCount - 1 };
+                        Value value{ typeDesc, layout };
+
+                        value.SetData(*reinterpret_cast<intptr_t*>(address), true);
+                        return value;
+                    }
+                    else
+                    {
+                        auto address = *data;
+                        switch (type)
+                        {
+                        case ValueType::Boolean:
+                            return { reinterpret_cast<bool*>(address), layout };
+                        case ValueType::Char8:
+                            return { reinterpret_cast<char*>(address), layout };
+                        case ValueType::Byte:
+                            return { reinterpret_cast<uint8_t*>(address), layout };
+                        case ValueType::Int16:
+                            return { reinterpret_cast<int16_t*>(address), layout };
+                        case ValueType::Int32:
+                            return { reinterpret_cast<int32_t*>(address), layout };
+                        case ValueType::Int64:
+                            return { reinterpret_cast<int64_t*>(address), layout };
+                        case ValueType::Float:
+                            return { reinterpret_cast<float*>(address), layout };
+                        case ValueType::Double:
+                            return { reinterpret_cast<double*>(address), layout };
+                        default:
+                            throw LogicException(LogicExceptionErrors::notImplemented);
+                        }
+                    }
+                }
+                else
+                {
+                    throw LogicException(LogicExceptionErrors::illegalState);
+                }
+            },
+            source.GetUnderlyingData());
+    }
+
     Value ComputeContext::UnaryOperationImpl(ValueUnaryOperation op, Value destination)
     {
         throw LogicException(LogicExceptionErrors::notImplemented);
@@ -1168,7 +1250,36 @@ namespace value
 
     bool ComputeContext::TypeCompatible(Value value1, Value value2) const
     {
-        return value1.GetBaseType() == value2.GetBaseType() && value1.PointerLevel() == value2.PointerLevel();
+        auto pointerLevel1 = value1.PointerLevel();
+        auto pointerLevel2 = value2.PointerLevel();
+
+        if (value1.GetBaseType() == value2.GetBaseType() &&
+            pointerLevel1 == pointerLevel2 &&
+            pointerLevel1 == 1)
+        {
+            return true;
+        }
+
+        if (pointerLevel1 > 1 && pointerLevel2 > 1)
+        {
+            return false;
+        }
+
+        constexpr auto intptrType = GetValueType<intptr_t>();
+        if (pointerLevel1 > 1)
+        {
+            assert(pointerLevel2 == 1);
+            return value2.GetBaseType() == intptrType;
+        }
+
+        if (pointerLevel2 > 1)
+        {
+            assert(pointerLevel1 == 1);
+            return value1.GetBaseType() == intptrType;
+        }
+
+        assert(false);
+        return false;
     }
 
     std::string ComputeContext::GetScopeAdjustedName(GlobalAllocationScope scope, std::string name) const

@@ -12,6 +12,7 @@ set(src
     src/LLVMContext.cpp
     src/Matrix.cpp
     src/MatrixOperations.cpp
+    src/Reference.cpp
     src/Scalar.cpp
     src/ScalarOperations.cpp
     src/Tensor.cpp
@@ -30,6 +31,7 @@ set(include
     include/LLVMContext.h
     include/Matrix.h
     include/MatrixOperations.h
+    include/Reference.h
     include/Scalar.h
     include/ScalarOperations.h
     include/Tensor.h

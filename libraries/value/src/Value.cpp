@@ -25,7 +25,15 @@ namespace value
 
     Value::Value(const Value&) = default;
 
-    Value::Value(Value&& other) noexcept = default;
+    Value::Value(Value&& other) noexcept
+    {
+        // GCC 8's stdlib doesn't have std::swap for std::variant
+        auto temp = _data;
+        _data = other._data;
+        other._data = temp;
+        std::swap(_type, other._type);
+        std::swap(_layout, other._layout);
+    }
 
     // clang-format off
     /****************************************************************************
@@ -211,31 +219,29 @@ namespace value
         _data = {};
     }
 
-    void Value::SetData(Value value)
+    void Value::SetData(Value value, bool force)
     {
-        if (value.IsConstrained() && value.GetLayout() != GetLayout())
+        if (!force && value.IsConstrained() && value.GetLayout() != GetLayout())
         {
             throw InputException(InputExceptionErrors::invalidArgument);
         }
 
-        std::visit(VariantVisitor{ [this](Emittable emittable) {
+        std::visit(VariantVisitor{ [this, force](Emittable emittable) {
                                       auto type = GetContext().GetType(emittable);
-                                      if (type.first != _type.first)
+                                      if (!force && type.first != _type.first)
                                       {
                                           throw InputException(InputExceptionErrors::typeMismatch);
                                       }
 
                                       _data = emittable;
-                                      _type = type;
                                   },
-                                   [this, &value](auto&& arg) {
-                                       if (GetValueType<std::decay_t<decltype(arg)>>() != _type.first)
+                                   [this, force](auto&& arg) {
+                                       if (!force && GetValueType<std::decay_t<decltype(arg)>>() != _type.first)
                                        {
                                            throw InputException(InputExceptionErrors::typeMismatch);
                                        }
 
                                        _data = arg;
-                                       _type = value._type;
                                    } },
                    value._data);
     }
@@ -255,7 +261,7 @@ namespace value
 
     bool Value::IsIntegral() const
     {
-        if (IsPointer())
+        if (IsReference())
         {
             return false;
         }
@@ -279,28 +285,28 @@ namespace value
         }
     }
 
-    bool Value::IsBoolean() const { return _type.first == ValueType::Boolean && !IsPointer(); }
+    bool Value::IsBoolean() const { return _type.first == ValueType::Boolean && !IsReference(); }
 
-    bool Value::IsInt16() const { return _type.first == ValueType::Int16 && !IsPointer(); }
+    bool Value::IsInt16() const { return _type.first == ValueType::Int16 && !IsReference(); }
 
-    bool Value::IsInt32() const { return _type.first == ValueType::Int32 && !IsPointer(); }
+    bool Value::IsInt32() const { return _type.first == ValueType::Int32 && !IsReference(); }
 
-    bool Value::IsInt64() const { return _type.first == ValueType::Int64 && !IsPointer(); }
+    bool Value::IsInt64() const { return _type.first == ValueType::Int64 && !IsReference(); }
 
     bool Value::IsFloatingPoint() const
     {
-        return (_type.first == ValueType::Float || _type.first == ValueType::Double) && !IsPointer();
+        return (_type.first == ValueType::Float || _type.first == ValueType::Double) && !IsReference();
     }
 
-    bool Value::IsFloat32() const { return _type.first == ValueType::Float && !IsPointer(); }
+    bool Value::IsFloat32() const { return _type.first == ValueType::Float && !IsReference(); }
 
-    bool Value::IsDouble() const { return _type.first == ValueType::Double && !IsPointer(); }
+    bool Value::IsDouble() const { return _type.first == ValueType::Double && !IsReference(); }
 
-    bool Value::IsPointer() const { return _type.second > 1; }
+    bool Value::IsReference() const { return _type.second > 1; }
 
-    bool Value::IsIntegralPointer() const
+    bool Value::IsIntegralReference() const
     {
-        if (!IsPointer())
+        if (!IsReference())
         {
             return false;
         }
@@ -324,30 +330,43 @@ namespace value
         }
     }
 
-    bool Value::IsBooleanPointer() const { return _type.first == ValueType::Boolean && IsPointer(); }
+    bool Value::IsBooleanReference() const { return _type.first == ValueType::Boolean && IsReference(); }
 
-    bool Value::IsShortPointer() const { return _type.first == ValueType::Int16 && IsPointer(); }
+    bool Value::IsShortReference() const { return _type.first == ValueType::Int16 && IsReference(); }
 
-    bool Value::IsInt32Pointer() const { return _type.first == ValueType::Int32 && IsPointer(); }
+    bool Value::IsInt32Reference() const { return _type.first == ValueType::Int32 && IsReference(); }
 
-    bool Value::IsInt64Pointer() const { return _type.first == ValueType::Int64 && IsPointer(); }
+    bool Value::IsInt64Reference() const { return _type.first == ValueType::Int64 && IsReference(); }
 
-    bool Value::IsFloatingPointPointer() const
+    bool Value::IsFloatingPointReference() const
     {
-        return (_type.first == ValueType::Float || _type.first == ValueType::Double) && IsPointer();
+        return (_type.first == ValueType::Float || _type.first == ValueType::Double) && IsReference();
     }
 
-    bool Value::IsFloat32Pointer() const { return _type.first == ValueType::Float && IsPointer(); }
+    bool Value::IsFloat32Reference() const { return _type.first == ValueType::Float && IsReference(); }
 
-    bool Value::IsDoublePointer() const { return _type.first == ValueType::Double && IsPointer(); }
+    bool Value::IsDoubleReference() const { return _type.first == ValueType::Double && IsReference(); }
 
     bool Value::IsConstrained() const { return _layout.has_value(); }
 
     const MemoryLayout& Value::GetLayout() const { return _layout.value(); }
 
+    Value Value::Reference() const { return GetContext().Reference(*this); }
+
+    Value Value::Dereference() const { return GetContext().Dereference(*this); }
+
     Value Value::Offset(Value index) const { return GetContext().Offset(*this, index); }
 
     Value Value::Offset(Scalar index) const { return Offset(index.GetValue()); }
+
+    Value Value::Offset(const std::vector<Scalar>& indices) const
+    {
+        if (GetLayout().NumDimensions() != static_cast<int>(indices.size()))
+        {
+            throw InputException(InputExceptionErrors::invalidArgument, "Must pass in one index per dimension in the value layout");
+        }
+        return GetContext().Offset(*this, indices);
+    }
 
     ValueType Value::GetBaseType() const { return _type.first; }
 

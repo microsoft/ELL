@@ -334,6 +334,15 @@ int main()
         ADD_TEST_FUNCTION(Parallelized_test1);
         ADD_TEST_FUNCTION(Parallelized_test2);
         ADD_TEST_FUNCTION(Prefetch_test1);
+        ADD_TEST_FUNCTION(ScalarRefTest);
+        ADD_TEST_FUNCTION(ScalarRefRefTest);
+        ADD_TEST_FUNCTION(ScalarRefRefRefTest);
+        ADD_TEST_FUNCTION(MatrixReferenceTest);
+        ADD_TEST_FUNCTION(RefScalarRefTest);
+        ADD_TEST_FUNCTION(RefScalarRefCtorsTest);
+        ADD_TEST_FUNCTION(RefScalarRefRefTest);
+        ADD_TEST_FUNCTION(RefScalarRefRefRefTest);
+        ADD_TEST_FUNCTION(RefMatrixReferenceTest);
 
         for (auto [name, fn] : testFunctions)
         {

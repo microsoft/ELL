@@ -62,7 +62,7 @@ namespace emitters
     /// <summary>
     /// ELL Model output ports are bound to logical variables. Variables represent ports and port elements in machine terms: the local,
     /// global or heap scalars and vectors that they are being emitted as.
-    /// Our compilers can emit code/IR in multiple formats. Hence we need a format independant scheme
+    /// Our compilers can emit code/IR in multiple formats. Hence we need a format independent scheme
     ///  </summary>
     class Variable
     {
