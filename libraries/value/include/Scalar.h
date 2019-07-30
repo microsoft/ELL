@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "ScalarOperations.h"
 #include "Value.h"
 
 namespace ell
@@ -68,6 +67,29 @@ namespace value
         ValueType GetType() const;
 
     private:
+        friend Scalar operator+(Scalar, Scalar);
+        friend Scalar operator*(Scalar, Scalar);
+        friend Scalar operator-(Scalar, Scalar);
+        friend Scalar operator/(Scalar, Scalar);
+        friend Scalar operator%(Scalar, Scalar);
+
+        friend Scalar operator-(Scalar);
+
+        friend Scalar operator++(Scalar);
+        friend Scalar operator++(Scalar, int);
+        friend Scalar operator--(Scalar);
+        friend Scalar operator--(Scalar, int);
+
+        friend Scalar operator==(Scalar, Scalar);
+        friend Scalar operator!=(Scalar, Scalar);
+        friend Scalar operator<(Scalar, Scalar);
+        friend Scalar operator<=(Scalar, Scalar);
+        friend Scalar operator>(Scalar, Scalar);
+        friend Scalar operator>=(Scalar, Scalar);
+
+        friend Scalar operator&&(Scalar, Scalar);
+        friend Scalar operator||(Scalar, Scalar);
+
         Value _value;
     };
 

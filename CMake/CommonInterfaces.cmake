@@ -137,10 +137,10 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
         set_property(SOURCE ${INTERFACE_MAIN} PROPERTY CPLUSPLUS ON)
         set_property(SOURCE ${INTERFACE_SRC} PROPERTY CPLUSPLUS ON)
         set_property(SOURCE ${INTERFACE_INCLUDE} PROPERTY CPLUSPLUS ON)
-        swig_add_library(${module_name} 
-              LANGUAGE ${LANGUAGE_NAME} 
+        swig_add_library(${module_name}
+              LANGUAGE ${LANGUAGE_NAME}
               SOURCES ${INTERFACE_MAIN} ${INTERFACE_SRC} ${INTERFACE_INCLUDE}) # ${EXTRA_INTERFACE})
-          
+
         swig_link_libraries(${module_name} ${INTERFACE_LIBRARIES} common data dsp emittable_functions emitters evaluators functions math model nodes optimization passes predictors trainers utilities value)
 
         if(${language} STREQUAL "python" AND APPLE)
@@ -149,13 +149,13 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
           set_target_properties( ${PREPEND_TARGET}${module_name} PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
         else()
           swig_link_libraries(${module_name} ${LANGUAGE_LIBRARIES})
-        endif()          
+        endif()
 
       else()
 
         add_custom_target(${PREPEND_TARGET}${module_name}
           DEPENDS ${generated_sources})
-      
+
       endif()
       set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES OUTPUT_NAME ${PREPEND_TARGET}${TARGET_NAME})
       set_target_properties(${SWIG_MODULE_${module_name}_REAL_NAME} PROPERTIES EXCLUDE_FROM_ALL TRUE)

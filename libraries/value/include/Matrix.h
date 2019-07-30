@@ -109,6 +109,16 @@ namespace value
         Matrix& operator/=(Scalar);
 
     private:
+        friend Matrix operator+(Matrix, Matrix);
+        friend Matrix operator+(Matrix, Scalar);
+
+        friend Matrix operator-(Matrix, Matrix);
+        friend Matrix operator-(Matrix, Scalar);
+
+        friend Matrix operator*(Matrix, Scalar);
+
+        friend Matrix operator/(Matrix, Scalar);
+
         Value _value;
     };
 

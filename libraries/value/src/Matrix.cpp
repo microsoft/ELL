@@ -226,5 +226,41 @@ namespace value
         return *this;
     }
 
+    // Free function operator overloads
+    Matrix operator+(Matrix m1, Matrix m2)
+    {
+        Matrix copy = m1.Copy();
+        return copy += m2;
+    }
+
+    Matrix operator+(Matrix m, Scalar s)
+    {
+        Matrix copy = m.Copy();
+        return copy += s;
+    }
+
+    Matrix operator-(Matrix m1, Matrix m2)
+    {
+        Matrix copy = m1.Copy();
+        return copy -= m2;
+    }
+    Matrix operator-(Matrix m, Scalar s)
+    {
+        Matrix copy = m.Copy();
+        return copy -= s;
+    }
+
+    Matrix operator*(Matrix m, Scalar s)
+    {
+        Matrix copy = m.Copy();
+        return copy *= s;
+    }
+
+    Matrix operator/(Matrix m, Scalar s)
+    {
+        Matrix copy = m.Copy();
+        return copy /= s;
+    }
+
 } // namespace value
 } // namespace ell

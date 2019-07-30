@@ -42,29 +42,5 @@ namespace value
         });
     }
 
-    Tensor operator+(Tensor t, Scalar s)
-    {
-        Tensor copy = t.Copy();
-        return copy += s;
-    }
-
-    Tensor operator-(Tensor t, Scalar s)
-    {
-        Tensor copy = t.Copy();
-        return copy -= s;
-    }
-
-    Tensor operator*(Tensor t, Scalar s)
-    {
-        Tensor copy = t.Copy();
-        return copy *= s;
-    }
-
-    Tensor operator/(Tensor t, Scalar s)
-    {
-        Tensor copy = t.Copy();
-        return copy /= s;
-    }
-
 } // namespace value
 } // namespace ell

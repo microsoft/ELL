@@ -23,6 +23,8 @@ namespace ell
 {
 namespace model
 {
+    using namespace value;
+
     namespace
     {
         //
@@ -153,7 +155,7 @@ namespace model
     template <>
     std::vector<bool> Map::ComputeOutput<bool>(const PortElementsBase& elements)
     {
-        value::ContextGuard<> guard(_computeContext);
+        ContextGuard<> guard(_computeContext);
 
         return ComputeBoolOutput(elements);
     }
@@ -161,7 +163,7 @@ namespace model
     template <>
     std::vector<int> Map::ComputeOutput<int>(const PortElementsBase& elements)
     {
-        value::ContextGuard<> guard(_computeContext);
+        ContextGuard<> guard(_computeContext);
 
         return ComputeIntOutput(elements);
     }
@@ -169,7 +171,7 @@ namespace model
     template <>
     std::vector<int64_t> Map::ComputeOutput<int64_t>(const PortElementsBase& elements)
     {
-        value::ContextGuard<> guard(_computeContext);
+        ContextGuard<> guard(_computeContext);
 
         return ComputeInt64Output(elements);
     }
@@ -177,7 +179,7 @@ namespace model
     template <>
     std::vector<float> Map::ComputeOutput<float>(const PortElementsBase& elements)
     {
-        value::ContextGuard<> guard(_computeContext);
+        ContextGuard<> guard(_computeContext);
 
         return ComputeFloatOutput(elements);
     }
@@ -185,14 +187,14 @@ namespace model
     template <>
     std::vector<double> Map::ComputeOutput<double>(const PortElementsBase& elements)
     {
-        value::ContextGuard<> guard(_computeContext);
+        ContextGuard<> guard(_computeContext);
 
         return ComputeDoubleOutput(elements);
     }
 
     void Map::ComputeMultiple(const std::vector<void*>& inputs, const std::vector<void*>& outputs)
     {
-        value::ContextGuard<> guard(_computeContext);
+        ContextGuard<> guard(_computeContext);
 
         auto numInputs = NumInputs();
         for (size_t i = 0; i < numInputs && i < inputs.size(); i++)
@@ -286,7 +288,7 @@ namespace model
 
     void Map::Reset()
     {
-        value::ContextGuard<> guard(_computeContext);
+        ContextGuard<> guard(_computeContext);
 
         _model.Reset();
     }

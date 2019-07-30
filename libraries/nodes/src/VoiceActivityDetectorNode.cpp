@@ -15,6 +15,8 @@
 
 namespace ell
 {
+using namespace value;
+
 namespace nodes
 {
     VoiceActivityDetectorNode::VoiceActivityDetectorNode() :
@@ -41,14 +43,14 @@ namespace nodes
     {
     }
 
-    void VoiceActivityDetectorNode::Define(value::FunctionDeclaration& fn)
+    void VoiceActivityDetectorNode::Define(FunctionDeclaration& fn)
     {
-        (void)fn.Define([this](const value::Vector data, value::Vector output) {
+        (void)fn.Define([this](const Vector data, Vector output) {
             output[0] = _vad.Process(data);
         });
     }
 
-    void VoiceActivityDetectorNode::DefineReset(value::FunctionDeclaration& fn)
+    void VoiceActivityDetectorNode::DefineReset(FunctionDeclaration& fn)
     {
         (void)fn.Define([this] { _vad.Reset(); });
     }

@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "Value.h"
 #include "Scalar.h"
+#include "Value.h"
 #include "Vector.h"
 
 #include <utilities/include/MemoryLayout.h>
@@ -48,22 +48,6 @@ namespace value
     /// <param name="vector"> The instance of Vector that references the data over which to iterate </param>
     /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>
     void For(Vector vector, std::function<void(Scalar)> fn);
-
-    Vector operator+(Scalar s, Vector v);
-    Vector operator+(Vector v, Scalar s);
-    Vector operator+(Vector v1, Vector v2);
-
-    Vector operator-(Scalar s, Vector v);
-    Vector operator-(Vector v, Scalar s);
-    Vector operator-(Vector v1, Vector v2);
-
-    Vector operator*(Scalar s, Vector v);
-    Vector operator*(Vector v, Scalar s);
-    Vector operator*(Vector v, Vector u); // elementwise multiply
-
-    Vector operator/(Scalar s, Vector v);
-    Vector operator/(Vector v, Scalar s);
-    Vector operator/(Vector v, Vector u); // elementwise divide
 
 } // namespace value
 } // namespace ell

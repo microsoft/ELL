@@ -24,7 +24,7 @@ namespace value
 
     /// <summary> Reinterprets the given data value as a matrix of the given size </summary>
 	Matrix ToMatrix(Value data, int numRows, int numCols);
-    
+
     Scalar Sum(Matrix matrix, Scalar initialValue);
 
     /// <summary> Creates a for loop over the matrix </summary>
@@ -35,16 +35,6 @@ namespace value
     Matrix GEMM(Matrix m1, Matrix m2);
 
     Vector GEMV(Matrix m, Vector v);
-
-    Matrix operator+(Matrix, Matrix);
-    Matrix operator+(Matrix, Scalar);
-
-    Matrix operator-(Matrix, Matrix);
-    Matrix operator-(Matrix, Scalar);
-
-    Matrix operator*(Matrix, Scalar);
-
-    Matrix operator/(Matrix, Scalar);
 
 } // namespace value
 } // namespace ell

@@ -108,7 +108,7 @@ void TestVoiceActivityDetector(const std::string& path)
     // test serialization
 
     {
-        value::ContextGuard<value::ComputeContext> contextGuard{ "vad" };
+        ContextGuard<ComputeContext> contextGuard{ "vad" };
         SerializationContext context;
         std::stringstream strstream;
         {

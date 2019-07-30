@@ -70,7 +70,6 @@ namespace value
         return Scalar(indexedValue).Copy();
     }
 
-
     Value Vector::GetValue() const { return _value; }
 
     Vector Vector::SubVector(Scalar offset, int size) const
@@ -188,6 +187,89 @@ namespace value
         });
 
         return *this;
+    }
+
+    // Free function operator overloads
+    Vector operator+(Scalar s, Vector v)
+    {
+        return v + s;
+    }
+
+    Vector operator+(Vector v, Scalar s)
+    {
+        Vector copy = v.Copy();
+        return copy += s;
+    }
+
+    Vector operator+(Vector v1, Vector v2)
+    {
+        Vector copy = v1.Copy();
+        return copy += v2;
+    }
+
+    Vector operator-(Scalar s, Vector v)
+    {
+        Vector copy = v.Copy();
+        For(copy, [&](Scalar index) {
+            copy(index) = s - copy(index);
+        });
+        return copy;
+    }
+
+    Vector operator-(Vector v, Scalar s)
+    {
+        Vector copy = v.Copy();
+        return copy -= s;
+    }
+
+    Vector operator-(Vector v1, Vector v2)
+    {
+        Vector copy = v1.Copy();
+        return copy -= v2;
+    }
+
+    Vector operator*(Scalar s, Vector v)
+    {
+        return v * s;
+    }
+
+    Vector operator*(Vector v, Scalar s)
+    {
+        Vector copy = v.Copy();
+        return copy *= s;
+    }
+
+    Vector operator*(Vector v, Vector u)
+    {
+        Vector copy = v.Copy();
+        For(copy, [&](Scalar index) {
+            copy(index) = copy(index) * u(index);
+        });
+        return copy;
+    }
+
+    Vector operator/(Scalar s, Vector v)
+    {
+        Vector copy = v.Copy();
+        For(copy, [&](Scalar index) {
+            copy(index) = s / copy(index);
+        });
+        return copy;
+    }
+
+    Vector operator/(Vector v, Scalar s)
+    {
+        Vector copy = v.Copy();
+        return copy /= s;
+    }
+
+    Vector operator/(Vector v, Vector u)
+    {
+        Vector copy = v.Copy();
+        For(copy, [&](Scalar index) {
+            copy(index) = copy(index) / u(index);
+        });
+        return copy;
     }
 
 } // namespace value

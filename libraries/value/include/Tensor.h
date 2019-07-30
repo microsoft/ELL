@@ -129,6 +129,11 @@ namespace value
         Tensor& operator/=(Scalar);
 
     private:
+        friend Tensor operator+(Tensor, Scalar);
+        friend Tensor operator-(Tensor, Scalar);
+        friend Tensor operator*(Tensor, Scalar);
+        friend Tensor operator/(Tensor, Scalar);
+
         Value _value;
     };
 

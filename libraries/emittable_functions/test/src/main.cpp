@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     {
         for (const auto& context : GetContexts())
         {
-            value::ContextGuard<> guard(*context);
+            ContextGuard<> guard(*context);
 
             TestSoftmax();
             TestSigmoid();

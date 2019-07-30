@@ -239,5 +239,30 @@ namespace value
         return *this;
     }
 
+    // Free function operator overloads
+    Tensor operator+(Tensor t, Scalar s)
+    {
+        Tensor copy = t.Copy();
+        return copy += s;
+    }
+
+    Tensor operator-(Tensor t, Scalar s)
+    {
+        Tensor copy = t.Copy();
+        return copy -= s;
+    }
+
+    Tensor operator*(Tensor t, Scalar s)
+    {
+        Tensor copy = t.Copy();
+        return copy *= s;
+    }
+
+    Tensor operator/(Tensor t, Scalar s)
+    {
+        Tensor copy = t.Copy();
+        return copy /= s;
+    }
+
 } // namespace value
 } // namespace ell

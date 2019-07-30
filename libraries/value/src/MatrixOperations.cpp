@@ -60,7 +60,7 @@ namespace value
 
     Matrix GEMM(Matrix m1, Matrix m2) { throw LogicException(LogicExceptionErrors::notImplemented); }
 
-    Vector GEMV(Matrix m, Vector v) 
+    Vector GEMV(Matrix m, Vector v)
     {
         Vector result = Allocate(v.GetType(), m.Rows());
         Scalar first = Allocate(ValueType::Int32, ScalarLayout);
@@ -79,41 +79,6 @@ namespace value
             });
         });
         return result;
-    }
-
-    Matrix operator+(Matrix m1, Matrix m2)
-    {
-        Matrix copy = m1.Copy();
-        return copy += m2;
-    }
-
-    Matrix operator+(Matrix m, Scalar s)
-    {
-        Matrix copy = m.Copy();
-        return copy += s;
-    }
-
-    Matrix operator-(Matrix m1, Matrix m2)
-    {
-        Matrix copy = m1.Copy();
-        return copy -= m2;
-    }
-    Matrix operator-(Matrix m, Scalar s)
-    {
-        Matrix copy = m.Copy();
-        return copy -= s;
-    }
-
-    Matrix operator*(Matrix m, Scalar s)
-    {
-        Matrix copy = m.Copy();
-        return copy *= s;
-    }
-
-    Matrix operator/(Matrix m, Scalar s)
-    {
-        Matrix copy = m.Copy();
-        return copy /= s;
     }
 
 } // namespace value

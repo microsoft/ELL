@@ -10,10 +10,9 @@
 #include "NodeOperations.h"
 
 #include <value/include/EmitterContext.h>
+#include <value/include/Scalar.h>
 #include <value/include/Value.h>
 #include <value/include/ValueOperations.h>
-#include <value/include/Scalar.h>
-#include <value/include/ScalarOperations.h>
 
 #include <emittable_functions/include/LogisticFunctions.h>
 
@@ -22,11 +21,11 @@
 
 #include <cmath>
 
-using namespace ell;
-using namespace ell::emittable_functions;
-
 namespace ell
 {
+using namespace emittable_functions;
+using namespace value;
+
 namespace nodes
 {
     template <typename ValueType>
@@ -56,10 +55,9 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void UnaryOperationNode<ValueType>::Define(value::FunctionDeclaration& fn)
+    void UnaryOperationNode<ValueType>::Define(FunctionDeclaration& fn)
     {
-        (void)fn.Define([this](const value::Vector data, value::Vector result) {
-
+        (void)fn.Define([this](const Vector data, Vector result) {
             auto op = _operation;
             if (op == UnaryOperationType::softmax)
             {
@@ -67,7 +65,7 @@ namespace nodes
             }
             else
             {
-                For(data, [&](value::Scalar index) {
+                For(data, [&](Scalar index) {
                     auto v = data(index);
                     switch (op)
                     {

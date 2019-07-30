@@ -19,7 +19,6 @@
 #include <value/include/FunctionDeclaration.h>
 #include <value/include/LLVMContext.h>
 #include <value/include/Scalar.h>
-#include <value/include/ScalarOperations.h>
 #include <value/include/Value.h>
 #include <value/include/Vector.h>
 

@@ -244,7 +244,12 @@ add_dependencies(${test_name} dspDataFiles)
 
 copy_shared_libraries(${test_name})
 
-set_property(TARGET ${test_name} PROPERTY FOLDER "tests")
+set_target_properties(
+    ${test_name}
+    PROPERTIES
+        FOLDER "tests"
+        ENABLE_EXPORTS ON
+)
 
 add_test(NAME ${test_name} COMMAND ${test_name})
 set_test_library_path(${test_name})

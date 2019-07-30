@@ -104,6 +104,22 @@ namespace value
         Vector& operator-=(Vector);
 
     private:
+        friend Vector operator+(Scalar s, Vector v);
+        friend Vector operator+(Vector v, Scalar s);
+        friend Vector operator+(Vector v1, Vector v2);
+
+        friend Vector operator-(Scalar s, Vector v);
+        friend Vector operator-(Vector v, Scalar s);
+        friend Vector operator-(Vector v1, Vector v2);
+
+        friend Vector operator*(Scalar s, Vector v);
+        friend Vector operator*(Vector v, Scalar s);
+        friend Vector operator*(Vector v, Vector u); // elementwise multiply
+
+        friend Vector operator/(Scalar s, Vector v);
+        friend Vector operator/(Vector v, Scalar s);
+        friend Vector operator/(Vector v, Vector u); // elementwise divide
+
         Value _value;
     };
 

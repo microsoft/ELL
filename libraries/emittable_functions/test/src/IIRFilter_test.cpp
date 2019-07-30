@@ -27,20 +27,19 @@ using namespace ell::utilities;
 using namespace ell::value;
 using namespace ell::emittable_functions;
 
-namespace
-{
-
-template <typename T>
-constexpr ValueType GetValueType(const std::vector<T>& value)
-{
-    return ell::value::GetValueType<typename std::decay_t<decltype(value)>::value_type>();
-}
-
-} // namespace
-
 namespace ell
 {
 
+namespace
+{
+
+    template <typename T>
+    constexpr ValueType GetValueType(const std::vector<T>& value)
+    {
+        return value::GetValueType<typename std::decay_t<decltype(value)>::value_type>();
+    }
+
+} // namespace
 void TestIIRFilter()
 {
     // Simple pre-emph filter

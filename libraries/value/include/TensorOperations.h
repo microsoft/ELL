@@ -33,10 +33,5 @@ namespace value
     /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>
     void For(Tensor tensor, std::function<void(Scalar, Scalar, Scalar)> fn);
 
-    Tensor operator+(Tensor, Scalar);
-    Tensor operator-(Tensor, Scalar);
-    Tensor operator*(Tensor, Scalar);
-    Tensor operator/(Tensor, Scalar);
-
 } // namespace value
 } // namespace ell

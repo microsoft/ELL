@@ -10,9 +10,8 @@
 
 #include <value/include/ComputeContext.h>
 #include <value/include/EmitterContext.h>
-#include <value/include/Vector.h>
 #include <value/include/Scalar.h>
-#include <value/include/ScalarOperations.h>
+#include <value/include/Vector.h>
 
 namespace ell
 {
@@ -20,10 +19,10 @@ namespace emittable_functions
 {
     using namespace value;
 
-    void Softmax(value::Vector input, value::Vector output)
+    void Softmax(Vector input, Vector output)
     {
         // softmax is invariant under translation by the same constant value in each coordinate so we can subtract
-        // the maxValue from each coordinate in order to keep the sum of the exponents under control.        
+        // the maxValue from each coordinate in order to keep the sum of the exponents under control.
         Scalar max = Max(input);
 
         // now compute the Euler values and the sum of those values
@@ -39,21 +38,21 @@ namespace emittable_functions
         output /= sum;
     }
 
-    value::Scalar Sigmoid(value::Scalar x)
+    Scalar Sigmoid(Scalar x)
     {
         Scalar zero = Cast(0, x.GetType());
         Scalar one = Cast(1, x.GetType());
         Scalar result;
-        If (x > zero, [&]{
+        If(x > zero, [&] {
             result = one / (Exp(-x) + one);
-        }).Else([&]{
+        }).Else([&] {
             auto expInput = Exp(x);
             result = expInput / (expInput + one);
         });
         return result;
     }
 
-    value::Scalar HardSigmoid(value::Scalar x)
+    Scalar HardSigmoid(Scalar x)
     {
         // y = clip (scale*x + bias) to [0,1]
 
@@ -72,7 +71,7 @@ namespace emittable_functions
         return result;
     }
 
-    value::Scalar HardTanh(value::Scalar x)
+    Scalar HardTanh(Scalar x)
     {
         // y = clip (x) to [-1,1]
 

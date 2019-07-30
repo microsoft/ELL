@@ -184,7 +184,7 @@ namespace nodes
             int wrank = static_cast<int>(this->_wRank);
             int urank = static_cast<int>(this->_uRank);
             _hiddenState = StaticAllocate("hiddenState", GetValueType<ElementType>(), MemoryLayout({ hiddenUnits }));
-            _lastResetValue = StaticAllocate("lastResetValue", ell::value::ValueType::Int32, ell::utilities::ScalarLayout);
+            _lastResetValue = StaticAllocate("lastResetValue", ValueType::Int32, ScalarLayout);
 
             int inputSize = static_cast<int>(input.Size());
 
@@ -265,6 +265,7 @@ namespace nodes
             if (resetVector.Size() > 0)
             {
                 Scalar triggerValue = Cast<int>(resetVector[0]);
+
                 If(triggerValue == 0, [&] {
                     // todo logical And operation present in ScalarOperations.h
                     // bugbug: logical AND is apparently not implemented in the value library...

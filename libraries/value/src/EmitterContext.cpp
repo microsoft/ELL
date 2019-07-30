@@ -9,7 +9,6 @@
 #include "EmitterContext.h"
 #include "FunctionDeclaration.h"
 #include "Scalar.h"
-#include "ScalarOperations.h"
 #include "Value.h"
 #include "Vector.h"
 

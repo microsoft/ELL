@@ -14,7 +14,6 @@ set(src
     src/MatrixOperations.cpp
     src/Reference.cpp
     src/Scalar.cpp
-    src/ScalarOperations.cpp
     src/Tensor.cpp
     src/TensorOperations.cpp
     src/Value.cpp
@@ -33,7 +32,6 @@ set(include
     include/MatrixOperations.h
     include/Reference.h
     include/Scalar.h
-    include/ScalarOperations.h
     include/Tensor.h
     include/TensorOperations.h
     include/Value.h

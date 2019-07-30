@@ -37,6 +37,7 @@ namespace ell
 namespace model
 {
     using namespace logging;
+    using namespace value;
 
     IRMapCompiler::IRMapCompiler() :
         IRMapCompiler(MapCompilerOptions{}, ModelOptimizerOptions{})
@@ -90,7 +91,7 @@ namespace model
         _profiler.EmitInitialization();
 
         {
-            value::ContextGuard<value::LLVMContext> guard(_moduleEmitter);
+            ContextGuard<LLVMContext> guard(_moduleEmitter);
 
             // Now we have the refined map, compile it
             Log() << "Compiling map..." << EOL;

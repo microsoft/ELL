@@ -42,6 +42,7 @@
 
 using namespace ell;
 using namespace nodes;
+using namespace value;
 using namespace std::string_literals;
 
 //
@@ -82,8 +83,8 @@ void TestBasicMathNodes()
 
 void TestUnaryOperationNodeCompute(UnaryOperationType op, double (*expectedTransform)(double))
 {
-    value::ComputeContext context("TestUnaryOperationNodeCompute");
-    value::ContextGuard<> guard(context);
+    ComputeContext context("TestUnaryOperationNodeCompute");
+    ContextGuard<> guard(context);
 
     std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
 
@@ -109,8 +110,8 @@ void TestUnaryOperationNodeCompute(UnaryOperationType op, double (*expectedTrans
 
 void TestUnaryOperationNodeCompute(UnaryOperationType op, bool (*expectedTransform)(bool))
 {
-    value::ComputeContext context("TestUnaryOperationNodeCompute<bool>");
-    value::ContextGuard<> guard(context);
+    ComputeContext context("TestUnaryOperationNodeCompute<bool>");
+    ContextGuard<> guard(context);
 
     std::vector<std::vector<bool>> data = { { true }, { false } };
 
@@ -207,8 +208,8 @@ void TestBroadcastLinearFunctionNodeCompute()
     // clang-format off
     std::vector<double> input1Vals{ 1, 2, 1, 2,    1, 2, 1, 2,    1, 2, 1, 2,
                                     3, 4, 3, 4,    3, 4, 3, 4,    3, 4, 3, 4 };
-    std::vector<double> input2Vals{ 2, 4, 6 }; 
-    // broadcasts to              { 2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6,       
+    std::vector<double> input2Vals{ 2, 4, 6 };
+    // broadcasts to              { 2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6,
     //                              2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6 }
     std::vector<double> input3Vals{ 1, 2, 3 };
     // broadcasts to              { 1, 1, 1, 1,    2, 2, 2, 2     3, 3, 3, 3,
@@ -299,7 +300,7 @@ void TestBroadcastBinaryOperationNodeComputeAdd()
 
     // clang-format off
     std::vector<double> input1Vals{ 1, 2, 1, 2,    1, 2, 1, 2,    1, 2, 1, 2,        3, 4, 3, 4,    3, 4, 3, 4,    3, 4, 3, 4 };
-    std::vector<double> input2Vals{ 2, 4, 6 }; 
+    std::vector<double> input2Vals{ 2, 4, 6 };
     // broadcasts to:             { 2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6,        2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6 }
     std::vector<double>   expected{ 3, 4, 3, 4,    5, 6, 5, 6,    7, 8, 7, 8,        5, 6, 5, 6,    7, 8, 7, 8,    9, 10, 9, 10 };
     // clang-format on
@@ -330,7 +331,7 @@ void TestBroadcastBinaryOperationNodeComputeSubtract()
 
     // clang-format off
     std::vector<double> input1Vals{ 1, 2, 1, 2,      1, 2, 1, 2,      1, 2, 1, 2,            3, 4, 3, 4,    3, 4, 3, 4,    3, 4, 3, 4 };
-    std::vector<double> input2Vals{ 2, 4, 6 }; 
+    std::vector<double> input2Vals{ 2, 4, 6 };
     // broadcasts to:             { 2, 2, 2, 2,      4, 4, 4, 4,      6, 6, 6, 6,            2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6 }
     std::vector<double>   expected{ -1, 0, -1, 0,    -3, -2, -3, -2,    -5, -4, -5, -4,      1, 2, 1, 2,   -1, 0, -1, 0,  -3, -2, -3, -2 };
     // clang-format on
@@ -364,7 +365,7 @@ void TestBroadcastBinaryOperationNodeComputeWithOrdering()
     // std::vector<double> input2Vals{ 10, 20, 30,
     //                                 40, 50, 60 };
     // in column-major order:
-    std::vector<double> input2Vals{ 10, 40, 
+    std::vector<double> input2Vals{ 10, 40,
                                     20, 50,
                                     30, 60 };
     std::vector<double>   expected{ 11, 22, 33,
@@ -471,11 +472,11 @@ void TestBroadcastBinaryOperationNodeComputeDifferentBroadcastDimensions()
     model::PortMemoryLayout outputLayout({ numRows, numColumns });
 
     // clang-format off
-    std::vector<double> input1Vals{ 1, 
+    std::vector<double> input1Vals{ 1,
                                     2};
-    // broadcasts to:             { 1, 1, 1, 
+    // broadcasts to:             { 1, 1, 1,
     //                              2, 2, 2 }
-    std::vector<double> input2Vals{ 2, 4, 6 }; 
+    std::vector<double> input2Vals{ 2, 4, 6 };
     // broadcasts to:             { 2, 4, 6,
     //                              2, 4, 6 }
     std::vector<double>   expected{ 3, 5, 7,
@@ -512,8 +513,8 @@ void TestBroadcastTernaryOperationNodeComputeFMA()
     // clang-format off
     std::vector<double> input1Vals{ 1, 2, 1, 2,    1, 2, 1, 2,    1, 2, 1, 2,
                                     3, 4, 3, 4,    3, 4, 3, 4,    3, 4, 3, 4 };
-    std::vector<double> input2Vals{ 2, 4, 6 }; 
-    // broadcasts to              { 2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6,       
+    std::vector<double> input2Vals{ 2, 4, 6 };
+    // broadcasts to              { 2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6,
     //                              2, 2, 2, 2,    4, 4, 4, 4,    6, 6, 6, 6 }
     std::vector<double> input3Vals{ 1, 2, 3 };
     // broadcasts to              { 1, 1, 1, 1,    2, 2, 2, 2     3, 3, 3, 3,

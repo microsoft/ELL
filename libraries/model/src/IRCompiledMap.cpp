@@ -249,7 +249,7 @@ namespace model
 
     std::vector<int> IRCompiledMap::ComputeIntOutput(const model::PortElementsBase& outputs)
     {
-        EnsureExecutionEngine();
+        FinishJitting();
         if (GetOutput(0).GetType() != model::Port::PortType::integer)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
