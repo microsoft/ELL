@@ -22,7 +22,7 @@ namespace ell
 namespace value
 {
 
-    /// <summary> Wraps a Value instance and enforces a memory layout that represents a vector </summary>
+    /// <summary> A View type that wraps a Value instance and enforces a memory layout that represents a vector </summary>
     class Vector
     {
     public:
@@ -131,6 +131,11 @@ namespace value
     {
         return Vector(Allocate<T>(size));
     }
+
+    /// <summary> Given a view with contiguous memory, return a Vector that represents the entirety of the memory </summary>
+    /// <param name="view"> The view that should be reinterpreted as a Vector </param>
+    /// <returns> A Vector that encompasses the entire memory region </returns>
+    Vector AsVector(ViewAdapter view);
 
 } // namespace value
 } // namespace ell

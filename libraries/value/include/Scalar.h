@@ -15,7 +15,7 @@ namespace ell
 namespace value
 {
 
-    /// <summary> Wraps a Value instance and enforces a memory layout that represents a single value </summary>
+    /// <summary> A View type that wraps a Value instance and enforces a memory layout that represents a single value </summary>
     class Scalar
     {
     public:

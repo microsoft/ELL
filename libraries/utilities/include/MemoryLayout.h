@@ -536,7 +536,7 @@ namespace utilities
         /// <remarks>
         /// The new layout is created by appending dimensions of size (and extent) `1` and offset `0`.
         /// For instance, calling `CopyWithExtraDimensions(2)` on a layout of size `{2,3,4}` would result
-        /// in a layout of size `{1,1,2,3,4}.`
+        /// in a layout of size `{1,1,2,3,4}`.
         MemoryLayout CopyWithExtraDimensions(int addedDimensions) const;
 
         /// <summary> Gets the name of this type (for serialization). </summary>

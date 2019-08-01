@@ -21,7 +21,7 @@ namespace ell
 namespace value
 {
 
-    /// <summary> Wraps a Value instance and enforces a memory layout that represents a matrix </summary>
+    /// <summary> A View type that wraps a Value instance and enforces a memory layout that represents a matrix </summary>
     class Matrix
     {
     public:

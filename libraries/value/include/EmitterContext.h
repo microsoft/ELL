@@ -35,9 +35,6 @@ namespace value
     namespace detail
     {
         Scalar CalculateOffset(const utilities::MemoryLayout& layout, std::vector<Scalar> coordinates);
-
-        template <typename ViewType>
-        Value GetValue(ViewType value);
     } // namespace detail
 
     class FunctionDeclaration;
@@ -264,7 +261,7 @@ namespace value
         void DebugDump(Value value, std::string tag, std::ostream* stream) const;
         void DebugDump(FunctionDeclaration fn, std::string tag, std::ostream* stream) const;
 
-        /// <summary> Emit a debug print message.  This assumes the application 
+        /// <summary> Emit a debug print message.  This assumes the application
         /// on the target platform implements a "void DebugPrint(char* message)" function.  This function will be
         /// defined for you when running in JIT or Compute mode.  </summary>
         void DebugPrint(std::string message);
@@ -595,6 +592,10 @@ namespace value
     template <typename ViewType>
     void Prefetch(ViewType view, PrefetchType type = PrefetchType::Read, PrefetchLocality locality = PrefetchLocality::None);
 
+    /// <summary> Returns the passed in View type with the memory layout representative of the full view of the memory, i.e., no padding. </summary>
+    template <typename ViewType>
+    ViewType AsFullView(ViewType view);
+
 } // namespace value
 } // namespace ell
 
@@ -604,24 +605,6 @@ namespace ell
 {
 namespace value
 {
-    namespace detail
-    {
-        template <typename ViewType>
-        Value GetValue(ViewType value)
-        {
-            if constexpr (std::is_same_v<Value, utilities::RemoveCVRefT<ViewType>>)
-            {
-                return value;
-            }
-            else
-            {
-                static_assert(std::is_same_v<decltype(std::declval<ViewType>().GetValue()), Value>,
-                              "Parameter type isn't a valid view type of Value. Must have member function GetValue that returns Value instance.");
-
-                return value.GetValue();
-            }
-        }
-    } // namespace detail
 
     template <typename ContextType, typename Fn, typename ReturnType>
     auto InvokeForContext(Fn&& fn) -> std::conditional_t<std::is_same_v<ReturnType, void>, void, std::optional<ReturnType>>
@@ -676,6 +659,14 @@ namespace value
     void Prefetch(ViewType view, PrefetchType type, PrefetchLocality locality)
     {
         GetContext().Prefetch(detail::GetValue(view), type, locality);
+    }
+
+    template <typename ViewType>
+    ViewType AsFullView(ViewType view)
+    {
+        auto value = GetValue(view);
+        value.SetLayout(utilities::MemoryLayout{ value.GetLayout().GetExtent() });
+        return value;
     }
 
 } // namespace value

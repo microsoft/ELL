@@ -272,5 +272,11 @@ namespace value
         return copy;
     }
 
+    Vector AsVector(ViewAdapter view)
+    {
+        Value value = view;
+        value.SetLayout(value.GetLayout().Flatten());
+        return value;
+    }
 } // namespace value
 } // namespace ell

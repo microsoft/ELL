@@ -42,6 +42,9 @@ namespace value
         using ValueTypeDescription = std::pair<ValueType, int>;
 
         Value StoreConstantData(ConstantData);
+
+        template <typename ViewType>
+        Value GetValue(ViewType value);
     } // namespace detail
 
     /// <summary> The basic type in the Value library upon which most operations are based. Wraps either C++ data (constant data) or data that is
@@ -408,6 +411,21 @@ namespace value
         std::optional<MemoryLayout> _layout = {};
     };
 
+    /// <summary> A helper type that can hold any View type, which is any type that has a member function
+    /// `Value GetValue()` </summary>
+    struct ViewAdapter
+    {
+        template <typename ViewType>
+        ViewAdapter(ViewType view) :
+            _value(detail::GetValue(view))
+        {}
+
+        inline operator Value() const { return _value; }
+
+    private:
+        Value _value;
+    };
+
 } // namespace value
 } // namespace ell
 
@@ -430,6 +448,24 @@ namespace ell
 {
 namespace value
 {
+    namespace detail
+    {
+        template <typename ViewType>
+        Value GetValue(ViewType value)
+        {
+            if constexpr (std::is_same_v<Value, utilities::RemoveCVRefT<ViewType>>)
+            {
+                return value;
+            }
+            else
+            {
+                static_assert(std::is_same_v<decltype(std::declval<ViewType>().GetValue()), Value>,
+                              "Parameter type isn't a valid view type of Value. Must have member function GetValue that returns Value instance.");
+
+                return value.GetValue();
+            }
+        }
+    } // namespace detail
 
     template <typename T>
     Value Cast(Value value)
