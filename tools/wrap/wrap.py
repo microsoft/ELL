@@ -376,7 +376,32 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
         self.stop_timer("compile")
         if self.swig:
             self.start_timer("swig")
-            self.tools.swig(self.output_dir, self.model_file_base, self.language)
+            args = []
+            if self.target in ["pi3", "pi0", "orangepi0"]:
+                args += ["-DSWIGWORDSIZE32", "-DLINUX"]
+            elif self.target in ["pi3_64", "aarch64"]:
+                args += ["-DSWIGWORDSIZE64", "-DLINUX"]
+            elif self.target == "host":
+                from sys import maxsize
+                if sys.platform.startswith('win32'):
+                    args += ["-DWIN32"]
+                    # SWIG expects 32-bit, regardless of bitness for Windows
+                    # (because INT_MAX == LONG_MAX on Windows)
+                    args += ["-DSWIGWORDSIZE32"]
+                else:
+                    if sys.platform.startswith('linux'):
+                        args += ["-DLINUX"]
+                        if maxsize > 2**32:
+                            args += ["-DSWIGWORDSIZE64"]
+                        else:
+                            args += ["-DSWIGWORDSIZE32"]
+                    elif sys.platform.startswith('darwin'):
+                        args += ["-DAPPLE"]
+                    else:
+                        pass  # raise exception?
+            else:
+                pass  # raise exception?
+            self.tools.swig(self.output_dir, self.model_file_base, self.language, args)
             self.stop_timer("swig")
         if not self.no_opt_tool:
             self.start_timer("opt")

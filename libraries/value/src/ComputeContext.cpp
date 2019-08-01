@@ -11,6 +11,7 @@
 #include "Scalar.h"
 #include "Value.h"
 
+#include <utilities/include/TypeAliases.h>
 #include <utilities/include/TypeName.h>
 #include <utilities/include/TypeTraits.h>
 
@@ -757,7 +758,7 @@ namespace value
                     auto layout = source.GetLayout();
                     detail::ValueTypeDescription typeDesc{ type, pointerCount };
                     Value value{ typeDesc, layout };
-                    value.SetData(reinterpret_cast<intptr_t>(data), true);
+                    value.SetData(reinterpret_cast<IntPtrT>(data), true);
                     return value;
                 }
             },
@@ -774,7 +775,7 @@ namespace value
                 {
                     throw LogicException(LogicExceptionErrors::illegalState);
                 }
-                else if constexpr (std::is_same_v<Type, intptr_t>)
+                else if constexpr (std::is_same_v<Type, IntPtrT>)
                 {
                     [[maybe_unused]] auto type = source.GetBaseType();
                     auto layout = source.GetLayout();
@@ -785,7 +786,7 @@ namespace value
                         detail::ValueTypeDescription typeDesc{ type, pointerCount - 1 };
                         Value value{ typeDesc, layout };
 
-                        value.SetData(*reinterpret_cast<intptr_t*>(address), true);
+                        value.SetData(*reinterpret_cast<IntPtrT*>(address), true);
                         return value;
                     }
                     else
@@ -1265,7 +1266,7 @@ namespace value
             return false;
         }
 
-        constexpr auto intptrType = GetValueType<intptr_t>();
+        constexpr auto intptrType = GetValueType<IntPtrT>();
         if (pointerLevel1 > 1)
         {
             assert(pointerLevel2 == 1);

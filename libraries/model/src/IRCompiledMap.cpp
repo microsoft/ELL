@@ -18,6 +18,7 @@
 
 #include <utilities/include/Exception.h>
 #include <utilities/include/Files.h>
+#include <utilities/include/TypeAliases.h>
 
 #include <llvm/Transforms/Utils/Cloning.h>
 
@@ -38,7 +39,7 @@ namespace ell
 {
 namespace model
 {
-    using utilities::Boolean;
+    using namespace utilities;
 
     IRCompiledMap::IRCompiledMap(IRCompiledMap&& other) :
         CompiledMap(std::move(other)),
@@ -465,27 +466,27 @@ namespace model
                 // these callbacks need to be resolved or else we will not be able to load the compiled module.
                 if (name.find("SourceCallbackThunk_float") != std::string::npos)
                 {
-                    jitter.DefineFunction(func, reinterpret_cast<uintptr_t>(&SourceCallbackThunk_float));
+                    jitter.DefineFunction(func, reinterpret_cast<UIntPtrT>(&SourceCallbackThunk_float));
                 }
                 else if (name.find("SourceCallbackThunk_double") != std::string::npos)
                 {
-                    jitter.DefineFunction(func, reinterpret_cast<uintptr_t>(&SourceCallbackThunk_double));
+                    jitter.DefineFunction(func, reinterpret_cast<UIntPtrT>(&SourceCallbackThunk_double));
                 }
                 else if (name.find("SourceCallbackThunk_int") != std::string::npos)
                 {
-                    jitter.DefineFunction(func, reinterpret_cast<uintptr_t>(&SourceCallbackThunk_int));
+                    jitter.DefineFunction(func, reinterpret_cast<UIntPtrT>(&SourceCallbackThunk_int));
                 }
                 else if (name.find("SinkCallbackThunk_float") != std::string::npos)
                 {
-                    jitter.DefineFunction(func, reinterpret_cast<uintptr_t>(&SinkCallbackThunk_float));
+                    jitter.DefineFunction(func, reinterpret_cast<UIntPtrT>(&SinkCallbackThunk_float));
                 }
                 else if (name.find("SinkCallbackThunk_double") != std::string::npos)
                 {
-                    jitter.DefineFunction(func, reinterpret_cast<uintptr_t>(&SinkCallbackThunk_double));
+                    jitter.DefineFunction(func, reinterpret_cast<UIntPtrT>(&SinkCallbackThunk_double));
                 }
                 else if (name.find("SinkCallbackThunk_int") != std::string::npos)
                 {
-                    jitter.DefineFunction(func, reinterpret_cast<uintptr_t>(&SinkCallbackThunk_int));
+                    jitter.DefineFunction(func, reinterpret_cast<UIntPtrT>(&SinkCallbackThunk_int));
                 }
                 else
                 {

@@ -19,8 +19,9 @@
 
 #include <testing/include/testing.h>
 
-#include <utilities/include/Unused.h>
 #include <utilities/include/StringUtil.h>
+#include <utilities/include/TypeAliases.h>
+#include <utilities/include/Unused.h>
 
 #include <functional>
 #include <iostream>
@@ -31,7 +32,8 @@
 #include <vector>
 
 using namespace ell;
-using namespace ell::emitters;
+using namespace emitters;
+using namespace utilities;
 
 // Utility code
 std::string g_outputBasePath = "";
@@ -93,8 +95,7 @@ LLVMFunction DeclareDebugPrint(IRModuleEmitter& module)
     auto type = llvm::FunctionType::get(
         llvm::Type::getInt32Ty(context),
         { llvm::Type::getInt8PtrTy(context) },
-        false
-    );
+        false);
     return module.DeclareFunction("DebugPrint", type);
 }
 
@@ -106,7 +107,7 @@ void CallDebugPrint(IRFunctionEmitter& function, LLVMFunction printFunction, std
 void DefineDebugPrint(LLVMFunction debugPrintFunction, IRExecutionEngine& jitter)
 {
     g_debugOutput.clear();
-    jitter.DefineFunction(debugPrintFunction, reinterpret_cast<uintptr_t>(&DebugPrint));
+    jitter.DefineFunction(debugPrintFunction, reinterpret_cast<UIntPtrT>(&DebugPrint));
 }
 
 std::string GetCapturedDebugOutput()
@@ -271,8 +272,7 @@ void TestHighLevelNestedIf()
                   fn.If(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [&result](IRFunctionEmitter& fn) {
                       fn.Store(result, fn.Literal<int>(1));
                   });
-              })
-                .ElseIf(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [&result, x, y](IRFunctionEmitter& fn) {
+              }).ElseIf(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, z), [&result, x, y](IRFunctionEmitter& fn) {
                     fn.If(fn.Comparison(emitters::TypedComparison::lessThanFloat, x, y), [&result](IRFunctionEmitter& fn) {
                         fn.Store(result, fn.Literal<int>(2));
                     });
@@ -450,7 +450,7 @@ void TestLogicalNot()
     testing::ProcessTest("Testing logical NOT", success);
 }
 
-template<typename ValueType>
+template <typename ValueType>
 void TestBinaryNumericOperations()
 {
     std::string functionName = utilities::FormatString("BinaryOperations_%s", typeid(ValueType).name());
@@ -526,7 +526,7 @@ void TestBinaryLogicalOperations()
     AddLogicalOperator(module, "LogicalXor", emitters::BinaryOperatorType::logicalXor);
 
     IRExecutionEngine jit(std::move(module));
-    auto jittedOr = jit.GetFunction<bool(bool,bool)>("LogicalOr");
+    auto jittedOr = jit.GetFunction<bool(bool, bool)>("LogicalOr");
     auto jittedAnd = jit.GetFunction<bool(bool, bool)>("LogicalAnd");
     auto jittedXor = jit.GetFunction<bool(bool, bool)>("LogicalXor");
 
@@ -918,10 +918,9 @@ void TestScopedIfElse()
 
         fn.If(cmp, [&result](IRFunctionEmitter& fn) {
               fn.Store(result, fn.Literal<int>(1));
-          })
-            .Else([&result](IRFunctionEmitter& fn) {
-                fn.Store(result, fn.Literal<int>(2));
-            });
+          }).Else([&result](IRFunctionEmitter& fn) {
+            fn.Store(result, fn.Literal<int>(2));
+        });
         fn.Return(fn.Load(result));
     }
     module.EndFunction();
@@ -966,8 +965,7 @@ void TestScopedIfElse2()
         auto cmp2 = fn.Comparison(TypedComparison::greaterThan, x, fn.Literal<int>(6));
         fn.If(cmp1, [&result](IRFunctionEmitter& fn) {
               fn.Store(result, fn.Literal<int>(1));
-          })
-            .ElseIf(cmp2, [&result](IRFunctionEmitter& fn) {
+          }).ElseIf(cmp2, [&result](IRFunctionEmitter& fn) {
                 fn.Store(result, fn.Literal<int>(3));
             })
             .Else([&result](IRFunctionEmitter& fn) {
@@ -1024,10 +1022,9 @@ void TestElseIfWithComputedCondition()
 
         fn.If(a == 1 && b == 1, [result](emitters::IRFunctionEmitter& fn) {
               fn.Store(result, fn.Literal(1));
-          })
-            .ElseIf(a == 2 || b == 2, [result](emitters::IRFunctionEmitter& fn) {
-                fn.Store(result, fn.Literal(2));
-            });
+          }).ElseIf(a == 2 || b == 2, [result](emitters::IRFunctionEmitter& fn) {
+            fn.Store(result, fn.Literal(2));
+        });
 
         fn.Return(fn.Load(result));
     }

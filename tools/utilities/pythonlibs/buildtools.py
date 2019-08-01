@@ -146,17 +146,15 @@ class EllBuildTools:
                 'interfaces/common/include',
                 'libraries/emitters/include']]
 
-    def swig(self, output_dir, model_name, language):
+    def swig(self, output_dir, model_name, language, args=[]):
         args = [self.swigexe,
                 '-' + language,
                 '-c++',
-                '-Fmicrosoft']
+                '-Fmicrosoft'] + args
         if language == "python":
             args += ["-py3"]
         if language == "javascript":
             args += ["-v8"]
-        if os.name == 'nt':
-            args += ["-DWIN32"]
         args = args + ['-outdir', output_dir] + ['-I' + d for d in self.swig_header_dirs()] + [
             '-o', os.path.join(output_dir, model_name + language.upper() + '_wrap.cxx'),
             os.path.join(output_dir, model_name + ".i")

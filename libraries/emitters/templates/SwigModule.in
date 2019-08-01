@@ -1,22 +1,6 @@
 u8R"(%module(directors="1", moduleimport="import $module") @@MODULE@@
 %feature("autodoc", "3");
 
-#if defined(WIN32)
-
-typedef long long 		    int64_t;
-typedef unsigned long long 	uint64_t;
-%apply long long { int64_t };
-%apply unsigned long long { uint64_t };
-
-#else
-
-typedef long int 		    int64_t;
-typedef unsigned long int 	uint64_t;
-%apply long int  { int64_t };
-%apply unsigned long int { uint64_t };
-
-#endif
-
 %include "stdint.i"
 
 %include "vector.i"

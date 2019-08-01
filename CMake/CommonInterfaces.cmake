@@ -93,9 +93,20 @@ macro(generate_interface_module MODULE_NAME TARGET_NAME LANGUAGE_NAME LANGUAGE_D
       add_definitions(-DSWIG_DIRECTOR_NO_UEH)
     endif()
 
-    if(WIN32)
-      set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -DWIN32)
-    endif()
+    if(APPLE)
+      set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -DAPPLE)
+    else()
+      if(WIN32)
+        set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -DWIN32)
+      else()
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8) # 64-bit
+          set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -DSWIGWORDSIZE64)
+        else() # 32-bit
+          set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -DSWIGWORDSIZE32)
+        endif()
+        set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} -DLINUX)
+      endif(WIN32)
+    endif(APPLE)
 
     set(SWIG_MODULE_${module_name}_EXTRA_DEPS ${INTERFACE_FILES} ${INTERFACE_SRC} ${INTERFACE_INCLUDE} ${EXTRA_INTERFACE})
 

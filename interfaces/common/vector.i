@@ -23,7 +23,7 @@
 %include "std_string.i"
 %include "std_vector.i"
 %include "macros.i"
-%include "integer.i"
+%include "stdint.i"
 
 %template(DoubleVector) std::vector<double>;
 %template(DoubleVectorVector) std::vector<std::vector<double>>;

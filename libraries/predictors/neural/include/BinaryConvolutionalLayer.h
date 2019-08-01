@@ -12,6 +12,8 @@
 
 #include <math/include/Matrix.h>
 
+#include <utilities/include/TypeAliases.h>
+
 namespace ell
 {
 namespace predictors
@@ -154,6 +156,8 @@ namespace predictors
 
             using Layer<ElementType>::_layerParameters;
             using Layer<ElementType>::_output;
+
+            using IntPtrT = utilities::IntPtrT;
 
             constexpr static size_t _binaryElementSize = 64;
             BinaryConvolutionalParameters _convolutionalParameters;
@@ -418,9 +422,9 @@ namespace predictors
                     const size_t volRow = (f / input.NumChannels()) / _convolutionalParameters.receptiveField;
 
                     // Calculate where this fits in relation to the input volume
-                    const intptr_t sourceCol = horizontalStart + volCol;
-                    const intptr_t sourceRow = verticalStart + volRow;
-                    const intptr_t sourceDepth = volDepth;
+                    const IntPtrT sourceCol = horizontalStart + volCol;
+                    const IntPtrT sourceRow = verticalStart + volRow;
+                    const IntPtrT sourceDepth = volDepth;
 
                     ElementType value = input(sourceRow, sourceCol, sourceDepth);
                     const size_t block = (f / _binaryElementSize);
@@ -636,8 +640,8 @@ namespace predictors
                     const size_t volRow = (f / _layerParameters.input.NumChannels()) / _convolutionalParameters.receptiveField;
 
                     // Calculate where this fits in relation to the input volume
-                    const intptr_t sourceCol = horizontalStart + volCol;
-                    const intptr_t sourceRow = verticalStart + volRow;
+                    const IntPtrT sourceCol = horizontalStart + volCol;
+                    const IntPtrT sourceRow = verticalStart + volRow;
 
                     const size_t block = f / _binaryElementSize;
                     const size_t bit = f % _binaryElementSize;

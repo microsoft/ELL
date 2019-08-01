@@ -42,7 +42,7 @@ set(include
   include/AnyIterator.h
   include/Archiver.h
   include/ArchiveVersion.h
-  include/Boolean.h  
+  include/Boolean.h
   include/CallbackRegistry.h
   include/CommandLineParser.h
   include/CompressedIntegerList.h
@@ -80,6 +80,7 @@ set(include
   include/Tokenizer.h
   include/TransformIterator.h
   include/TupleUtils.h
+  include/TypeAliases.h
   include/TypeFactory.h
   include/TypeName.h
   include/TypeTraits.h

@@ -9,6 +9,8 @@
 #include "IRExecutionEngine.h"
 #include "IRModuleEmitter.h"
 
+#include <utilities/include/TypeAliases.h>
+
 #include <llvm/Support/TargetSelect.h>
 
 #include <memory>
@@ -30,6 +32,8 @@ namespace ell
 {
 namespace emitters
 {
+    using namespace utilities;
+
     void FatalErrorHandler(void* userData, const std::string& reason, bool genCrashDiag)
     {
         std::string msg = "llvm fatal error: " + reason;
@@ -62,7 +66,7 @@ namespace emitters
         // If DeclareDebugPrint was called, then define it here.
         if (debugPrintFunction)
         {
-            DefineFunction(debugPrintFunction, reinterpret_cast<uintptr_t>(&DebugPrintImpl));
+            DefineFunction(debugPrintFunction, reinterpret_cast<UIntPtrT>(&DebugPrintImpl));
         }
 
     }
@@ -114,7 +118,7 @@ namespace emitters
         return functionAddress;
     }
 
-    void IRExecutionEngine::DefineFunction(LLVMFunction func, uintptr_t address)
+    void IRExecutionEngine::DefineFunction(LLVMFunction func, UIntPtrT address)
     {
         EnsureEngine();
         _pEngine->addGlobalMapping(func, (void*)address);

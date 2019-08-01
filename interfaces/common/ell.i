@@ -32,7 +32,7 @@
 %}
 #endif // SWIGJAVASCRIPT
 
-%include "integer.i"
+%include "stdint.i"
 %include "vector.i"
 
 #ifndef SWIGXML

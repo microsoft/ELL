@@ -19,6 +19,7 @@
 
 #include <utilities/include/Exception.h>
 #include <utilities/include/StringUtil.h>
+#include <utilities/include/TypeAliases.h>
 
 #include <testing/include/testing.h>
 
@@ -53,7 +54,7 @@ void PrintIR(TestLLVMContext& context)
 #endif // PRINT_IR
 }
 
-extern "C" 
+extern "C"
 {
 void JittedDebugPrintInts(int* ints, int* len)
 {
@@ -127,9 +128,9 @@ void DeclarDebugPrintFunctions(ell::emitters::IRModuleEmitter& module)
 
 void DefineDebugPrintFunctions(ell::emitters::IRExecutionEngine& jitter)
 {
-    jitter.DefineFunction(printFloatsFunction, reinterpret_cast<uintptr_t>(&JittedDebugPrintFloats));
-    jitter.DefineFunction(printDoublesFunction, reinterpret_cast<uintptr_t>(&JittedDebugPrintDoubles));
-    jitter.DefineFunction(printIntsFunction, reinterpret_cast<uintptr_t>(&JittedDebugPrintInts));
+    jitter.DefineFunction(printFloatsFunction, reinterpret_cast<UIntPtrT>(&JittedDebugPrintFloats));
+    jitter.DefineFunction(printDoublesFunction, reinterpret_cast<UIntPtrT>(&JittedDebugPrintDoubles));
+    jitter.DefineFunction(printIntsFunction, reinterpret_cast<UIntPtrT>(&JittedDebugPrintInts));
 }
 
 namespace ell

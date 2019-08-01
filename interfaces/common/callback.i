@@ -15,7 +15,7 @@
 #endif // SWIGPYTHON
 
 // stl
-%include "integer.i"
+%include "stdint.i"
 %include "vector.i"
 
 // ELL API

@@ -16,6 +16,7 @@
 
 #include <passes/include/StandardTransformations.h>
 
+#include <utilities/include/TypeAliases.h>
 #include <utilities/include/Files.h>
 #include <utilities/include/Graph.h>
 
@@ -314,7 +315,7 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
     auto func = module->getFunction("DebugOutput");
     if (func != nullptr)
     {
-        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uintptr_t>(&DebugOutput));
+        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<UIntPtrT>(&DebugOutput));
     }
     else
     {
@@ -325,13 +326,13 @@ void ModelComparison::Compare(std::vector<float>& input, model::Map& reference, 
     func = module->getFunction("ELL_InputCallback");
     if (func != nullptr)
     {
-        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uintptr_t>(&ELL_InputCallback));
+        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<UIntPtrT>(&ELL_InputCallback));
     }
     // Define the ELL_OutputCallback in case the model contains sink nodes.
     func = module->getFunction("ELL_OutputCallback");
     if (func != nullptr)
     {
-        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<uintptr_t>(&ELL_OutputCallback));
+        compiledMap.GetJitter().DefineFunction(func, reinterpret_cast<UIntPtrT>(&ELL_OutputCallback));
     }
 
     std::cout << "jitting..." << std::endl;

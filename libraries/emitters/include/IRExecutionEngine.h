@@ -9,6 +9,7 @@
 
 #include "LLVMUtilities.h"
 
+#include <utilities/include/TypeAliases.h>
 #include <utilities/include/Exception.h>
 
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
@@ -100,7 +101,7 @@ namespace emitters
         ///
         /// <param name="func"> The function being defined. </param>
         /// <param name="address"> The address of the function being defined. </param>
-        void DefineFunction(LLVMFunction func, uintptr_t address);
+        void DefineFunction(LLVMFunction func, utilities::UIntPtrT address);
 
         /// <summary>
         /// Return a main function that takes no arguments - if one exists. Returns nullptr if not found.
