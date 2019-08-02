@@ -188,7 +188,33 @@ class KeywordSpotter(nn.Module):
         lr_min = options.lr_min
         lr_peaks = options.lr_peaks
         ticks = training_data.num_rows / batch_size  # iterations per epoch
-        total_iterations = ticks * num_epochs
+
+        # Calculation of total iterations in non-rolling vs rolling training
+        # ticks = num_rows/batch_size (total number of iterations per epoch)
+        # Non-Rolling Training:
+        # Total Iteration = num_epochs * ticks
+        # Rolling Training:
+        # irl = Initial_rolling_length (We are using 2)
+        # If num_epochs <=  max_rolling_length:
+        # Total Iterations = sum(range(irl, irl + num_epochs))
+        # If num_epochs > max_rolling_length:
+        # Total Iterations = sum(range(irl, irl + max_rolling_length)) + (num_epochs - max_rolling_length)*ticks
+        if options.rolling:
+            rolling_length = 2
+            max_rolling_length = int(ticks)
+            if max_rolling_length > options.max_rolling_length + rolling_length:
+                max_rolling_length = options.max_rolling_length + rolling_length
+            bag_count = 100
+            hidden_bag_size = batch_size * bag_count
+            if num_epochs + rolling_length < max_rolling_length:
+                max_rolling_length = num_epochs + rolling_length
+            total_iterations = sum(range(rolling_length, max_rolling_length))
+            if num_epochs + rolling_length > max_rolling_length:
+                epochs_remaining = num_epochs + rolling_length - max_rolling_length
+                total_iterations += epochs_remaining * training_data.num_rows / batch_size
+            ticks = total_iterations / num_epochs
+        else:
+            total_iterations = ticks * num_epochs
         gamma = options.lr_gamma
 
         if not lr_min:
@@ -213,19 +239,11 @@ class KeywordSpotter(nn.Module):
 
         # optimizer = optim.Adam(model.parameters(), lr=0.0001)
         log = []
-        if options.rolling:
-            rolling_length = 2
-            max_rolling_length = int(ticks)
-            if max_rolling_length > options.max_rolling_length:
-                max_rolling_length = options.max_rolling_length
-            bag_count = 100
-            hidden_bag_size = batch_size * bag_count
-
         for epoch in range(num_epochs):
             self.train()
             if options.rolling:
                 rolling_length += 1
-                if rolling_length < max_rolling_length:
+                if rolling_length <= max_rolling_length:
                     hidden1_bag = torch.from_numpy(np.zeros([1, hidden_bag_size, model.hidden_units],
                                                             dtype=np.float32)).to(device)
                     if model.architecture == 'LSTM':
@@ -254,7 +272,7 @@ class KeywordSpotter(nn.Module):
                 # Also, we need to clear out the hidden state,
                 # detaching it from its history on the last instance.
                 if options.rolling:
-                    if rolling_length < max_rolling_length:
+                    if rolling_length <= max_rolling_length:
                         if (i_batch + 1) % rolling_length == 0:
                             self.init_hidden()
                             break
