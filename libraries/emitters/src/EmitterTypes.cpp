@@ -9,6 +9,8 @@
 #include "EmitterTypes.h"
 #include "EmitterException.h"
 
+#include <utilities/include/Boolean.h>
+
 namespace ell
 {
 namespace emitters
@@ -190,6 +192,18 @@ namespace emitters
 
     template <>
     VariableType GetVariableType<bool*>()
+    {
+        return VariableType::BytePointer;
+    }
+
+    template <>
+    VariableType GetVariableType<utilities::Boolean>()
+    {
+        return VariableType::Byte;
+    }
+
+    template <>
+    VariableType GetVariableType<utilities::Boolean*>()
     {
         return VariableType::BytePointer;
     }

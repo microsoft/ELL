@@ -1896,7 +1896,7 @@ namespace emitters
         assert(pPointer != nullptr);
         auto pSource = PointerOffset(pPointer, Literal(sourceOffset));
         auto pDestination = PointerOffset(pPointer, Literal(destinationOffset));
-        int byteCount = count * sizeof(ValueType);
+        int byteCount = count * GetEmitter().SizeOf<ValueType>();
         GetEmitter().MemoryMove(pSource, pDestination, Literal(byteCount));
     }
 
@@ -1905,7 +1905,7 @@ namespace emitters
     {
         auto pSource = PointerOffset(pSourcePointer, 0);
         auto pDestination = PointerOffset(pDestinationPointer, 0);
-        auto byteCount = count * sizeof(ValueType);
+        auto byteCount = count * GetEmitter().SizeOf<ValueType>();
         GetEmitter().MemoryCopy(pSource, pDestination, Literal<int>(byteCount));
     }
 
@@ -1923,7 +1923,7 @@ namespace emitters
     {
         auto pSource = PointerOffset(pSourcePointer, Literal(sourceOffset));
         auto pDestination = PointerOffset(pDestinationPointer, Literal(destinationOffset));
-        int byteCount = count * sizeof(ValueType);
+        int byteCount = count * GetEmitter().SizeOf<ValueType>();
         GetEmitter().MemoryCopy(pSource, pDestination, Literal(byteCount));
     }
 
@@ -1940,7 +1940,7 @@ namespace emitters
     void IRFunctionEmitter::MemorySet(LLVMValue pDestinationPointer, int destinationOffset, LLVMValue value, int count)
     {
         auto pDestination = PointerOffset(pDestinationPointer, Literal(destinationOffset));
-        int byteCount = count * sizeof(ValueType);
+        int byteCount = count * GetEmitter().SizeOf<ValueType>();
         GetEmitter().MemorySet(pDestination, value, Literal(byteCount));
     }
 
@@ -1948,7 +1948,7 @@ namespace emitters
     void IRFunctionEmitter::MemorySet(LLVMValue pDestinationPointer, LLVMValue pDestinationOffset, LLVMValue value, int count)
     {
         auto pDestination = PointerOffset(pDestinationPointer, pDestinationOffset);
-        int byteCount = count * sizeof(ValueType);
+        int byteCount = count * GetEmitter().SizeOf<ValueType>();
         GetEmitter().MemorySet(pDestination, value, Literal(byteCount));
     }
 

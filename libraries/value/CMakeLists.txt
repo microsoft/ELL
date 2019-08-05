@@ -68,10 +68,20 @@ endif()
 
 set(test_src
     test/src/main.cpp
+    test/src/Matrix_test.cpp
+    test/src/Scalar_test.cpp
+    test/src/Tensor_test.cpp
+    test/src/TestUtil.cpp
+    test/src/Vector_test.cpp
     test/src/Value_test.cpp
 )
 
 set(test_include
+    test/include/Matrix_test.h
+    test/include/Scalar_test.h
+    test/include/Tensor_test.h
+    test/include/TestUtil.h
+    test/include/Vector_test.h
     test/include/Value_test.h
 )
 

@@ -622,12 +622,16 @@ namespace value
 
                     if (!maybeGlobal)
                     {
+                        // BUG: The error in the "compute" version of Vector_test3 may be in `ExtractConstantData()`. Possibly we're extracting from the wrong part of the constant array?
+                        // The test in question has a variable called `dest` with the value `[10, 0]`. It (the test) then returns `dest(1)`, which should be `0`.
+                        // Here, `movedOutOfScope` gets the value `[10, 0]`, which represents the entire `dest` value, not just element `1`.
                         movedOutOfScope = ExtractConstantData(returnValue);
                     }
                 }
                 if (!maybeGlobal)
                 {
                     GetTopFrame().second.push_front(std::move(movedOutOfScope));
+                    // BUG: The error in the "compute" version of Vector_test3 may instead be here. It may be that `ConstantDataToValue()` isn't returning the correct part of the "moved out of scope" data.
                     return ConstantDataToValue(GetTopFrame().second.front(), expectedReturn.GetLayout());
                 }
                 else

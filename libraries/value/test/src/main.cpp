@@ -2,11 +2,15 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     main.cpp (value)
-//  Authors:  Kern Handa
+//  Authors:  Kern Handa, Chuck Jacobs
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "Matrix_test.h"
+#include "Scalar_test.h"
+#include "Tensor_test.h"
 #include "Value_test.h"
+#include "Vector_test.h"
 
 #include <value/include/ComputeContext.h>
 #include <value/include/FunctionDeclaration.h>
@@ -29,6 +33,8 @@
 
 using namespace ell::utilities;
 using namespace ell::value;
+
+#define PRINT_IR 0
 
 struct TestLLVMContext : public LLVMContext
 {
@@ -101,7 +107,7 @@ ell::emitters::LLVMFunction printDoublesFunction;
 ell::emitters::LLVMFunction printFloatsFunction;
 ell::emitters::LLVMFunction printIntsFunction;
 
-void DeclarDebugPrintFunctions(ell::emitters::IRModuleEmitter& module)
+void DeclareDebugPrintFunctions(ell::emitters::IRModuleEmitter& module)
 {
     auto& context = module.GetIREmitter().GetContext();
 
@@ -260,7 +266,7 @@ void LLVMJitTest(std::string testName, std::function<Scalar()> defineFunction)
     compilerSettings.parallelize = true;
     compilerSettings.useThreadPool = false;
     ell::emitters::IRModuleEmitter moduleEmitter("Value_test_llvm", compilerSettings);
-    DeclarDebugPrintFunctions(moduleEmitter);
+    DeclareDebugPrintFunctions(moduleEmitter);
     ContextGuard<TestLLVMContext> guard(moduleEmitter);
 
     auto fn = DeclareFunction(testName)
@@ -292,8 +298,23 @@ void LLVMJitTest(std::string testName, std::function<Scalar()> defineFunction)
 
 void RunTest(std::string testName, std::function<Scalar()> defineFunction)
 {
-    ComputeTest(testName, defineFunction);
-    LLVMJitTest(testName, defineFunction);
+    try
+    {
+        ComputeTest(testName, defineFunction);
+    }
+    catch (const std::exception& e)
+    {
+        ell::testing::ProcessTest(testName + " Compute failed with exception, " + e.what(), false);
+    }
+
+    try
+    {
+        LLVMJitTest(testName, defineFunction);
+    }
+    catch (const std::exception& e)
+    {
+        ell::testing::ProcessTest(testName + " Jitted LLVM failed with exception, " + e.what(), false);
+    }
 }
 
 int main()
@@ -302,18 +323,24 @@ int main()
     using namespace utilities;
     try
     {
-#define ADD_TEST_FUNCTION(a) testFunctions[#a] = a
-        std::map<std::string, std::function<Scalar()>> testFunctions;
+#define ADD_TEST_FUNCTION(a) testFunctions.push_back({ #a, a });
+        std::vector<std::pair<std::string, std::function<Scalar()>>> testFunctions;
 
         // Value tests
         ADD_TEST_FUNCTION(Basic_test);
         ADD_TEST_FUNCTION(DebugPrint_test);
         ADD_TEST_FUNCTION(If_test1);
         ADD_TEST_FUNCTION(Value_test1);
+
         ADD_TEST_FUNCTION(Scalar_test1);
+        ADD_TEST_FUNCTION(Scalar_test2);
+
         ADD_TEST_FUNCTION(Vector_test1);
         ADD_TEST_FUNCTION(Vector_test2);
-        //ADD_TEST_FUNCTION(Vector_test3); // bugbug: work item 2335, fix subvector assignment.
+        ADD_TEST_FUNCTION(Vector_test3); // bugbug: work item 2335, fix subvector assignment.
+        ADD_TEST_FUNCTION(Vector_test4);
+        ADD_TEST_FUNCTION(Vector_test5);
+        
         ADD_TEST_FUNCTION(Matrix_test1);
         ADD_TEST_FUNCTION(Matrix_test2);
         ADD_TEST_FUNCTION(Matrix_test3);
@@ -323,6 +350,7 @@ int main()
         ADD_TEST_FUNCTION(Tensor_test2);
         ADD_TEST_FUNCTION(Tensor_test3);
         ADD_TEST_FUNCTION(Tensor_slice_test1);
+
         ADD_TEST_FUNCTION(Casting_test1);
         ADD_TEST_FUNCTION(Sum_test);
         ADD_TEST_FUNCTION(Dot_test);
@@ -334,6 +362,7 @@ int main()
         ADD_TEST_FUNCTION(ForRangeCasting_test2);
         ADD_TEST_FUNCTION(Parallelized_test1);
         ADD_TEST_FUNCTION(Parallelized_test2);
+        ADD_TEST_FUNCTION(Parallelized_test3);
         ADD_TEST_FUNCTION(Prefetch_test1);
         ADD_TEST_FUNCTION(ScalarRefTest);
         ADD_TEST_FUNCTION(ScalarRefRefTest);
