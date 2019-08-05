@@ -91,6 +91,9 @@ namespace value
         void DebugDumpImpl(FunctionDeclaration fn, std::string tag, std::ostream& stream) const override;
         void DebugPrintImpl(std::string message) override;
 
+        void SetNameImpl(const Value& value, const std::string& name) override;
+        std::string GetNameImpl(const Value& value) const override;
+
         Value IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args);
 
         std::optional<Value> EmitExternalCall(FunctionDeclaration func, std::vector<Value> args);

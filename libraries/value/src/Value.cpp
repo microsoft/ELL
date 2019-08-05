@@ -11,6 +11,8 @@
 #include "Scalar.h"
 
 #include <utilities/include/Hash.h>
+#include <utilities/include/TypeAliases.h>
+#include <utilities/include/TypeTraits.h>
 
 namespace ell
 {
@@ -382,6 +384,19 @@ namespace value
 
     const Value::UnderlyingDataType& Value::GetUnderlyingData() const { return _data; }
 
+    void Value::SetName(const std::string& name)
+    {
+        GetContext().SetName(*this, name);
+        _hasName = true;
+    }
+
+    std::string Value::GetName() const
+    {
+        return GetContext().GetName(*this);
+    }
+
+    bool Value::HasCustomName() const { return _hasName; }
+
     namespace detail
     {
         Value StoreConstantData(ConstantData data) { return GetContext().StoreConstantData(data); }
@@ -435,8 +450,18 @@ namespace value
 size_t std::hash<::ell::value::Value>::operator()(const ::ell::value::Value& value) const noexcept
 {
     using ::ell::utilities::HashCombine;
+    using ::ell::utilities::IntPtrT;
+    using ::ell::utilities::VariantVisitor;
+    using ::ell::value::Emittable;
 
     size_t hash = 0;
+
+    HashCombine(hash,
+                std::visit(
+                    VariantVisitor{
+                        [](Emittable emittable) { return std::hash<IntPtrT>{}(emittable.GetDataAs<IntPtrT>()); },
+                        [](auto&& data) { return std::hash<std::decay_t<decltype(data)>>{}(data); } },
+                    value.GetUnderlyingData()));
     HashCombine(hash, value.GetBaseType());
     HashCombine(hash, value.PointerLevel());
 

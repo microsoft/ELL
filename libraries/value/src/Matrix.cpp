@@ -23,12 +23,17 @@ namespace value
 
     Matrix::Matrix() = default;
 
-    Matrix::Matrix(Value value) :
+    Matrix::Matrix(Value value, const std::string& name) :
         _value(value)
     {
         if (!_value.IsDefined() || !_value.IsConstrained() || _value.GetLayout().NumDimensions() != 2)
         {
             throw InputException(InputExceptionErrors::invalidArgument, "Value passed in must be two-dimensional");
+        }
+
+        if (!name.empty())
+        {
+            SetName(name);
         }
     }
 
@@ -131,6 +136,10 @@ namespace value
     size_t Matrix::Columns() const { return static_cast<size_t>(_value.GetLayout().GetLogicalDimensionActiveSize(1)); }
 
     ValueType Matrix::Type() const { return _value.GetBaseType(); }
+
+    void Matrix::SetName(const std::string& name) { _value.SetName(name); }
+
+    std::string Matrix::GetName() const { return _value.GetName(); }
 
     Matrix& Matrix::operator+=(Matrix m)
     {

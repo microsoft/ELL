@@ -1412,6 +1412,30 @@ namespace value
         _emitter.DebugPrint(message);
     }
 
+    void LLVMContext::SetNameImpl(const Value& value, const std::string& name)
+    {
+        auto realized = Realize(value);
+        if (realized.IsConstant())
+        {
+            _computeContext.SetName(realized, name);
+        }
+
+        auto llvmValue = ToLLVMValue(realized);
+        llvmValue->setName(name);
+    }
+
+    std::string LLVMContext::GetNameImpl(const Value& value) const
+    {
+        auto realized = Realize(value);
+        if (realized.IsConstant())
+        {
+            return _computeContext.GetName(realized);
+        }
+
+        auto llvmValue = ToLLVMValue(realized);
+        return llvmValue->getName();
+    }
+
     Value LLVMContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)
     {
         static std::unordered_map<FunctionDeclaration, std::function<Value(IRFunctionEmitter&, std::vector<Value>)>> intrinsics = {
@@ -1700,9 +1724,14 @@ namespace value
 
             auto& fn = GetFunctionEmitter();
             auto emittable = promotionalDesc.realValue;
+            auto name = _computeContext.GetName(value);
 
             Value newValue = value;
             newValue.SetData(Emittable{ fn.PointerOffset(emittable.GetDataAs<LLVMValue>(), static_cast<int>(offset)) });
+            if (!name.empty())
+            {
+                ToLLVMValue(newValue)->setName(name);
+            }
 
             return newValue;
         }

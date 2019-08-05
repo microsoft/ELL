@@ -81,13 +81,16 @@ namespace value
         void DebugDumpImpl(FunctionDeclaration fn, std::string tag, std::ostream& stream) const override;
         void DebugPrintImpl(std::string message) override;
 
+        void SetNameImpl(const Value& value, const std::string& name) override;
+        std::string GetNameImpl(const Value& value) const override;
+
         Value IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args);
 
         bool ValidateValue(Value value) const;
         bool TypeCompatible(Value value1, Value value2) const;
 
         ConstantData ExtractConstantData(Value value);
-        bool IsGlobalValue(Value value);
+        bool IsGlobalValue(Value value) const;
 
         std::string GetScopeAdjustedName(GlobalAllocationScope scope, std::string name) const;
         std::string GetGlobalScopedName(std::string name) const;
@@ -105,6 +108,7 @@ namespace value
         std::stack<Frame> _stack;
         std::map<std::string, std::pair<ConstantData, MemoryLayout>> _globals;
         std::unordered_map<FunctionDeclaration, DefinedFunction> _definedFunctions;
+        std::unordered_map<Value, std::string> _namedValues;
         std::string _moduleName;
     };
 

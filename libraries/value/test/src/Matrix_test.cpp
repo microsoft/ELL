@@ -338,6 +338,7 @@ Scalar MatrixReferenceTest()
         });
     return ok;
 }
+
 Scalar RefMatrixReferenceTest()
 {
     const int N = 4;
@@ -345,7 +346,7 @@ Scalar RefMatrixReferenceTest()
     const int offsetRows = 0;
     const int offsetCols = 1;
 
-    auto A = MakeMatrix<int>(N, N);
+    auto A = MakeMatrix<int>(N, N, "A");
 
     // Initialize A to this matrix:
     // [ 0, -1, -2, -3 ]
@@ -356,7 +357,7 @@ Scalar RefMatrixReferenceTest()
     // Expected matrix is the upper right quadrant of A:
     // [ -1, -2 ]
     // [  0, -1 ]
-    auto expected = MakeMatrix<int>(kernelSize, kernelSize);
+    auto expected = MakeMatrix<int>(kernelSize, kernelSize, "expected");
 
     ForRange(N, [&](Scalar i) {
         ForRange(N, [&](Scalar j) {
@@ -380,7 +381,7 @@ Scalar RefMatrixReferenceTest()
 
     Matrix valueCachePtr = *valueCachePtrPtr;
 
-    Scalar ok = Allocate<int>(ScalarLayout);
+    Scalar ok = MakeScalar<int>("ok");
     ok = 1;
     If(
         Verify(valueCachePtr, expected) == 0,

@@ -30,22 +30,23 @@ namespace value
 
         /// <summary> Constructor that wraps the provided instance of Value </summary>
         /// <param name="value"> The Value instance to wrap </param>
-        Vector(Value value);
+        /// <param name="name"> The optional name </param>
+        Vector(Value value, const std::string& name = "");
 
         /// <summary> Constructs an instance from a vector of fundamental types </summary>
         /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
         /// <param name="t"> The data to wrap </param>
         template <typename T, typename A = std::allocator<T>>
-        Vector(std::vector<T, A> data) :
-            _value(std::move(data))
+        Vector(std::vector<T, A> data, const std::string& name = "") :
+            Vector(Value(std::move(data)), name)
         {}
 
         /// <summary> Constructs an instance from an initializer list of fundamental types </summary>
         /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
         /// <param name="t"> The data to wrap </param>
         template <typename T>
-        Vector(std::initializer_list<T> data) :
-            _value(std::vector<T>(data))
+        Vector(std::initializer_list<T> data, const std::string& name = "") :
+            Vector(std::vector<T>(data), name)
         {}
 
         Vector(const Vector&);
@@ -95,6 +96,9 @@ namespace value
         /// <returns> The type </returns>
         ValueType GetType() const;
 
+        void SetName(const std::string& name);
+        std::string GetName() const;
+
         Vector& operator+=(Scalar);
         Vector& operator-=(Scalar);
         Vector& operator*=(Scalar);
@@ -127,9 +131,9 @@ namespace value
     /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
     /// <param name="size"> The size of the allocated vector </param>
     template <typename T>
-    Vector MakeVector(size_t size)
+    Vector MakeVector(size_t size, const std::string& name = "")
     {
-        return Vector(Allocate<T>(size));
+        return Vector(Allocate<T>(size), name);
     }
 
     /// <summary> Given a view with contiguous memory, return a Vector that represents the entirety of the memory </summary>

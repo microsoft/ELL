@@ -50,5 +50,9 @@ namespace value
 
     Value Ref<Value>::GetValue() const { return _value; }
 
+    void Ref<Value>::SetName(const std::string& name) { _value.SetName(name); }
+
+    std::string Ref<Value>::GetName() const { return _value.GetName(); }
+
 } // namespace value
 } // namespace ell

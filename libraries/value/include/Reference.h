@@ -37,6 +37,9 @@ namespace value
 
         Value GetValue() const;
 
+        void SetName(const std::string& name);
+        std::string GetName() const;
+
     private:
         Value _value;
     };
@@ -59,6 +62,8 @@ namespace value
         ViewType operator*() const;
 
         using Ref<Value>::GetValue;
+        using Ref<Value>::SetName;
+        using Ref<Value>::GetName;
     };
 
     using Reference = Ref<Value>;

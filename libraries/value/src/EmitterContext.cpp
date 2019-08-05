@@ -271,6 +271,16 @@ namespace value
         DebugPrintImpl(message);
     }
 
+    void EmitterContext::SetName(const Value& value, const std::string& name)
+    {
+        SetNameImpl(value, name);
+    }
+
+    std::string EmitterContext::GetName(const Value& value) const
+    {
+        return GetNameImpl(value);
+    }
+
     const std::vector<std::reference_wrapper<FunctionDeclaration>>& EmitterContext::GetIntrinsics() const
     {
         static std::vector intrinsics = {

@@ -541,7 +541,7 @@ namespace value
         return movedOutOfScope;
     }
 
-    bool ComputeContext::IsGlobalValue(Value value)
+    bool ComputeContext::IsGlobalValue(Value value) const
     {
         return std::visit(VariantVisitor{ [](Emittable) -> bool {
                                              throw LogicException(LogicExceptionErrors::illegalState);
@@ -1215,6 +1215,21 @@ namespace value
     void ComputeContext::DebugPrintImpl(std::string message)
     {
         std::cout << message;
+    }
+
+    void ComputeContext::SetNameImpl(const Value& value, const std::string& name)
+    {
+        _namedValues[value] = name;
+    }
+
+    std::string ComputeContext::GetNameImpl(const Value& value) const
+    {
+        if (auto it = _namedValues.find(value); it != _namedValues.end())
+        {
+            return it->second;
+        }
+
+        return {};
     }
 
     Value ComputeContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)

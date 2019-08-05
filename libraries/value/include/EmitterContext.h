@@ -266,6 +266,16 @@ namespace value
         /// defined for you when running in JIT or Compute mode.  </summary>
         void DebugPrint(std::string message);
 
+        /// <summary> Set the name for the value instance </summary>
+        /// <param name="value"> The Value instance </param>
+        /// <param name="name"> The name </param>
+        void SetName(const Value& value, const std::string& name);
+
+        /// <summary> Gets the name for the value instance. If `SetName` has not been called, this will return the name
+        /// chosen by the emitter context, if any. </summary>
+        /// <param name="value"> The Value instance </param>
+        std::string GetName(const Value& value) const;
+
     protected:
         const std::vector<std::reference_wrapper<FunctionDeclaration>>& GetIntrinsics() const;
 
@@ -314,6 +324,9 @@ namespace value
         virtual void DebugDumpImpl(FunctionDeclaration fn, std::string tag, std::ostream& stream) const = 0;
 
         virtual void DebugPrintImpl(std::string message) = 0;
+
+        virtual void SetNameImpl(const Value& value, const std::string& name) = 0;
+        virtual std::string GetNameImpl(const Value& value) const = 0;
     };
 
     /// <summary> Returns the global instance of EmitterContext </summary>

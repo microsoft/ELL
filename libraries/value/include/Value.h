@@ -404,11 +404,23 @@ namespace value
         /// <returns> The underlying data storage </returns>
         const UnderlyingDataType& GetUnderlyingData() const;
 
+        /// <summary> Set the name for this instance with the current emitter context </summary>
+        /// <param name="name"> The name </param>
+        void SetName(const std::string& name);
+
+        /// <summary> Gets the name for this instance from the current emitter context.
+        /// If `SetName` has not been called, this will return the name chosen by the emitter context, if any. </summary>
+        std::string GetName() const;
+
+        /// <summary> Returns true if a custom name has been set by calling `SetName` </summary>
+        bool HasCustomName() const;
+
     private:
         UnderlyingDataType _data;
 
         detail::ValueTypeDescription _type{ ValueType::Undefined, 0 };
         std::optional<MemoryLayout> _layout = {};
+        bool _hasName = false;
     };
 
     /// <summary> A helper type that can hold any View type, which is any type that has a member function
@@ -440,6 +452,18 @@ struct hash<::ell::value::Value>
 
     [[nodiscard]] size_t operator()(const Type& value) const noexcept;
 };
+
+template <>
+struct equal_to<::ell::value::Value>
+{
+    using Type = ::ell::value::Value;
+    inline bool operator()(const Type& first, const Type& second) const noexcept
+    {
+        auto hash = std::hash<Type>{};
+        return hash(first) == hash(second);
+    }
+};
+
 } // namespace std
 
 #pragma region implementation

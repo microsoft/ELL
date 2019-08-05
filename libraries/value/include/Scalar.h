@@ -23,14 +23,14 @@ namespace value
 
         /// <summary> Constructor that wraps the provided instance of Value </summary>
         /// <param name="value"> The Value instance to wrap </param>
-        Scalar(Value value);
+        Scalar(Value value, const std::string& name = "");
 
         /// <summary> Constructs an instance from a fundamental type value </summary>
         /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
         /// <param name="t"> The value to wrap </param>
         template <typename T>
-        Scalar(T t) :
-            Scalar(Value(t))
+        Scalar(T t, const std::string& name = "") :
+            Scalar(Value(t), name)
         {}
 
         Scalar(const Scalar&);
@@ -62,6 +62,9 @@ namespace value
             return *_value.Get<T*>();
         }
 
+        void SetName(const std::string& name);
+        std::string GetName() const;
+
         /// <summary> Retrieves the type of data stored in the wrapped Value instance </summary>
         /// <returns> The type </returns>
         ValueType GetType() const;
@@ -92,6 +95,14 @@ namespace value
 
         Value _value;
     };
+
+    Scalar MakeScalar(ValueType type, const std::string& name = "");
+
+    template <typename T, std::enable_if_t<std::is_convertible_v<std::vector<T>, detail::ConstantData>, void*> = nullptr>
+    Scalar MakeScalar(const std::string& name = "")
+    {
+        return MakeScalar(GetValueType<T>(), name);
+    }
 
 } // namespace value
 } // namespace ell

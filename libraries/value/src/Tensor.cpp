@@ -23,12 +23,16 @@ namespace value
 {
     Tensor::Tensor() = default;
 
-    Tensor::Tensor(Value value) :
+    Tensor::Tensor(Value value, const std::string& name) :
         _value(value)
     {
         if (!_value.IsDefined() || !_value.IsConstrained() || _value.GetLayout().NumDimensions() != 3)
         {
             throw InputException(InputExceptionErrors::invalidArgument, "Value passed in must be three-dimensional");
+        }
+        if (!name.empty())
+        {
+            SetName(name);
         }
     }
 
@@ -182,6 +186,10 @@ namespace value
     size_t Tensor::Channels() const { return static_cast<size_t>(_value.GetLayout().GetLogicalDimensionActiveSize(2)); }
 
     ValueType Tensor::Type() const { return _value.GetBaseType(); }
+
+    void Tensor::SetName(const std::string& name) { _value.SetName(name); }
+
+    std::string Tensor::GetName() const { return _value.GetName(); }
 
     Tensor& Tensor::operator+=(Scalar s)
     {

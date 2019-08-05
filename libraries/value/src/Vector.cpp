@@ -17,12 +17,16 @@ namespace value
 
     Vector::Vector() = default;
 
-    Vector::Vector(Value value) :
+    Vector::Vector(Value value, const std::string& name) :
         _value(value)
     {
         if (!_value.IsDefined() || !_value.IsConstrained() || _value.GetLayout().NumDimensions() != 1)
         {
             throw InputException(InputExceptionErrors::invalidArgument, "Value passed in must be one-dimensional");
+        }
+        if (!name.empty())
+        {
+            SetName(name);
         }
     }
 
@@ -94,6 +98,10 @@ namespace value
     size_t Vector::Size() const { return _value.GetLayout().NumElements(); }
 
     ValueType Vector::GetType() const { return _value.GetBaseType(); }
+
+    void Vector::SetName(const std::string& name) { _value.SetName(name); }
+
+    std::string Vector::GetName() const { return _value.GetName(); }
 
     Vector& Vector::operator+=(Scalar s)
     {

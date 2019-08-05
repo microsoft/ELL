@@ -19,12 +19,16 @@ namespace value
 
     Scalar::Scalar() = default;
 
-    Scalar::Scalar(Value value) :
+    Scalar::Scalar(Value value, const std::string& name) :
         _value(std::move(value))
     {
         if (!_value.IsDefined() || !_value.IsConstrained() || _value.GetLayout().NumDimensions() != 0)
         {
             throw InputException(InputExceptionErrors::invalidArgument);
+        }
+        if (!name.empty())
+        {
+            SetName(name);
         }
     }
 
@@ -61,6 +65,10 @@ namespace value
     }
 
     ValueType Scalar::GetType() const { return _value.GetBaseType(); }
+
+    void Scalar::SetName(const std::string& name) { _value.SetName(name); }
+
+    std::string Scalar::GetName() const { return _value.GetName(); }
 
     Scalar& Scalar::operator+=(Scalar s)
     {
@@ -210,6 +218,11 @@ namespace value
     Scalar operator||(Scalar s1, Scalar s2)
     {
         return GetContext().BinaryOperation(ValueBinaryOperation::logicalOr, s1.GetValue(), s2.GetValue());
+    }
+
+    Scalar MakeScalar(ValueType type, const std::string& name)
+    {
+        return Scalar(Allocate(type, ScalarLayout), name);
     }
 
 } // namespace value

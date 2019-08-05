@@ -29,21 +29,24 @@ namespace value
 
         /// <summary> Constructor that wraps the provided instance of Value </summary>
         /// <param name="value"> The Value instance to wrap </param>
-        Matrix(Value value);
+        /// <param name="name"> The optional name </param>
+        Matrix(Value value, const std::string& name = "");
 
         /// <summary> Constructs an instance from a std::vector based representation of the matrix </summary>
         /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
         /// <param name="data"> The data represented as a std::vector of std::vectors, in canonical row-major layout </param>
+        /// <param name="name"> The optional name </param>
         template <typename T>
-        Matrix(const std::vector<std::vector<T>>& data);
+        Matrix(const std::vector<std::vector<T>>& data, const std::string& name = "");
 
         /// <summary> Constructs an instance from a 1D std::vector reshaped into the given rows and columns </summary>
         /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
         /// <param name="data"> The data represented as a std::vector, in canonical row-major layout </param>
         /// <param name="numRows"> The number of rows </param>
         /// <param name="numColumns"> The the number of columns </param>
+        /// <param name="name"> The optional name </param>
         template <typename T>
-        Matrix(const std::vector<T>& data, int numRows, int numColumns);
+        Matrix(const std::vector<T>& data, int numRows, int numColumns, const std::string& name = "");
 
         Matrix(const Matrix&);
         Matrix(Matrix&&) noexcept;
@@ -98,6 +101,9 @@ namespace value
         /// <returns> The type </returns>
         ValueType Type() const;
 
+        void SetName(const std::string& name);
+        std::string GetName() const;
+
         Matrix& operator+=(Scalar);
         Matrix& operator+=(Matrix);
 
@@ -126,10 +132,11 @@ namespace value
     /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
     /// <param name="rows"> The number of rows of the allocated matrix </param>
     /// <param name="columns"> The number of columns of the allocated matrix </param>
+    /// <param name="name"> The optional name </param>
     template <typename T>
-    Matrix MakeMatrix(int rows, int columns)
+    Matrix MakeMatrix(int rows, int columns, const std::string& name = "")
     {
-        return Matrix(Allocate<T>(utilities::MemoryLayout({ rows, columns })));
+        return Matrix(Allocate<T>(utilities::MemoryLayout({ rows, columns })), name);
     }
 
 } // namespace value
@@ -143,7 +150,7 @@ namespace value
 {
 
     template <typename T>
-    Matrix::Matrix(const std::vector<std::vector<T>>& data)
+    Matrix::Matrix(const std::vector<std::vector<T>>& data, const std::string& name)
     {
         using namespace utilities;
 
@@ -172,10 +179,14 @@ namespace value
         }
 
         _value = Value(coalesced, MemoryLayout({ numRows, numColumns }));
+        if (!name.empty())
+        {
+            SetName(name);
+        }
     }
 
     template <typename T>
-    Matrix::Matrix(const std::vector<T>& data, int numRows, int numColumns)
+    Matrix::Matrix(const std::vector<T>& data, int numRows, int numColumns, const std::string& name)
     {
         using namespace utilities;
 
@@ -186,6 +197,10 @@ namespace value
         }
         std::vector<T> coalesced = data; // non-const copy
         _value = Value(coalesced, MemoryLayout({ numRows, numColumns }));
+        if (!name.empty())
+        {
+            SetName(name);
+        }
     }
 
 } // namespace value

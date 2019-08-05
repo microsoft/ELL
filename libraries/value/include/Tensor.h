@@ -25,13 +25,13 @@ namespace value
 
         /// <summary> Constructor that wraps the provided instance of Value </summary>
         /// <param name="value"> The Value instance to wrap </param>
-        Tensor(Value value);
+        Tensor(Value value, const std::string& name = "");
 
         /// <summary> Constructs an instance from a std::vector based representation of the tensor </summary>
         /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
         /// <param name="data"> The data represented in canonical row-major layout </param>
         template <typename T>
-        Tensor(const std::vector<std::vector<std::vector<T>>>& data);
+        Tensor(const std::vector<std::vector<std::vector<T>>>& data, const std::string& name = "");
 
         Tensor(const Tensor&);
         Tensor(Tensor&&) noexcept;
@@ -123,6 +123,9 @@ namespace value
         /// <returns> The type </returns>
         ValueType Type() const;
 
+        void SetName(const std::string& name);
+        std::string GetName() const;
+
         Tensor& operator+=(Scalar);
         Tensor& operator-=(Scalar);
         Tensor& operator*=(Scalar);
@@ -143,9 +146,9 @@ namespace value
     /// <param name="columns"> The number of columns of the allocated tensor </param>
     /// <param name="channels"> The number of columns of the allocated tensor </param>
     template <typename T>
-    Tensor MakeTensor(int rows, int columns, int channels)
+    Tensor MakeTensor(int rows, int columns, int channels, const std::string& name = "")
     {
-        return Tensor(Allocate<T>(utilities::MemoryLayout({ rows, columns, channels })));
+        return Tensor(Allocate<T>(utilities::MemoryLayout({ rows, columns, channels })), name);
     }
 
 } // namespace value
@@ -159,7 +162,7 @@ namespace value
 {
 
     template <typename T>
-    Tensor::Tensor(const std::vector<std::vector<std::vector<T>>>& data)
+    Tensor::Tensor(const std::vector<std::vector<std::vector<T>>>& data, const std::string& name)
     {
         using namespace utilities;
 
@@ -202,6 +205,10 @@ namespace value
         }
 
         _value = Value(coalesced, MemoryLayout({ numRows, numColumns, numChannels }));
+        if (!name.empty())
+        {
+            SetName(name);
+        }
     }
 
 } // namespace value

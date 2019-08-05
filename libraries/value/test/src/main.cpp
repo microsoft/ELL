@@ -340,7 +340,7 @@ int main()
         ADD_TEST_FUNCTION(Vector_test3); // bugbug: work item 2335, fix subvector assignment.
         ADD_TEST_FUNCTION(Vector_test4);
         ADD_TEST_FUNCTION(Vector_test5);
-        
+
         ADD_TEST_FUNCTION(Matrix_test1);
         ADD_TEST_FUNCTION(Matrix_test2);
         ADD_TEST_FUNCTION(Matrix_test3);
