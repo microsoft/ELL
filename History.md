@@ -1,4 +1,4 @@
-## 3.0.2*
+## 3.0.2
 - Add FastGRNN node to ELL, train_classifier.py and the onnx_importer.
 
 ## 3.0.1
