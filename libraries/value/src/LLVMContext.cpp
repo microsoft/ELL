@@ -1417,7 +1417,7 @@ namespace value
         auto realized = Realize(value);
         if (realized.IsConstant())
         {
-            _computeContext.SetName(realized, name);
+            return _computeContext.SetName(realized, name);
         }
 
         auto llvmValue = ToLLVMValue(realized);
