@@ -65,7 +65,7 @@ goto :test
 echo ===================================== TEST ==================================
 if "%SUBSET%"=="" goto :fulltest
 
-ctest . --build-config release -R %SUBSET% -VV --timeout 600
+ctest . --build-config release -R %SUBSET% -VV --timeout 600 -T Test
 if ERRORLEVEL 1 exit /B 1
 
 if not EXIST .\tools\utilities\pitest\test\pi3 goto :pitesterror
@@ -76,7 +76,7 @@ echo ### Error: it looks like the pitest didn't run...
 exit /B 1
 
 :fulltest
-ctest . --build-config release -VV --timeout 600
+ctest . --build-config release -VV --timeout 600 -T Test
 if ERRORLEVEL 1 exit /B 1
 goto :done
 
