@@ -1902,6 +1902,7 @@ ONNX_OP_TYPE_TO_CONVERTER_MAP = {
     "AveragePool"             : OnnxAveragePoolingConverter,  # noqa E203
     "BatchNormalization"      : OnnxBatchNormalizationConverter,  # noqa E203
     "Bias"                    : OnnxBiasConverter,  # noqa E203
+    "Cast"                    : OnnxCastConverter,  # noqa E203
     "Concat"                  : OnnxConcatConverter,  # noqa E203
     "Conv"                    : OnnxConvolutionConverter,  # noqa E203
     "Convolution"             : OnnxConvolutionConverter,  # noqa E203
@@ -1942,13 +1943,13 @@ ONNX_OP_TYPE_TO_CONVERTER_MAP = {
     "Sin"                     : OnnxSinConverter,  # noqa E203
     "Sqrt"                    : OnnxSqrtConverter,  # noqa E203
     "Slice"                   : OnnxSliceConverter,  # noqa E203
+    "Squeeze"                 : OnnxSqueezeConverter,  # noqa E203
     "Softmax"                 : OnnxSoftmaxConverter,  # noqa E203
     "Sub"                     : OnnxSubtractConverter,  # noqa E203
+    "Sum"                     : OnnxPlusConverter,  # noqa E203
     "Tanh"                    : OnnxTanhConverter,  # noqa E203
     "Transpose"               : OnnxTransposeConverter,  # noqa E203
     "Unsqueeze"               : OnnxUnsqueezeConverter,  # noqa E203
-    "Squeeze"                 : OnnxSqueezeConverter,  # noqa E203
-    "Cast"                    : OnnxCastConverter  # noqa E203
 }
 
 
