@@ -73,6 +73,15 @@ Then follow the PyTorch setup instructions for Anaconda and your version of CUDA
 [https://pytorch.org/get-started/locally/](https://pytorch.org/get-started/locally/).
 
 
+## Installing pyaudio
+
+This tutorial uses `pyaudio` which can be installed using:
+```
+[Linux] sudo apt-get install python-pyaudio python3-pyaudio && pip install pyaudio
+[Windows] pip install pyaudio
+[macOS] brew install portaudio && pip install pyaudio
+```
+
 ## Helper Python Code
 
 This tutorial uses python scripts located in your ELL git repo under `tools/utilities/pythonlibs/audio` and `tools/utilities/pythonlibs/audio/training`.  When you see a python script referenced below like `make_training_list.py`, just prefix that with the full path to that script your ELL git repo.
@@ -118,8 +127,14 @@ As shown in the [earlier tutorial](/ELL/tutorials/Getting-started-with-audio-key
 This featurizer is created as an ELL model using the `make_featurizer` command:
 
 ```
-python make_featurizer.py --sample_rate 16000 --window_size 512 --input_buffer_size 512 --filterbank_type mel --filterbank_size 80 --filterbank_nfft 512 --nfft 512 --log
+python make_featurizer.py --sample_rate 16000 --window_size 512 --input_buffer_size 512 --hamming_window --filterbank_type mel --filterbank_size 80 --filterbank_nfft 512 --nfft 512 --log --auto_scale
 ```
+
+The reason for the `--sample_rate 16000` argument is that small low powered target devices might not be able to record and process audio at very high rates.
+
+So while your host PC can probably do 96kHz audio and higher just fine, this tutorial shows you how to down sample the audio to something that will run on a tiny target device.  The main point being that you will get the best results if you train the model on audio that is sampled at the same rate that your target device will be recording.
+
+The `--auto_scale` option converts raw integer audio values to floating point numbers in the range [-1, 1].
 
 You should see a message saying "Saving **featurizer.ell**" and if you print this using the following command line:
 
@@ -177,90 +192,101 @@ popd
 Now you have a compiled featurizer, so you can preprocess all the audio files using this featurizer and create a compressed numpy dataset with the result.  This large dataset will contain one row per audio file, where each row contains all the featurizer output for that file.  The featurizer output is smaller than the raw audio, but it will still end up being a pretty big file, (about 1.2 GB).  Of course it depends how many files you include in the set.  Remember for best training results the more files the better, so  you will use the **training_list.txt** you created earlier which selected 1600 files per keyword.  You need three datasets created from each of the list files in your audio folder using `make_dataset` as follows:
 
 ```shell
-python make_dataset.py --list_file audio/training_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --window_size 40 --shift 40 --auto_scale
-python make_dataset.py --list_file audio/validation_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --window_size 40 --shift 40 --auto_scale
-python make_dataset.py --list_file audio/testing_list.txt --featurizer compiled_featurizer/mfcc --sample_rate 16000 --window_size 40 --shift 40 --auto_scale
+python make_dataset.py --list_file audio/training_list.txt --featurizer compiled_featurizer/mfcc --window_size 40 --shift 40
+python make_dataset.py --list_file audio/validation_list.txt --featurizer compiled_featurizer/mfcc --window_size 40 --shift 40
+python make_dataset.py --list_file audio/testing_list.txt --featurizer compiled_featurizer/mfcc --window_size 40 --shift 40
 ```
 
 Where the **audio** folder contains your unpacked .wav files.  If your audio files are in a different location then simply provide the full path to it in the above commands.
 
-The reason for the `--sample_rate 16000` argument is that small low powered target devices might not be able to record and process audio at very high rates.
-So while your host PC can probably do 96kHz audio and higher just fine, this tutorial shows you how to down sample the audio to something that will run on a tiny target device.  The main point being that you will get the best results if you train the model on audio that is sampled at the same rate that your target device will be recording.
-
-The `--auto_scale` option converts raw integer audio values to floating point numbers in the range [-1, 1].
-
 Creating the datasets will take a while, about 10 minutes or more, so now is a great time to grab a cup of tea.  It will produce three files in your working folder named **training.npz**, **validation.npz** and **testing.npz** which you will use below.
 
-You will notice in the output that any folder starting with "_" special category named `<null>`. This means you can add negative audio samples to these folders so the
-model learns to ignore words also rather than falsely recognizing them as one of the 30 words you want to recognize.
+Note that make_training_list.py skipped the _background_noise folder.
+But make_dataset.py has options to use that background noise to randomly mix in with each training word.  By default make_dataset.py does not do that.
+But you can experiment with this and see if it helps or not.
 
 ## Train the Keyword Spotter
 
 You can now finally train the keyword spotter using the `train_classifier` script:
 
 ```shell
-python train_classifier.py --architecture GRU --audio .
+python train_classifier.py --architecture GRU --num_layers 2 --dataset . --use_gpu --outdir .
 ```
 
 This script will use PyTorch to train a GRU based model using the datasets you created earlier then it will export an onnx model from that.  The file will be named **KeywordSpotter.onnx** and if all goes well you should see console output like this:
 
 ```
-Loading d:\datasets\Audio\Kaggle\train\audio\training_list.npz...
-Loading d:\datasets\Audio\Kaggle\train\audio\validation_list.npz...
-Training keyword spotter using 46953 rows of featurized training input...
-Epoch 0, Loss 1.5005683898925781, Validation Accuracy 65.404
-Epoch 1, Loss 1.191438913345337, Validation Accuracy 76.931
-Epoch 2, Loss 1.031152606010437, Validation Accuracy 81.928
-Epoch 3, Loss 0.8680925369262695, Validation Accuracy 84.891
-Epoch 4, Loss 0.8902071118354797, Validation Accuracy 85.996
-Epoch 5, Loss 0.7643579244613647, Validation Accuracy 87.294
-Epoch 6, Loss 0.7202472686767578, Validation Accuracy 87.058
-Epoch 7, Loss 0.7902640104293823, Validation Accuracy 87.618
-Epoch 8, Loss 0.7076990008354187, Validation Accuracy 88.163
-Epoch 9, Loss 0.7693088054656982, Validation Accuracy 87.765
-Epoch 10, Loss 0.6854181289672852, Validation Accuracy 88.561
-Epoch 11, Loss 0.805185854434967, Validation Accuracy 88.414
-Epoch 12, Loss 0.5628467202186584, Validation Accuracy 89.121
-Epoch 13, Loss 0.7616006135940552, Validation Accuracy 89.239
-Epoch 14, Loss 0.6700156331062317, Validation Accuracy 89.107
-Epoch 15, Loss 0.5844067931175232, Validation Accuracy 89.180
-Epoch 16, Loss 0.583706259727478, Validation Accuracy 89.166
-Epoch 17, Loss 0.6179401278495789, Validation Accuracy 89.225
-Epoch 18, Loss 0.6164156794548035, Validation Accuracy 88.856
-Epoch 19, Loss 0.5983876585960388, Validation Accuracy 89.225
-Epoch 20, Loss 0.6414792537689209, Validation Accuracy 89.328
-Epoch 21, Loss 0.600459635257721, Validation Accuracy 89.269
-Epoch 22, Loss 0.5980986952781677, Validation Accuracy 89.460
-Epoch 23, Loss 0.5426868200302124, Validation Accuracy 89.372
-Epoch 24, Loss 0.552982747554779, Validation Accuracy 89.682
-Epoch 25, Loss 0.5772491097450256, Validation Accuracy 89.446
-Epoch 26, Loss 0.5909024477005005, Validation Accuracy 89.298
-Epoch 27, Loss 0.5863549709320068, Validation Accuracy 89.814
-Epoch 28, Loss 0.605217456817627, Validation Accuracy 89.505
-Epoch 29, Loss 0.5369739532470703, Validation Accuracy 89.785
-Trained in 380.31 seconds, saved model 'KeywordSpotter.pt'
-Training accuracy = 98.849 %
-Loading d:\datasets\Audio\Kaggle\train\audio\testing_list.npz...
-Testing accuracy = 89.696 %
-saving onnx file: KeywordSpotter.onnx
+Loading .\testing_list.npz...
+Loaded dataset testing_list.npz and found sample rate 16000, audio_size 512, input_size 80, window_size 40 and shift 40
+Loading .\training_list.npz...
+Loaded dataset training_list.npz and found sample rate 16000, audio_size 512, input_size 80, window_size 40 and shift 40
+Loading .\validation_list.npz...
+Loaded dataset validation_list.npz and found sample rate 16000, audio_size 512, input_size 80, window_size 40 and shift                                          40
+Training model GRU128KeywordSpotter.pt
+Training 2 layer GRU 128 using 46256 rows of featurized training input...
+RMSprop (
+Parameter Group 0
+    alpha: 0
+    centered: False
+    eps: 1e-08
+    lr: 0.001
+    momentum: 0
+    weight_decay: 1e-05
+)
+Epoch 0, Loss 1.624, Validation Accuracy 48.340, Learning Rate 0.001
+Epoch 1, Loss 0.669, Validation Accuracy 78.581, Learning Rate 0.001
+Epoch 2, Loss 0.538, Validation Accuracy 88.623, Learning Rate 0.001
+Epoch 3, Loss 0.334, Validation Accuracy 91.423, Learning Rate 0.001
+Epoch 4, Loss 0.274, Validation Accuracy 92.041, Learning Rate 0.001
+Epoch 5, Loss 0.196, Validation Accuracy 93.945, Learning Rate 0.001
+Epoch 6, Loss 0.322, Validation Accuracy 93.652, Learning Rate 0.001
+Epoch 7, Loss 0.111, Validation Accuracy 94.548, Learning Rate 0.001
+Epoch 8, Loss 0.146, Validation Accuracy 95.296, Learning Rate 0.001
+Epoch 9, Loss 0.109, Validation Accuracy 95.052, Learning Rate 0.001
+Epoch 10, Loss 0.115, Validation Accuracy 95.492, Learning Rate 0.001
+Epoch 11, Loss 0.116, Validation Accuracy 95.931, Learning Rate 0.001
+Epoch 12, Loss 0.064, Validation Accuracy 95.866, Learning Rate 0.001
+Epoch 13, Loss 0.159, Validation Accuracy 95.736, Learning Rate 0.001
+Epoch 14, Loss 0.083, Validation Accuracy 95.898, Learning Rate 0.001
+Epoch 15, Loss 0.094, Validation Accuracy 96.484, Learning Rate 0.001
+Epoch 16, Loss 0.056, Validation Accuracy 95.801, Learning Rate 0.001
+Epoch 17, Loss 0.096, Validation Accuracy 95.964, Learning Rate 0.001
+Epoch 18, Loss 0.019, Validation Accuracy 96.305, Learning Rate 0.001
+Epoch 19, Loss 0.140, Validation Accuracy 96.501, Learning Rate 0.001
+Epoch 20, Loss 0.057, Validation Accuracy 96.094, Learning Rate 0.001
+Epoch 21, Loss 0.025, Validation Accuracy 96.289, Learning Rate 0.001
+Epoch 22, Loss 0.037, Validation Accuracy 95.947, Learning Rate 0.001
+Epoch 23, Loss 0.008, Validation Accuracy 96.191, Learning Rate 0.001
+Epoch 24, Loss 0.050, Validation Accuracy 96.419, Learning Rate 0.001
+Epoch 25, Loss 0.010, Validation Accuracy 96.257, Learning Rate 0.001
+Epoch 26, Loss 0.014, Validation Accuracy 96.712, Learning Rate 0.001
+Epoch 27, Loss 0.044, Validation Accuracy 96.159, Learning Rate 0.001
+Epoch 28, Loss 0.011, Validation Accuracy 96.289, Learning Rate 0.001
+Epoch 29, Loss 0.029, Validation Accuracy 96.143, Learning Rate 0.001
+Trained in 299.81 seconds
+Training accuracy = 99.307 %
+Evaluating GRU keyword spotter using 6573 rows of featurized test audio...
+Saving evaluation results in '.\results.txt'
+Testing accuracy = 93.673 %
+saving onnx file: GRU128KeywordSpotter.onnx
 ```
 
-So here you see the model has trained pretty well and is getting an evaluation score of 89.696% using the **testing_list.npz** dataset.  The testing_list contains files that the training_list never saw before so it is expected that the test score (89.7%) will always be lower than the final training accuracy (98.8%).  The real trick is increasing that test score.  This problem has many data scientists employed around the world!
+So here you see the model has trained well and is getting an evaluation score of 93.673% using the **testing_list.npz** dataset.  The testing_list contains files that the training_list never saw before so it is expected that the test score will always be lower than the final training accuracy (99.307%).  The real trick is increasing that test score.  This problem has many data scientists employed around the world!
 
 ## Importing the ONNX Model
 
 In order to try your new model using ELL, you first need to import it from ONNX into the ELL format as follows:
 
 ```
-[Linux] python $ELL_ROOT/tools/importers/onnx/onnx_import.py GRUKeywordSpotter.onnx
-[Windows] python %ELL_ROOT%\tools\importers\onnx\onnx_import.py GRUKeywordSpotter.onnx
+[Linux] python $ELL_ROOT/tools/importers/onnx/onnx_import.py GRU128KeywordSpotter.onnx
+[Windows] python %ELL_ROOT%\tools\importers\onnx\onnx_import.py GRU128KeywordSpotter.onnx
 ```
 
-This will generate an ELL model named **GRUKeywordSpotter.ell** which you can now compile using similar technique you used on the featurizer:
+This will generate an ELL model named **GRU128KeywordSpotter.ell** which you can now compile using similar technique you used on the featurizer:
 
 ```
-[Linux] python $ELL_ROOT%/tools/wrap/wrap.py --model_file GRUKeywordSpotter.ell --outdir KeywordSpotter --module_name model
-[Windows] python %ELL_ROOT%\tools\wrap\wrap.py --model_file GRUKeywordSpotter.ell --outdir KeywordSpotter --module_name model
+[Linux] python $ELL_ROOT%/tools/wrap/wrap.py --model_file GRU128KeywordSpotter.ell --outdir KeywordSpotter --module_name model
+[Windows] python %ELL_ROOT%\tools\wrap\wrap.py --model_file GRU128KeywordSpotter.ell --outdir KeywordSpotter --module_name model
 ```
 
 then compile the resulting KeywordSpotter project using your new `makeit` command:
@@ -279,30 +305,18 @@ So you can now take the new compiled keyword spotter for a spin and see how it w
 python test_ell_model.py --classifier KeywordSpotter/model --featurizer compiled_featurizer/mfcc --sample_rate 16000 --list_file audio/testing_list.txt --categories categories.txt --reset --auto_scale
 ```
 
-This is going back to the raw .wav file input and refeaturizing each .wav file using the compiled featurizer.  This is similar to what you will do on your target device while processing microphone input.  As a result this test pass will take a little longer (about 2 minutes).  You will see every file scroll by telling you which one passed or failed with
+This is going back to the raw .wav file input and refeaturizing each .wav file using the compiled featurizer, processing each file in random order.  This is similar to what you will do on your target device while processing microphone input.  As a result this test pass will take a little longer (about 2 minutes).  You will see every file scroll by telling you which one passed or failed with
 a running pass rate.  The last page of output should look something like this:
 
 ```
 ...
-PASSED 88.37%: zero
-FAILED: go, expecting zero, path=zero/d0faf7e4_nohash_4.wav
-FAILED: go, expecting zero, path=zero/d0faf7e4_nohash_5.wav
-PASSED 88.35%: zero
-PASSED 88.35%: zero
-PASSED 88.38%: zero
-PASSED 88.38%: zero
-PASSED 88.39%: zero
-PASSED 88.39%: zero
-PASSED 88.40%: zero
-PASSED 88.40%: zero
-PASSED 88.41%: zero
-PASSED 88.41%: zero
-Test completed in 135.90 seconds
-6043 passed, 792 failed, pass rate of 88.41 %
+Saving 'results.json'
+Test completed in 157.65 seconds
+6090 passed, 483 failed, pass rate of 92.65 %
 Best prediction time was 0.0 seconds
 ```
 
-The final pass rate printed here is 88.49% which is close to the pytorch test accuracy of 89.69%.
+The final pass rate printed here is 92.65% which is close to the pytorch test accuracy of 93.673%.
 
 But how will this model perform on a continuous stream of audio from a microphone?  You can try this out using the following tool:
 
@@ -321,34 +335,50 @@ But in live audio how do you know when one word stops and another starts? Someti
 How does ELL then know when to reset the GRU nodes hidden state?
 By default ELL does not reset the hidden state so the GRU state blurs together over time and gets confused especially if there is no clear silence between consecutive words.
 
-So how can you fix this?  Well, this is where Voice Activity Detection (VAD) can come in handy.  ELL actually has a node called VoiceActivityDetectorNode that you can add to the model.  The input is the same featurizer input that the classifier uses, and the output is an integer value 0 if there is no activity detected and 1 if there is activity.  This output signal can then be piped into the GRU nodes as a "reset_trigger".  The GRU nodes will then reset themselves when they see that trigger change from 1 to 0 (the end of a word).  To enable this you will need to edit the ELL **GRUKeywordSpotter.ell** file using the `add_vad.py` script:
+So how can you fix this?  Well, this is where Voice Activity Detection (VAD) can come in handy.  ELL actually has a node called VoiceActivityDetectorNode that you can add to the model.  The input is the same featurizer input that the classifier uses, and the output is an integer value 0 if there is no activity detected and 1 if there is activity.  This output signal can then be piped into the GRU nodes as a "reset_trigger".  The GRU nodes will then reset themselves when they see that trigger change from 1 to 0 (the end of a word).  To enable this you will need to edit the ELL **GRU128KeywordSpotter.ell** file using the `add_vad.py` script:
 
 ```
-python add_vad.py GRUKeywordSpotter.ell --sample_rate 16000 --window_size 512 --tau_up 1.5 --tau_down 0.09 --large_input 4 --gain_att 0.01 --threshold_up 3.5 --threshold_down 0.9 --level_threshold 0.02
+python add_vad.py GRU128KeywordSpotter.ell --sample_rate 16000 --window_size 512 --tau_up 1.5 --tau_down 0.09 --large_input 4 --gain_att 0.01 --threshold_up 3.5 --threshold_down 0.9 --level_threshold 0.02
 ```
 
-This will edit the ELL model, remove the dummy reset triggers on the two GRU nodes and replace them with a VoiceActivityDetectorNode.  Your new GRUKeywordSpotter.ell should now look like this:
+This will edit the ELL model, remove the dummy reset triggers on the two GRU nodes and replace them with a VoiceActivityDetectorNode.  Your new GRU128KeywordSpotter.ell should now look like this:
 
 ![graph](GRUKeywordSpotter.png)
 
 **Note:** you can use the following tool to generate these graphs:
 
 ```
-[Linux] $ELL_ROOT/build/bin/release/print -imap GRUKeywordSpotter.ell -fmt dot -of graph.dot
-[Windows] %ELL_ROOT%\build\bin\release\print -imap GRUKeywordSpotter.ell -fmt dgml -of graph.dgml
+[Linux] $ELL_ROOT/build/bin/release/print -imap GRU128KeywordSpotter.ell -fmt dot -of graph.dot
+[Windows] %ELL_ROOT%\build\bin\release\print -imap GRU128KeywordSpotter.ell -fmt dgml -of graph.dgml
 ```
 
 And you can view graph.dgml using Visual Studio.  On Linux you can use the `dot` format which can be viewed using GraphViz.
 
-You can now compile this new GRUKeywordSpotter.ell model using `wrap.py` as before and try it out.  You should see the `test_ell_model` accuracy increase back up from 70% to about 85%.  The VoiceActivityDetector is not perfect on all the audio test samples, especially those with high background noise.  The VoiceActivityDetector has many parameters that you can see in `add_vad.py`.  These parameters can be tuned for your particular device to get the best result.  You can use the `<ELL_ROOT>/tools/utilities/pythonlibs/audio/vad_test.py` tool to help with that.
+You can now compile this new GRU128KeywordSpotter.ell model using `wrap.py` as before and try it out.  You should see the `test_ell_model` accuracy increase back up from 70% to about 85%.  The VoiceActivityDetector is not perfect on all the audio test samples, especially those with high background noise.  The VoiceActivityDetector has many parameters that you can see in `add_vad.py`.  These parameters can be tuned for your particular device to get the best result.  You can use the `<ELL_ROOT>/tools/utilities/pythonlibs/audio/vad_test.py` tool to help with that.
 
 You can also use the `view_audio.py` script again and see how it behaves when you speak the 30 different keywords listed in categories.txt.  You should notice that it works better now because of the VoiceActivityDetection whereas previously you had to click "stop" and "record" to reset the model. Now it resets automatically and is able to recognize the next keyword after a small silence.  You still cannot speak the keywords too quickly, so this solution is not perfect.  Understanding full conversation speech is a different kind of problem that requires bigger models and audio datasets that include whole phrases.
+
+## VAD Tuning
+
+The add_vad.py script takes many parameters that you may need to tune for
+your particular microphone.  To do this use the following tool:
+
+```
+tools/utilities/pythonlibs/audio/vad_test.py
+```
+
+This tool takes the featurizer.ell and generates vad.ell models matching the given parameters you provide in the dialog, and it will test that on a given wav file.  So record wav files off the STM32F469-disco of you speaking a few words (in a quiet place) and run them, then calibrate the vad.ell model parameters until the vad output detects words and silence correctly.  You are done when the graph looks like this.  You may also need to configure the microphone gain on your device.  Specifically you should see the Orange VAD signal nicely frame each word spoken.
+
+![vad](vad.png)
+
+Use `--help` on the `add_vad.py` command line to see what each parameter
+means.
 
 ## Experimenting
 
 The `train_classifier.py` script has a number of other options you can play with including number of epochs, batch_size, learning_rate, and the number of hidden_units to use in the GRU layers.  Note that training also has an element of randomness to it, so you will never see the exact same numbers even when you retrain with the exact same parameters.  This is due to the Stochastic Gradient Descent algorithm that is used by the trainer.
 
-The neural network you just trained is described by the KeywordSpotter class in the `train_classifier.py` script.  You can see the **\_\_init\_\_** method of the GRUKeywordSpotter class creating two GRU nodes and a Linear layer which are used by the **forward** method as follows:
+The neural network you just trained is described by the KeywordSpotter class in the `train_classifier.py` script.  You can see the **\_\_init\_\_** method of the GRU128KeywordSpotter class creating two GRU nodes and a Linear layer which are used by the **forward** method as follows:
 
 ```python
     def forward(self, input):
