@@ -584,7 +584,7 @@ namespace emitters
         /// <param name="label"> The block label. </param>
         /// <param name="shouldConcatenate"> true if should concatenate, default is false. </param>
         ///
-        /// <returns> :Pointer to the new block. </returns>
+        /// <returns> Pointer to the new block. </returns>
         llvm::BasicBlock* BeginBlock(const std::string& label, bool shouldConcatenate = false);
 
         /// <summary> Emit a new labeled code block. The "current" block does not change. </summary>
@@ -718,86 +718,77 @@ namespace emitters
         /// <param name="attribute"> The attribute </param>
         void SetAttributeForArguments(std::vector<size_t> indices, Attributes attribute);
 
-        /// <summary> Emit a stack variable. Can be optionally zero initialized. </summary>
+        /// <summary> Emit a stack variable. </summary>
         ///
         /// <param name="type"> The variable type. </param>
-        /// <param name="flags"> VariableFlags to be applied. Only `none` and `hasInitValue` are valid options. </param>
         ///
         /// <returns> Pointer to the resulting variable. </returns>
-        llvm::AllocaInst* Variable(VariableType type, Variable::VariableFlags flags = Variable::VariableFlags::none);
+        llvm::AllocaInst* Variable(VariableType type);
 
-        /// <summary> Emit a stack variable. Can be optionally zero initialized. </summary>
+        /// <summary> Emit a stack variable. </summary>
         ///
         /// <param name="type"> The variable type. </param>
-        /// <param name="flags"> VariableFlags to be applied. Only `none` and `hasInitValue` are valid options. </param>
         ///
         /// <returns> Pointer to the resulting variable. </returns>
-        llvm::AllocaInst* Variable(LLVMType type, Variable::VariableFlags flags = Variable::VariableFlags::none);
+        llvm::AllocaInst* Variable(LLVMType type);
 
-        /// <summary> Emit a named stack variable. Can be optionally zero initialized. </summary>
+        /// <summary> Emit a named stack variable. </summary>
         ///
         /// <param name="type"> The variable type. </param>
         /// <param name="namePrefix"> The variable name prefix. If more than one variable share the prefix, they will be uniqued by appending a unique index. </param>
-        /// <param name="flags"> VariableFlags to be applied. Only `none` and `hasInitValue` are valid options. </param>
         ///
         /// <returns> Pointer to the resulting variable. </returns>
-        llvm::AllocaInst* Variable(VariableType type, const std::string& namePrefix, Variable::VariableFlags flags = Variable::VariableFlags::none);
+        llvm::AllocaInst* Variable(VariableType type, const std::string& namePrefix);
 
-        /// <summary> Emit a named stack variable. Can be optionally zero initialized. </summary>
+        /// <summary> Emit a named stack variable. </summary>
         ///
         /// <param name="type"> The variable type. </param>
         /// <param name="namePrefix"> The variable name prefix. If more than one variable share the prefix, they will be uniqued by appending a unique index. </param>
-        /// <param name="flags"> VariableFlags to be applied. Only `none` and `hasInitValue` are valid options. </param>
         ///
         /// <returns> Pointer to the resulting variable. </returns>
-        llvm::AllocaInst* Variable(LLVMType type, const std::string& namePrefix, Variable::VariableFlags flags = Variable::VariableFlags::none);
+        llvm::AllocaInst* Variable(LLVMType type, const std::string& namePrefix);
 
-        /// <summary> Emit a stack array of the given size. Can be optionally zero initialized. </summary>
+        /// <summary> Emit a stack array of the given size. </summary>
         ///
         /// <param name="type"> The array entry type. </param>
         /// <param name="size"> The array size. </param>
-        /// <param name="flags"> VariableFlags to be applied. Only `none` and `hasInitValue` are valid options. </param>
         ///
         /// <returns> Pointer to the array. </returns>
-        llvm::AllocaInst* Variable(VariableType type, int size, Variable::VariableFlags flags = Variable::VariableFlags::none);
+        llvm::AllocaInst* Variable(VariableType type, int size);
 
-        /// <summary> Emit a 2D stack array of the given dimensions. Can be optionally zero initialized. </summary>
+        /// <summary> Emit a 2D stack array of the given dimensions. </summary>
         ///
         /// <param name="type"> The array entry type. </param>
         /// <param name="rows"> The number of rows in the array. </param>
         /// <param name="columns"> The number of columns in the array. </param>
-        /// <param name="flags"> VariableFlags to be applied. Only `none` and `hasInitValue` are valid options. </param>
         ///
         /// <returns> Pointer to the array. </returns>
-        llvm::AllocaInst* Variable(VariableType type, int rows, int columns, Variable::VariableFlags flags = Variable::VariableFlags::none);
+        llvm::AllocaInst* Variable(VariableType type, int rows, int columns);
 
-        /// <summary> Emit a stack array of the given size. Can be optionally zero initialized. </summary>
+        /// <summary> Emit a stack array of the given size. </summary>
         ///
         /// <param name="type"> The array entry type. </param>
         /// <param name="size"> The array size. </param>
-        /// <param name="flags"> VariableFlags to be applied. Only `none` and `hasInitValue` are valid options. </param>
         ///
         /// <returns> Pointer to the array. </returns>
-        llvm::AllocaInst* Variable(LLVMType type, int size, Variable::VariableFlags flags = Variable::VariableFlags::none);
+        llvm::AllocaInst* Variable(LLVMType type, int size);
 
-        /// <summary> Emit a 2D stack array of the given dimensions. Can be optionally zero initialized. </summary>
+        /// <summary> Emit a 2D stack array of the given dimensions. </summary>
         ///
         /// <param name="type"> The array entry type. </param>
         /// <param name="rows"> The number of rows in the array. </param>
         /// <param name="columns"> The number of columns in the array. </param>
-        /// <param name="flags"> VariableFlags to be applied. Only `none` and `hasInitValue` are valid options. </param>
         ///
         /// <returns> Pointer to the array. </returns>
-        llvm::AllocaInst* Variable(LLVMType type, int rows, int columns, Variable::VariableFlags flags = Variable::VariableFlags::none);
+        llvm::AllocaInst* Variable(LLVMType type, int rows, int columns);
 
-        /// <summary> Return an emitted stack variable and assign it a name. Can be optionally zero initialized. </summary>
+        /// <summary> Return an emitted stack variable and assign it a name. </summary>
         ///
         /// <param name="type"> The variable type. </param>
         /// <param name="size"> The variable name. </param>
-        /// <param name="flags"> VariableFlags to be applied. Only `none` and `hasInitValue` are valid options. </param>
         ///
         /// <returns> Pointer to the emitted variable. </returns>
-        llvm::AllocaInst* EmittedVariable(VariableType type, const std::string& name, Variable::VariableFlags flags = Variable::VariableFlags::none);
+        llvm::AllocaInst* EmittedVariable(VariableType type, const std::string& name);
 
         ///
         /// Load and Store
@@ -1722,11 +1713,13 @@ namespace emitters
         {
         public:
             EntryBlockScope(IRFunctionEmitter& function);
+            void ExitScope();
             ~EntryBlockScope();
 
         private:
             IRFunctionEmitter& _function;
             llvm::IRBuilder<>::InsertPoint _oldPos;
+            bool _inScope = true;
         };
 
         LLVMValue PtrOffsetA(LLVMValue pPointer, int offset);

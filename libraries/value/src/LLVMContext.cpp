@@ -558,12 +558,11 @@ namespace value
         auto& fn = GetFunctionEmitter();
         auto& irEmitter = fn.GetEmitter();
 
-        auto int8Type = llvm::Type::getInt8Ty(fn.GetLLVMContext());
         auto llvmType = ValueTypeToLLVMType(irEmitter, { type, 0 });
         assert(!llvmType->isPointerTy());
-        auto allocatedVariable = fn.Variable(llvmType, layout.GetMemorySize(), Variable::VariableFlags::hasInitValue);
+        auto allocatedVariable = fn.Variable(llvmType, layout.GetMemorySize());
+        fn.StoreZero(allocatedVariable, layout.GetMemorySize());
 
-        irEmitter.MemorySet(allocatedVariable, irEmitter.Zero(int8Type), irEmitter.Literal(static_cast<int64_t>(layout.GetMemorySize() * irEmitter.SizeOf(llvmType))));
         return { Emittable{ allocatedVariable }, layout };
     }
 
@@ -911,7 +910,7 @@ namespace value
 
         auto llvmType = ValueTypeToLLVMType(irEmitter, { source.GetBaseType(), source.PointerLevel() });
         assert(llvmType->isPointerTy());
-        auto allocatedVariable = fn.Variable(llvmType, 1, Variable::VariableFlags::hasInitValue);
+        auto allocatedVariable = fn.Variable(llvmType, 1);
 
         fn.SetValueAt(allocatedVariable, 0, llvmSourceValue);
         return { Emittable{ allocatedVariable }, source.GetLayout() };
@@ -934,7 +933,7 @@ namespace value
 
         auto newPointerLevel = source.PointerLevel() - 1;
         auto llvmType = ValueTypeToLLVMType(irEmitter, { source.GetBaseType(), newPointerLevel });
-        auto allocatedVariable = fn.Variable(llvmType, 1, Variable::VariableFlags::hasInitValue);
+        auto allocatedVariable = fn.Variable(llvmType, 1);
 
         fn.SetValueAt(allocatedVariable, 0, llvmLoadedValue);
         return { Emittable{ fn.ValueAt(allocatedVariable) }, source.GetLayout() };

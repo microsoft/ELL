@@ -294,15 +294,15 @@ namespace emitters
     void IRProfiler::FixUpGetNumRegionsFunction()
     {
         assert(_getNumRegionsFunction != nullptr);
-        assert(&(_getNumRegionsFunction->front()) == &(_getNumRegionsFunction->back()));
 
-        auto& entryBlock = _getNumRegionsFunction->getEntryBlock();
-        auto oldReturnInstr = entryBlock.getTerminator();
+        auto& exitBlock = _getNumRegionsFunction->back();
+        auto oldReturnInstr = exitBlock.getTerminator();
         auto& emitter = _module->GetIREmitter();
 
         // save old insert point
         auto oldInsertPoint = emitter.GetCurrentInsertPoint();
-        emitter.SetCurrentBlock(&entryBlock);
+        emitter.SetCurrentBlock(&exitBlock);
+        
         // add new return instruction
         emitter.Return(emitter.Literal(_regionCount));
 
@@ -331,13 +331,13 @@ namespace emitters
     {
         assert(_getRegionBufferFunction != nullptr);
 
-        auto& entryBlock = _getRegionBufferFunction->getEntryBlock();
-        auto oldReturnInstr = entryBlock.getTerminator();
+        auto& exitBlock = _getRegionBufferFunction->back();
+        auto oldReturnInstr = exitBlock.getTerminator();
         auto& emitter = _module->GetIREmitter();
 
         // save old insert point
         auto oldInsertPoint = emitter.GetCurrentInsertPoint();
-        emitter.SetCurrentBlock(&entryBlock);
+        emitter.SetCurrentBlock(&exitBlock);
 
         // add new return instruction
         auto returnType = _profileRegionType->getPointerTo();

@@ -24,7 +24,6 @@ void TestIR()
 {
     // From IREmitterTest.h
     TestIREmitter();
-    TestStringCompareFunction();
 
     TestEmitLLVM();
     TestLLVMShiftRegister();
@@ -59,6 +58,8 @@ void TestIRFunction()
 {
     TestIRAddFunction();
     TestCompilableFunction();
+    TestStringCompareFunction();
+    TestAllocaPlacement();
 }
 
 void TestAsyncEmitter()

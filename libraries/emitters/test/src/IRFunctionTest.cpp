@@ -143,3 +143,75 @@ void TestStringCompareFunction()
                          testing::IsEqual(u, 0) && testing::IsEqual(v, 0) && testing::IsEqual(x, 0) && testing::IsEqual(y, 0) &&
                              testing::IsEqual(z, 1));
 }
+
+void TestAllocaPlacement()
+{
+    CompilerOptions options;
+    IRModuleEmitter module("TestAllocasInEntryBlock", options);
+
+    NamedVariableTypeList args;
+    args.push_back({ "x", VariableType::Double });
+    args.push_back({ "y", VariableType::Double });
+    auto function = module.BeginFunction("test", VariableType::Double, args);
+
+    // Get args
+    IRLocalScalar x = function.LocalScalar(function.GetFunctionArgument("x"));
+    IRLocalScalar y = function.LocalScalar(function.GetFunctionArgument("y"));
+
+    // Compute a value
+    auto result = x + y;
+
+    // Create a local variable (alloca)
+    auto resultVar = function.Variable(VariableType::Double);
+    function.Store(resultVar, result);
+
+    function.For(10, [&](IRFunctionEmitter& function, IRLocalScalar i) {
+        // Create a new local variable
+        auto temp = function.Variable(VariableType::Int32);
+        function.Store(temp, 2 * i);
+    });
+
+    auto temp2 = function.Variable(VariableType::Double);
+    function.Store(temp2, function.Literal<double>(0.0));
+
+    function.Return(result);
+    module.EndFunction();
+
+    bool ok = true;
+    bool firstBlock = true;
+    for (auto& bb : *function.GetFunction())
+    {
+        if (firstBlock)
+        {
+            bool foundNonAlloca = false;
+            // check that the only allocas in this block are at the very beginning
+            for (auto& inst : bb)
+            {
+                if (llvm::isa<llvm::AllocaInst>(inst))
+                {
+                    if (foundNonAlloca)
+                    {
+                        ok = false;
+                    }
+                }
+                else
+                {
+                    foundNonAlloca = true;
+                }
+            }
+            firstBlock = false;
+        }
+        else
+        {
+            // check that there are no allocas in this block at all
+            for (auto& inst : bb)
+            {
+                if (llvm::isa<llvm::AllocaInst>(inst))
+                {
+                    ok = false;
+                }
+            }
+        }
+    }
+    testing::ProcessTest("Testing alloca placement", ok);
+}

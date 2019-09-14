@@ -496,12 +496,12 @@ std::vector<std::vector<bool>> GetExpectedUnaryOperationOutput(std::vector<std::
     return result;
 }
 
-template<typename ElementType>
+template <typename ElementType>
 class Buffer
 {
 public:
-    Buffer(size_t size)
-        : _buffer(size)
+    Buffer(size_t size) :
+        _buffer(size)
     {
     }
     std::vector<ElementType>& Compute(std::vector<ElementType> input)
@@ -518,15 +518,16 @@ public:
             std::copy_n(_buffer.begin() + inputSize, offset, _buffer.begin());
         }
 
-        // Copy input to right hand side of the buffer        
+        // Copy input to right hand side of the buffer
         std::copy_n(input.begin(), inputSize, _buffer.begin() + offset);
         return _buffer;
     }
+
 private:
     std::vector<ElementType> _buffer;
 };
 
-template<typename ElementType>
+template <typename ElementType>
 void TestBufferNode()
 {
     model::Model model;
@@ -566,7 +567,6 @@ template void TestBufferNode<float>();
 template void TestBufferNode<double>();
 template void TestBufferNode<int>();
 template void TestBufferNode<int64_t>();
-
 
 void TestCompilableUnaryOperationNode()
 {
@@ -1352,7 +1352,7 @@ void TestCompilableSourceNode()
         model::IRMapCompiler compiler(settings, optimizerOptions);
         auto compiledMap = compiler.Compile(map);
         bool exception = false;
-        try 
+        try
         {
             compiledMap.SetContext(&context);
         }
@@ -1383,6 +1383,11 @@ extern "C" {
 void TestSinkNode_CompiledSinkNode_OutputCallback(void* context, double* output, int size)
 {
     CallbackContext* cc = static_cast<CallbackContext*>(context);
+    if (!cc)
+    {
+        throw utilities::InputException(utilities::InputExceptionErrors::nullReference);
+    }
+
     cc->called = true;
     Log() << "Sink Output Callback (size=" << size << ") " << *output << EOL;
     testing::ProcessTest("Callback size is correct", size == static_cast<int>(cc->inputSize));

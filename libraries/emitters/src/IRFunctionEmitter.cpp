@@ -166,6 +166,7 @@ namespace emitters
 
     void IRFunctionEmitter::CompleteFunction()
     {
+        Log() << "Completing function " << GetFunctionName() << EOL;
         Verify();
     }
 
@@ -177,6 +178,10 @@ namespace emitters
         AddRegion(pBlock);
         GetEmitter().SetCurrentBlock(pBlock); // if/when we get our own IREmitter, this statefulness won't be so objectionable
         _entryBlock = pBlock;
+
+        // Now create the first code block
+        auto bodyBlock = BeginBlock("body", true);
+        AddRegion(bodyBlock);
     }
 
     IRLocalPointer IRFunctionEmitter::LocalPointer(LLVMValue value)
@@ -592,9 +597,9 @@ namespace emitters
     void IRFunctionEmitter::ConcatenateBlocks(std::vector<llvm::BasicBlock*> blocks)
     {
         llvm::BasicBlock* previousBlock = nullptr;
-        for (auto ptr = blocks.begin(), end = blocks.end(); ptr != end; ptr++)
+        for (auto ptr : blocks)
         {
-            llvm::BasicBlock* nextBlock = *ptr;
+            llvm::BasicBlock* nextBlock = ptr;
             if (previousBlock != nullptr)
             {
                 ConcatenateBlocks(previousBlock, nextBlock);
@@ -605,6 +610,8 @@ namespace emitters
 
     void IRFunctionEmitter::ConcatenateBlocks(llvm::BasicBlock* pTopBlock, llvm::BasicBlock* pBottomBlock)
     {
+        Log() << "Concatenating blocks " << std::string(pTopBlock->getName()) << " and " << std::string(pBottomBlock->getName()) << EOL;
+
         assert(pTopBlock != nullptr && pBottomBlock != nullptr);
 
         pBottomBlock->removeFromParent();
@@ -641,7 +648,6 @@ namespace emitters
         // using utilities::logging::Log;
         assert(pTop != nullptr && pBottom != nullptr);
 
-        Log() << "Concatenating block regions";
         if (moveBlocks)
         {
             Log() << " and placing them together";
@@ -652,6 +658,7 @@ namespace emitters
         auto pPrevCurBlock = SetCurrentBlock(pTop->End());
         {
             DeleteTerminatingBranch();
+
             Branch(pBottom->Start());
             pTop->SetEnd(pBottom->End());
             pBottom->IsTopLevel() = false;
@@ -678,6 +685,7 @@ namespace emitters
 
     void IRFunctionEmitter::ConcatRegions()
     {
+        Log() << "ConcatRegions()" << EOL;
         ConcatRegions(_regions);
     }
 
@@ -698,13 +706,23 @@ namespace emitters
         }
         else
         {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState, "Entry block has no terminator");
             function.SetCurrentBlock(entryBlock);
+        }
+    }
+
+    void IRFunctionEmitter::EntryBlockScope::ExitScope()
+    {
+        if (_inScope)
+        {
+            _function.SetCurrentInsertPoint(_oldPos);
+            _inScope = false;
         }
     }
 
     IRFunctionEmitter::EntryBlockScope::~EntryBlockScope()
     {
-        _function.SetCurrentInsertPoint(_oldPos);
+        ExitScope();
     }
 
     void IRFunctionEmitter::SetAttributeForArgument(size_t index, IRFunctionEmitter::Attributes attribute)
@@ -728,109 +746,91 @@ namespace emitters
         }
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, Variable::VariableFlags flags)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type)
     {
         EntryBlockScope scope(*this);
         auto alloca = GetEmitter().StackAllocate(type);
-        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
-        {
-            StoreZero(alloca, 1);
-        }
-        return alloca;
+        scope.ExitScope();
+
+       return alloca;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, Variable::VariableFlags flags)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type)
     {
         EntryBlockScope scope(*this);
         auto alloca = GetEmitter().StackAllocate(type);
-        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
-        {
-            StoreZero(alloca, 1);
-        }
+        scope.ExitScope();
+
         return alloca;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, const std::string& namePrefix, Variable::VariableFlags flags)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, const std::string& namePrefix)
     {
         EntryBlockScope scope(*this);
 
         // don't do this for emitted variables!
         auto name = _locals.GetUniqueName(namePrefix);
         auto result = GetEmitter().StackAllocate(type, name);
-        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
-        {
-            StoreZero(result, 1);
-        }
+        scope.ExitScope();
+
         _locals.Add(name, result);
         return result;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, const std::string& namePrefix, Variable::VariableFlags flags)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, const std::string& namePrefix)
     {
         EntryBlockScope scope(*this);
         auto name = _locals.GetUniqueName(namePrefix);
         auto result = GetEmitter().StackAllocate(type, name);
-        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
-        {
-            StoreZero(result, 1);
-        }
+        scope.ExitScope();
+
         _locals.Add(name, result);
         return result;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::EmittedVariable(VariableType type, const std::string& name, Variable::VariableFlags flags)
+    llvm::AllocaInst* IRFunctionEmitter::EmittedVariable(VariableType type, const std::string& name)
     {
         EntryBlockScope scope(*this);
         auto result = GetEmitter().StackAllocate(type, name);
-        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
-        {
-            StoreZero(result, 1);
-        }
+        scope.ExitScope();
+
         _locals.Add(name, result);
         return result;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, int size, Variable::VariableFlags flags)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, int size)
     {
         EntryBlockScope scope(*this);
         auto alloca = GetEmitter().StackAllocate(type, size);
-        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
-        {
-            StoreZero(alloca, size);
-        }
+        scope.ExitScope();
+
         return alloca;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, int rows, int columns, Variable::VariableFlags flags)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(VariableType type, int rows, int columns)
     {
         EntryBlockScope scope(*this);
         auto alloca = GetEmitter().StackAllocate(type, rows, columns);
-        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
-        {
-            StoreZero(alloca, rows * columns);
-        }
+        scope.ExitScope();
+
         return alloca;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, int size, Variable::VariableFlags flags)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, int size)
     {
         EntryBlockScope scope(*this);
         auto alloca = GetEmitter().StackAllocate(type, size);
-        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
-        {
-            StoreZero(alloca, size);
-        }
+        scope.ExitScope();
+
         return alloca;
     }
 
-    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, int rows, int columns, Variable::VariableFlags flags)
+    llvm::AllocaInst* IRFunctionEmitter::Variable(LLVMType type, int rows, int columns)
     {
         EntryBlockScope scope(*this);
         auto alloca = GetEmitter().StackAllocate(type, rows, columns);
-        if (static_cast<int>(flags) & static_cast<int>(Variable::VariableFlags::hasInitValue))
-        {
-            StoreZero(alloca, rows * columns);
-        }
+        scope.ExitScope();
+
         return alloca;
     }
 
@@ -874,8 +874,7 @@ namespace emitters
 
         auto int8Type = llvm::Type::getInt8Ty(GetLLVMContext());
         auto& irEmitter = GetEmitter();
-        irEmitter.MemorySet(pPointer, irEmitter.Zero(int8Type),
-            irEmitter.Literal(static_cast<int64_t>(numElements * irEmitter.SizeOf(type))));
+        irEmitter.MemorySet(pPointer, irEmitter.Zero(int8Type), irEmitter.Literal(static_cast<int64_t>(numElements * irEmitter.SizeOf(type))));
 
         return pPointer;
     }
@@ -1822,7 +1821,6 @@ namespace emitters
             ++argumentsIterator;
         }
     }
-
 
     void IRFunctionEmitter::RegisterFunctionArgs(const NamedLLVMTypeList& args)
     {

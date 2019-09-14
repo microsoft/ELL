@@ -766,13 +766,21 @@ namespace model
     void IRMapCompiler::NewNodeRegion(const Node& node)
     {
         auto& currentFunction = GetModule().GetCurrentFunction();
-        auto pBlock = currentFunction.Block(IdString(node));
+        
+        auto currentBlock = currentFunction.GetCurrentBlock();
+        auto termInst = currentBlock->getTerminator();
+
+        if (termInst == nullptr)
+        {
+            Log() << "Prev block had no terminator!" << EOL;
+        }
+        
+        // Create a new block
+        auto pBlock = currentFunction.BeginBlock(IdString(node), true);
         assert(pBlock != nullptr && "Got null new block");
-        currentFunction.SetCurrentBlock(pBlock);
         auto currentRegion = currentFunction.AddRegion(pBlock);
 
         Log() << "Created region for node: " << DiagnosticString(node) << EOL;
-
         GetCurrentNodeBlocks().Set(node, currentRegion);
 
         if (GetMapCompilerOptions().compilerSettings.includeDiagnosticInfo)

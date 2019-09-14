@@ -10,3 +10,4 @@
 void TestIRAddFunction();
 void TestCompilableFunction();
 void TestStringCompareFunction();
+void TestAllocaPlacement();

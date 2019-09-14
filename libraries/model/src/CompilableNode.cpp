@@ -42,8 +42,8 @@ namespace model
         auto& enclosingFunction = moduleEmitter.GetCurrentFunction();
         if (ShouldCompileInline() || compiler.GetMapCompilerOptions(*this).inlineNodes)
         {
-            Log() << "Inlining node " << DiagnosticString(*this) << " into function " << enclosingFunction.GetFunctionName() << EOL;
-
+            Log() << "Inlining node " << DiagnosticString(*this) << " into function " << enclosingFunction.GetFunctionName() << ", currently in block " << enclosingFunction.GetCurrentBlock()->getName().str() << EOL;
+            
             irCompiler->NewNodeRegion(*this);
             auto oldOptions = enclosingFunction.GetCompilerOptions();
             enclosingFunction.SetCompilerOptions(compiler.GetMapCompilerOptions(*this).compilerSettings);
