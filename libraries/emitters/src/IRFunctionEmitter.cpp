@@ -871,10 +871,16 @@ namespace emitters
         }
 
         auto type = llvm::cast<llvm::PointerType>(pPointer->getType())->getElementType();
-
-        auto int8Type = llvm::Type::getInt8Ty(GetLLVMContext());
-        auto& irEmitter = GetEmitter();
-        irEmitter.MemorySet(pPointer, irEmitter.Zero(int8Type), irEmitter.Literal(static_cast<int64_t>(numElements * irEmitter.SizeOf(type))));
+        if (auto& irEmitter = GetEmitter(); numElements == 1)
+        {
+            auto zero = irEmitter.Zero(type);
+            Store(pPointer, zero);
+        }
+        else
+        {
+            auto int8Type = llvm::Type::getInt8Ty(GetLLVMContext());
+            irEmitter.MemorySet(pPointer, irEmitter.Zero(int8Type), irEmitter.Literal(static_cast<int64_t>(numElements * irEmitter.SizeOf(type))));
+        }
 
         return pPointer;
     }
