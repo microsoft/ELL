@@ -1,3 +1,6 @@
+## 3.0.3
+- Fix VS 2019 build.
+
 ## 3.0.2
 - Add FastGRNN node to ELL, train_classifier.py and the onnx_importer.
 

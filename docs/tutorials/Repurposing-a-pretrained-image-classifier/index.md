@@ -225,7 +225,7 @@ To finish creating the Python wrapper, build the CMake project.
 
 ```shell
 [Linux/macOS] cmake .. -DCMAKE_BUILD_TYPE=Release && make && cd ../..
-[Windows] cmake -G "Visual Studio 15 2017 Win64" -Thost=x64 .. && cmake --build . --config release && cd ..\..
+[Windows] cmake -G "Visual Studio 16 2019" -A x64 .. && cmake --build . --config release && cd ..\..
 ```
 
 You have just created a Python module named **model**.  This module provides functions that report the shapes of the model's input and output as well as the **predict** function, which invokes a compiled and optimized version of the retargeted model you created earlier.

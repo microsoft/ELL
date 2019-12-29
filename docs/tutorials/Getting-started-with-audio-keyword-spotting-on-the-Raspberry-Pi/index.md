@@ -122,7 +122,7 @@ You can now build these using a build script:
 mkdir build
 cd build
 [Linux/macOS] cmake .. -DCMAKE_BUILD_TYPE=Release && make && cd ../..
-[Windows] cmake -G "Visual Studio 15 2017 Win64" -Thost=x64 .. && cmake --build . --config Release && cd ..\..
+[Windows] cmake -G "Visual Studio 16 2019" -A x64 .. && cmake --build . --config Release && cd ..\..
 ```
 
 Run this script on both the compiled_featurizer and compiled_classifier folders.

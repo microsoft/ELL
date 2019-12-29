@@ -12,14 +12,14 @@ git clone https://github.com/Microsoft/ELL.git
 
 ### Visual Studio
 
-ELL requires a C++ compiler. On Windows, you can use *Visual Studio 2017 with C++ Desktop Development Workload*. A free version of Visual Studio 2017 is available at <https://www.visualstudio.com/vs/community/> (make sure to select *Desktop Development with C++* during installation).
+ELL requires a C++ compiler. On Windows, you can use *Visual Studio 2019 with C++ Desktop Development Workload*. A free version of Visual Studio 2019 is available at <https://www.visualstudio.com/vs/community/> (make sure to select *Desktop Development with C++* during installation).
 
 ### CMake 3.12
 
-ELL uses the [*CMake*](https://cmake.org/) build system and requires version 3.12 or newer. A version of CMake that satisfies this requirement is already provided with Visual Studio 2017. You can find it if you
+ELL uses the [*CMake*](https://cmake.org/) build system and requires version 3.15 or newer. A version of CMake that satisfies this requirement is already provided with Visual Studio 2019. You can find it if you
 use the "Developer Command Prompt' that is installed by Visual Studio.  It lives here:
 ```
-c:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Preview\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe
 ```
 You may also download new versions of cmake from <https://cmake.org/download/> if you want to.
 
@@ -66,6 +66,14 @@ You need to repeat this activation command each time you open a new terminal and
 conda install -c conda-forge opencv
 ```
 
+In order to run the Python based ELL unit tests you will also need to install the following:
+
+```shell
+conda install pytorch torchvision cudatoolkit=10.1 -c pytorch
+conda install -c conda-forge onnx
+pip install -r requirements.txt
+```
+
 Miniconda comes with useful command line tools such as `curl`, which is used to transfer data via URL. When files are required to be downloaded from a URL, the instructions assume you have `curl` available to perform the download. Ensure you activate your conda environment before running commands like `curl`.
 
 ## Building ELL
@@ -82,7 +90,7 @@ cd build
 Invoke CMake as follows
 
 ```shell
-cmake -G "Visual Studio 15 2017 Win64" -T host=x64 -D ONNX=ON ..
+cmake -G "Visual Studio 16 2019" -A x64 -T host=x64 -D ONNX=ON ..
 ```
 Don't forget the two dots (..) at the end of the command! This command creates a Visual Studio solution file named `ELL.sln`, and the associated project files in the `build` directory.
 

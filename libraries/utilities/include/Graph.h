@@ -32,7 +32,7 @@ namespace utilities
     public:
         /// <summary> This method is how you add nodes to the graph. </summary>
         /// <param name="id"> Each node in the graph must have a unique id, try and use valid programming identifiers to make serialization easier. </param>
-        /// <param name="label"> Each node cna have a display label. </param>
+        /// <param name="label"> Each node can have a display label. </param>
         GraphNode& GetOrCreateNode(const std::string& id, const std::string& label);
 
         /// <summary> This method is how you add links to the graph. </summary>
@@ -46,8 +46,8 @@ namespace utilities
         /// <returns> The node with given id or nullptr if node is not defined in this graph. </returns>
         GraphNode* GetNode(const std::string& id);
 
-        /// <summary> DGML graphs can also contain groups of nodes.  You build a group by adding links from this group node to it's children
-        /// with links that have the category 'contains'. </summary>
+        /// <summary> Graphs can also contain groups of nodes.  You build a group by adding links from this group node to it's children
+        /// with links that have the category 'Contains'. </summary>
         GraphNode& GetOrCreateGroup(const std::string& id, const std::string& label);
 
         /// <summary> Serialize the graph in DOT Language format. </summary>
@@ -125,7 +125,6 @@ namespace utilities
 
     public:
         GraphLink();
-        GraphLink(GraphLink&& other);
         GraphLink(const GraphLink& other) = default;
         GraphLink& operator=(GraphLink& other) = default;
 

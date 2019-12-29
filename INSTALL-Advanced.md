@@ -14,7 +14,7 @@ git clone https://github.com/xianyi/OpenBLAS
 cd OpenBLAS
 mkdir build
 cd build
-cmake -G "Visual Studio 15 2017 Win64" -Thost=x64 ..
+cmake -G "Visual Studio 16 2019" -A x64 ..
 cmake --build . --config Release
 ```
 Then from an `Administrator` command prompt run the following install comamnd, from the above build folder:
@@ -73,12 +73,12 @@ Advanced users can compile OpenCV with CUDA support. To do so, clone the OpenCV 
     mkdir build
     cd build
 
-    set PYTHON3_EXECUTABLE=d:\Continuum\Anaconda2.7\envs\py35\python.exe
-    set PYTHON3_INCLUDE_DIR=d:\Continuum\Anaconda2.7\envs\py35\include
-    set PYTHON3_LIBRARY=d:\Continuum\Anaconda2.7\envs\py35\libs\python35.lib
-    set PYTHON3_NUMPY_INCLUDE_DIRS=d:\Continuum\Anaconda2.7\envs\py35\lib\site-packages\numpy\core\include
-    set PYTHON3_PACKAGES_PATH=d:\Continuum\Anaconda2.7\envs\py35\lib\site-packages
+    set PYTHON3_EXECUTABLE=%LOCALAPPDATA%\Continuum\miniconda3\envs\py36\python.exe
+    set PYTHON3_INCLUDE_DIR=%LOCALAPPDATA%\Continuum\miniconda3\envs\py36\include
+    set PYTHON3_LIBRARY=%LOCALAPPDATA%\Continuum\miniconda3\envs\py36\libs\python35.lib
+    set PYTHON3_NUMPY_INCLUDE_DIRS=%LOCALAPPDATA%\Continuum\miniconda3\envs\py36\lib\site-packages\numpy\core\include
+    set PYTHON3_PACKAGES_PATH=%LOCALAPPDATA%\Continuum\miniconda3\envs\py36\lib\site-packages
 
-    cmake  -G "Visual Studio 15 2017 Win64" -Thost=x64 -D CMAKE_BUILD_TYPE=Release -D WITH_CUDA=1  -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF ..
+    cmake -G "Visual Studio 16 2019" -A x64 .. -D CMAKE_BUILD_TYPE=Release -D WITH_CUDA=1  -D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF ..
     if ERRORLEVEL 1 goto :eof
     cmake --build . --config Release

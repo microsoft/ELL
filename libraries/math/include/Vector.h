@@ -11,6 +11,7 @@
 #include <utilities/include/IArchivable.h>
 #include <utilities/include/StlStridedIterator.h>
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <vector>
