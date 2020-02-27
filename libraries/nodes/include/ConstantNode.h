@@ -260,7 +260,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename ModelLikeType>
-    const model::OutputPort<ValueType>& Constant(ModelLikeType& model, const std::vector<ValueType>& values, const model::MemoryShape& shape)
+    const model::OutputPort<ValueType>& Constant(ModelLikeType& model, const std::vector<ValueType>& values, const ell::model::MemoryShape& shape)
     {
         static_assert(utilities::IsOneOf<ModelLikeType, model::Model, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
         auto node = model.template AddNode<ConstantNode<ValueType>>(values, shape);
@@ -268,7 +268,7 @@ namespace nodes
     }
 
     template <typename ValueType, typename ModelLikeType>
-    const model::OutputPort<ValueType>& Constant(ModelLikeType& model, const std::vector<ValueType>& values, const model::PortMemoryLayout& layout)
+    const model::OutputPort<ValueType>& Constant(ModelLikeType& model, const std::vector<ValueType>& values, const ell::model::PortMemoryLayout& layout)
     {
         static_assert(utilities::IsOneOf<ModelLikeType, model::Model, model::ModelTransformer>, "'model' parameter must be a model::Model or model::ModelTransformer");
         auto node = model.template AddNode<ConstantNode<ValueType>>(values, layout);
