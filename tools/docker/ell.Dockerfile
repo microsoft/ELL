@@ -6,7 +6,15 @@
 FROM ell-dependencies
 
 RUN conda create -n py36 numpy python=3.6
-RUN activate py36
+RUN conda activate py36
+
+# Install pyaudio for ELL audio tutorials
+RUN sudo apt-get install -y portaudio19-dev
+RUN sudo apt-get install -y python3-pyaudio
+RUN pip install pyaudio
+
+# Install ONNX for import-onnx.py
+RUN pip install onnx
 
 ENV ELL_ROOT "/ELL"
 
@@ -21,9 +29,6 @@ RUN make _ELL_python
 # Add ELL's build/bin folder to the PATH
 ENV ELL_BUILD "/ELL/build/bin"
 ENV PATH "$PATH:$ELL_BUILD"
-
-# Install ONNX for import-onnx.py
-RUN pip install onnx
 
 # Install helpers for running command line scripts
 RUN pip install \
