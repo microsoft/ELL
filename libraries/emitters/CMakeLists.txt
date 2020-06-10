@@ -91,19 +91,58 @@ set (include
 
 set (templates
     templates/CppPredictWrapper.in
+    templates/LLVMEmitterTargets.h.in
     templates/SwigModule.in
     templates/SwigPredictPython.in
     templates/SwigShapeWrappers.in
 )
+
+# This is supposed to be overriden on the command line
+# As of LLVM 8.0.1, the possible values within the list are:
+# AArch64 AMDGPU ARM BPF Hexagon Lanai Mips MSP430 NVPTX PowerPC Sparc SystemZ
+# WebAssembly X86 XCore
+set(LLVM_EMITTER_TARGETS "X86;ARM" CACHE STRING "List of LLVM emitter targets to support. Default is \"X86;ARM\". Specify 'ALL' to support all targets")
+if(LLVM_EMITTER_TARGETS STREQUAL "ALL")
+  set(LLVM_EMITTER_TARGETS_FINAL ${LLVM_ALL_TARGETS})
+else()
+  set(LLVM_EMITTER_TARGETS_FINAL ${LLVM_EMITTER_TARGETS})
+endif()
+
+set(emitter_targets_content "")
+set(llvm_emitter_target_libs )
+foreach(LLVM_EMITTER_TARGET ${LLVM_EMITTER_TARGETS_FINAL})
+  if(NOT ${LLVM_EMITTER_TARGET} IN_LIST LLVM_ALL_TARGETS)
+    message(FATAL_ERROR "Unrecognized LLVM emitter target: ${LLVM_EMITTER_TARGET}.\n\nTargets must be one of: ${LLVM_ALL_TARGETS}")
+  endif()
+  set(emitter_targets_content "${emitter_targets_content}    EMITTER_TARGET_ACTION(${LLVM_EMITTER_TARGET}) \\\n")
+  set(llvm_emitter_target_libs
+    ${llvm_emitter_target_libs}
+    LLVM${LLVM_EMITTER_TARGET}CodeGen
+    LLVM${LLVM_EMITTER_TARGET}AsmParser
+    LLVM${LLVM_EMITTER_TARGET}Disassembler
+    LLVM${LLVM_EMITTER_TARGET}AsmPrinter
+    LLVM${LLVM_EMITTER_TARGET}Desc
+    LLVM${LLVM_EMITTER_TARGET}Info
+  )
+endforeach(LLVM_EMITTER_TARGET LLVM_EMITTER_TARGETS)
+configure_file(templates/LLVMEmitterTargets.h.in build/LLVMEmitterTargets.h @ONLY)
 
 source_group("src" FILES ${src})
 source_group("include" FILES ${include})
 source_group("templates" FILES ${templates})
 
 add_library(${library_name} ${src} ${include} ${templates})
-target_include_directories(${library_name} PRIVATE include templates ${ELL_LIBRARIES_DIR})
+target_include_directories(${library_name} PRIVATE ${CMAKE_CURRENT_BINARY_DIR} include templates ${ELL_LIBRARIES_DIR})
 target_include_directories(${library_name} SYSTEM PUBLIC ${LLVM_INCLUDE_DIRS})
-target_link_libraries(${library_name} math utilities ${LLVM_LIBS})
+target_link_libraries(
+  ${library_name}
+  math
+  utilities
+
+  LLVMMCJIT
+  ${llvm_emitter_target_libs}
+  LLVMipo
+)
 target_compile_options(${library_name} PUBLIC ${LLVM_COMPILE_OPTIONS})
 
 set_property(TARGET ${library_name} PROPERTY FOLDER "libraries")

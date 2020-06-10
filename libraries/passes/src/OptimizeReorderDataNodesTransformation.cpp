@@ -10,7 +10,7 @@
 
 #include <model/include/ModelTransformer.h>
 
-#include <nodes/include/ReorderDataNode.h>
+#include <nodes/include/ReorderDataCodeNode.h>
 
 #include <utilities/include/Exception.h>
 #include <utilities/include/Logger.h>
@@ -50,7 +50,7 @@ namespace passes
                 return true;
             }
 
-            if (auto reorderNode = dynamic_cast<const ReorderDataNode<ValueType>*>(&nodeToOptimize))
+            if (auto reorderNode = dynamic_cast<const ReorderDataCodeNode<ValueType>*>(&nodeToOptimize))
             {
                 const auto& node = *reorderNode;
 
@@ -71,9 +71,9 @@ namespace passes
                     while (currentNode != nullptr)
                     {
                         // iff we have one dependent node and it's a reorder node
-                        const ReorderDataNode<ValueType>* nextNode = nullptr;
+                        const ReorderDataCodeNode<ValueType>* nextNode = nullptr;
                         if (currentNode->GetDependentNodes().size() == 1 &&
-                            (nextNode = dynamic_cast<const ReorderDataNode<ValueType>*>(currentNode->GetDependentNodes()[0])))
+                            (nextNode = dynamic_cast<const ReorderDataCodeNode<ValueType>*>(currentNode->GetDependentNodes()[0])))
                         {
                             Log() << "Removing node ReorderDataNode [id = " << currentNode->GetId().ToString() << "] since it is followed by another ReorderDataNode" << EOL;
 
@@ -114,7 +114,7 @@ namespace passes
                     // otherwise, create a new reorder node and use the input to the chain and map its output to the
                     // final output of the chain
                     const auto& newInput = transformer.GetCorrespondingInputs(node.input);
-                    const auto& reorderedInput = nodes::ReorderData(newInput, inputLayout, outputLayout, node.GetPaddingValue());
+                    const auto& reorderedInput = nodes::ReorderDataWithCodeNode(newInput, inputLayout, outputLayout, node.GetPaddingValue());
                     transformer.MapNodeOutput(*finalOutputPort, reorderedInput);
 
                     Log() << "ReorderDataNode chain's input and output memory layout are different. Entire chain is being "

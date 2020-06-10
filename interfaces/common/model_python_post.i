@@ -8,6 +8,16 @@
 
 %pythoncode %{
 
+# Python friendly class for MatrixMatrixMultiplyImplementation
+class MatrixMatrixMultiplyImplementation:
+    SimpleForLoops = MatrixMatrixMultiplyImplementation_SimpleForLoops
+    Mlas_Loopnest_Value = MatrixMatrixMultiplyImplementation_Mlas_Loopnest_Value
+    ImplementationCount = MatrixMatrixMultiplyImplementation_ImplementationCount
+
+del MatrixMatrixMultiplyImplementation_SimpleForLoops
+del MatrixMatrixMultiplyImplementation_Mlas_Loopnest_Value
+del MatrixMatrixMultiplyImplementation_ImplementationCount
+
 # Python friendly class for PortType
 class PortType:
     bigInt = PortType_bigInt

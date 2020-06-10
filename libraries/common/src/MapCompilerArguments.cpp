@@ -191,6 +191,20 @@ namespace common
               { "true", utilities::Optional<bool>(true) },
               { "false", utilities::Optional<bool>(false) } },
             "auto");
+
+        parser.AddOption(
+            globalValueAlignment,
+            "globalValueAlignment",
+            "gva",
+            "The number of bytes to align global buffers to",
+            32);
+        
+        parser.AddOption(
+            skip_ellcode,
+            "skip_ellcode",
+            "skip_ellcode",
+            "To skip ELLCode",
+            false);
     }
 
     model::MapCompilerOptions MapCompilerArguments::GetMapCompilerOptions(const std::string& modelName) const
@@ -231,6 +245,8 @@ namespace common
         settings.profile = profile;
         settings.compilerSettings.profile = profile;
         settings.compilerSettings.positionIndependentCode = positionIndependentCode;
+        settings.compilerSettings.globalValueAlignment = globalValueAlignment;
+        settings.compilerSettings.skip_ellcode = skip_ellcode;
 
         if (target != "")
         {

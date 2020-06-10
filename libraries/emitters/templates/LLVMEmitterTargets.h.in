@@ -1,0 +1,16 @@
+// Auto-generated
+// The contents of this file are based on the CMake variable LLVM_EMITTER_TARGETS
+// Specified in libraries/emitters/CMakeLists.txt
+// The generated preprocessor define is part of an X-Macro (https://en.wikipedia.org/wiki/X_Macro)
+// The other part of the X-Macro relies on the definition of the macro EMITTER_TARGET_ACTION(TargetName)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     LLVMEmitterTargets.h (emitters)
+//  Authors:  Kern Handa
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define LLVM_EMITTER_TARGETS \
+@emitter_targets_content@

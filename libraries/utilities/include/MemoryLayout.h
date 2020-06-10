@@ -109,6 +109,8 @@ namespace utilities
         /// <summary> Element access operator. </summary>
         int operator[](int index) const;
 
+        std::string ToString() const;
+
     private:
         int& operator[](int index);
     };
@@ -159,6 +161,8 @@ namespace utilities
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "MemoryShape"; }
+
+        std::string ToString() const;
     };
 
     /// <summary> A vector of numbers representing an index into a multidimensional array. </summary>
@@ -195,6 +199,8 @@ namespace utilities
         ///
         /// <returns> The name of this type. </returns>
         static std::string GetTypeName() { return "MemoryCoordinates"; }
+
+        std::string ToString() const;
     };
 
     /// <summary> A class representing layout of a block of data in memory where the block can also
@@ -552,6 +558,8 @@ namespace utilities
         /// <summary> If the layout is contiguous, return a new layout that interprets this block as 
         /// a simple one dimensional vector, otherwise throws an exception. </summary>
         MemoryLayout Flatten() const;
+
+        std::string ToString() const;
 
     protected:
         size_t GetDataOffset() const; // offset for physical entry {0,0,0...}

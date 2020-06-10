@@ -17,6 +17,7 @@ std::vector<void*> GetOutputBuffersFromList(std::shared_ptr<ell::model::Map> map
 #endif // SWIGPYTHON
 
 #include "Ports.h"
+#include "MatrixMatrixMultiplyImplementation.h"
 #include "ModelInterface.h"
 #include "ModelBuilderInterface.h"
 
@@ -33,6 +34,7 @@ std::vector<void*> GetOutputBuffersFromList(std::shared_ptr<ell::model::Map> map
 
 // Include the C++ code to be wrapped
 %include "Ports.h"
+%include "MatrixMatrixMultiplyImplementation.h"
 %include "ModelInterface.h"
 %include "ModelBuilderInterface.h"
 %include "macros.i"

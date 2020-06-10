@@ -161,10 +161,12 @@ namespace emitters
         // GetPthreadAttrType
         // GetPthreadOnceType
 
+        IRPosixRuntime(const IRPosixRuntime&) = delete;
+
     private:
         friend IRModuleEmitter;
         friend IRRuntime;
-        IRPosixRuntime(IRModuleEmitter& module);
+        explicit IRPosixRuntime(IRModuleEmitter& module);
 
         LLVMType GetIntType(); // returns LLVM type for native `int`
         LLVMType GetPointerSizedIntType(); // returns LLVM type for an int the size of a pointer

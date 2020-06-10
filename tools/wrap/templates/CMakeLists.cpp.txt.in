@@ -33,12 +33,12 @@ if(WIN32)
     # path to the OpenBLAS Nuget
     set(PACKAGE_ROOT "@ELL_ROOT@")
 endif()
+
 include(OpenBLASSetup.cmake)
 
 add_library(${target_name} STATIC IMPORTED GLOBAL)
 
+
 set_property(TARGET ${target_name} APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_SOURCE_DIR}/include")
 set_target_properties(${target_name} PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/@ELL_model@.@OBJECT_EXTENSION@)
-if(BLAS_LIBS)
-    target_link_libraries(${target_name} INTERFACE ${BLAS_LIBS})
-endif()
+target_link_libraries(${target_name} INTERFACE ${BLAS_LIBS})

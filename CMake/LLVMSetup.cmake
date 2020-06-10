@@ -66,7 +66,4 @@ foreach(DEFINITION ${LLVM_DEFINITIONS})
     add_definitions(${DEFINITION})
 endforeach()
 
-set(LLVM_LIBS ${LLVM_AVAILABLE_LIBS})
-list(FILTER LLVM_LIBS INCLUDE REGEX "LLVM.+")
-
 set_property(TARGET intrinsics_gen PROPERTY FOLDER "cmake_macros")

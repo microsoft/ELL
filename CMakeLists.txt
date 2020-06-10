@@ -4,11 +4,18 @@
 
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
+# Error on non-existent dependency in add_dependencies.
+cmake_policy(SET CMP0046 NEW)
+
 # Include modules in the CMake directory.
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
+set(ELL_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${ELL_ROOT}/CMake")
 include(CompilerCache)
 
-project(ELL)
+project(ELL CXX ASM)
+if(MSVC)
+  enable_language(ASM_MASM)
+endif()
 
 file(STRINGS "VERSION" ELL_VERSION)
 message(STATUS "ELL version ${ELL_VERSION}")
@@ -41,11 +48,14 @@ option(DISABLE_PYTHON "Explicitly disable building python modules" OFF)
 option(CNTK "Enable CNTK importer and related unit tests (requires CNTK python module)" OFF)
 option(ONNX "Enable ONNX importer and related unit tests (requires PyTorch and ONNX python modules)" OFF)
 
-set(ELL_ROOT "${CMAKE_SOURCE_DIR}")
-set(FLAKE8_CONFIG "${CMAKE_SOURCE_DIR}/.flake8")
-set(TEST_MODELS_REPO "https://github.com/Microsoft/ell-test-models" CACHE DOCUMENTATION "URL to the git repo containing test models" )
+set(FLAKE8_CONFIG "${ELL_ROOT}/.flake8")
+set(TEST_MODELS_REPO "https://github.com/Microsoft/ell-test-models" CACHE STRING "URL to the git repo containing test models" )
 message(STATUS "Configuring tests to use TEST_MODELS_REPO at: ${TEST_MODELS_REPO}")
-set(EXTERNAL_DIR "${CMAKE_SOURCE_DIR}/external" CACHE DOCUMENTATION "Directory to install external dependencies" )
+
+if(NOT ELL_EXTERNAL_DIR)
+  set(ELL_EXTERNAL_DIR "${ELL_ROOT}/external" CACHE STRING "Directory to install external dependencies" )
+endif(NOT ELL_EXTERNAL_DIR)
+
 set(RPI_PASSWORD "$ENV{RPI_PASSWORD}")
 set(RPI_CLUSTER "$ENV{RPI_CLUSTER}")
 set(RPI_KEY "$ENV{RPI_APIKEY}")
@@ -106,7 +116,8 @@ endif()
 enable_testing()
 
 # Set up global variables to help find NuGet projects
-set(PACKAGE_ROOT ${EXTERNAL_DIR})
+set(PACKAGE_ROOT ${ELL_EXTERNAL_DIR})
+
 include(OpenBLASSetup)
 include(LLVMSetup)
 include(SWIGSetup)
@@ -138,14 +149,16 @@ else()
   add_compile_options(-Wmissing-field-initializers)
   add_compile_options(-fvisibility-inlines-hidden)
   add_compile_options(-Wno-unknown-pragmas)
-  add_compile_options(-Wno-backslash-newline-escape)
   add_compile_options(-Wno-comment)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb3 -O0")
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb3 -O0")
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ggdb3")
   set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -ggdb3")
   if(${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
+    add_compile_options(-Wno-backslash-newline-escape)
     add_compile_options(-Wno-self-assign)
+  else() # GCC
+    add_compile_options(-Wno-ignored-attributes)
   endif()
 endif()
 
@@ -163,17 +176,17 @@ add_subdirectory(interfaces)
 add_subdirectory(examples)
 
 # Add user directories to ELL build if requested
-if(EXISTS "${CMAKE_SOURCE_DIR}/user")
+if(EXISTS "${ELL_ROOT}/user")
   # Add root user directory if it has a CMakeLists.txt file and INCLUDE_IN_ELL_BUILD.txt file
-  if(EXISTS"${CMAKE_SOURCE_DIR}/user/CMakeLists.txt" AND EXISTS "${CMAKE_SOURCE_DIR}/user/INCLUDE_IN_ELL_BUILD.txt")
+  if(EXISTS"${ELL_ROOT}/user/CMakeLists.txt" AND EXISTS "${ELL_ROOT}/user/INCLUDE_IN_ELL_BUILD.txt")
     message(STATUS "Adding user directory to ELL build")
     add_subdirectory(user)
   endif()
 
   # Now add all child directories that have CMakeLists.txt files and INCLUDE_IN_ELL_BUILD.txt file
-  file(GLOB children RELATIVE "${CMAKE_SOURCE_DIR}/user" "${CMAKE_SOURCE_DIR}/user/*")
+  file(GLOB children RELATIVE "${ELL_ROOT}/user" "${ELL_ROOT}/user/*")
   foreach(child ${children})
-    if(IS_DIRECTORY "${CMAKE_SOURCE_DIR}/user/${child}" AND EXISTS "${CMAKE_SOURCE_DIR}/user/${child}/CMakeLists.txt" AND EXISTS "${CMAKE_SOURCE_DIR}/user/${child}/INCLUDE_IN_ELL_BUILD.txt")
+    if(IS_DIRECTORY "${ELL_ROOT}/user/${child}" AND EXISTS "${ELL_ROOT}/user/${child}/CMakeLists.txt" AND EXISTS "${ELL_ROOT}/user/${child}/INCLUDE_IN_ELL_BUILD.txt")
       message(STATUS "Adding user directory ${child} to ELL build")
       add_subdirectory("user/${child}")
     endif()

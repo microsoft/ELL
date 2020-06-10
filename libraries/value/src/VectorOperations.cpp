@@ -92,7 +92,7 @@ namespace value
             result = InvokeForContext<LLVMContext>([&](LLVMContext& context) -> Scalar {
                 if (context.GetModuleEmitter().GetCompilerOptions().useBlas)
                 {
-                    auto returnValue = fn.Decorated(FunctionDecorated::No)
+                    auto returnValue = fn.Decorated(false)
                                            .Call(
                                                Scalar{ static_cast<int>(v1.Size()) },
                                                v1,
@@ -108,7 +108,12 @@ namespace value
                 }
             });
 
-            return *result;
+            if (result)
+            {
+                return *result;
+            }
+
+            return defaultImpl(v1, v2);
         }
         else if (v1.GetType() == ValueType::Double)
         {
@@ -142,7 +147,7 @@ namespace value
             result = InvokeForContext<LLVMContext>([&](LLVMContext& context) -> Scalar {
                 if (context.GetModuleEmitter().GetCompilerOptions().useBlas)
                 {
-                    auto returnValue = fn.Decorated(FunctionDecorated::No)
+                    auto returnValue = fn.Decorated(false)
                                            .Call(
                                                Scalar{ static_cast<int>(v1.Size()) },
                                                v1,
@@ -158,7 +163,12 @@ namespace value
                 }
             });
 
-            return *result;
+            if (result)
+            {
+                return *result;
+            }
+
+            return defaultImpl(v1, v2);
         }
         else
         {
@@ -168,6 +178,11 @@ namespace value
 
     void For(Vector v, std::function<void(Scalar)> fn)
     {
+        For(std::string{}, v, fn);
+    }
+
+    void For(const std::string& name, Vector v, std::function<void(Scalar)> fn)
+    {
         auto layout = v.GetValue().GetLayout();
 
         if (layout.NumDimensions() != 1)
@@ -176,7 +191,10 @@ namespace value
                                  "Layout being looped over must be one-dimensional");
         }
 
-        GetContext().For(layout, [fn = std::move(fn)](std::vector<Scalar> coordinates) { fn(coordinates[0]); });
+        GetContext().For(
+            layout,
+            [fn = std::move(fn)](std::vector<Scalar> coordinates) { fn(coordinates[0]); },
+            name);
     }
 
 } // namespace value

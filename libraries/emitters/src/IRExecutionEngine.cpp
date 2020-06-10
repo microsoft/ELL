@@ -40,12 +40,12 @@ namespace emitters
         throw emitters::EmitterException(emitters::EmitterError::unexpected, msg);
     }
 
-    IRExecutionEngine::IRExecutionEngine(IRModuleEmitter&& module, bool verify) :
-        IRExecutionEngine(module.TransferOwnership(), verify)
+    IRExecutionEngine::IRExecutionEngine(IRModuleEmitter&& module, bool verify, llvm::CodeGenOpt::Level optLevel) :
+        IRExecutionEngine(module.TransferOwnership(), verify, optLevel)
     {
     }
 
-    IRExecutionEngine::IRExecutionEngine(std::unique_ptr<llvm::Module> pModule, bool verify)
+    IRExecutionEngine::IRExecutionEngine(std::unique_ptr<llvm::Module> pModule, bool verify, llvm::CodeGenOpt::Level optLevel)
     {
         auto debugPrintFunction = pModule->getFunction("DebugPrint");
 
@@ -53,7 +53,7 @@ namespace emitters
         llvm::InitializeNativeTargetAsmPrinter();
 
         _pBuilder = std::make_unique<llvm::EngineBuilder>(std::move(pModule));
-        _pBuilder->setEngineKind(llvm::EngineKind::JIT).setVerifyModules(verify).setUseOrcMCJITReplacement(false);
+        _pBuilder->setEngineKind(llvm::EngineKind::JIT).setVerifyModules(verify).setOptLevel(optLevel).setEmulatedTLS(true);
 
         static bool installed = false;
         if (!installed)
@@ -68,7 +68,6 @@ namespace emitters
         {
             DefineFunction(debugPrintFunction, reinterpret_cast<UIntPtrT>(&DebugPrintImpl));
         }
-
     }
 
     IRExecutionEngine::~IRExecutionEngine()
@@ -122,6 +121,12 @@ namespace emitters
     {
         EnsureEngine();
         _pEngine->addGlobalMapping(func, (void*)address);
+    }
+
+    void IRExecutionEngine::DefineFunction(const std::string& name, UIntPtrT address)
+    {
+        EnsureEngine();
+        _pEngine->addGlobalMapping(name, address);
     }
 
     DynamicFunction IRExecutionEngine::GetMain()

@@ -11,6 +11,7 @@ InputNode,\
 InputNodeList,\
 InputPort,\
 InputPortIterator, \
+MatrixMatrixMultiplyImplementation, \
 Node,\
 NodeIterator,\
 OutputNode,\

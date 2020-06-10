@@ -138,6 +138,11 @@ class AudioDemo(Frame):
         elif self.CLASSIFIER_MODEL_KEY in self.settings:
             self.classifier_model = self.settings[self.CLASSIFIER_MODEL_KEY]
 
+        self.vad = None
+        if vad_model:
+            self.vad = vad.VoiceActivityDetector(vad_model)
+            self.previous_vad = 0
+
         self.wav_filename = wav_file
         if self.wav_filename is None and self.WAV_FILE_KEY in self.settings:
             self.wav_filename = self.settings[self.WAV_FILE_KEY]
@@ -394,7 +399,9 @@ class AudioDemo(Frame):
             prediction, probability, label, _ = self.classifier.predict(self.classifier_feature_data.ravel())
             if prediction is not None:
                 percent = int(100 * probability)
-                if self.last_prediction != prediction or self.probability < probability:
+                if label == "silence":
+                    self.classifier.reset()
+                elif self.last_prediction != prediction or self.probability < probability:
                     self.last_prediction = prediction
                     self.probability = probability
                     self.show_output(" DETECTED ({}) {}% {}".format(prediction, percent, label))

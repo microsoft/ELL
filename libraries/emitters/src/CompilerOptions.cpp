@@ -72,6 +72,8 @@ namespace emitters
         maxThreads = properties.GetOrParseEntry<int>("maxThreads", maxThreads);
         useFastMath = properties.GetOrParseEntry<bool>("useFastMath", useFastMath);
         debug = properties.GetOrParseEntry<bool>("debug", debug);
+        globalValueAlignment = properties.GetOrParseEntry<int>("globalValueAlignment", globalValueAlignment);
+        skip_ellcode = properties.GetOrParseEntry<bool>("skip_ellcode", skip_ellcode);
 
         if (properties.HasEntry("deviceName"))
         {

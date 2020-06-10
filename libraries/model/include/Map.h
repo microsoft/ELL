@@ -65,8 +65,6 @@ namespace model
         /// <param name="other"> The other map. </param>
         Map(const Map& other);
 
-        Map(Map&& other) = default;
-
         /// <summary> Assignment operator. </summary>
         ///
         /// <param name="other"> The other map. </param>

@@ -48,6 +48,9 @@ public:
     Node AddConstantNode(Model model, std::vector<double> values, const PortMemoryLayout& outputMemoryLayout, PortType type);
     Node AddDCTNode(Model model, PortElements input, int numFilters);
     Node AddMatrixMultiplyNode(Model model, PortElements input1, PortElements input2);
+    Node AddMatrixMatrixMultiplyNode(Model model, PortElements input1, PortElements input2);
+    Node AddMatrixMatrixMultiplyCodeNode(Model model, PortElements input1, PortElements input2, int gemmImpl);
+    Node AddMatrixMatrixMultiplyCodeNode(Model model, PortElements input1, PortElements input2, int panelM, int panelN, int panelK, int kernelM, int kernelN, int kernelK, int gemmImpl);
     Node AddDotProductNode(Model model, PortElements input1, PortElements input2);
     Node AddNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor predictor);
     Node AddFFTNode(Model model, PortElements input, int nfft = 0);

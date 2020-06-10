@@ -70,7 +70,7 @@ void TestBasicMathNodes()
     TestUnaryOperationNodeCompute();
 
     TestBroadcastUnaryOperationNodeCompute();
-    TestBroadcastLinearFunctionNodeCompute();
+
     TestBroadcastBinaryOperationNodeComputeFull();
     TestBroadcastBinaryOperationNodeComputeAdd();
     TestBroadcastBinaryOperationNodeComputeSubtract();
@@ -79,6 +79,8 @@ void TestBasicMathNodes()
     TestBroadcastBinaryOperationNodeComputeWithBadLayout();
     TestBroadcastBinaryOperationNodeComputeDifferentBroadcastDimensions();
     TestBroadcastTernaryOperationNodeComputeFMA();
+
+    TestBroadcastLinearFunctionNodeCompute();
 }
 
 void TestUnaryOperationNodeCompute(UnaryOperationType op, double (*expectedTransform)(double))
@@ -296,7 +298,6 @@ void TestBroadcastBinaryOperationNodeComputeAdd()
 
     model::PortMemoryLayout input1Layout({ numRows, numColumns, numChannels });
     model::PortMemoryLayout input2Layout({ 1, numColumns, 1 });
-    model::PortMemoryLayout input3Layout({ 1, numColumns, 1 });
 
     // clang-format off
     std::vector<double> input1Vals{ 1, 2, 1, 2,    1, 2, 1, 2,    1, 2, 1, 2,        3, 4, 3, 4,    3, 4, 3, 4,    3, 4, 3, 4 };
@@ -327,7 +328,6 @@ void TestBroadcastBinaryOperationNodeComputeSubtract()
 
     model::PortMemoryLayout input1Layout({ numRows, numColumns, numChannels });
     model::PortMemoryLayout input2Layout({ 1, numColumns, 1 });
-    model::PortMemoryLayout input3Layout({ 1, numColumns, 1 });
 
     // clang-format off
     std::vector<double> input1Vals{ 1, 2, 1, 2,      1, 2, 1, 2,      1, 2, 1, 2,            3, 4, 3, 4,    3, 4, 3, 4,    3, 4, 3, 4 };
@@ -473,7 +473,7 @@ void TestBroadcastBinaryOperationNodeComputeDifferentBroadcastDimensions()
 
     // clang-format off
     std::vector<double> input1Vals{ 1,
-                                    2};
+                                    2 };
     // broadcasts to:             { 1, 1, 1,
     //                              2, 2, 2 }
     std::vector<double> input2Vals{ 2, 4, 6 };

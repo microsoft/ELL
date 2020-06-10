@@ -52,12 +52,12 @@ namespace emitters
 
     // Move ctor and assignment op are needed to explicitly swap out values,
     // since the default behavior for "moving" fundamental types (aka, pointers) is to do a bitwise-copy
-    IRIfEmitter::IRIfEmitter(IRIfEmitter&& other)
+    IRIfEmitter::IRIfEmitter(IRIfEmitter&& other) noexcept
     {
         *this = std::move(other);
     }
 
-    IRIfEmitter& IRIfEmitter::operator=(IRIfEmitter&& other)
+    IRIfEmitter& IRIfEmitter::operator=(IRIfEmitter&& other) noexcept
     {
         if (this != &other)
         {

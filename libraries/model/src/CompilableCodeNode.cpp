@@ -77,7 +77,7 @@ namespace model
         const auto& inputs = GetInputPorts();
         const auto& outputs = GetOutputPorts();
 
-        std::vector<Value> parameters;
+        std::vector<ViewAdapter> parameters;
         parameters.reserve(inputs.size() + outputs.size());
         std::transform(inputs.begin(), inputs.end(), std::back_inserter(parameters), PortToValue);
         std::transform(outputs.begin(), outputs.end(), std::back_inserter(parameters), PortToValue);
@@ -222,7 +222,7 @@ namespace model
         const auto& inputs = GetInputPorts();
         const auto& outputs = GetOutputPorts();
 
-        std::vector<Value> args;
+        std::vector<ViewAdapter> args;
         args.reserve(inputs.size() + outputs.size());
         std::transform(inputs.begin(), inputs.end(), std::back_inserter(args), PortToValue);
 

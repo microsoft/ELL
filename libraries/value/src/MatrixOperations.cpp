@@ -20,15 +20,15 @@ using namespace utilities;
 namespace value
 {
 
-	Matrix ToMatrix(Value data, int numRows, int numCols)
-	{
-		Value matrix = data;
-		auto size = data.GetLayout().GetActiveSize().NumElements();
-		if (size != numRows * numCols || !data.GetLayout().IsContiguous())
-		{
-			throw InputException(InputExceptionErrors::invalidArgument,
-				ell::utilities::FormatString("data must be contiguous and have size %zu = %d * %d", size, numRows, numCols));
-		}
+    Matrix ToMatrix(Value data, int numRows, int numCols)
+    {
+        Value matrix = data;
+        auto size = data.GetLayout().GetActiveSize().NumElements();
+        if (size != numRows * numCols || !data.GetLayout().IsContiguous())
+        {
+            throw InputException(InputExceptionErrors::invalidArgument,
+                                 ell::utilities::FormatString("data must be contiguous and have size %zu = %d * %d", size, numRows, numCols));
+        }
         matrix.SetLayout(utilities::MemoryLayout{ { numRows, numCols } });
         return matrix;
     }
@@ -46,6 +46,11 @@ namespace value
 
     void For(Matrix matrix, std::function<void(Scalar, Scalar)> fn)
     {
+        For(std::string{}, matrix, fn);
+    }
+
+    void For(const std::string& name, Matrix matrix, std::function<void(Scalar, Scalar)> fn)
+    {
         auto layout = matrix.GetValue().GetLayout();
         if (layout.NumDimensions() != 2)
         {
@@ -53,9 +58,12 @@ namespace value
                                  "Layout being looped over must be two-dimensional");
         }
 
-        GetContext().For(layout, [fn = std::move(fn)](std::vector<Scalar> coordinates) {
-            fn(coordinates[0], coordinates[1]);
-        });
+        GetContext().For(
+            layout,
+            [fn = std::move(fn)](std::vector<Scalar> coordinates) {
+                fn(coordinates[0], coordinates[1]);
+            },
+            name);
     }
 
     Matrix GEMM(Matrix m1, Matrix m2) { throw LogicException(LogicExceptionErrors::notImplemented); }
@@ -67,7 +75,7 @@ namespace value
         if (m.Columns() != v.Size())
         {
             throw InputException(InputExceptionErrors::invalidArgument,
-                ell::utilities::FormatString("Vector size %d must match number of columns in the matrix %d", v.Size(), m.Columns()));
+                                 ell::utilities::FormatString("Vector size %d must match number of columns in the matrix %d", v.Size(), m.Columns()));
         }
         first = 1;
         For(m, [&](Scalar row, Scalar col) {

@@ -26,6 +26,9 @@ namespace emitters
     /// <summary> Nice name for llvm::Function pointers. </summary>
     using LLVMFunction = llvm::Function*;
 
+    /// <summary> Nice name for llvm::Function pointers. </summary>
+    using LLVMFunctionType = llvm::FunctionType*;
+
     /// <summary> Nice name for llvm::Type pointers. </summary>
     using LLVMType = llvm::Type*;
 
@@ -73,6 +76,9 @@ namespace emitters
     ///
     /// <returns> The VariableType or VariableType::Custom for anything that doesn't map. </returns>
     VariableType ToVariableType(LLVMType type);
+
+    /// <summary> Initializes LLVM </summary>
+    void InitializeLLVM();
 
 } // namespace emitters
 } // namespace ell

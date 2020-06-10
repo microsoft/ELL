@@ -8,7 +8,8 @@ project(profiler)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(PACKAGE_ROOT @EXTERNAL_DIR@)
+set(PACKAGE_ROOT @ELL_EXTERNAL_DIR@)
+
 include(./OpenBLASSetup.cmake)
 
 if(MSVC)

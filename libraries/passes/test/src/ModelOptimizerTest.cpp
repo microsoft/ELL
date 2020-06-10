@@ -17,7 +17,7 @@
 #include <nodes/include/ConstantNode.h>
 #include <nodes/include/ConvolutionalLayerNode.h>
 #include <nodes/include/MatrixMatrixMultiplyNode.h>
-#include <nodes/include/ReorderDataNode.h>
+#include <nodes/include/ReorderDataCodeNode.h>
 
 #include <passes/include/StandardTransformations.h>
 
@@ -230,11 +230,11 @@ void TestOptimizeReorderDataNodes1()
 
     model::Model model;
     auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(model::MemoryShape{ m, k });
-    auto reorderedInputMatrixNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(inputMatrixNode->output, orderA);
+    auto reorderedInputMatrixNode = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(inputMatrixNode->output, orderA);
 
     std::vector<ValueType> matrixBVals(k * n);
     auto matrixBNode = model.AddNode<nodes::ConstantNode<ValueType>>(matrixBVals, model::MemoryShape{ k, n });
-    auto reorderedMatrixBNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(matrixBNode->output, orderB);
+    auto reorderedMatrixBNode = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(matrixBNode->output, orderB);
 
     auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(reorderedInputMatrixNode->output, reorderedMatrixBNode->output, outputLayout);
 
@@ -280,11 +280,11 @@ void TestOptimizeReorderDataNodes2()
 
     model::Model model;
     auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(model::MemoryShape{ m, k });
-    auto reorderedInputMatrixNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(inputMatrixNode->output, orderA);
+    auto reorderedInputMatrixNode = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(inputMatrixNode->output, orderA);
 
     std::vector<ValueType> matrixBVals(k * n);
     auto matrixBNode = model.AddNode<nodes::ConstantNode<ValueType>>(matrixBVals, model::MemoryShape{ k, n });
-    auto reorderedMatrixBNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(matrixBNode->output, orderB);
+    auto reorderedMatrixBNode = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(matrixBNode->output, orderB);
 
     auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(reorderedInputMatrixNode->output, reorderedMatrixBNode->output, outputLayout);
 
@@ -330,11 +330,11 @@ void TestOptimizeReorderDataNodes3()
 
     model::Model model;
     auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(model::MemoryShape{ m, k });
-    auto reorderedInputMatrixNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(inputMatrixNode->output, orderA);
+    auto reorderedInputMatrixNode = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(inputMatrixNode->output, orderA);
 
     std::vector<ValueType> matrixBVals(k * n);
     auto matrixBNode = model.AddNode<nodes::ConstantNode<ValueType>>(matrixBVals, model::MemoryShape{ k, n });
-    auto reorderedMatrixBNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(matrixBNode->output, orderB);
+    auto reorderedMatrixBNode = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(matrixBNode->output, orderB);
 
     auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(reorderedInputMatrixNode->output, reorderedMatrixBNode->output, outputLayout);
 
@@ -380,17 +380,17 @@ void TestOptimizeReorderDataNodes4()
     auto rowMajorLayout = model::PortMemoryLayout(model::MemoryShape{ m, k }).ReorderedCopy(rowMajor);
     auto colMajorLayout = model::PortMemoryLayout(model::MemoryShape{ m, k }).ReorderedCopy(colMajor);
     auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(rowMajorLayout.GetActiveSize());
-    auto reorderedInputMatrixNode1 = model.AddNode<nodes::ReorderDataNode<ValueType>>(inputMatrixNode->output, rowMajorLayout, colMajorLayout);
-    auto reorderedInputMatrixNode2 = model.AddNode<nodes::ReorderDataNode<ValueType>>(reorderedInputMatrixNode1->output, colMajorLayout, rowMajorLayout);
-    auto reorderedInputMatrixNode3 = model.AddNode<nodes::ReorderDataNode<ValueType>>(reorderedInputMatrixNode2->output, rowMajorLayout, rowMajorLayout);
+    auto reorderedInputMatrixNode1 = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(inputMatrixNode->output, rowMajorLayout, colMajorLayout);
+    auto reorderedInputMatrixNode2 = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(reorderedInputMatrixNode1->output, colMajorLayout, rowMajorLayout);
+    auto reorderedInputMatrixNode3 = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(reorderedInputMatrixNode2->output, rowMajorLayout, rowMajorLayout);
 
     std::vector<ValueType> matrixBVals(k * n);
     rowMajorLayout = model::PortMemoryLayout(model::MemoryShape{ k, n }).ReorderedCopy(rowMajor);
     colMajorLayout = model::PortMemoryLayout(model::MemoryShape{ k, n }).ReorderedCopy(colMajor);
     auto matrixBNode = model.AddNode<nodes::ConstantNode<ValueType>>(matrixBVals, rowMajorLayout);
-    auto reorderedMatrixBNode1 = model.AddNode<nodes::ReorderDataNode<ValueType>>(matrixBNode->output, rowMajorLayout, rowMajorLayout);
-    auto reorderedMatrixBNode2 = model.AddNode<nodes::ReorderDataNode<ValueType>>(reorderedMatrixBNode1->output, rowMajorLayout, colMajorLayout);
-    auto reorderedMatrixBNode3 = model.AddNode<nodes::ReorderDataNode<ValueType>>(reorderedMatrixBNode2->output, colMajorLayout, colMajorLayout);
+    auto reorderedMatrixBNode1 = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(matrixBNode->output, rowMajorLayout, rowMajorLayout);
+    auto reorderedMatrixBNode2 = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(reorderedMatrixBNode1->output, rowMajorLayout, colMajorLayout);
+    auto reorderedMatrixBNode3 = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(reorderedMatrixBNode2->output, colMajorLayout, colMajorLayout);
 
     auto matMatMultNode = model.AddNode<nodes::MatrixMatrixMultiplyNode<ValueType>>(reorderedInputMatrixNode3->output, reorderedMatrixBNode3->output, outputLayout);
 

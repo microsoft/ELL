@@ -156,10 +156,16 @@ template <typename ElementType>
 void FillTensor(math::TensorReference<ElementType, math::Dimension::channel, math::Dimension::column, math::Dimension::row>& tensor, ElementType startValue = 0, ElementType step = 1);
 
 template <typename ElementType>
+void FillTensor(ell::math::ColumnRowChannelTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1);
+
+template <typename ElementType>
 void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue = 0, ElementType step = 1);
 
 template <typename ElementType>
 void FillMatrix(math::RowMatrix<ElementType>& matrix, ElementType startValue = 0, ElementType step = 1);
+
+template <typename ElementType>
+void FillMatrix(math::ColumnMatrix<ElementType>& matrix, ElementType startValue = 0, ElementType step = 1);
 
 #pragma region implementation
 
@@ -385,11 +391,9 @@ void VerifyCompiledOutput(model::Map& map, model::IRCompiledMap& compiledMap, co
     }
 }
 
-
 ///<summary> Verify the compiled output matches the computed output, and also verify computed output matches a given expected output </summary>
 template <typename InputType, typename OutputType>
-bool VerifyCompiledOutputAndResult(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal,
-    const std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage, double epsilon)
+bool VerifyCompiledOutputAndResult(model::Map& map, model::IRCompiledMap& compiledMap, const std::vector<std::vector<InputType>>& signal, const std::vector<std::vector<OutputType>>& expectedOutput, const std::string& name, const std::string& additionalMessage, double epsilon)
 {
     bool ok = true;
     std::vector<OutputType> computedResult;
@@ -429,7 +433,6 @@ bool VerifyCompiledOutputAndResult(model::Map& map, model::IRCompiledMap& compil
     testing::ProcessTest(std::string("Testing compiled " + name + additionalMessage + " (jitted)"), ok);
     return ok;
 }
-
 
 template <typename ValueType>
 class Uniform
@@ -521,6 +524,23 @@ void FillTensor(math::TensorReference<ElementType, math::Dimension::channel, mat
 }
 
 template <typename ElementType>
+void FillTensor(ell::math::ColumnRowChannelTensor<ElementType>& tensor, ElementType startValue, ElementType step)
+{
+    ElementType val = startValue;
+    for (size_t row = 0; row < tensor.NumRows(); row++)
+    {
+        for (size_t column = 0; column < tensor.NumColumns(); column++)
+        {
+            for (size_t channel = 0; channel < tensor.NumChannels(); channel++)
+            {
+                tensor(row, column, channel) = val;
+                val += step;
+            }
+        }
+    }
+}
+
+template <typename ElementType>
 void FillWeightsTensor(ell::math::ChannelColumnRowTensor<ElementType>& tensor, ElementType startValue, ElementType step)
 {
     ElementType val = startValue;
@@ -534,10 +554,28 @@ template <typename ElementType>
 void FillMatrix(math::RowMatrix<ElementType>& matrix, ElementType startValue, ElementType step)
 {
     ElementType val = startValue;
-    matrix.Generate([&val, step]() {
-        auto result = val;
-        val += step;
-        return result; });
+    for (size_t row = 0; row < matrix.NumRows(); row++)
+    {
+        for (size_t column = 0; column < matrix.NumColumns(); column++)
+        {
+            matrix(row, column) = val;
+            val += step;
+        }
+    }
+}
+
+template <typename ElementType>
+void FillMatrix(math::ColumnMatrix<ElementType>& matrix, ElementType startValue, ElementType step)
+{
+    ElementType val = startValue;
+    for (size_t row = 0; row < matrix.NumRows(); row++)
+    {
+        for (size_t column = 0; column < matrix.NumColumns(); column++)
+        {
+            matrix(row, column) = val;
+            val += step;
+        }
+    }
 }
 
 #pragma endregion implementation

@@ -37,11 +37,13 @@
 #include <nodes/include/HammingWindowNode.h>
 #include <nodes/include/IIRFilterNode.h>
 #include <nodes/include/LSTMNode.h>
+#include <nodes/include/MatrixMatrixMultiplyNode.h>
+#include <nodes/include/MatrixMatrixMultiplyCodeNode.h>
 #include <nodes/include/MatrixVectorMultiplyNode.h>
 #include <nodes/include/NeuralNetworkPredictorNode.h>
 #include <nodes/include/NodeOperations.h>
 #include <nodes/include/ReinterpretLayoutNode.h>
-#include <nodes/include/ReorderDataNode.h>
+#include <nodes/include/ReorderDataCodeNode.h>
 #include <nodes/include/TypeCastNode.h>
 #include <nodes/include/UnaryOperationNode.h>
 #include <nodes/include/VoiceActivityDetectorNode.h>
@@ -455,7 +457,7 @@ Node ModelBuilder::AddReorderDataNode(Model model, PortElements input, PortMemor
     switch (type)
     {
     case PortType::real:
-        newNode = model.GetModel()->AddNode<ell::nodes::ReorderDataNode<double>>(
+        newNode = model.GetModel()->AddNode<ell::nodes::ReorderDataCodeNode<double>>(
             ell::model::PortElements<double>(elements),
             inputMemoryLayout.Get(),
             outputMemoryLayout.Get(),
@@ -463,7 +465,7 @@ Node ModelBuilder::AddReorderDataNode(Model model, PortElements input, PortMemor
             outputPaddingValue);
         break;
     case PortType::smallReal:
-        newNode = model.GetModel()->AddNode<ell::nodes::ReorderDataNode<float>>(
+        newNode = model.GetModel()->AddNode<ell::nodes::ReorderDataCodeNode<float>>(
             ell::model::PortElements<float>(elements),
             inputMemoryLayout.Get(),
             outputMemoryLayout.Get(),
@@ -484,12 +486,12 @@ Node ModelBuilder::AddReorderDataNode(Model model, PortElements input, std::vect
     switch (type)
     {
     case PortType::real:
-        newNode = model.GetModel()->AddNode<ell::nodes::ReorderDataNode<double>>(
+        newNode = model.GetModel()->AddNode<ell::nodes::ReorderDataCodeNode<double>>(
             ell::model::PortElements<double>(elements),
             order);
         break;
     case PortType::smallReal:
-        newNode = model.GetModel()->AddNode<ell::nodes::ReorderDataNode<float>>(
+        newNode = model.GetModel()->AddNode<ell::nodes::ReorderDataCodeNode<float>>(
             ell::model::PortElements<float>(elements),
             order);
         break;
@@ -966,6 +968,120 @@ Node ModelBuilder::AddMatrixMultiplyNode(Model model, PortElements input1, PortE
         // if both are 1D then use DotProductNode.
         // etc.
         throw std::invalid_argument("Error: input sizes not yet supported");
+    }
+
+    return Node(newNode, model.GetModel());
+}
+
+Node ModelBuilder::AddMatrixMatrixMultiplyNode(Model model, PortElements input1, PortElements input2)
+{
+    auto type = input1.GetType();
+    auto t2 = input2.GetType();
+    if (type != t2)
+    {
+        throw std::invalid_argument("Error: input1 has different element types from input2");
+    }
+    auto elements1 = input1.GetPortElements();
+    auto elements2 = input2.GetPortElements();
+
+    auto layout1 = elements1.GetMemoryLayout();
+    auto layout2 = elements2.GetMemoryLayout();
+
+    ell::model::Node* newNode = nullptr;
+
+    if (layout1.NumDimensions() != 2 && layout2.NumDimensions() != 2)
+    {
+        throw std::invalid_argument("Error: input sizes invalid");
+    }
+    else
+    {
+        switch (type)
+        {
+        case PortType::real:
+            newNode = model.GetModel()->AddNode<ell::nodes::MatrixMatrixMultiplyNode<double>>(ell::model::PortElements<double>(elements1), ell::model::PortElements<double>(elements2));
+            break;
+        case PortType::smallReal:
+            newNode = model.GetModel()->AddNode<ell::nodes::MatrixMatrixMultiplyNode<float>>(ell::model::PortElements<float>(elements1), ell::model::PortElements<float>(elements2));
+            break;
+        default:
+            throw std::invalid_argument("Error: could not create MatrixMatrixMultiplyNode of the requested type");
+        }
+    }
+
+    return Node(newNode, model.GetModel());
+}
+
+Node ModelBuilder::AddMatrixMatrixMultiplyCodeNode(Model model, PortElements input1, PortElements input2, int gemmImpl)
+{
+    auto type = input1.GetType();
+    auto t2 = input2.GetType();
+    if (type != t2)
+    {
+        throw std::invalid_argument("Error: input1 has different element types from input2");
+    }
+    auto elements1 = input1.GetPortElements();
+    auto elements2 = input2.GetPortElements();
+
+    auto layout1 = elements1.GetMemoryLayout();
+    auto layout2 = elements2.GetMemoryLayout();
+
+    ell::model::Node* newNode = nullptr;
+
+    if (layout1.NumDimensions() != 2 && layout2.NumDimensions() != 2)
+    {
+        throw std::invalid_argument("Error: input sizes invalid");
+    }
+    else
+    {
+        switch (type)
+        {
+        case PortType::real:
+            newNode = model.GetModel()->AddNode<ell::nodes::MatrixMatrixMultiplyCodeNode<double>>(ell::model::PortElements<double>(elements1), ell::model::PortElements<double>(elements2), static_cast<ell::nodes::MatrixMatrixMultiplyImplementation>(gemmImpl));
+            break;
+        case PortType::smallReal:
+            newNode = model.GetModel()->AddNode<ell::nodes::MatrixMatrixMultiplyCodeNode<float>>(ell::model::PortElements<float>(elements1), ell::model::PortElements<float>(elements2), static_cast<ell::nodes::MatrixMatrixMultiplyImplementation>(gemmImpl));
+            break;
+        default:
+            throw std::invalid_argument("Error: could not create MatrixMatrixMultiplyCodeNode of the requested type");
+        }
+    }
+
+    return Node(newNode, model.GetModel());
+}
+
+Node ModelBuilder::AddMatrixMatrixMultiplyCodeNode(Model model, PortElements input1, PortElements input2, int panelM, int panelN, int panelK, int kernelM, int kernelN, int kernelK, int gemmImpl)
+{
+    auto type = input1.GetType();
+    auto t2 = input2.GetType();
+    if (type != t2)
+    {
+        throw std::invalid_argument("Error: input1 has different element types from input2");
+    }
+    auto elements1 = input1.GetPortElements();
+    auto elements2 = input2.GetPortElements();
+
+    auto layout1 = elements1.GetMemoryLayout();
+    auto layout2 = elements2.GetMemoryLayout();
+
+    ell::model::Node* newNode = nullptr;
+
+    if (layout1.NumDimensions() != 2 && layout2.NumDimensions() != 2)
+    {
+        throw std::invalid_argument("Error: input sizes invalid");
+    }
+    else
+    {
+        switch (type)
+        {
+        case PortType::real:
+            newNode = model.GetModel()->AddNode<ell::nodes::MatrixMatrixMultiplyCodeNode<double>>(ell::model::PortElements<double>(elements1), ell::model::PortElements<double>(elements2), panelM, panelN, panelK, kernelM, kernelN, kernelK, static_cast<ell::nodes::MatrixMatrixMultiplyImplementation>(gemmImpl));
+            break;
+        case PortType::smallReal:
+            newNode = model.GetModel()->AddNode<ell::nodes::MatrixMatrixMultiplyCodeNode<float>>(ell::model::PortElements<float>(elements1), ell::model::PortElements<float>(elements2), panelM, panelN, panelK, kernelM, kernelN, kernelK, static_cast<ell::nodes::MatrixMatrixMultiplyImplementation>(gemmImpl));
+            break;
+        default:
+            throw std::invalid_argument("Error: could not create MatrixMatrixMultiplyCodeNode of the requested type");
+        }
     }
 
     return Node(newNode, model.GetModel());

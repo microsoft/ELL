@@ -8,7 +8,7 @@
 
 #include "WinogradConvolutionNode.h"
 #include "ConstantNode.h"
-#include "ReorderDataNode.h"
+#include "ReorderDataCodeNode.h"
 
 #include <dsp/include/WinogradConvolution.h>
 
@@ -1187,7 +1187,7 @@ namespace nodes
         {
             // add a ReorderDataNode to convert to channel-major, which is more efficient in this case
             auto orderArr = utilities::ChannelMajorTensorOrder;
-            const auto& reorderedData = ReorderData(*newInput, convInputLayout, convInputLayout, utilities::DimensionOrder{ orderArr });
+            const auto& reorderedData = ReorderDataWithCodeNode(*newInput, convInputLayout, convInputLayout, utilities::DimensionOrder{ orderArr });
             newInput = &reorderedData;
             convInputLayout = reorderedData.GetMemoryLayout();
         }

@@ -113,23 +113,25 @@ class EllBuildTools:
             if "closed file" not in msg:
                 self.logger.info(msg)
 
-    def run(self, command, print_output=True, shell=False):
+    def run(self, command, print_output=True, shell=False, cwd=None):
         cmdstr = command if isinstance(command, str) else " ".join(command)
         if self.verbose:
             self.logger.info(cmdstr)
         try:
-            with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0,
-                                  universal_newlines=True, shell=shell) as proc:
+            output_target = subprocess.PIPE if print_output else subprocess.DEVNULL
+            with subprocess.Popen(command, stdout=output_target, stderr=output_target, bufsize=0,
+                                  universal_newlines=True, shell=shell, cwd=cwd) as proc:
                 self.output = ''
 
-                stdout_thread = Thread(target=self.logstream, args=(proc.stdout,))
-                stderr_thread = Thread(target=self.logstream, args=(proc.stderr,))
+                if print_output:
+                    stdout_thread = Thread(target=self.logstream, args=(proc.stdout,))
+                    stderr_thread = Thread(target=self.logstream, args=(proc.stderr,))
 
-                stdout_thread.start()
-                stderr_thread.start()
+                    stdout_thread.start()
+                    stderr_thread.start()
 
-                while stdout_thread.isAlive() or stderr_thread.isAlive():
-                    pass
+                    while stdout_thread.isAlive() or stderr_thread.isAlive():
+                        pass
 
                 proc.wait()
 
@@ -191,7 +193,8 @@ class EllBuildTools:
         args = [self.llcexe,
                 input_file,
                 "-o", out_file,
-                "-O" + optimization_level
+                "-O" + optimization_level,
+                '' if optimization_level == '0' else "-fp-contract=fast"
                 ]
         args = args + self.get_llc_options(target)
         # Save the parameters passed to llc. This is used for archiving purposes.
@@ -202,25 +205,26 @@ class EllBuildTools:
 
         return out_file
 
-    def opt(self, output_dir, input_file, optimization_level="3"):
+    def opt(self, output_dir, input_file, optimization_level="3", print_output=True):
         # opt compiled_model.ll -o compiled_model_opt.ll -O3
         model_name = os.path.splitext(os.path.basename(input_file))[0]
         out_file = os.path.join(output_dir, model_name + ".opt.bc")
         args = [self.optexe,
                 input_file,
                 "-o", out_file,
-                "-O" + optimization_level]
+                "-O" + optimization_level,
+                '' if optimization_level == '0' else "-fp-contract=fast"]
         # Save the parameters passed to opt. This is used for archiving purposes.
         self.log_command_arguments(args, log_dir=output_dir)
 
         self.logger.info("running opt ...")
-        self.run(args)
+        self.run(args, print_output=print_output)
         return out_file
 
-    def compile(self, model_file, func_name, model_name, target, output_dir,
+    def compile(self, model_file, func_name, model_name, target, output_dir, skip_ellcode=False,
                 use_blas=False, fuse_linear_ops=True, optimize_reorder_data_nodes=True, profile=False, llvm_format="bc",
                 optimize=True, parallelize=True, vectorize=True, debug=False, is_model_file=False, swig=True,
-                header=False, objext=".o", extra_options=[]):
+                header=False, objext=".o", global_value_alignment=32, extra_options=[]):
         file_arg = "-imf" if is_model_file else "-imap"
         format_flag = {
             "bc": "--bitcode",
@@ -244,7 +248,8 @@ class EllBuildTools:
                 "--target", target,
                 "-od", output_dir,
                 "--fuseLinearOps", str(fuse_linear_ops),
-                "--optimizeReorderDataNodes", str(optimize_reorder_data_nodes)
+                "--optimizeReorderDataNodes", str(optimize_reorder_data_nodes),
+                "--globalValueAlignment", str(global_value_alignment)
                 ]
         if swig:
             args.append("--swig")
@@ -269,6 +274,9 @@ class EllBuildTools:
 
         if profile:
             args.append("--profile")
+
+        if skip_ellcode:
+            args.append("--skip_ellcode")
 
         args += extra_options
 

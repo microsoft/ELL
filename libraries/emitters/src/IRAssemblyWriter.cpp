@@ -142,6 +142,11 @@ namespace emitters
         llvm::TargetOptions targetOptions = MakeTargetOptions();
         targetOptions.MCOptions.AsmVerbose = ellOptions.verboseOutput;
         targetOptions.FloatABIType = ellOptions.floatABI;
+        targetOptions.AllowFPOpFusion = ellOptions.floatFusionMode;
+        targetOptions.UnsafeFPMath = ellOptions.unsafeFPMath ? 1 : 0;
+        targetOptions.NoInfsFPMath = ellOptions.noInfsFPMath ? 1 : 0;
+        targetOptions.NoNaNsFPMath = ellOptions.noNaNsFPMath ? 1 : 0;
+        targetOptions.NoSignedZerosFPMath = ellOptions.noSignedZerosFPMath ? 1 : 0;
 
         OutputRelocationModel relocModel = ellOptions.relocModel;
         llvm::CodeModel::Model codeModel = llvm::CodeModel::Small; // If this code gets run during JIT, we may have to change to medium/large

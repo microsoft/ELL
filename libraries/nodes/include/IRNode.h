@@ -41,8 +41,6 @@ namespace nodes
     class IRNode : public model::CompilableNode
     {
     public:
-        IRNode() = default;
-
         IRNode(const IRNode&) = delete;
         IRNode(IRNode&&) = delete;
 

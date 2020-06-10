@@ -26,6 +26,11 @@ namespace utilities
         {};
     } // namespace detail
 
+    /// <summary> Templated type that always has a value of `false`. </summary>
+    template <typename... Ts>
+    struct FalseType : std::false_type
+    {};
+
     /// <summary> Enabled if ValueType is a boolean. </summary>
     template <typename ValueType>
     using IsBoolean = std::enable_if_t<std::is_same<std::decay_t<ValueType>, bool>::value, bool>;
@@ -161,7 +166,7 @@ namespace utilities
         {
             using type = std::remove_cv_t<std::remove_reference_t<T>>;
         };
-    }
+    } // namespace detail
 
     // Convenience type alias to remove all references and const/volatile qualifiers
     // from a type.

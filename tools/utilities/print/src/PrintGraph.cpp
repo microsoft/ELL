@@ -115,6 +115,8 @@ std::string ToShortString(BinaryOperationType op)
         return "||";
     case BinaryOperationType::logicalXor:
         return "^";
+    case BinaryOperationType::modulo:
+        return "%";
     }
     return "";
 }

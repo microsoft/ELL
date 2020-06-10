@@ -35,6 +35,7 @@ namespace value
         other._data = temp;
         std::swap(_type, other._type);
         std::swap(_layout, other._layout);
+        std::swap(_hasName, other._hasName);
     }
 
     // clang-format off
@@ -74,6 +75,7 @@ namespace value
                     _layout = other._layout;
                     _data = other._data;
                     _type = other._type;
+                    _hasName = other._hasName;
                 }
             }
             else
@@ -96,6 +98,7 @@ namespace value
                         _layout = other._layout;
                         _data = other._data;
                         _type = other._type;
+                        _hasName = other._hasName;
                     }
                     else
                     {
@@ -113,6 +116,7 @@ namespace value
                         }
                         _data = other._data;
                         _type = other._type;
+                        _hasName = other._hasName;
                     }
                     else
                     {
@@ -142,6 +146,7 @@ namespace value
                     _data = std::move(other._data);
                     _layout = std::move(other._layout);
                     _type = std::move(other._type);
+                    _hasName = std::move(other._hasName);
                 }
             }
             else
@@ -164,6 +169,7 @@ namespace value
                         _data = std::move(other._data);
                         _layout = std::move(other._layout);
                         _type = std::move(other._type);
+                        _hasName = std::move(other._hasName);
                     }
                     else
                     {
@@ -181,6 +187,7 @@ namespace value
                         }
                         _data = std::move(other._data);
                         _type = other._type;
+                        _hasName = std::move(other._hasName);
                     }
                     else
                     {
@@ -219,6 +226,7 @@ namespace value
         _type = { ValueType::Undefined, 0 };
         _layout.reset();
         _data = {};
+        _hasName = false;
     }
 
     void Value::SetData(Value value, bool force)
@@ -236,6 +244,10 @@ namespace value
                                       }
 
                                       _data = emittable;
+                                      if (!force)
+                                      {
+                                          _type = type;
+                                      }
                                   },
                                    [this, force](auto&& arg) {
                                        if (!force && GetValueType<std::decay_t<decltype(arg)>>() != _type.first)

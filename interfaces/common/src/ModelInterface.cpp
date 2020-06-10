@@ -960,6 +960,7 @@ CompiledMap Map::Compile(const std::string& targetDevice, const std::string& mod
     settings.compilerSettings.allowVectorInstructions = compilerSettings.allowVectorInstructions;
     settings.compilerSettings.vectorWidth = compilerSettings.vectorWidth;
     settings.compilerSettings.debug = compilerSettings.debug;
+    settings.compilerSettings.skip_ellcode = compilerSettings.skip_ellcode;
 
     ell::model::ModelOptimizerOptions optimizerOptions;
     optimizerOptions["fuseLinearFunctionNodes"] = optimizerSettings.fuseLinearFunctionNodes;

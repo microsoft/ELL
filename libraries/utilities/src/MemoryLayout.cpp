@@ -13,6 +13,7 @@
 
 #include <cassert>
 #include <numeric>
+#include <sstream>
 
 namespace ell
 {
@@ -154,6 +155,13 @@ namespace utilities
         return true;
     }
 
+    std::string DimensionOrder::ToString() const
+    {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
+    }
+
     //
     // MemoryShape / Coordinates
     //
@@ -175,6 +183,20 @@ namespace utilities
             _data[1] *= _data[0];
             _data.erase(_data.begin());
         }
+    }
+
+    std::string MemoryShape::ToString() const
+    {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
+    }
+
+    std::string MemoryCoordinates::ToString() const
+    {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
     }
 
     //
@@ -582,6 +604,13 @@ namespace utilities
         }
     }
 
+    std::string MemoryLayout::ToString() const
+    {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
+    }
+
     bool Equal(const DimensionVector& shape1, const DimensionVector& shape2)
     {
         auto size = shape1.NumDimensions();
@@ -706,7 +735,7 @@ namespace utilities
         else
         {
             throw InputException(InputExceptionErrors::invalidArgument,
-                "Cannot flatten a discontiguous MemoryLayout.");
+                                 "Cannot flatten a discontiguous MemoryLayout.");
         }
     }
 

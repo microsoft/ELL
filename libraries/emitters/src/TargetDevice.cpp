@@ -9,6 +9,7 @@
 #include "TargetDevice.h"
 #include "EmitterException.h"
 #include "IRAssemblyWriter.h" // for OutputRelocationModel
+#include "LLVMUtilities.h"
 
 #include <llvm/ADT/Triple.h>
 #include <llvm/Support/Host.h>
@@ -219,12 +220,28 @@ namespace emitters
 
         void SetHostTargetProperties(TargetDevice& targetDevice)
         {
+            InitializeLLVM();
+
             auto hostTripleString = llvm::sys::getProcessTriple();
             llvm::Triple hostTriple(hostTripleString);
 
             targetDevice.triple = hostTriple.normalize();
             targetDevice.architecture = llvm::Triple::getArchTypeName(hostTriple.getArch());
             targetDevice.cpu = llvm::sys::getHostCPUName();
+
+            llvm::StringMap<bool> features;
+            llvm::sys::getHostCPUFeatures(features);
+            for (const auto& feature : features)
+            {
+                if (feature.second)
+                {
+                    targetDevice.features += '+' + feature.first().str() + ",";
+                }
+            }
+            if (!targetDevice.features.empty())
+            {
+                targetDevice.features.pop_back();
+            }
 
             SetTargetDataLayout(targetDevice);
         }

@@ -8,11 +8,9 @@
 # On Linux and Mac, this can be done by call *make* on the specific language wrapper e.g.
 # make _ELL_python
 
-cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
-
 set(GLOBAL_BIN_DIR "${CMAKE_BINARY_DIR}/bin")
 if(WIN32)
-set(GLOBAL_BIN_DIR "${CMAKE_BINARY_DIR}/bin/release")
+  set(GLOBAL_BIN_DIR "${GLOBAL_BIN_DIR}/release")
 endif()
 
 #

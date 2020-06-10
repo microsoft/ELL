@@ -106,7 +106,7 @@ Scalar Vector_test1()
     // Vector result = convolve1D(signal, filter);
 
     Vector expected(referenceResult);
-    return Verify(result, expected);
+    return VerifySame(result, expected);
 }
 
 Scalar Vector_test2()
@@ -119,7 +119,7 @@ Scalar Vector_test2()
     {
         Vector expected(std::vector<float>{ 1.2f + 3.4f, 2.3f + 3.4f });
         Vector actual = v + testScalar;
-        If(Verify(actual, expected) != 0, [&] {
+        If(VerifySame(actual, expected) != 0, [&] {
             DebugPrint("## Vector_test2 vector scalar addition failed\n");
             ok = 1;
         });
@@ -127,7 +127,7 @@ Scalar Vector_test2()
     {
         Vector expected(std::vector<float>{ 1.2f - 3.4f, 2.3f - 3.4f });
         Vector actual = v - testScalar;
-        If(Verify(actual, expected) != 0, [&] {
+        If(VerifySame(actual, expected) != 0, [&] {
             DebugPrint("## Vector_test2 vector scalar subtraction failed\n");
             ok = 1;
         });
@@ -135,7 +135,7 @@ Scalar Vector_test2()
     {
         Vector expected(std::vector<float>{ 1.2f * 3.4f, 2.3f * 3.4f });
         Vector actual = v * testScalar;
-        If(Verify(actual, expected) != 0, [&] {
+        If(VerifySame(actual, expected) != 0, [&] {
             DebugPrint("## Vector_test2 vector scalar multiplication failed\n");
             ok = 1;
         });
@@ -143,7 +143,7 @@ Scalar Vector_test2()
     {
         Vector expected(std::vector<float>{ 1.2f / 3.4f, 2.3f / 3.4f });
         Vector actual = v / testScalar;
-        If(Verify(actual, expected) != 0, [&] {
+        If(VerifySame(actual, expected) != 0, [&] {
             DebugPrint("## Vector_test2 vector scalar division failed\n");
             ok = 1;
         });
@@ -153,7 +153,7 @@ Scalar Vector_test2()
     {
         Vector expected(std::vector<float>{ 1.2f + 0.1f, 2.3f + 1.2f });
         Vector actual = v + testVector;
-        If(Verify(actual, expected) != 0, [&] {
+        If(VerifySame(actual, expected) != 0, [&] {
             DebugPrint("## Vector_test2 vector+vector failed\n");
             ok = 1;
         });
@@ -161,7 +161,7 @@ Scalar Vector_test2()
     {
         Vector expected(std::vector<float>{ 1.2f - 0.1f, 2.3f - 1.2f });
         Vector actual = v - testVector;
-        If(Verify(actual, expected) != 0, [&] {
+        If(VerifySame(actual, expected) != 0, [&] {
             DebugPrint("## Vector_test2 vector-vector failed\n");
             ok = 1;
         });
@@ -185,7 +185,7 @@ Scalar Vector_test3()
 
     Vector e = std::vector<float>{ 1, 1, 1, 1, 1, 1, 2, 2, 2 };
 
-    If(Verify(v, e) != 0, [&] {
+    If(VerifySame(v, e) != 0, [&] {
         DebugPrint("## Vector_test3 subvector assignment failed\n");
         ok = 1;
     });

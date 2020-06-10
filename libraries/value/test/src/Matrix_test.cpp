@@ -71,7 +71,7 @@ namespace
             auto mathRowVector = mathMatrix.GetRow(rowIndex);
             auto rowVector = matrix.Row((int)rowIndex);
             Vector expected = mathRowVector.ToArray();
-            If(Verify(rowVector, expected) != 0, [&] {
+            If(VerifySame(rowVector, expected) != 0, [&] {
                 ok2 = 1;
             });
         }
@@ -87,7 +87,7 @@ namespace
             auto mathColumnVector = mathMatrix.GetColumn(columnIndex);
             auto columnVector = matrix.Column((int)columnIndex);
             Vector expected = mathColumnVector.ToArray();
-            If(Verify(columnVector, expected) != 0, [&] {
+            If(VerifySame(columnVector, expected) != 0, [&] {
                 ok2 = 1;
             });
         }
@@ -169,7 +169,7 @@ Scalar Matrix_test3()
             std::vector<float>{ 1.2f + 3.4f, 2.3f + 3.4f },
             std::vector<float>{ 3.4f + 3.4f, 4.5f + 3.4f } });
         Matrix actual = m + testScalar;
-        If(0 != Verify(actual, expected), [&] {
+        If(0 != VerifySame(actual, expected), [&] {
             DebugPrint("Matrix_test3 matrix scalar addition failed \n");
             ok = 1;
         });
@@ -179,7 +179,7 @@ Scalar Matrix_test3()
             std::vector<float>{ 1.2f - 3.4f, 2.3f - 3.4f },
             std::vector<float>{ 3.4f - 3.4f, 4.5f - 3.4f } });
         Matrix actual = m - testScalar;
-        If(0 != Verify(actual, expected), [&] {
+        If(0 != VerifySame(actual, expected), [&] {
             DebugPrint("Matrix_test3 matrix scalar subtraction failed \n");
             ok = 1;
         });
@@ -189,7 +189,7 @@ Scalar Matrix_test3()
             std::vector<float>{ 1.2f * 3.4f, 2.3f * 3.4f },
             std::vector<float>{ 3.4f * 3.4f, 4.5f * 3.4f } });
         Matrix actual = m * testScalar;
-        If(0 != Verify(actual, expected), [&] {
+        If(0 != VerifySame(actual, expected), [&] {
             DebugPrint("Matrix_test3 matrix scalar multiplication failed \n");
             ok = 1;
         });
@@ -199,7 +199,7 @@ Scalar Matrix_test3()
             std::vector<float>{ 1.2f / 3.4f, 2.3f / 3.4f },
             std::vector<float>{ 3.4f / 3.4f, 4.5f / 3.4f } });
         Matrix actual = m / testScalar;
-        If(0 != Verify(actual, expected), [&] {
+        If(0 != VerifySame(actual, expected), [&] {
             DebugPrint("Matrix_test3 matrix scalar division failed \n");
             ok = 1;
         });
@@ -211,7 +211,7 @@ Scalar Matrix_test3()
             std::vector<float>{ 1.2f + 0.1f, 2.3f + 1.2f },
             std::vector<float>{ 3.4f + 2.3f, 4.5f + 3.4f } });
         Matrix actual = m + testMatrix;
-        If(0 != Verify(actual, expected), [&] {
+        If(0 != VerifySame(actual, expected), [&] {
             DebugPrint("Matrix_test3 matrix + matrix failed \n");
             ok = 1;
         });
@@ -221,11 +221,45 @@ Scalar Matrix_test3()
             std::vector<float>{ 1.2f - 0.1f, 2.3f - 1.2f },
             std::vector<float>{ 3.4f - 2.3f, 4.5f - 3.4f } });
         Matrix actual = m - testMatrix;
-        If(0 != Verify(actual, expected), [&] {
+        If(0 != VerifySame(actual, expected), [&] {
             DebugPrint("Matrix_test3 matrix - matrix failed \n");
             ok = 1;
         });
     }
+    return ok;
+}
+
+// This test verifies:
+// - "For" with Matrix
+// - Assignment from Matrix of one dimension order to another
+// NOTE: This test currently passes for Compute but FAILS for Compile
+Scalar Matrix_test4()
+{
+    Scalar ok = Allocate(ValueType::Int32, ScalarLayout);
+    ok = 0;
+
+    std::vector<std::vector<int>> dt{
+        std::vector<int>{ 1, 2, 3 },
+        std::vector<int>{ 4, 5, 6 },
+    };
+    auto source = Matrix(dt);
+    auto destValue = Allocate(value::ValueType::Int32, source.GetValue().GetLayout().ReorderedCopy(DimensionOrder{ 1, 0 }));
+    auto dest = Matrix(destValue);
+
+    For(source, [&](value::Scalar row, value::Scalar column) {
+        dest(row, column) = source(row, column);
+    });
+
+    std::vector<int> expectedValues{ 1, 4, 2, 5, 3, 6 };
+    auto expected = Vector(expectedValues);
+
+    Vector actual = AsVector(AsFullView(dest));
+
+    If(VerifySame(actual, expected) == 1, [&] {
+        DebugPrint("Matrix_test4 matrix assignment to different dimension order failed \n");
+        ok = 1;
+    });
+
     return ok;
 }
 
@@ -241,12 +275,12 @@ Scalar Reshape_test()
 
     Vector v = std::vector<float>{ 1, 2, 3, 4, 5, 6 };
 
-    If(0 != Verify(ToVector(m.GetValue()), v), [&] {
+    If(0 != VerifySame(ToVector(m.GetValue()), v), [&] {
         DebugPrint("Reshape_test matrix into a vector failed \n");
         ok = 1;
     });
 
-    If(0 != Verify(ToMatrix(v.GetValue(), 2, 3), m), [&] {
+    If(0 != VerifySame(ToMatrix(v.GetValue(), 2, 3), m), [&] {
         DebugPrint("Reshape_test vector into a matrix failed \n");
         ok = 1;
     });
@@ -270,7 +304,7 @@ Scalar GEMV_test()
 
     Vector expected(std::vector<float>{ 9.3f, 20.3f });
 
-    If(0 != Verify(actual, expected, 1e-5), [&] {
+    If(0 != VerifySame(actual, expected, 1e-5), [&] {
         DebugPrint("GEMV_test - failed \n");
         ok = 1;
     });
@@ -281,8 +315,8 @@ Scalar MatrixReferenceTest()
 {
     const int N = 4;
     const int kernelSize = 2;
-    const int offsetRows = 0;
-    const int offsetCols = 1;
+    const Scalar offsetRows = 0;
+    const Scalar offsetCols = 1;
 
     auto A = MakeMatrix<int>(N, N);
 
@@ -322,7 +356,7 @@ Scalar MatrixReferenceTest()
     Scalar ok = Allocate<int>(ScalarLayout);
     ok = 1;
     If(
-        Verify(valueCachePtr, expected) == 0,
+        VerifySame(valueCachePtr, expected) == 0,
         [&] {
             ok = 0;
         })
@@ -343,8 +377,8 @@ Scalar RefMatrixReferenceTest()
 {
     const int N = 4;
     const int kernelSize = 2;
-    const int offsetRows = 0;
-    const int offsetCols = 1;
+    const Scalar offsetRows = 0;
+    const Scalar offsetCols = 1;
 
     auto A = MakeMatrix<int>(N, N, "A");
 
@@ -384,7 +418,7 @@ Scalar RefMatrixReferenceTest()
     Scalar ok = MakeScalar<int>("ok");
     ok = 1;
     If(
-        Verify(valueCachePtr, expected) == 0,
+        VerifySame(valueCachePtr, expected) == 0,
         [&] {
             ok = 0;
         })

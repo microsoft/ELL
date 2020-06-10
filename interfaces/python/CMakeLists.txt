@@ -37,16 +37,16 @@ if (TARGET _ELL_python)
   add_custom_command(TARGET _ELL_python
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${PYTHON_DIR}/ell_py.py ${PYTHON_DIR}/package/ell/ell_py.py
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/tools/utilities/pythonlibs/buildtools.py ${PYTHON_DIR}/package/ell/util/buildtools.py
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/docs/tutorials/shared/tutorial_helpers.py ${PYTHON_DIR}/package/ell/util/tutorialHelpers.py
+      COMMAND ${CMAKE_COMMAND} -E copy ${ELL_ROOT}/tools/utilities/pythonlibs/buildtools.py ${PYTHON_DIR}/package/ell/util/buildtools.py
+      COMMAND ${CMAKE_COMMAND} -E copy ${ELL_ROOT}/docs/tutorials/shared/tutorial_helpers.py ${PYTHON_DIR}/package/ell/util/tutorialHelpers.py
   )
 
-  file(GLOB PKGHDR RELATIVE ${CMAKE_SOURCE_DIR}/interfaces ${CMAKE_SOURCE_DIR}/interfaces/common/*.i ${CMAKE_SOURCE_DIR}/interfaces/common/include/*.h)
+  file(GLOB PKGHDR RELATIVE ${ELL_ROOT}/interfaces ${ELL_ROOT}/interfaces/common/*.i ${ELL_ROOT}/interfaces/common/include/*.h)
 
   foreach(hdr ${PKGHDR})
     add_custom_command(TARGET _ELL_python
         POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/interfaces/${hdr} ${CMAKE_BINARY_DIR}/interfaces/python/package/ell/headers/${hdr}
+        COMMAND ${CMAKE_COMMAND} -E copy ${ELL_ROOT}/interfaces/${hdr} ${CMAKE_BINARY_DIR}/interfaces/python/package/ell/headers/${hdr}
     )
   endforeach()
 
@@ -54,9 +54,9 @@ if (TARGET _ELL_python)
 
   add_custom_command(TARGET _ELL_python
       POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/CMake/OpenBLASSetup.cmake ${DEPLOYDIR}/OpenBLASSetup.cmake
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/interfaces/common/include/CallbackInterface.h ${DEPLOYDIR}/include/CallbackInterface.h
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/tools/wrap/templates/CMakeLists.python.txt.in ${DEPLOYDIR}/CMakeLists.python.txt.in
+      COMMAND ${CMAKE_COMMAND} -E copy ${ELL_ROOT}/CMake/OpenBLASSetup.cmake ${DEPLOYDIR}/OpenBLASSetup.cmake
+      COMMAND ${CMAKE_COMMAND} -E copy ${ELL_ROOT}/interfaces/common/include/CallbackInterface.h ${DEPLOYDIR}/include/CallbackInterface.h
+      COMMAND ${CMAKE_COMMAND} -E copy ${ELL_ROOT}/tools/wrap/templates/CMakeLists.python.txt.in ${DEPLOYDIR}/CMakeLists.python.txt.in
   )
 
   if(WIN32)
@@ -73,4 +73,7 @@ if (TARGET _ELL_python)
           COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:_ELL_python> ${PYTHON_DIR}/package/ell/$<TARGET_FILE_NAME:_ELL_python>
     )
   endif()
+
+  add_dependencies(_ELL_python pythonpackage)
+
 endif(TARGET _ELL_python)

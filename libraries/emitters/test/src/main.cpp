@@ -52,6 +52,8 @@ void TestIR()
 
     TestCastValue();
     TestCastToConditionalBool();
+
+    TestInlineAssembly();
 }
 
 void TestIRFunction()

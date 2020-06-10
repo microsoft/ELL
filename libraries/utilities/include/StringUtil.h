@@ -22,6 +22,20 @@ namespace utilities
     /// <returns> `true` if the substring is contained in the string (according to `std::string::find`) </returns>
     bool Contains(const std::string& s, const std::string& substring);
 
+    /// <summary> Checks whether a string starts with the specified substring (using case-sensitive comparison) </summary>
+    ///
+    /// <param name="s"> The string to search </param>
+    /// <param name="substring"> The substring to search for </param>
+    /// <returns> `true` if the string starts with the substring (according to `std::string::compare`) </returns>
+    bool StartsWith(const std::string& s, const std::string& prefix);
+
+    /// <summary> Checks whether a string ends with the specified substring (using case-sensitive comparison) </summary>
+    ///
+    /// <param name="s"> The string to search </param>
+    /// <param name="substring"> The substring to search for </param>
+    /// <returns> `true` if the string ends with the substring (according to `std::string::compare`) </returns>
+    bool EndsWith(const std::string& s, const std::string& suffix);
+
     /// <summary> Returns copy of std::string with all lowercase characters </summary>
     ///
     /// <param name="s"> The string to convert to lowercase </param>

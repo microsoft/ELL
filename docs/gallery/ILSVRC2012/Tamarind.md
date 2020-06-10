@@ -6,12 +6,12 @@ permalink: /gallery/ILSVRC2012/Tamarind
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 128x128x3 Convolutional Neural Network (70.46% top 1 accuracy, 89.57% top 5 accuracy, 665ms/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
+## ILSVRC2012 Classification: 128x128x3 Convolutional Neural Network (70.46% top 1 accuracy, 89.57% top 5 accuracy, 470ms/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
 
 <table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Tamarind/Tamarind_pi3.ell.zip">Tamarind_pi3.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Tamarind/Tamarind.ell.zip">Tamarind.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/Tamarind
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 665ms/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz: 470ms/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>

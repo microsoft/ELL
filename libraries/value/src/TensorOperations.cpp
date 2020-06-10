@@ -30,6 +30,11 @@ namespace value
 
     void For(Tensor tensor, std::function<void(Scalar, Scalar, Scalar)> fn)
     {
+        For(std::string{}, tensor, fn);
+    }
+
+    void For(const std::string& name, Tensor tensor, std::function<void(Scalar, Scalar, Scalar)> fn)
+    {
         auto layout = tensor.GetValue().GetLayout();
         if (layout.NumDimensions() != 3)
         {
@@ -37,9 +42,12 @@ namespace value
                                  "Layout being looped over must be three-dimensional");
         }
 
-        GetContext().For(layout, [fn = std::move(fn)](std::vector<Scalar> coordinates) {
-            fn(coordinates[0], coordinates[1], coordinates[2]);
-        });
+        GetContext().For(
+            layout,
+            [fn = std::move(fn)](std::vector<Scalar> coordinates) {
+                fn(coordinates[0], coordinates[1], coordinates[2]);
+            },
+            name);
     }
 
 } // namespace value

@@ -109,7 +109,7 @@ configure_file(build_and_run.sh.in build_and_run.sh @ONLY NEWLINE_STYLE UNIX)
 configure_file(build_and_run.cmd.in build_and_run.cmd @ONLY NEWLINE_STYLE WIN32)
 configure_file(remote_test.sh.in remote_test.sh @ONLY NEWLINE_STYLE UNIX)
 configure_file(remote_test.cmd.in remote_test.cmd @ONLY NEWLINE_STYLE WIN32)
-configure_file(${CMAKE_SOURCE_DIR}/CMake/OpenBLASSetup.cmake OpenBLASSetup.cmake COPYONLY)
+configure_file(${ELL_ROOT}/CMake/OpenBLASSetup.cmake OpenBLASSetup.cmake COPYONLY)
 
 
 if(WIN32)

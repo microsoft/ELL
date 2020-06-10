@@ -57,9 +57,9 @@ namespace emitters
         IRModuleEmitter(const std::string& moduleName, const CompilerOptions& parameters);
 
         IRModuleEmitter(const IRModuleEmitter&) = delete;
-        IRModuleEmitter(IRModuleEmitter&&) = default;
+        IRModuleEmitter(IRModuleEmitter&&) = delete;
         IRModuleEmitter& operator=(const IRModuleEmitter&) = delete;
-        IRModuleEmitter& operator=(IRModuleEmitter&&) = default;
+        IRModuleEmitter& operator=(IRModuleEmitter&&) = delete;
 
         //
         // Properties of the module
@@ -87,17 +87,17 @@ namespace emitters
         /// <summary> Returns the runtime object that manages functions. </summary>
         ///
         /// <returns> Reference to the `IRRuntime`. </returns>
-        IRRuntime& GetRuntime() { return _runtime; }
+        IRRuntime& GetRuntime() { return *_runtime; }
 
         /// <summary> Gets a reference to the profiler. </summary>
         ///
         /// <returns> Reference to the `IRProfiler` object for this module. </returns>
-        IRProfiler& GetProfiler() { return _profiler; }
+        IRProfiler& GetProfiler() { return *_profiler; }
 
         /// <summary> Gets a reference to the underlying IREmitter. </summary>
         ///
         /// <returns> Reference to the underlying IREmitter. </returns>
-        IREmitter& GetIREmitter() { return _emitter; }
+        IREmitter& GetIREmitter() { return *_emitter; }
 
         /// <summary> Can this module emitter still be used to add functions to the module? </summary>
         ///
@@ -240,74 +240,82 @@ namespace emitters
         ///
         /// <param name="type"> The variable type. </param>
         /// <param name="name"> The name of the variable. </param>
+        /// <param name="isThreadLocal"> Specifies whether the global memory address is unique to each thread </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
-        llvm::GlobalVariable* Global(VariableType type, const std::string& name);
+        llvm::GlobalVariable* Global(VariableType type, const std::string& name, bool isThreadLocal = false);
 
         /// <summary> Emit a named global variable of the given type. </summary>
         ///
         /// <param name="pType"> Pointer to the runtime value that contains the variable type. </param>
         /// <param name="name"> The name of the variable. </param>
+        /// <param name="isThreadLocal"> Specifies whether the global memory address is unique to each thread </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
-        llvm::GlobalVariable* Global(LLVMType pType, const std::string& name);
+        llvm::GlobalVariable* Global(LLVMType pType, const std::string& name, bool isThreadLocal = false);
 
         /// <summary> Emit a named global variable of a template type. </summary>
         ///
         /// <typeparam name="ValueType"> The variable type. </typeparam>
         /// <param name="name"> The name of the variable. </param>
         /// <param name="value"> The initial value of the variable. </param>
+        /// <param name="isThreadLocal"> Specifies whether the global memory address is unique to each thread </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
         template <typename ValueType>
-        llvm::GlobalVariable* Global(const std::string& name, ValueType value);
+        llvm::GlobalVariable* Global(const std::string& name, ValueType value, bool isThreadLocal = false);
 
         /// <summary> Emit a named global variable of Pointer type, initialized to nullptr. </summary>
         ///
         /// <typeparam name="ValueType"> The variable type. </typeparam>
         /// <param name="name"> The name of the variable. </param>
         /// <param name="type"> The variable type. </param>
+        /// <param name="isThreadLocal"> Specifies whether the global memory address is unique to each thread </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
-        llvm::GlobalVariable* GlobalPointer(const std::string& name, VariableType type);
+        llvm::GlobalVariable* GlobalPointer(const std::string& name, VariableType type, bool isThreadLocal = false);
 
         /// <summary> Emit a named global array of the given type and size. </summary>
         ///
         /// <param name="type"> The variable type. </param>
         /// <param name="name"> The name of the variable. </param>
         /// <param name="size"> The array size. </param>
+        /// <param name="isThreadLocal"> Specifies whether the global memory address is unique to each thread </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
-        llvm::GlobalVariable* GlobalArray(VariableType type, const std::string& name, const size_t size);
+        llvm::GlobalVariable* GlobalArray(VariableType type, const std::string& name, const size_t size, bool isThreadLocal = false);
 
         /// <summary> Emit a named global array of the given type and size. </summary>
         ///
         /// <param name="name"> The name of the variable. </param>
         /// <param name="pType"> Pointer to the runtime value that contains the variable type. </param>
         /// <param name="size"> The array size. </param>
+        /// <param name="isThreadLocal"> Specifies whether the global memory address is unique to each thread </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
-        llvm::GlobalVariable* GlobalArray(const std::string& name, LLVMType pType, const size_t size);
+        llvm::GlobalVariable* GlobalArray(const std::string& name, LLVMType pType, const size_t size, bool isThreadLocal = false);
 
         /// <summary> Emit a zero-initialized named, module scoped array of a template type. </summary>
         ///
         /// <typeparam name="ValueType"> Type of each array entry. </typeparam>
         /// <param name="name"> The name of the variable. </param>
         /// <param name="size"> The size of the array. </param>
+        /// <param name="isThreadLocal"> Specifies whether the global memory address is unique to each thread </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
         template <typename ValueType>
-        llvm::GlobalVariable* GlobalArray(const std::string& name, size_t size);
+        llvm::GlobalVariable* GlobalArray(const std::string& name, size_t size, bool isThreadLocal = false);
 
         /// <summary> Emit a named, module scoped array of a template type. </summary>
         ///
         /// <typeparam name="ValueType"> Type of each array entry. </typeparam>
         /// <param name="name"> The name of the variable. </param>
         /// <param name="value"> The value of the array. </param>
+        /// <param name="isThreadLocal"> Specifies whether the global memory address is unique to each thread </param>
         ///
         /// <returns> Pointer to the llvm::GlobalVariable that represents the variable. </returns>
         template <typename ValueType>
-        llvm::GlobalVariable* GlobalArray(const std::string& name, const std::vector<ValueType>& value);
+        llvm::GlobalVariable* GlobalArray(const std::string& name, const std::vector<ValueType>& value, bool isThreadLocal = false);
 
         //
         // Functions
@@ -354,6 +362,13 @@ namespace emitters
         ///
         /// <returns> Pointer to an llvm::Function that represents the requested function, or nullptr if it doesn't exist. </returns>
         LLVMFunction GetFunction(const std::string& name) const;
+
+        /// <summary> Get an LLVM intrinsic function taking no arguments with the given id. </summary>
+        ///
+        /// <param name="id"> The intrinsic function identifier. </param>
+        ///
+        /// <returns> Pointer to an llvm::Function that represents the requested function. </returns>
+        LLVMFunction GetIntrinsic(llvm::Intrinsic::ID id);
 
         /// <summary> Get an LLVM intrinsic function with the given id and signature. </summary>
         ///
@@ -530,6 +545,31 @@ namespace emitters
         ///
         /// <param name="text"> The IR text. </param>
         void LoadIR(const std::string& text);
+
+        /// <summary> Load LLVM IR from the given stream </summary>
+        ///
+        /// <param name="stream"> The stream that serves as the input </param>
+        void LoadIR(std::istream& stream);
+
+        /// <summary> Load LLVM IR from the file into this module. </summary>
+        ///
+        /// <param name="filename"> The name of the file containing the IR </param>
+        void LoadIRFromFile(const std::string& filename);
+
+        /// <summary> Load Assembler text into this module. </summary>
+        ///
+        /// <param name="text"> The IR text. </param>
+        void LoadAsm(const std::string& text);
+
+        /// <summary> Load Assembler from the given stream </summary>
+        ///
+        /// <param name="stream"> The stream that serves as the input </param>
+        void LoadAsm(std::istream& stream);
+
+        /// <summary> Load Assembler from the file into this module. </summary>
+        ///
+        /// <param name="filename"> The name of the file containing the Assembler text </param>
+        void LoadAsmFromFile(const std::string& filename);
 
         //
         // Optimization
@@ -752,7 +792,7 @@ namespace emitters
         void InsertFunctionMetadata(LLVMFunction function, const std::string& tag, const std::vector<std::string>& value = { "" });
 
         // Get a reference to the thread pool
-        IRThreadPool& GetThreadPool() { return _threadPool; }
+        IRThreadPool& GetThreadPool() { return *_threadPool; }
 
         // Actual code output implementations
         void WriteHeader(std::ostream& stream);
@@ -762,18 +802,13 @@ namespace emitters
         // Lower-level internal functions
         //
         void SetCompilerOptions(const CompilerOptions& parameters) override;
-        llvm::GlobalVariable* AddGlobal(const std::string& name, LLVMType pType, llvm::Constant* pInitial, bool isConst);
+        llvm::GlobalVariable* AddGlobal(const std::string& name, LLVMType pType, llvm::Constant* pInitial, bool isConst, bool isThreadLocal = false);
         IRFunctionEmitter Function(const std::string& name, VariableType returnType, const VariableTypeList* pArguments, bool isPublic);
         llvm::Function::LinkageTypes Linkage(bool isPublic);
         llvm::ConstantAggregateZero* ZeroInitializer(LLVMType pType);
         static void CompleteCompilerOptions(CompilerOptions& parameters);
         void SetTargetTriple(const std::string& triple);
-
-        //
-        // LLVM global state management
-        //
-        void InitializeLLVM();
-        static llvm::PassRegistry* InitializeGlobalPassRegistry();
+        MachineCodeOutputOptions GetMachineCodeOutputOptions() const;
 
         //
         // Data members
@@ -781,14 +816,14 @@ namespace emitters
         std::unique_ptr<llvm::LLVMContext> _llvmContext; // LLVM global context
         std::unique_ptr<llvm::Module> _llvmModule; // The LLVM Module being emitted
         std::unique_ptr<IRDiagnosticHandler> _diagnosticHandler = nullptr;
-        IREmitter _emitter;
+        std::unique_ptr<IREmitter> _emitter;
         std::stack<std::pair<IRFunctionEmitter, llvm::IRBuilder<>::InsertPoint>> _functionStack; // contains the location we were emitting code into when we paused to emit a new function
 
         IRValueTable _literals; // Symbol table - name to literals
         IRValueTable _globals; // Symbol table - name to global variables
-        IRRuntime _runtime; // Manages emission of runtime functions
-        IRThreadPool _threadPool; // A pool of worker threads -- gets initialized the first time it's used (?)
-        IRProfiler _profiler;
+        std::unique_ptr<IRRuntime> _runtime; // Manages emission of runtime functions
+        std::unique_ptr<IRThreadPool> _threadPool; // A pool of worker threads -- gets initialized the first time it's used (?)
+        std::unique_ptr<IRProfiler> _profiler;
         int _globalStringIndex = 0;
 
         // Info to modify how code is written out
@@ -824,31 +859,31 @@ namespace emitters
     template <typename ValueType>
     llvm::GlobalVariable* IRModuleEmitter::Constant(const std::string& name, ValueType value)
     {
-        return AddGlobal(name, _emitter.Type(GetVariableType<ValueType>()), _emitter.Literal(value), true);
+        return AddGlobal(name, GetIREmitter().Type(GetVariableType<ValueType>()), GetIREmitter().Literal(value), true);
     }
 
     template <typename ValueType>
-    llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, ValueType value)
+    llvm::GlobalVariable* IRModuleEmitter::Global(const std::string& name, ValueType value, bool isThreadLocal)
     {
-        return AddGlobal(name, _emitter.Type(GetVariableType<ValueType>()), _emitter.Literal(value), false);
+        return AddGlobal(name, GetIREmitter().Type(GetVariableType<ValueType>()), GetIREmitter().Literal(value), false, isThreadLocal);
     }
 
     template <typename ValueType>
     llvm::GlobalVariable* IRModuleEmitter::ConstantArray(const std::string& name, const std::vector<ValueType>& value)
     {
-        return AddGlobal(name, _emitter.ArrayType(GetVariableType<ValueType>(), value.size()), _emitter.Literal(value), true);
+        return AddGlobal(name, GetIREmitter().ArrayType(GetVariableType<ValueType>(), value.size()), GetIREmitter().Literal(value), true);
     }
 
     template <typename ValueType>
-    llvm::GlobalVariable* IRModuleEmitter::GlobalArray(const std::string& name, size_t size)
+    llvm::GlobalVariable* IRModuleEmitter::GlobalArray(const std::string& name, size_t size, bool isThreadLocal)
     {
-        return GlobalArray(GetVariableType<ValueType>(), name, size);
+        return GlobalArray(GetVariableType<ValueType>(), name, size, isThreadLocal);
     }
 
     template <typename ValueType>
-    llvm::GlobalVariable* IRModuleEmitter::GlobalArray(const std::string& name, const std::vector<ValueType>& value)
+    llvm::GlobalVariable* IRModuleEmitter::GlobalArray(const std::string& name, const std::vector<ValueType>& value, bool isThreadLocal)
     {
-        return AddGlobal(name, _emitter.ArrayType(GetVariableType<ValueType>(), value.size()), _emitter.Literal(value), false);
+        return AddGlobal(name, GetIREmitter().ArrayType(GetVariableType<ValueType>(), value.size()), GetIREmitter().Literal(value), false, isThreadLocal);
     }
 
     //

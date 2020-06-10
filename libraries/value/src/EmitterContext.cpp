@@ -72,34 +72,61 @@ namespace value
         return std::move(*this);
     }
 
-    void EmitterContext::IfContext::Else(std::function<void()> fn) && { _impl->Else(fn); }
+    void EmitterContext::IfContext::ElseIf(Scalar test, std::function<void()> fn) &
+    {
+        if (test.GetType() != ValueType::Boolean)
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        _impl->ElseIf(test, fn);
+    }
+
+    void EmitterContext::IfContext::Else(std::function<void()> fn) &&
+    {
+        _impl->Else(fn);
+    }
+
+    void EmitterContext::IfContext::Else(std::function<void()> fn) &
+    {
+        _impl->Else(fn);
+    }
 
     EmitterContext::~EmitterContext() = default;
 
-    Value EmitterContext::Allocate(ValueType type, size_t size) { return Allocate(type, MemoryLayout({ (int)size })); }
-
-    Value EmitterContext::Allocate(ValueType type, MemoryLayout layout) { return AllocateImpl(type, layout); }
-
-    Value EmitterContext::StaticAllocate(std::string name, ValueType type, utilities::MemoryLayout layout)
+    Value EmitterContext::Allocate(ValueType type, size_t size, size_t align, AllocateFlags flags)
     {
-        if (auto globalValue = GetGlobalValue(GlobalAllocationScope::Function, name))
-        {
-            Value value = globalValue.value();
-            if (layout.GetMemorySize() > value.GetLayout().GetMemorySize())
-            {
-                throw InputException(InputExceptionErrors::invalidSize);
-            }
-            value.SetLayout(layout);
-
-            return value;
-        }
-
-        return GlobalAllocateImpl(GlobalAllocationScope::Function, name, type, layout);
+        return Allocate(type, MemoryLayout({ (int)size }), align, flags);
     }
 
-    Value EmitterContext::GlobalAllocate(std::string name, ValueType type, utilities::MemoryLayout layout)
+    Value EmitterContext::Allocate(ValueType type, MemoryLayout layout, size_t align, AllocateFlags flags)
     {
-        if (auto globalValue = GetGlobalValue(GlobalAllocationScope::Global, name))
+        return AllocateImpl(type, layout, align, flags);
+    }
+
+    Value EmitterContext::StaticAllocate(std::string name, ValueType type, utilities::MemoryLayout layout, AllocateFlags flags)
+    {
+        if (auto globalValue = GetGlobalValue(GlobalAllocationScope::Function, name, layout))
+        {
+            return *globalValue;
+        }
+
+        return GlobalAllocateImpl(GlobalAllocationScope::Function, name, type, layout, flags);
+    }
+
+    Value EmitterContext::GlobalAllocate(std::string name, ValueType type, utilities::MemoryLayout layout, AllocateFlags flags)
+    {
+        if (auto globalValue = GetGlobalValue(GlobalAllocationScope::Global, name, layout))
+        {
+            return *globalValue;
+        }
+
+        return GlobalAllocateImpl(GlobalAllocationScope::Global, name, type, layout, flags);
+    }
+
+    std::optional<Value> EmitterContext::GetGlobalValue(GlobalAllocationScope scope, std::string name, MemoryLayout layout)
+    {
+        if (auto globalValue = GetGlobalValue(scope, name))
         {
             Value value = globalValue.value();
             if (layout.GetMemorySize() > value.GetLayout().GetMemorySize())
@@ -111,7 +138,7 @@ namespace value
             return value;
         }
 
-        return GlobalAllocateImpl(GlobalAllocationScope::Global, name, type, layout);
+        return std::nullopt;
     }
 
     detail::ValueTypeDescription EmitterContext::GetType(Emittable emittable) { return GetTypeImpl(emittable); }
@@ -128,17 +155,17 @@ namespace value
 
     Value EmitterContext::StoreConstantData(ConstantData data) { return StoreConstantDataImpl(data); }
 
-    void EmitterContext::For(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn)
+    void EmitterContext::For(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn, const std::string& name)
     {
         if (layout.NumElements() == 0)
         {
             return;
         }
 
-        return ForImpl(layout, fn);
+        return ForImpl(layout, fn, name);
     }
 
-    void EmitterContext::For(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn)
+    void EmitterContext::For(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn, const std::string& name)
     {
         if (!(start.GetType() == stop.GetType() && start.GetType() == step.GetType()))
         {
@@ -150,7 +177,7 @@ namespace value
             throw InputException(InputExceptionErrors::invalidArgument, "start/stop/step must not be boolean");
         }
 
-        return ForImpl(start, stop, step, fn);
+        return ForImpl(start, stop, step, fn, name);
     }
 
     void EmitterContext::MoveData(Value& source, Value& destination) { return MoveDataImpl(source, destination); }
@@ -161,11 +188,11 @@ namespace value
 
     Value EmitterContext::Dereference(Value source)
     {
-        if (source.PointerLevel() < 1)
+        if (source.PointerLevel() < 0)
         {
-            throw LogicException(LogicExceptionErrors::illegalState, "Pointer level is less than the expected minimum of 1");
+            throw LogicException(LogicExceptionErrors::illegalState, "Pointer level is less than the minimum of 0");
         }
-        else if (source.PointerLevel() == 1)
+        else if (source.PointerLevel() == 0)
         {
             throw LogicException(LogicExceptionErrors::illegalState, "Attempted to dereference Value that is not a reference");
         }
@@ -225,9 +252,20 @@ namespace value
         return IfImpl(test, fn);
     }
 
-    std::optional<Value> EmitterContext::Call(FunctionDeclaration func, std::vector<Value> args)
+    void EmitterContext::While(Scalar test, std::function<void()> fn)
     {
-        return CallImpl(func, args);
+        if (test.GetType() != ValueType::Boolean)
+        {
+            throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        return WhileImpl(test, fn);
+    }
+
+    std::optional<Value> EmitterContext::Call(FunctionDeclaration func, std::vector<ViewAdapter> args)
+    {
+        std::vector<Value> valueArgs(args.begin(), args.end());
+        return CallImpl(func, valueArgs);
     }
 
     void EmitterContext::Prefetch(Value data, PrefetchType type, PrefetchLocality locality)
@@ -237,7 +275,14 @@ namespace value
 
     void EmitterContext::Parallelize(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn)
     {
+        if (numTasks == 0) return;
+
         return ParallelizeImpl(numTasks, captured, fn);
+    }
+
+    void EmitterContext::DebugBreak()
+    {
+        DebugBreakImpl();
     }
 
     void EmitterContext::DebugDump(Value value, std::string tag, std::ostream* stream) const
@@ -281,6 +326,11 @@ namespace value
         return GetNameImpl(value);
     }
 
+    void EmitterContext::ImportCodeFile(std::string file)
+    {
+        ImportCodeFileImpl(file);
+    }
+
     const std::vector<std::reference_wrapper<FunctionDeclaration>>& EmitterContext::GetIntrinsics() const
     {
         static std::vector intrinsics = {
@@ -299,10 +349,69 @@ namespace value
             std::ref(TanhFunctionDeclaration),
             std::ref(RoundFunctionDeclaration),
             std::ref(FloorFunctionDeclaration),
-            std::ref(CeilFunctionDeclaration)
+            std::ref(CeilFunctionDeclaration),
+            std::ref(FmaFunctionDeclaration),
+            std::ref(MemCopyFunctionDeclaration),
+            std::ref(MemMoveFunctionDeclaration),
+            std::ref(MemSetFunctionDeclaration),
         };
 
         return intrinsics;
+    }
+
+    std::vector<Value> EmitterContext::NormalizeReferenceLevels(const std::vector<Value>& args, const std::vector<Value>& expected) const
+    {
+        if (args.size() != expected.size())
+        {
+            throw new InputException(InputExceptionErrors::sizeMismatch);
+        }
+        std::vector<Value> normalizedArgs;
+        normalizedArgs.reserve(args.size());
+        for (unsigned index = 0; index < args.size(); ++index)
+        {
+            auto& expectedValue = expected[index];
+            auto& arg = args[index];
+            Value value{
+                { expectedValue.GetBaseType(), expectedValue.PointerLevel() },
+                expectedValue.IsConstrained() ? std::optional{ expectedValue.GetLayout() } : std::optional<MemoryLayout>{ std::nullopt }
+            };
+            if (expectedValue.PointerLevel() == arg.PointerLevel())
+            {
+                value.SetData(arg, true);
+            }
+            else if (expectedValue.PointerLevel() == (arg.PointerLevel() - 1))
+            {
+                value.SetData(arg.Dereference(), true);
+            }
+            else
+            {
+                throw LogicException(LogicExceptionErrors::illegalState);
+            }
+            normalizedArgs.push_back(value);
+        }
+        return normalizedArgs;
+    }
+
+    std::string EmitterContext::UniqueName(const std::string& prefix)
+    {
+        auto uniqueId = _uniqueNames[prefix]++;
+        return prefix + "_" + std::to_string(uniqueId);
+    }
+
+    Scalar EmitterContext::GetFunctionAddress(const FunctionDeclaration& decl)
+    {
+        if (const auto& intrinsics = GetIntrinsics();
+            std::find(intrinsics.begin(), intrinsics.end(), decl) != intrinsics.end())
+        {
+            throw InputException(InputExceptionErrors::invalidArgument, "Cannot get function address of intrinsic");
+        }
+
+        return GetFunctionAddressImpl(decl);
+    }
+
+    void swap(EmitterContext& l, EmitterContext& r) noexcept
+    {
+        std::swap(l._uniqueNames, r._uniqueNames);
     }
 
     namespace
@@ -332,35 +441,66 @@ namespace value
 
     ContextGuard<>::~ContextGuard() { _oldContext ? SetContext(*_oldContext) : ClearContext(); }
 
-    Value Allocate(ValueType type, size_t size) { return GetContext().Allocate(type, size); }
-
-    Value Allocate(ValueType type, MemoryLayout layout) { return GetContext().Allocate(type, layout); }
-
-    Value StaticAllocate(std::string name, ValueType type, utilities::MemoryLayout layout)
+    Value Allocate(ValueType type, size_t size, size_t align, AllocateFlags flags)
     {
-        return GetContext().StaticAllocate(name, type, layout);
+        return GetContext().Allocate(type, size, align, flags);
     }
 
-    Value GlobalAllocate(std::string name, ValueType type, utilities::MemoryLayout layout)
+    Value Allocate(ValueType type, MemoryLayout layout, size_t align, AllocateFlags flags)
     {
-        return GetContext().GlobalAllocate(name, type, layout);
+        return GetContext().Allocate(type, layout, align, flags);
+    }
+
+    Value StaticAllocate(std::string name, ValueType type, utilities::MemoryLayout layout, AllocateFlags flags)
+    {
+        return GetContext().StaticAllocate(name, type, layout, flags);
+    }
+
+    Value GlobalAllocate(std::string name, ValueType type, utilities::MemoryLayout layout, AllocateFlags flags)
+    {
+        return GetContext().GlobalAllocate(name, type, layout, flags);
     }
 
     EmitterContext::IfContext If(Scalar test, std::function<void()> fn) { return GetContext().If(test, fn); }
 
+    void While(Scalar test, std::function<void()> fn)
+    {
+        return GetContext().While(test, fn);
+    }
+
     void ForRange(Scalar end, std::function<void(Scalar)> fn)
     {
-        ForRange(0, end, fn);
+        ForRange(std::string{}, end, fn);
+    }
+
+    void ForRange(const std::string& name, Scalar end, std::function<void(Scalar)> fn)
+    {
+        ForRange(name, Scalar{ 0 }, end, fn);
     }
 
     void ForRange(Scalar start, Scalar end, std::function<void(Scalar)> fn)
     {
-        ForRange(start, end, 1, fn);
+        ForRange(std::string{}, start, end, fn);
+    }
+
+    void ForRange(const std::string& name, Scalar start, Scalar end, std::function<void(Scalar)> fn)
+    {
+        ForRange(name, start, end, 1, fn);
     }
 
     void ForRange(Scalar start, Scalar end, Scalar step, std::function<void(Scalar)> fn)
     {
-        GetContext().For(start, end, step, fn);
+        ForRange(std::string{}, start, end, step, fn);
+    }
+
+    void ForRange(const std::string& name, Scalar start, Scalar end, Scalar step, std::function<void(Scalar)> fn)
+    {
+        GetContext().For(start, end, step, fn, name);
+    }
+
+    void DebugBreak()
+    {
+        GetContext().DebugBreak();
     }
 
     void DebugDump(FunctionDeclaration fn, std::string tag, std::ostream* stream)
@@ -371,6 +511,11 @@ namespace value
     void DebugDump(Value value, std::string tag, std::ostream* stream)
     {
         GetContext().DebugDump(value, tag, stream);
+    }
+
+    void DebugPrint(std::string message)
+    {
+        GetContext().DebugPrint(message);
     }
 
     void Parallelize(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn)
@@ -458,6 +603,11 @@ namespace value
         return *GetContext().Call(CeilFunctionDeclaration, { s.GetValue() });
     }
 
+    Scalar Fma(Scalar a, Scalar b, Scalar c)
+    {
+        return *GetContext().Call(FmaFunctionDeclaration, { a.GetValue(), b.GetValue(), c.GetValue() });
+    }
+
     Scalar Sign(Scalar s)
     {
         return *GetContext().Call(CopySignFunctionDeclaration, { Cast(1, s.GetType()).GetValue(), s.GetValue() });
@@ -541,9 +691,10 @@ namespace value
         {
             If(v == Cast(0, v.GetType()), [&] {
                 r = Cast(1, v.GetType());
-            }).Else([&] {
-                r = Cast(0, v.GetType());
-            });
+            })
+                .Else([&] {
+                    r = Cast(0, v.GetType());
+                });
         }
         return r;
     }
@@ -560,6 +711,39 @@ namespace value
     Vector Ceil(Vector v)
     {
         return *GetContext().Call(CeilFunctionDeclaration, { v.GetValue() });
+    }
+
+    void MemCopy(ViewAdapter dest, ViewAdapter source, std::optional<Scalar> length)
+    {
+        (void)GetContext().Call(MemCopyFunctionDeclaration, { dest, source, length.value_or(static_cast<int64_t>(source.GetValue().GetLayout().GetMemorySize())).GetValue() });
+    }
+
+    void MemMove(ViewAdapter dest, ViewAdapter source, std::optional<Scalar> length)
+    {
+        (void)GetContext().Call(MemMoveFunctionDeclaration, { dest, source, length.value_or(static_cast<int64_t>(source.GetValue().GetLayout().GetMemorySize())).GetValue() });
+    }
+
+    void MemSet(ViewAdapter dest, Scalar data, std::optional<Scalar> length)
+    {
+        if (data.GetType() != ValueType::Char8)
+        {
+            throw InputException(InputExceptionErrors::typeMismatch, "Memory pattern specified by data is expected to be of type Char8");
+        }
+
+        (void)GetContext().Call(MemSetFunctionDeclaration, { dest, data.GetValue(), length.value_or(static_cast<int64_t>(dest.GetValue().GetLayout().GetMemorySize())).GetValue() });
+    }
+
+    void ZeroMemory(ViewAdapter dest, std::optional<Scalar> length)
+    {
+        // As of 9/11/2019, when compiling with C++17, `Value{ char{} }` in place of `Value(char{})`
+        // triggers the `std::initializer_list<T>` ctor for Value, instead of the `Value<T>(T)` ctor.
+        // This might change in C++20.
+        MemSet(dest, Value(char{}), length);
+    }
+
+    std::string UniqueName(const std::string& prefix)
+    {
+        return GetContext().UniqueName(prefix);
     }
 
 } // namespace value

@@ -25,6 +25,12 @@ namespace value
     class Matrix
     {
     public:
+        enum class MatrixLayout
+        {
+            rowMajor,
+            columnMajor
+        };
+
         Matrix();
 
         /// <summary> Constructor that wraps the provided instance of Value </summary>
@@ -97,6 +103,8 @@ namespace value
         /// <summary> Gets the number of columns within the active area </summary>
         size_t Columns() const;
 
+        MatrixLayout GetMatrixLayout() const;
+
         /// <summary> Retrieves the type of data stored in the wrapped Value instance </summary>
         /// <returns> The type </returns>
         ValueType Type() const;
@@ -129,6 +137,16 @@ namespace value
     };
 
     /// <summary> Constructs an allocated instance with the specified dimensions </summary>
+    /// <param name="rows"> The number of rows of the allocated matrix </param>
+    /// <param name="columns"> The number of columns of the allocated matrix </param>
+    /// <param name="type"> The type of the elements </typeparam>
+    /// <param name="name"> The optional name </param>
+    inline Matrix MakeMatrix(int rows, int columns, ValueType type, const std::string& name = "")
+    {
+        return Matrix(Allocate(type, utilities::MemoryLayout({ rows, columns })), name);
+    }
+
+    /// <summary> Constructs an allocated instance with the specified dimensions </summary>
     /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
     /// <param name="rows"> The number of rows of the allocated matrix </param>
     /// <param name="columns"> The number of columns of the allocated matrix </param>
@@ -137,6 +155,28 @@ namespace value
     Matrix MakeMatrix(int rows, int columns, const std::string& name = "")
     {
         return Matrix(Allocate<T>(utilities::MemoryLayout({ rows, columns })), name);
+    }
+
+
+    /// <summary> Constructs a statically-allocated instance with the specified dimensions </summary>
+    /// <param name="rows"> The number of rows of the allocated matrix </param>
+    /// <param name="columns"> The number of columns of the allocated matrix </param>
+    /// <param name="type"> The type of the elements </typeparam>
+    /// <param name="name"> The optional name </param>
+    inline Matrix MakeStaticMatrix(int rows, int columns, ValueType type, const std::string& name = "")
+    {
+        return Matrix(StaticAllocate(name, type, utilities::MemoryLayout({ rows, columns })));
+    }
+    
+    /// <summary> Constructs a statically-allocated instance with the specified dimensions </summary>
+    /// <typeparam name="T"> Any fundamental type accepted by Value </typeparam>
+    /// <param name="rows"> The number of rows of the allocated matrix </param>
+    /// <param name="columns"> The number of columns of the allocated matrix </param>
+    /// <param name="name"> The optional name </param>
+    template <typename T>
+    Matrix MakeStaticMatrix(int rows, int columns, const std::string& name = "")
+    {
+        return Matrix(StaticAllocate<T>(name, utilities::MemoryLayout({ rows, columns })));
     }
 
 } // namespace value

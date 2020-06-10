@@ -106,6 +106,7 @@ namespace nodes
         void Copy(model::ModelTransformer& transformer) const override;
 
         MatrixType GetWeightsMatrix(const ConstTensorReferenceType& weightsTensor) const;
+        bool IsELLCodeTarget(model::ModelTransformer& transformer) const;
 
         // Input
         model::InputPort<ValueType> _input;

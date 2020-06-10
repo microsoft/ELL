@@ -59,7 +59,8 @@ namespace nodes
             divide,
             logicalAnd,
             logicalOr,
-            logicalXor
+            logicalXor,
+            modulo
         };
 
         template <typename ValueType>

@@ -37,7 +37,7 @@
 #include <nodes/include/IIRFilterNode.h>
 #include <nodes/include/LSTMNode.h>
 #include <nodes/include/RNNNode.h>
-#include <nodes/include/ReorderDataNode.h>
+#include <nodes/include/ReorderDataCodeNode.h>
 #include <nodes/include/SimpleConvolutionNode.h>
 #include <nodes/include/UnrolledConvolutionNode.h>
 #include <nodes/include/WinogradConvolutionNode.h>
@@ -370,7 +370,7 @@ static void TestIIRFilterNode4()
 template <typename ValueType>
 static void TestMelFilterBankNode()
 {
-    const ValueType epsilon = static_cast<ValueType>(1e-6);
+    const ValueType epsilon = static_cast<ValueType>(1e-5);
     const size_t numFilters = 13;
     const size_t windowSize = 512;
     const size_t fftSize = 512;
@@ -593,7 +593,7 @@ static void TestConvolutionNodeCompileVsReference(ImageShape inputShape, Filters
     auto convInputLayout = inputMemoryLayout.ReorderedCopy({ shouldReorderToChannelMajor ? utilities::ChannelMajorTensorOrder : utilities::RowMajorTensorOrder });
     auto convOutputLayout = outputMemoryLayout.ReorderedCopy({ shouldReorderToChannelMajor ? utilities::ChannelMajorTensorOrder : utilities::RowMajorTensorOrder });
 
-    auto preConvReorderNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(inputNode->output, inputMemoryLayout, convInputLayout);
+    auto preConvReorderNode = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(inputNode->output, inputMemoryLayout, convInputLayout);
     const auto* newInput = &preConvReorderNode->output;
 
     model::PortElements<ValueType> convOutput;
@@ -629,7 +629,7 @@ static void TestConvolutionNodeCompileVsReference(ImageShape inputShape, Filters
     }
     }
 
-    auto postConvReorderNode = model.AddNode<nodes::ReorderDataNode<ValueType>>(convOutput, convOutputLayout, outputMemoryLayout);
+    auto postConvReorderNode = model.AddNode<nodes::ReorderDataCodeNode<ValueType>>(convOutput, convOutputLayout, outputMemoryLayout);
 
     auto map = model::Map(model, { { "input", inputNode } }, { { "output", postConvReorderNode->output } });
 

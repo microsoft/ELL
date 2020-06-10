@@ -40,7 +40,7 @@ namespace emitters
         /// <summary> Return the base compiler settings </summary>
         ///
         /// <returns> The settings for the compiler </returns>
-        CompilerOptions GetCompilerOptions() const { return _options; }
+        const CompilerOptions& GetCompilerOptions() const { return _options; }
 
         // Note, this differs from IRModuleEmitter::BeginFunction only by return type
         /// <summary> Set a function declaration. Note that BeginMapPredictFunction can't be called from within a function - it completes the currently-being-emitted function </summary>

@@ -123,14 +123,17 @@ else()
             set(BLAS_LIB_SEARCH_PATHS ${BLAS_PACKAGE_DIR}/lib/)
             set(BLAS_FOUND TRUE)
         else()
-            # Known registry ID (family, model) settings for various CPU types
+            # Known registry ID (family, model) settings for various Intel CPU types
             #
             # Haswell: Family 6, model 60, 63, 69
             # Broadwell: Family 6, Model 70, 79 (compatible with Haswell)
             # Kaby Lake: Family 6, Model 78, 142, 158 (compatible with Haswell)
             # Sandybridge: Family 6, model 42, 45
             # Ivybridge: Family 6, model 58 (compatible with Sandybridge)
-            # Skylake: Family 6, model 42
+            # Skylake: Family 6, model 85
+            #
+            # Known registry ID (family, model) settings for various AMD CPU types
+            # Epyc: Family 23, model 1 (compatible with Haswell)
 
             # We can set up a mapping from a detected processor generation to the version of
             # the OpenBLAS libraries to use with the set_processor_mapping macro. For instance,
@@ -159,10 +162,14 @@ else()
                         set(processor_generation "sandybridge")
                     elseif(processor_model EQUAL 58)
                         set(processor_generation "sandybridge") # actually ivybridge, but it is compatible with sandybridge
-                    elseif(processor_model EQUAL 42)
+                    elseif(processor_model EQUAL 85)
                         set(processor_generation "sandybridge") # actually skylake, but it is compatible with sandybridge
                     else()
                         set(processor_generation "unknown")
+                    endif()
+                elseif(processor_family EQUAL 23)
+                    if(processor_model EQUAL 1)
+                        set(processor_generation "haswell")
                     endif()
                 endif()
             else()

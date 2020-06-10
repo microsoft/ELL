@@ -9,6 +9,7 @@
 #pragma once
 
 #include <utilities/include/Boolean.h>
+#include <utilities/include/Exception.h>
 #include <utilities/include/TypeTraits.h>
 
 #include <cstdint>
@@ -117,6 +118,10 @@ namespace value
         else if constexpr (std::is_same_v<T, double>)
         {
             return ValueType::Double;
+        }
+        else
+        {
+            static_assert(utilities::FalseType<T>::value, "Unknown value type");
         }
     }
 

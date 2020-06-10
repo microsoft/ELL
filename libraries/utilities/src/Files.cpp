@@ -36,10 +36,15 @@ namespace utilities
             const auto& path = filepath;
 #endif
             // open file
+            if(!FileExists(filepath))
+            {
+                throw utilities::InputException(InputExceptionErrors::invalidArgument, "file " + filepath + " doesn't exist");
+            }
+
             auto stream = std::ifstream(path, mode);
 
             // check that it opened
-            if (!stream.is_open())
+            if (!stream)
             {
                 throw utilities::InputException(InputExceptionErrors::invalidArgument, "error opening file " + filepath);
             }

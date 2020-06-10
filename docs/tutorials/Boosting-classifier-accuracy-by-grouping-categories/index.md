@@ -294,4 +294,3 @@ def main():
 
 ## Troubleshooting
 Find tips in the Troubleshooting section of the [Raspberry Pi Setup Instructions](/ELL/tutorials/Raspberry-Pi-setup).
-

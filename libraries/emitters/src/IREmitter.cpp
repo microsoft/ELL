@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "IREmitter.h"
-#include "IRModuleEmitter.h"
 #include "EmitterException.h"
+#include "IRModuleEmitter.h"
 #include "LLVMUtilities.h"
 
 #include <utilities/include/Logger.h>
@@ -77,8 +77,8 @@ namespace emitters
     //
     // IREmitter implementation
     //
-    IREmitter::IREmitter(IRModuleEmitter& moduleEmitter, llvm::LLVMContext& context) :
-        _moduleEmitter(moduleEmitter),
+    IREmitter::IREmitter(llvm::LLVMContext& context, llvm::Module& module) :
+        _module(module),
         _llvmContext(context),
         _irBuilder(context)
     {}
@@ -90,39 +90,55 @@ namespace emitters
         case VariableType::Void:
             return GetBaseVariableType(type);
         case VariableType::VoidPointer:
-            // We use BytePointer to avoid LLVM Assertion failed: isValidElementType(EltTy) && "Invalid type for pointer element!", 
+            // We use BytePointer to avoid LLVM Assertion failed: isValidElementType(EltTy) && "Invalid type for pointer element!",
             // file ~\llvm-8\lib\ir\type.cpp, line 632
             return GetBaseVariableType(VariableType::Byte)->getPointerTo();
+        case VariableType::VoidPointerPointer:
+            return GetBaseVariableType(VariableType::Byte)->getPointerTo()->getPointerTo();
         case VariableType::Boolean:
             return GetBaseVariableType(type);
         case VariableType::Byte:
             return GetBaseVariableType(type);
         case VariableType::BytePointer:
             return GetBaseVariableType(VariableType::Byte)->getPointerTo();
+        case VariableType::BytePointerPointer:
+            return GetBaseVariableType(VariableType::Byte)->getPointerTo()->getPointerTo();
         case VariableType::Int16:
             return GetBaseVariableType(type);
         case VariableType::Int16Pointer:
             return GetBaseVariableType(VariableType::Int16)->getPointerTo();
+        case VariableType::Int16PointerPointer:
+            return GetBaseVariableType(VariableType::Int16)->getPointerTo()->getPointerTo();
         case VariableType::Int32:
             return GetBaseVariableType(type);
         case VariableType::Int32Pointer:
             return GetBaseVariableType(VariableType::Int32)->getPointerTo();
+        case VariableType::Int32PointerPointer:
+            return GetBaseVariableType(VariableType::Int32)->getPointerTo()->getPointerTo();
         case VariableType::Int64:
             return GetBaseVariableType(type);
         case VariableType::Int64Pointer:
             return GetBaseVariableType(VariableType::Int64)->getPointerTo();
+        case VariableType::Int64PointerPointer:
+            return GetBaseVariableType(VariableType::Int64)->getPointerTo()->getPointerTo();
         case VariableType::Float:
             return GetBaseVariableType(type);
         case VariableType::FloatPointer:
             return GetBaseVariableType(VariableType::Float)->getPointerTo();
+        case VariableType::FloatPointerPointer:
+            return GetBaseVariableType(VariableType::Float)->getPointerTo()->getPointerTo();
         case VariableType::Double:
             return GetBaseVariableType(type);
         case VariableType::DoublePointer:
             return GetBaseVariableType(VariableType::Double)->getPointerTo();
+        case VariableType::DoublePointerPointer:
+            return GetBaseVariableType(VariableType::Double)->getPointerTo()->getPointerTo();
         case VariableType::Char8:
             return GetBaseVariableType(type);
         case VariableType::Char8Pointer:
             return GetBaseVariableType(VariableType::Char8)->getPointerTo();
+        case VariableType::Char8PointerPointer:
+            return GetBaseVariableType(VariableType::Char8)->getPointerTo()->getPointerTo();
         default:
             throw EmitterException(EmitterError::valueTypeNotSupported);
         }
@@ -1115,7 +1131,9 @@ namespace emitters
 
     uint64_t IREmitter::SizeOf(LLVMType type) const
     {
-        return _moduleEmitter.GetTargetDataLayout().getTypeAllocSize(type);
+        assert(!_module.getDataLayout().getStringRepresentation().empty());
+
+        return _module.getDataLayout().getTypeAllocSize(type);
     }
 
     uint64_t IREmitter::SizeOf(VariableType type) const

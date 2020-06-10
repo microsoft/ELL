@@ -57,6 +57,25 @@ namespace emitters
         DoublePointer,
 
         //
+        // Pointers to pointers
+        //
+        VoidPointerPointer,
+        ///<summary> Pointer to a pointer to a character array </summary>
+        Char8PointerPointer,
+        ///<summary> Pointer to a pointer to a byte </summary>
+        BytePointerPointer,
+        ///<summary> Pointer to a pointer to a Int16 </summary>
+        Int16PointerPointer,
+        ///<summary> Pointer to a pointer to an Int32 </summary>
+        Int32PointerPointer,
+        ///<summary> Pointer to a pointer to an Int64 </summary>
+        Int64PointerPointer,
+        ///<summary> Pointer to a pointer to a Float </summary>
+        FloatPointerPointer,
+        ///<summary> Pointer to a pointer to a Double </summary>
+        DoublePointerPointer,
+
+        //
         // Custom Structs
         //
         Custom
@@ -249,12 +268,19 @@ namespace emitters
     template <typename ValueType>
     VariableType GetVariableType();
 
-    /// <summary> Gets the value form the VariableType enum that corresponds to a pointer to a given nonpointer type. </summary>
+    /// <summary> Gets the value from the VariableType enum that corresponds to a pointer from a given nonpointer type. </summary>
     ///
-    /// <param name="type"> The nonpointer type, such as Short or Double. </typeparam>
+    /// <param name="type"> The nonpointer type, such as Int16 or Double. </typeparam>
     ///
     /// <returns> A VariableType that corresponds to the pointer to a given type. </returns>
     VariableType GetPointerType(VariableType type);
+
+    /// <summary> Gets the value from the VariableType enum that corresponds to a nonpointer from a given pointer type. </summary>
+    ///
+    /// <param name="type"> The pointer type, such as Int16Pointer or DoublePointer. </typeparam>
+    ///
+    /// <returns> A VariableType that corresponds to the nonpointer from a given type. </returns>
+    VariableType GetNonPointerType(VariableType type);
 
     /// <summary> Gets the default value for a certain type. </summary>
     ///

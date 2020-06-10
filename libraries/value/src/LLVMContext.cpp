@@ -11,13 +11,13 @@
 #include "Scalar.h"
 #include "Value.h"
 
-#include <emitters/include/IRModuleEmitter.h>
-
+#include <utilities/include/Files.h>
 #include <utilities/include/StringUtil.h>
 
-#include <numeric>
-
 #include <llvm/Support/raw_os_ostream.h>
+#include <llvm/Transforms/Utils/Cloning.h>
+
+#include <numeric>
 
 using namespace std::string_literals;
 
@@ -131,7 +131,7 @@ namespace value
             return type;
         }
 
-        VariableType ValueTypeToVariableType(ValueType type)
+        VariableType ValueTypeToVariableType(ValueType type, int ptrLevel = 1)
         {
             // clang-format off
 
@@ -141,7 +141,12 @@ namespace value
 
 #define VALUE_TYPE_TO_VARIABLE_TYPE_PTR(x)         \
     case ValueType::x:                             \
-        return VariableType::x##Pointer
+        if (ptrLevel == 0)                         \
+            return VariableType::x;                \
+        else if (ptrLevel == 1)                    \
+            return VariableType::x##Pointer;       \
+        else                                       \
+            return VariableType::x##PointerPointer
 
             // clang-format on
 
@@ -183,13 +188,24 @@ namespace value
             return true;
         }
 
+        emitters::FunctionInlining GetEmittersFunctionInlining(FunctionInlining inlining)
+        {
+            switch (inlining)
+            {
+            case FunctionInlining::always:
+                return emitters::FunctionInlining::always;
+            case FunctionInlining::never:
+                return emitters::FunctionInlining::never;
+            default:
+                return emitters::FunctionInlining::defaultInline;
+            }
+        }
+
         bool IncrementMemoryCoordinate(std::vector<int>& coordinate, const std::vector<int>& maxCoordinate)
         {
             assert(coordinate.size() == maxCoordinate.size());
             return IncrementMemoryCoordinateImpl(static_cast<int>(maxCoordinate.size()) - 1, coordinate, maxCoordinate);
         }
-
-        LLVMValue ToLLVMValue(Value value) { return value.Get<Emittable>().GetDataAs<LLVMValue>(); }
 
         auto SimpleNumericalFunctionIntrinsic(LLVMFunction (IRRuntime::*intrinsicFn)(VariableType)) -> std::function<Value(IRFunctionEmitter&, std::vector<Value>)>
         {
@@ -370,6 +386,68 @@ namespace value
             };
         }
 
+        auto FmaFunctionIntrinsic() -> std::function<Value(IRFunctionEmitter&, std::vector<Value>)>
+        {
+            return [](IRFunctionEmitter& fnEmitter, std::vector<Value> args) -> Value {
+                if (args.size() != 3)
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+
+                if (std::any_of(args.begin(), args.end(), [](Value& value) { return value.IsConstrained() && value.GetLayout() != ScalarLayout; }))
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+
+                const auto& value1 = args[0];
+                const auto& value2 = args[1];
+                const auto& value3 = args[2];
+                if (value1.GetBaseType() != value2.GetBaseType() || value1.GetBaseType() != value3.GetBaseType())
+                {
+                    throw InputException(InputExceptionErrors::typeMismatch);
+                }
+
+                if (value1.GetBaseType() == ValueType::Boolean)
+                {
+                    throw InputException(InputExceptionErrors::typeMismatch);
+                }
+
+                Value result = value::Allocate(value1.GetBaseType(), ScalarLayout);
+
+                auto llvmValue1 = fnEmitter.ValueAt(ToLLVMValue(value1), 0);
+                auto llvmValue2 = fnEmitter.ValueAt(ToLLVMValue(value2), 0);
+                auto llvmValue3 = fnEmitter.ValueAt(ToLLVMValue(value3), 0);
+
+                auto variableType = [type = value1.GetBaseType()] {
+                    switch (type)
+                    {
+                    case ValueType::Double:
+                        return VariableType::Double;
+                    default:
+                        return VariableType::Float;
+                    }
+                }();
+
+                // TODO: fix this so that GetNonPointerType call isn't needed
+                auto value1VariableType = GetNonPointerType(ValueTypeToVariableType(value1.GetBaseType(), value1.PointerLevel()));
+                if (variableType != value1VariableType)
+                {
+                    llvmValue1 = fnEmitter.CastValue(llvmValue1, variableType);
+                    llvmValue2 = fnEmitter.CastValue(llvmValue2, variableType);
+                    llvmValue3 = fnEmitter.CastValue(llvmValue3, variableType);
+                }
+                auto llvmFunc = fnEmitter.GetModule().GetRuntime().GetFmaFunction(variableType);
+                auto callResult = fnEmitter.Call(llvmFunc, { llvmValue1, llvmValue2, llvmValue3 });
+                if (variableType != value1VariableType)
+                {
+                    callResult = fnEmitter.CastValue(callResult, value1VariableType);
+                }
+                auto resultValue = ToLLVMValue(result);
+                fnEmitter.SetValueAt(resultValue, 0, callResult);
+                return result;
+            };
+        }
+
         enum class MaxMinIntrinsic
         {
             Max,
@@ -498,6 +576,71 @@ namespace value
             };
         }
 
+        enum class MemIntrinsicOp
+        {
+            Copy,
+            Move,
+            Set
+        };
+        auto MemOpFunctionIntrinsic(MemIntrinsicOp intrinsic) -> std::function<Value(IRFunctionEmitter&, std::vector<Value>)>
+        {
+            return [intrinsic](IRFunctionEmitter& fnEmitter, std::vector<Value> args) -> Value {
+                if (args.size() != 3)
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+
+                const auto& value1 = args[0];
+                const auto& value2 = args[1];
+                const auto& value3 = args[2];
+
+                if (!value3.IsConstrained() || value3.GetLayout() != ScalarLayout)
+                {
+                    throw InputException(InputExceptionErrors::invalidArgument);
+                }
+
+                if (intrinsic == MemIntrinsicOp::Set)
+                {
+                    assert((value2.IsConstrained() && value2.GetLayout() == ScalarLayout && value2.GetType() == std::pair{ ValueType::Char8, 1 }));
+                }
+
+                llvm::CallInst* (IREmitter::*memFn)(LLVMValue, LLVMValue, LLVMValue){};
+                switch (intrinsic)
+                {
+                case MemIntrinsicOp::Copy:
+                    memFn = &IREmitter::MemoryCopy;
+                    break;
+                case MemIntrinsicOp::Move:
+                    memFn = &IREmitter::MemoryMove;
+                    break;
+                case MemIntrinsicOp::Set:
+                    memFn = &IREmitter::MemorySet;
+                    break;
+                default:
+                    assert(false);
+                }
+
+                auto llvmValue1 = ToLLVMValue(value1);
+                auto llvmValue2 = ToLLVMValue(value2);
+                auto llvmValue3 = fnEmitter.Load(ToLLVMValue(value3));
+                auto llvmType = llvmValue1->getType()->getContainedType(0);
+                llvmValue3 = fnEmitter.LocalScalar(static_cast<int64_t>(fnEmitter.GetEmitter().SizeOf(llvmType))) * llvmValue3;
+
+                if (intrinsic == MemIntrinsicOp::Set)
+                {
+                    llvmValue2 = fnEmitter.Load(llvmValue2);
+
+                    // we're going to swap the first two params because MemorySet DOES have destination first...
+                    std::swap(llvmValue1, llvmValue2);
+                }
+
+                // IREmitter takes the first two parameters in the opposite order of everyone else!
+                (void)std::invoke(memFn, fnEmitter.GetEmitter(), llvmValue2, llvmValue1, llvmValue3);
+
+                return {}; // ignored
+            };
+        }
+
         void ConstantForLoop(const MemoryLayout& layout, std::function<void(const MemoryCoordinates&)> fn)
         {
             auto maxCoordinate = layout.GetActiveSize().ToVector();
@@ -520,7 +663,9 @@ namespace value
 
     struct LLVMContext::FunctionScope
     {
-        FunctionScope(LLVMContext& context, IRFunctionEmitter& emitter) :
+        FunctionScope(
+            LLVMContext& context,
+            IRFunctionEmitter& emitter) :
             context(context)
         {
             context._functionStack.push(emitter);
@@ -545,15 +690,32 @@ namespace value
     };
 
     LLVMContext::LLVMContext(IRModuleEmitter& emitter) :
+        EmitterContext(emitter.GetCompilerOptions().targetDevice),
         _emitter(emitter),
         _computeContext(_emitter.GetModuleName())
     {
         _promotedConstantStack.push({});
     }
 
-    IRModuleEmitter& LLVMContext::GetModuleEmitter() const { return _emitter; }
+    LLVMContext::LLVMContext(std::unique_ptr<IRModuleEmitter>&& emitter) :
+        EmitterContext(emitter->GetCompilerOptions().targetDevice),
+        _ownedEmitter(std::move(emitter)),
+        _emitter(*_ownedEmitter),
+        _computeContext(_emitter.GetModuleName())
+    {
+        _promotedConstantStack.push({});
+    }
 
-    Value LLVMContext::AllocateImpl(ValueType type, MemoryLayout layout)
+    LLVMContext::LLVMContext(const std::string& moduleName, const CompilerOptions& parameters) :
+        LLVMContext(std::make_unique<IRModuleEmitter>(moduleName, parameters))
+    {}
+
+    IRModuleEmitter& LLVMContext::GetModuleEmitter() const
+    {
+        return _emitter;
+    }
+
+    Value LLVMContext::AllocateImpl(ValueType type, MemoryLayout layout, size_t alignment, AllocateFlags flags)
     {
         auto& fn = GetFunctionEmitter();
         auto& irEmitter = fn.GetEmitter();
@@ -561,8 +723,11 @@ namespace value
         auto llvmType = ValueTypeToLLVMType(irEmitter, { type, 0 });
         assert(!llvmType->isPointerTy());
         auto allocatedVariable = fn.Variable(llvmType, layout.GetMemorySize());
+        if (alignment != 0)
+        {
+            allocatedVariable->setAlignment(alignment);
+        }
         fn.StoreZero(allocatedVariable, layout.GetMemorySize());
-
         return { Emittable{ allocatedVariable }, layout };
     }
 
@@ -577,7 +742,7 @@ namespace value
         return std::nullopt;
     }
 
-    Value LLVMContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data, MemoryLayout layout)
+    Value LLVMContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data, MemoryLayout layout, AllocateFlags flags)
     {
         std::string adjustedName = GetScopeAdjustedName(scope, name);
 
@@ -588,9 +753,10 @@ namespace value
         }
 
         llvm::GlobalVariable* global = std::visit(
-            [this, &adjustedName](auto&& vectorData) {
+            [this, flags, &adjustedName](auto&& vectorData) {
                 using Type = std::decay_t<decltype(vectorData)>;
 
+                bool isThreadLocal = (flags & AllocateFlags::ThreadLocal) == AllocateFlags::ThreadLocal;
                 if constexpr (std::is_same_v<Type, std::vector<utilities::Boolean>>)
                 {
                     // IREmitter stores a vector of bool values as a bitvector, which
@@ -601,14 +767,15 @@ namespace value
                     // originally, this was a vector of bools. This will be rectified
                     // in the near future. (2018-11-08)
                     std::vector<char> transformedData(vectorData.begin(), vectorData.end());
-                    return _emitter.GlobalArray(adjustedName, transformedData);
+                    return _emitter.GlobalArray(adjustedName, transformedData, isThreadLocal);
                 }
                 else
                 {
-                    return _emitter.GlobalArray(adjustedName, vectorData);
+                    return _emitter.GlobalArray(adjustedName, vectorData, isThreadLocal);
                 }
             },
             data);
+
         auto dereferencedGlobal = _emitter.GetIREmitter().PointerOffset(global, _emitter.GetIREmitter().Literal(0));
 
         Emittable emittable{ dereferencedGlobal };
@@ -617,7 +784,7 @@ namespace value
         return Value(emittable, layout);
     }
 
-    Value LLVMContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type, MemoryLayout layout)
+    Value LLVMContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type, MemoryLayout layout, AllocateFlags flags)
     {
         std::string adjustedName = GetScopeAdjustedName(scope, name);
 
@@ -629,7 +796,8 @@ namespace value
 
         auto global = _emitter.GlobalArray(adjustedName,
                                            ValueTypeToLLVMType(_emitter.GetIREmitter(), { type, 0 }),
-                                           layout.GetMemorySize());
+                                           layout.GetMemorySize(),
+                                           (flags & AllocateFlags::ThreadLocal) == AllocateFlags::ThreadLocal);
 
         auto dereferencedGlobal = _emitter.GetIREmitter().PointerOffset(global, _emitter.GetIREmitter().Literal(0));
 
@@ -664,23 +832,40 @@ namespace value
 
         std::vector<VariableType> variableArgTypes(argValues.size());
         std::transform(argValues.begin(), argValues.end(), variableArgTypes.begin(), [](Value value) {
-            return ValueTypeToVariableType(value.GetBaseType());
+            return ValueTypeToVariableType(value.GetBaseType(), value.PointerLevel());
         });
 
         const auto& fnName = decl.GetFunctionName();
+        auto argValuesCopy = argValues;
         {
             ValueType returnValueType = returnValue ? returnValue->GetBaseType() : ValueType::Void;
             FunctionScope scope(*this, fnName, ValueTypeToVariableType(returnValueType), variableArgTypes);
-            GetFunctionEmitter().SetAttributeForArguments(IRFunctionEmitter::Attributes::NoAlias);
 
-            auto functionArgs = GetFunctionEmitter().Arguments();
-            auto argValuesCopy = argValues;
+            auto& fnEmitter = GetFunctionEmitter();
+            if (decl.IsPublic())
+            {
+                fnEmitter.IncludeInHeader();
+            }
+            fnEmitter.SetAttributeForArguments(IRFunctionEmitter::Attributes::NoAlias);
+            fnEmitter.SetInlineState(GetEmittersFunctionInlining(decl.InlineState()));
+
+            auto functionArgs = fnEmitter.Arguments();
             auto returnValueCopy = returnValue;
 
             for (std::pair idx{ 0u, functionArgs.begin() }; idx.first < argValuesCopy.size(); ++idx.first, ++idx.second)
             {
-                idx.second->setName(std::string{ "arg" } + std::to_string(idx.first));
-                argValuesCopy[idx.first].SetData(Emittable{ idx.second });
+                auto& argValueCopy = argValuesCopy[idx.first];
+                auto argName = std::string{ "arg" } + std::to_string(idx.first);
+                auto inputName = argValueCopy.GetName();
+                idx.second->setName(argName);
+                argValueCopy.SetData(Emittable{ idx.second });
+
+                if (auto argType = idx.second->getType(); argValueCopy.IsConstrained() && argType->isPointerTy())
+                {
+                    auto innerType = argType->getPointerElementType();
+                    uint64_t bytes = argValueCopy.GetLayout().GetMemorySize() * fnEmitter.GetEmitter().SizeOf(innerType);
+                    fnEmitter.SetAttributeForArgument(idx.first, IRFunctionEmitter::Attributes::Dereferenceable, bytes);
+                }
             }
 
             returnValueCopy = fn(argValuesCopy);
@@ -694,7 +879,7 @@ namespace value
             }
         }
 
-        DefinedFunction returnFn = [this, decl](std::vector<Value> args) -> std::optional<Value> {
+        DefinedFunction returnFn = [this, decl, llvmExpectedValues = argValuesCopy](std::vector<Value> args) -> std::optional<Value> {
             const auto& argValues = decl.GetParameterTypes();
             const auto& returnValue = decl.GetReturnType();
             const auto& fnName = decl.GetFunctionName();
@@ -710,13 +895,12 @@ namespace value
                 throw InputException(InputExceptionErrors::invalidArgument);
             }
 
-            std::vector<LLVMValue> llvmArgs(args.size());
-            std::transform(args.begin(), args.end(), llvmArgs.begin(), [this](Value& arg) {
-                return EnsureEmittable(arg).Get<Emittable>().GetDataAs<LLVMValue>();
-            });
+            std::vector<Value> emittableArgs = EnsureEmittable(args);
+            auto normalizedArgs = NormalizeReferenceLevels(emittableArgs, llvmExpectedValues);
+            std::vector<LLVMValue> llvmArgs = ToLLVMValue(normalizedArgs);
 
             auto returnValueCopy = returnValue;
-            LLVMValue fnReturnValue = _emitter.GetCurrentFunction().Call(fnName, llvmArgs);
+            LLVMValue fnReturnValue = GetFunctionEmitter().Call(fnName, llvmArgs);
             if (returnValueCopy)
             {
                 returnValueCopy->SetData(Emittable{ fnReturnValue });
@@ -737,12 +921,17 @@ namespace value
             return true;
         }
 
-        return _definedFunctions.find(decl) != _definedFunctions.end();
+        if (_definedFunctions.find(decl) != _definedFunctions.end())
+        {
+            return true;
+        }
+
+        return _emitter.HasFunction(decl.GetFunctionName());
     }
 
     Value LLVMContext::StoreConstantDataImpl(ConstantData data) { return _computeContext.StoreConstantData(data); }
 
-    void LLVMContext::ForImpl(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn)
+    void LLVMContext::ForImpl(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn, const std::string& name)
     {
         std::vector<IRFunctionEmitter::ConstLoopRange> ranges(layout.NumDimensions());
         for (auto index = 0u; index < ranges.size(); ++index)
@@ -754,6 +943,7 @@ namespace value
         auto logicalOrder = layout.GetLogicalDimensionOrder();
 
         GetFunctionEmitter().For(
+            name,
             ranges,
             [&fn, logicalOrder](emitters::IRFunctionEmitter&, std::vector<emitters::IRLocalScalar> indices) {
                 std::vector<Scalar> logicalIndices(indices.size());
@@ -765,7 +955,7 @@ namespace value
             });
     }
 
-    void LLVMContext::ForImpl(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn)
+    void LLVMContext::ForImpl(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn, const std::string& name)
     {
         auto startValue = EnsureEmittable(start.GetValue());
         auto stopValue = EnsureEmittable(stop.GetValue());
@@ -780,6 +970,7 @@ namespace value
         Scalar index = value::Allocate<int>(ScalarLayout);
 
         fnEmitter.For(
+            name,
             fnEmitter.Load(ToLLVMValue(startValue)),
             fnEmitter.Load(ToLLVMValue(stopValue)),
             fnEmitter.Load(ToLLVMValue(stepValue)),
@@ -815,15 +1006,74 @@ namespace value
         }
         else
         {
-            if (!TypeCompatible(destination, source) &&
-                (destination.PointerLevel() == source.PointerLevel() ||
-                 destination.PointerLevel() == (1 + source.PointerLevel())))
+            if (!TypeCompatible(destination, source))
             {
                 throw InputException(InputExceptionErrors::typeMismatch);
             }
 
+            enum class CopyType
+            {
+                DirectScalarPassThrough,
+                DirectScalarCopy,
+                Memory,
+                Reference
+            };
+            CopyType copyType{};
+
+            if (auto srcPtrLevel = source.PointerLevel(); srcPtrLevel < 0)
+            {
+                throw LogicException(LogicExceptionErrors::illegalState);
+            }
+            else if (srcPtrLevel == 0)
+            {
+                switch (destination.PointerLevel())
+                {
+                case 0:
+                    copyType = CopyType::DirectScalarPassThrough;
+                    break;
+                case 1:
+                    copyType = CopyType::DirectScalarCopy;
+                    break;
+                default:
+                    throw LogicException(LogicExceptionErrors::illegalState);
+                }
+                if (source.GetLayout() != ScalarLayout || destination.GetLayout() != ScalarLayout)
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+            }
+            else if (srcPtrLevel == 1)
+            {
+                if (destination.PointerLevel() != 1)
+                {
+                    throw LogicException(LogicExceptionErrors::illegalState);
+                }
+                else
+                {
+                    if (destination.GetLayout() != source.GetLayout())
+                    {
+                        throw InputException(InputExceptionErrors::sizeMismatch);
+                    }
+                    copyType = CopyType::Memory;
+                }
+            }
+            else if (destination.PointerLevel() == srcPtrLevel)
+            {
+                assert(srcPtrLevel > 1);
+                if (source.IsConstant())
+                {
+                    throw LogicException(LogicExceptionErrors::illegalState);
+                }
+                copyType = CopyType::Reference;
+            }
+            else
+            {
+                throw LogicException(LogicExceptionErrors::illegalState);
+            }
+
             auto& irEmitter = _emitter.GetIREmitter();
             auto destValue = ToLLVMValue(destination);
+
             if (source.IsConstant())
             {
                 // we're only copying active areas below. should we copy padded too?
@@ -847,10 +1097,21 @@ namespace value
                 {
                     return;
                 }
-                if (auto& layout = source.GetLayout(); layout.IsContiguous())
+                switch (copyType)
                 {
-                    if (destination.PointerLevel() == source.PointerLevel())
+                case CopyType::DirectScalarPassThrough:
+                    destination.SetData(Emittable{ srcValue });
+                    break;
+                case CopyType::DirectScalarCopy:
+                {
+                    auto destAtOffset = irEmitter.PointerOffset(destValue, irEmitter.Zero(VariableType::Int32));
+                    irEmitter.Store(destAtOffset, srcValue);
+                    break;
+                }
+                case CopyType::Memory:
+                    if (auto& layout = source.GetLayout(); layout.IsContiguous())
                     {
+                        assert(copyType == CopyType::Memory);
                         auto llvmType = srcValue->getType()->getContainedType(0);
                         auto primSize = irEmitter.SizeOf(llvmType);
                         auto memorySize = irEmitter.Literal(static_cast<int64_t>(layout.GetMemorySize() * primSize));
@@ -860,17 +1121,24 @@ namespace value
                     }
                     else
                     {
-                        auto destAtOffset = irEmitter.PointerOffset(destValue, irEmitter.Zero(VariableType::Int32));
-                        irEmitter.Store(destAtOffset, srcValue);
+                        ForImpl(
+                            layout, [&](std::vector<Scalar> index) {
+                                auto offsetSource = source.Offset(detail::CalculateOffset(source.GetLayout(), index));
+                                auto offsetDest = destination.Offset(detail::CalculateOffset(destination.GetLayout(), index));
+                                (void)irEmitter.Store(ToLLVMValue(offsetDest), irEmitter.Load(ToLLVMValue(offsetSource)));
+                            },
+                            "");
                     }
-                }
-                else
+                    break;
+                case CopyType::Reference:
                 {
-                    ForImpl(layout, [&](std::vector<Scalar> index) {
-                        auto offsetSource = source.Offset(detail::CalculateOffset(source.GetLayout(), index));
-                        auto offsetDest = destination.Offset(detail::CalculateOffset(destination.GetLayout(), index));
-                        (void)irEmitter.Store(ToLLVMValue(offsetDest), irEmitter.Load(ToLLVMValue(offsetSource)));
-                    });
+                    auto srcAtOffset = irEmitter.Load(srcValue);
+                    irEmitter.Store(destValue, srcAtOffset);
+                    destination.SetLayout(source.GetLayout());
+                    break;
+                }
+                default:
+                    throw LogicException(LogicExceptionErrors::illegalState);
                 }
             }
         }
@@ -963,11 +1231,15 @@ namespace value
             destination = Allocate(source.GetBaseType(), source.GetLayout());
         }
 
-        if (!TypeCompatible(destination, source) &&
-            (destination.PointerLevel() == source.PointerLevel() ||
-             destination.PointerLevel() == (1 + source.PointerLevel())))
+        if (!TypeCompatible(destination, source))
         {
             throw InputException(InputExceptionErrors::typeMismatch);
+        }
+
+        if (!((source.PointerLevel() == 0 || source.PointerLevel() == 1) &&
+              (destination.PointerLevel() == 0 || destination.PointerLevel() == 1)))
+        {
+            throw InputException(InputExceptionErrors::invalidArgument);
         }
 
         if (destination.GetLayout() != source.GetLayout())
@@ -1018,6 +1290,17 @@ namespace value
                         }
                         opFn = [&fn](auto dst, auto src) { return fn.Operator(TypedOperator::moduloSigned, dst, src); };
                         break;
+                    case ValueBinaryOperation::logicalAnd:
+                        [[fallthrough]];
+                    case ValueBinaryOperation::logicalOr:
+                        if (destination.GetBaseType() != ValueType::Boolean)
+                        {
+                            throw InputException(InputExceptionErrors::invalidArgument);
+                        }
+                        opFn = [&fn, op](auto dst, auto src) {
+                            return fn.Operator(op == ValueBinaryOperation::logicalAnd ? TypedOperator::logicalAnd : TypedOperator::logicalOr, dst, src);
+                        };
+                        break;
                     default:
                         throw LogicException(LogicExceptionErrors::illegalState);
                     }
@@ -1031,22 +1314,43 @@ namespace value
                         // If the pointer levels don't match, it means the source is not a pointer (logically)
                         // and we just need to do an assignment of the value to the value pointed to by
                         // destintion
-                        bool scalarLLVMSource = source.PointerLevel() != destination.PointerLevel();
-                        ForImpl(layout, [&](std::vector<Scalar> index) {
-                            LLVMValue srcValue = nullptr;
-                            if (scalarLLVMSource)
-                            {
-                                srcValue = ToLLVMValue(source);
-                            }
-                            else
-                            {
-                                auto offsetSource = source.Offset(detail::CalculateOffset(source.GetLayout(), index));
-                                srcValue = fn.Load(ToLLVMValue(offsetSource));
-                            }
-                            auto offsetDest = destination.Offset(detail::CalculateOffset(destination.GetLayout(), index));
-                            auto destValue = ToLLVMValue(offsetDest);
-                            fn.Store(destValue, opFn(fn.Load(destValue), srcValue));
-                        });
+                        bool scalarLLVMSource = source.PointerLevel() == 0;
+                        bool scalarLLVMDestination = destination.PointerLevel() == 0;
+                        ForImpl(
+                            layout, [&](std::vector<Scalar> index) {
+                                LLVMValue srcValue = nullptr;
+                                if (scalarLLVMSource)
+                                {
+                                    srcValue = ToLLVMValue(source);
+                                }
+                                else
+                                {
+                                    auto offsetSource = source.Offset(detail::CalculateOffset(source.GetLayout(), index));
+                                    srcValue = fn.Load(ToLLVMValue(offsetSource));
+                                }
+
+                                LLVMValue destValue = nullptr;
+                                LLVMValue destValueOffset = nullptr;
+                                if (scalarLLVMDestination)
+                                {
+                                    destValue = ToLLVMValue(destination);
+                                }
+                                else
+                                {
+                                    destValueOffset = ToLLVMValue(destination.Offset(detail::CalculateOffset(destination.GetLayout(), index)));
+                                    destValue = fn.Load(destValueOffset);
+                                }
+                                auto result = opFn(destValue, srcValue);
+                                if (!scalarLLVMDestination)
+                                {
+                                    fn.Store(destValueOffset, result);
+                                }
+                                else
+                                {
+                                    const_cast<Value&>(destination).SetData(Emittable{ result });
+                                }
+                            },
+                            "");
                     }
                     else
                     {
@@ -1113,16 +1417,19 @@ namespace value
                                 auto& fn = this->GetFunctionEmitter();
                                 auto result = fn.TrueBit();
 
-                                ForImpl(source1.GetLayout(), [&](std::vector<Scalar> index) {
-                                    auto offsetSource1 = source1.Offset(detail::CalculateOffset(source1.GetLayout(), index));
-                                    auto offsetSource2 = source2.Offset(detail::CalculateOffset(source2.GetLayout(), index));
-                                    result = fn.LogicalAnd(
-                                        result,
-                                        fn.Comparison(
-                                            comparisonOp,
-                                            fn.Load(ToLLVMValue(offsetSource1)),
-                                            fn.Load(ToLLVMValue(offsetSource2))));
-                                });
+                                ForImpl(
+                                    source1.GetLayout(),
+                                    [&](std::vector<Scalar> index) {
+                                        auto offsetSource1 = source1.Offset(detail::CalculateOffset(source1.GetLayout(), index));
+                                        auto offsetSource2 = source2.Offset(detail::CalculateOffset(source2.GetLayout(), index));
+                                        result = fn.LogicalAnd(
+                                            result,
+                                            fn.Comparison(
+                                                comparisonOp,
+                                                fn.Load(ToLLVMValue(offsetSource1)),
+                                                fn.Load(ToLLVMValue(offsetSource2))));
+                                    },
+                                    "");
 
                                 return { Emittable{ result }, ScalarLayout };
                             },
@@ -1131,20 +1438,30 @@ namespace value
                                 using CastType = std::conditional_t<std::is_same_v<Type, Boolean>, bool, Type>;
                                 auto& fn = this->GetFunctionEmitter();
 
-                                auto result = fn.TrueBit();
+                                LLVMValue result = nullptr;
                                 auto llvmOp1 = source1Data.GetDataAs<LLVMValue>();
+                                if (source1.PointerLevel() == 0)
+                                {
+                                    result = fn.Comparison(
+                                        comparisonOp,
+                                        llvmOp1,
+                                        fn.Literal(static_cast<CastType>(source2Data[0])));
+                                }
+                                else
+                                {
+                                    result = fn.TrueBit();
+                                    ConstantForLoop(source1.GetLayout(), [&](const MemoryCoordinates& logicalCoordinates) {
+                                        auto source1Offset = source1.GetLayout().GetLogicalEntryOffset(logicalCoordinates);
+                                        auto source2Offset = source2.GetLayout().GetLogicalEntryOffset(logicalCoordinates);
 
-                                ConstantForLoop(source1.GetLayout(), [&](const MemoryCoordinates& logicalCoordinates) {
-                                    auto source1Offset = source1.GetLayout().GetLogicalEntryOffset(logicalCoordinates);
-                                    auto source2Offset = source2.GetLayout().GetLogicalEntryOffset(logicalCoordinates);
-
-                                    result = fn.LogicalAnd(
-                                        result,
-                                        fn.Comparison(
-                                            comparisonOp,
-                                            fn.ValueAt(llvmOp1, source1Offset),
-                                            fn.Literal(static_cast<CastType>(source2Data[source2Offset]))));
-                                });
+                                        result = fn.LogicalAnd(
+                                            result,
+                                            fn.Comparison(
+                                                comparisonOp,
+                                                fn.ValueAt(llvmOp1, source1Offset),
+                                                fn.Literal(static_cast<CastType>(source2Data[source2Offset]))));
+                                    });
+                                }
 
                                 return { Emittable{ result }, ScalarLayout };
                             } },
@@ -1224,7 +1541,7 @@ namespace value
             }
             else
             {
-                testValue = ToLLVMValue(value);
+                testValue = value::ToLLVMValue(value);
             }
 
             _ifEmitter.ElseIf(testValue, [fn = std::move(fn)](auto&) { fn(); });
@@ -1258,6 +1575,22 @@ namespace value
         return { std::make_unique<LLVMContext::IfContextImpl>(std::move(ifEmitter), fnEmitter) };
     }
 
+    void LLVMContext::WhileImpl(Scalar test, std::function<void()> fn)
+    {
+        auto& fnEmitter = GetFunctionEmitter();
+        LLVMValue testValue = nullptr;
+        if (auto value = test.GetValue(); value.IsConstant())
+        {
+            testValue = fnEmitter.Literal(static_cast<int>(test.Get<Boolean>()));
+        }
+        else
+        {
+            testValue = ToLLVMValue(value);
+        }
+
+        fnEmitter.While(testValue, [fn = std::move(fn)](auto&) { fn(); });
+    }
+
     std::optional<Value> LLVMContext::CallImpl(FunctionDeclaration func, std::vector<Value> args)
     {
         if (std::any_of(args.begin(), args.end(), [](const auto& value) { return value.IsEmpty(); }))
@@ -1275,9 +1608,9 @@ namespace value
         {
             return it->second(args);
         }
-
         return EmitExternalCall(func, args);
     }
+
     void LLVMContext::PrefetchImpl(Value data, PrefetchType type, PrefetchLocality locality)
     {
         if (data.IsConstant())
@@ -1431,8 +1764,37 @@ namespace value
             return _computeContext.GetName(realized);
         }
 
-        auto llvmValue = ToLLVMValue(realized);
-        return llvmValue->getName();
+        auto llvmValue = *ToLLVMValue(realized);
+        if (llvmValue != nullptr)
+            return llvmValue->getName();
+        else
+            return "";
+    }
+
+    void LLVMContext::ImportCodeFileImpl(std::string filename)
+    {
+        if (auto lowercaseFilename = utilities::ToLowercase(filename); utilities::EndsWith(lowercaseFilename, ".ll"))
+        {
+            _emitter.LoadIRFromFile(filename);
+        }
+        else if (utilities::EndsWith(lowercaseFilename, ".s"))
+        {
+            _emitter.LoadAsmFromFile(filename);
+        }
+        else
+        {
+            throw LogicException(LogicExceptionErrors::illegalState, "[LLVMContext] Don't know how to import code file " + filename);
+        }
+    }
+
+    Scalar LLVMContext::GetFunctionAddressImpl(const FunctionDeclaration& fn)
+    {
+        auto llvmFn = DeclareFunction(fn);
+
+        auto& fnEmitter = GetFunctionEmitter();
+        auto fnAddress = fnEmitter.CastPointerToInt(llvmFn, VariableType::Int64);
+        fnAddress->setName(fn.GetFunctionName() + "Ptr");
+        return Value(Emittable{ fnAddress }, ScalarLayout);
     }
 
     Value LLVMContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)
@@ -1454,12 +1816,16 @@ namespace value
             { FloorFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetFloorFunction) },
             { CeilFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetCeilFunction) },
             { CopySignFunctionDeclaration, CopySignFunctionIntrinsic() },
+            { FmaFunctionDeclaration, FmaFunctionIntrinsic() },
+            { MemCopyFunctionDeclaration, MemOpFunctionIntrinsic(MemIntrinsicOp::Copy) },
+            { MemMoveFunctionDeclaration, MemOpFunctionIntrinsic(MemIntrinsicOp::Move) },
+            { MemSetFunctionDeclaration, MemOpFunctionIntrinsic(MemIntrinsicOp::Set) },
         };
 
         if (std::all_of(args.begin(), args.end(), [](const auto& value) { return value.IsConstant(); }))
         {
             // Compute context can handle intrinsic calls with constant data
-            return *_computeContext.Call(intrinsic, args);
+            return *_computeContext.Call(intrinsic, std::vector<ViewAdapter>(args.begin(), args.end()));
         }
 
         std::vector<Value> emittableArgs;
@@ -1482,39 +1848,14 @@ namespace value
             throw InputException(InputExceptionErrors::sizeMismatch);
         }
 
-        auto& irEmitter = _emitter.GetIREmitter();
-        auto& fnEmitter = GetFunctionEmitter();
-
         const auto& returnType = externalFunc.GetReturnType();
 
-        // Create external function declaration
-        const auto& fnName = externalFunc.GetFunctionName();
-        if (!_emitter.HasFunction(fnName))
-        {
-            auto resultType = [&] {
-                if (returnType)
-                {
-                    return ValueTypeToLLVMType(irEmitter, { returnType->GetBaseType(), returnType->PointerLevel() });
-                }
-                else
-                {
-                    return ValueTypeToLLVMType(irEmitter, { ValueType::Void, 0 });
-                }
-            }();
-
-            std::vector<LLVMType> paramTypes(argTypes.size());
-            std::transform(argTypes.begin(), argTypes.end(), paramTypes.begin(), [&](const auto& value) {
-                return ValueTypeToLLVMType(irEmitter, { value.GetBaseType(), value.PointerLevel() });
-            });
-
-            auto fnType = llvm::FunctionType::get(resultType, paramTypes, false);
-            _emitter.DeclareFunction(fnName, fnType);
-        }
-        auto fn = _emitter.GetFunction(fnName);
+        DeclareFunction(externalFunc);
 
         // as a first approximation, if the corresponding arg type has a pointer level that's one less
         // than the passed in value, we dereference it. if it's the same, we pass it in as is. if it's anything else,
         // throw. this logic may not be sufficient for future use cases.
+        auto& fnEmitter = GetFunctionEmitter();
         std::vector<LLVMValue> argValues;
         argValues.reserve(args.size());
         for (auto idx = 0u; idx < args.size(); ++idx)
@@ -1542,7 +1883,39 @@ namespace value
             }
         }
 
+        auto fn = [&, this]() -> LLVMFunction {
+            if (externalFunc.IsPointerSet())
+            {
+                auto llvmFuncAddr = ToLLVMValue(externalFunc.GetPointer().GetValue());
+                auto& fnEmitter = GetFunctionEmitter();
+                auto fnType = ToLLVMFunctionType(externalFunc);
+                auto fnPtr = fnEmitter.CastIntToPointer(llvmFuncAddr, fnType->getPointerTo());
+                return llvm::dyn_cast<llvm::Function>(fnPtr);
+            }
+            else
+            {
+                const auto& fnName = externalFunc.GetFunctionName();
+                return _emitter.GetFunction(fnName);
+            }
+        }();
+        assert(fn != nullptr);
+
         auto resultValue = fnEmitter.Call(fn, argValues);
+        auto callInst = llvm::dyn_cast<llvm::CallInst>(resultValue);
+        if (callInst)
+        {
+            auto callingConv = fn->getCallingConv();
+            callInst->setCallingConv(callingConv);
+            if (externalFunc.InlineState() != FunctionInlining::defaultInline)
+            {
+                IRFunctionEmitter::SetInlineState(fn, GetEmittersFunctionInlining(externalFunc.InlineState()));
+
+                // Not sure if this is actually necessary or helpful:
+                llvm::InlineFunctionInfo inliner;
+                llvm::InlineFunction(callInst, inliner);
+            }
+        }
+
         auto result = returnType;
         if (result)
         {
@@ -1596,6 +1969,27 @@ namespace value
     IRFunctionEmitter& LLVMContext::GetFunctionEmitter() const
     {
         return _functionStack.top().get();
+    }
+
+    emitters::LLVMFunction LLVMContext::DeclareFunction(const FunctionDeclaration& func)
+    {
+        // Create external function declaration
+        const auto& fnName = func.GetFunctionName();
+        if (auto llvmFn = _emitter.GetFunction(fnName); llvmFn != nullptr)
+        {
+            return llvmFn;
+        }
+
+        auto fnType = ToLLVMFunctionType(func);
+        auto fn = _emitter.DeclareFunction(fnName, fnType);
+        IRFunctionEmitter::SetInlineState(fn, GetEmittersFunctionInlining(func.InlineState()));
+        return fn;
+    }
+
+    void LLVMContext::DebugBreakImpl()
+    {
+        auto& fn = GetFunctionEmitter();
+        fn.DebugBreak();
     }
 
     Value LLVMContext::PromoteConstantData(Value value)
@@ -1729,7 +2123,7 @@ namespace value
             newValue.SetData(Emittable{ fn.PointerOffset(emittable.GetDataAs<LLVMValue>(), static_cast<int>(offset)) });
             if (!name.empty())
             {
-                ToLLVMValue(newValue)->setName(name);
+                (*ToLLVMValue(newValue))->setName(name);
             }
 
             return newValue;
@@ -1752,5 +2146,86 @@ namespace value
         }
     }
 
+    std::vector<Value> LLVMContext::EnsureEmittable(std::vector<Value> values)
+    {
+        std::vector<Value> emittables(values.size());
+        std::transform(values.begin(), values.end(), emittables.begin(), [this](Value& arg) -> Value {
+            return EnsureEmittable(arg);
+        });
+        return emittables;
+    }
+
+    std::optional<LLVMValue> LLVMContext::ToLLVMValue(Value value) const
+    {
+        if (value.IsConstant())
+        {
+            return std::nullopt;
+        }
+        return value.Get<Emittable>().GetDataAs<LLVMValue>();
+    }
+
+    LLVMValue LLVMContext::ToLLVMValue(Value value)
+    {
+        return EnsureEmittable(value).Get<Emittable>().GetDataAs<LLVMValue>();
+    }
+
+    std::vector<std::optional<LLVMValue>> LLVMContext::ToLLVMValue(std::vector<Value> values) const
+    {
+        std::vector<std::optional<LLVMValue>> llvmValues(values.size());
+        std::transform(values.begin(), values.end(), llvmValues.begin(), [this](Value& value) -> std::optional<LLVMValue> {
+            return ToLLVMValue(value);
+        });
+        return llvmValues;
+    }
+
+    std::vector<LLVMValue> LLVMContext::ToLLVMValue(std::vector<Value> values)
+    {
+        std::vector<LLVMValue> llvmValues(values.size());
+        std::transform(values.begin(), values.end(), llvmValues.begin(), [this](Value& value) -> LLVMValue {
+            return ToLLVMValue(value);
+        });
+        return llvmValues;
+    }
+
+    LLVMFunctionType LLVMContext::ToLLVMFunctionType(const FunctionDeclaration& func) const
+    {
+        auto& irEmitter = _emitter.GetIREmitter();
+        const auto& argTypes = func.GetParameterTypes();
+        const auto& returnType = func.GetReturnType();
+
+        // Create external function declaration
+        auto resultType = returnType ? ValueTypeToLLVMType(irEmitter, { returnType->GetBaseType(), returnType->PointerLevel() }) : ValueTypeToLLVMType(irEmitter, { ValueType::Void, 0 });
+        std::vector<LLVMType> paramTypes(argTypes.size());
+        std::transform(argTypes.begin(), argTypes.end(), paramTypes.begin(), [&](const auto& value) {
+            return ValueTypeToLLVMType(irEmitter, { value.GetBaseType(), value.PointerLevel() });
+        });
+
+        return llvm::FunctionType::get(resultType, paramTypes, false);
+    }
+
+    LLVMValue ToLLVMValue(Value value)
+    {
+        auto val = InvokeForContext<LLVMContext>([&](LLVMContext& context) {
+            return context.ToLLVMValue(value);
+        });
+        return val.value_or(nullptr);
+    }
+
+    LLVMValue ToLLVMValue(ViewAdapter value)
+    {
+        auto val = InvokeForContext<LLVMContext>([&](LLVMContext& context) {
+            return context.ToLLVMValue(value);
+        });
+        return val.value_or(nullptr);
+    }
+
+    std::vector<LLVMValue> ToLLVMValue(std::vector<Value> values)
+    {
+        std::vector<LLVMValue> llvmValues(values.size());
+        std::transform(values.begin(), values.end(), llvmValues.begin(), [](Value& value) -> LLVMValue {
+            return ToLLVMValue(value);
+        });
+        return llvmValues;
+    }
 } // namespace value
 } // namespace ell

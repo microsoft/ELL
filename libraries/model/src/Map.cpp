@@ -88,6 +88,10 @@ namespace model
             AddOutput(name, transformer.GetCorrespondingOutputs(*outputPort));
         }
 
+        _metadata = other._metadata;
+
+        // TODO (kerha): _computeContext isn't copied right now. Not sure if it should be. [2019-08-23]
+
         _model.Verify();
     }
 
@@ -326,6 +330,7 @@ namespace model
         swap(a._outputs, b._outputs);
         swap(a._outputNames, b._outputNames);
         swap(a._outputsMap, b._outputsMap);
+        swap(a._metadata, b._metadata);
         swap(a._computeContext, b._computeContext);
     }
 

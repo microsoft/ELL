@@ -25,7 +25,7 @@ namespace emitters
     {
     public:
         virtual ~IRLoopEmitter() = default;
-    
+
     protected:
         IRLoopEmitter(IRFunctionEmitter& functionEmitter);
         void AddLoopMetadata(llvm::BranchInst* branch, bool unroll, bool parallel);
@@ -40,7 +40,8 @@ namespace emitters
         /// <summary> Constructs an instance of IRForLoopEmitter. </summary>
         ///
         /// <param name="functionEmitter"> The function emitter. </param>
-        IRForLoopEmitter(IRFunctionEmitter& functionEmitter);
+        /// <param name="tag"> Optional, tag to use when naming the basic block regions </param>
+        IRForLoopEmitter(IRFunctionEmitter& functionEmitter, const std::string& tag = "");
 
         /// <summary> Gets the block containing the body of the for loop. </summary>
         ///
@@ -105,6 +106,7 @@ namespace emitters
         llvm::BasicBlock* _pIncrementBlock = nullptr; // Here we increment the iteration variable
         llvm::BasicBlock* _pAfterBlock = nullptr; // When the loop is done, we branch to this block
         LLVMValue _pIterationVariable = nullptr;
+        std::string _tag;
     };
 
     /// <summary> Class that simplifies while loop creation. Used internally by IRFunctionEmitter. </summary>
@@ -116,7 +118,8 @@ namespace emitters
         /// <summary> Constructs an instance of IRWhileLoopEmitter. </summary>
         ///
         /// <param name="functionEmitter"> The function emitter. </param>
-        IRWhileLoopEmitter(IRFunctionEmitter& functionEmitter);
+        /// <param name="tag"> Optional, tag to use when naming the basic block regions </param>
+        IRWhileLoopEmitter(IRFunctionEmitter& functionEmitter, const std::string& tag = "");
 
         /// <summary> Emits the beginning of a while loop that uses a mutable test value. </summary>
         ///
@@ -150,6 +153,7 @@ namespace emitters
         llvm::BasicBlock* _pConditionBlock = nullptr; // Here we do the loop termination check
         llvm::BasicBlock* _pBodyBlock = nullptr; // The body of the loop
         llvm::BasicBlock* _pAfterBlock = nullptr; // When the loop is done, we branch to this block
+        std::string _tag;
     };
 } // namespace emitters
 } // namespace ell

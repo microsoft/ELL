@@ -42,3 +42,5 @@ void TestElseIfWithComputedCondition();
 
 void TestCastValue();
 void TestCastToConditionalBool();
+
+void TestInlineAssembly();

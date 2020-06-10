@@ -286,5 +286,6 @@ namespace value
         value.SetLayout(value.GetLayout().Flatten());
         return value;
     }
+
 } // namespace value
 } // namespace ell

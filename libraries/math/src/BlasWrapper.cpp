@@ -10,7 +10,11 @@
 #include "Matrix.h"
 
 #if USE_BLAS
+#if USE_MKL
+#include <mkl.h>
+#elif USE_OPENBLAS
 #include <cblas.h>
+#endif
 #endif
 
 #include <thread> // for hardware_concurrency()
@@ -69,8 +73,12 @@ namespace math
             {
                 numThreads = std::thread::hardware_concurrency();
             }
-#ifdef OPENBLAS_CONST
+#if USE_BLAS
+#if defined(USE_OPENBLAS) && defined(OPENBLAS_CONST)
             openblas_set_num_threads(numThreads);
+#elif USE_MKL
+            mkl_set_num_threads(numThreads);
+#endif
 #endif
         }
 

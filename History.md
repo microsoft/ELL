@@ -1,3 +1,16 @@
+## 3.1.0
+- Move to VS 2019
+- Fix a codegen error that was resulting in incorrect functional behavior
+- Fix regressions in audio training tutorial (#232)
+- Add importing of Sum nodes to ONNX importer
+- Fix crash in LLVMContext::SetName
+- Improved performance of CNN models on Pi3 with new implementations of spatial, pointwise and regular convolutions
+- Improved performance of reorder node
+- New nodes: ReorderDataCodeNode, SpatialConvolutionNode, MatrixMatrixMultiplyCodeNode
+- Implement parallelization strategies for matrix multiplication nodes.
+- Only enable new MatrixMatrixMultipleCodeNode path for select ARM targets like Pi, and not Intel/AMD CPUs
+- Add the flag `--skip_ellcode` to `compile` and `wrap.py` tools to use OpenBLAS for linear algebra computations.
+
 ## 3.0.3
 - Fix VS 2019 build.
 

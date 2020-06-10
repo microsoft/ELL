@@ -49,6 +49,7 @@ set(include
   include/CStringParser.h
   include/Debug.h
   include/Graph.h
+  include/EnumFlagHelpers.h
   include/Exception.h
   include/Files.h
   include/Format.h
@@ -79,6 +80,7 @@ set(include
   include/StringUtil.h
   include/Tokenizer.h
   include/TransformIterator.h
+  include/TunableParameters.h
   include/TupleUtils.h
   include/TypeAliases.h
   include/TypeFactory.h
@@ -121,6 +123,7 @@ set(test_src
   test/src/ObjectArchive_test.cpp
   test/src/PropertyBag_test.cpp
   test/src/RingBuffer_test.cpp
+  test/src/TunableParameters_test.cpp
   test/src/TypeFactory_test.cpp
   test/src/TypeName_test.cpp
   test/src/Variant_test.cpp
@@ -137,6 +140,7 @@ set(test_include
   test/include/ObjectArchive_test.h
   test/include/PropertyBag_test.h
   test/include/RingBuffer_test.h
+  test/include/TunableParameters_test.h
   test/include/TypeFactory_test.h
   test/include/TypeName_test.h
   test/include/Variant_test.h

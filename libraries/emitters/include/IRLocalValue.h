@@ -18,6 +18,7 @@ namespace emitters
 {
     class IRFunctionEmitter;
     struct IRLocalValue;
+    struct IRLocalScalar;
 
     namespace detail
     {
@@ -63,9 +64,6 @@ namespace emitters
 
         /// <summary> The LLVMValue being wrapped. </summary>
         LLVMValue value;
-
-    private:
-        IRLocalValue() = default;
     };
 
     /// <summary>
@@ -74,6 +72,11 @@ namespace emitters
     struct IRLocalPointer : public IRLocalValue
     {
         using IRLocalValue::IRLocalValue;
+
+        IRLocalValue Load() const;
+        IRLocalPointer Offset(int offset) const;
+        IRLocalPointer Offset(LLVMValue offset) const;
+        IRLocalPointer Offset(const IRLocalScalar& offset) const;
     };
 } // namespace emitters
 } // namespace ell

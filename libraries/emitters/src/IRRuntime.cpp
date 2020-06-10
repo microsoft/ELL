@@ -420,17 +420,22 @@ namespace emitters
         return _module.GetIntrinsic(llvm::Intrinsic::sin, { argType });
     }
 
-	LLVMFunction IRRuntime::GetCosFunction(VariableType argType)
+    LLVMFunction IRRuntime::GetCosFunction(VariableType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::cos, { argType });
     }
 
-	LLVMFunction IRRuntime::GetCopySignFunction(VariableType argType)
+    LLVMFunction IRRuntime::GetCopySignFunction(VariableType argType)
     {
         return _module.GetIntrinsic(llvm::Intrinsic::copysign, { argType });
     }
 
-	LLVMFunction IRRuntime::GetTanhFunction(VariableType argType)
+    LLVMFunction IRRuntime::GetFmaFunction(VariableType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::fma, { argType });
+    }
+
+    LLVMFunction IRRuntime::GetTanhFunction(VariableType argType)
     {
         // This assumes a standard C runtime library is linked
         auto& emitter = _module.GetIREmitter();
@@ -529,6 +534,11 @@ namespace emitters
         return _module.GetIntrinsic(llvm::Intrinsic::copysign, { argType });
     }
 
+    LLVMFunction IRRuntime::GetFmaFunction(LLVMType argType)
+    {
+        return _module.GetIntrinsic(llvm::Intrinsic::fma, { argType });
+    }
+
     LLVMFunction IRRuntime::GetPrefetchFunction()
     {
         return _module.GetIntrinsic(llvm::Intrinsic::prefetch, std::initializer_list<llvm::Type*>{});
@@ -563,11 +573,10 @@ namespace emitters
                                      // got to the end of both strings, so they are equal, return 1.
                                      fn.Store(result, fn.Literal(1));
                                      fn.Store(continuing, fn.FalseBit());
-                                 })
-                                   .ElseIf(achar == zero || bchar == zero || achar != bchar, [continuing](emitters::IRFunctionEmitter& fn) {
-                                       // terminate loop with 0 result
-                                       fn.Store(continuing, fn.FalseBit());
-                                   });
+                                 }).ElseIf(achar == zero || bchar == zero || achar != bchar, [continuing](emitters::IRFunctionEmitter& fn) {
+                                   // terminate loop with 0 result
+                                   fn.Store(continuing, fn.FalseBit());
+                               });
                                fn.Store(index, indexValue + 1);
                            });
 

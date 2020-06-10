@@ -92,6 +92,12 @@ namespace emitters
         /// <summary> The name of the file being compiled. </summary>
         std::string modelFile;
 
+        /// <summary> The byte alignment to use for global values. </summary>
+        int globalValueAlignment = 32;
+
+        /// <summary> Skip ELLCode optimization. </summary>
+        bool skip_ellcode = false;
+
     private:
         void AddOptions(const utilities::PropertyBag& properties);
     };

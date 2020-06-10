@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "ScalarOperations.h"
 #include "Value.h"
 
 namespace ell

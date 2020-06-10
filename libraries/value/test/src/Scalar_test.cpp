@@ -147,13 +147,13 @@ Scalar RefScalarRefCtorsTest()
 
     Scalar expected = Allocate<int>(ScalarLayout);
     expected = 100;
-    testing::ProcessTest("Value initial pointer level", expected.GetValue().PointerLevel() == 1);
+    testing::ProcessQuietTest("Value initial pointer level", expected.GetValue().PointerLevel() == 1);
     Ref<Scalar> scalarPtr = x;
-    testing::ProcessTest("Ref ctor", scalarPtr.GetValue().PointerLevel() == 2);
+    testing::ProcessQuietTest("Ref ctor", scalarPtr.GetValue().PointerLevel() == 2);
     Ref<Scalar> scalarPtrCopy = x;
-    testing::ProcessTest("Ref copy semantics", scalarPtr.GetValue().PointerLevel() == scalarPtrCopy.GetValue().PointerLevel());
+    testing::ProcessQuietTest("Ref copy semantics", scalarPtr.GetValue().PointerLevel() == scalarPtrCopy.GetValue().PointerLevel());
     Ref<Scalar> scalarPtrMove = std::move(scalarPtr);
-    testing::ProcessTest("Ref move semantics", !scalarPtr.GetValue().IsDefined() && scalarPtrMove.GetValue().PointerLevel() == 2);
+    testing::ProcessQuietTest("Ref move semantics", !scalarPtr.GetValue().IsDefined() && scalarPtrMove.GetValue().PointerLevel() == 2);
 
     return result;
 }
@@ -198,4 +198,67 @@ Scalar RefScalarRefRefRefTest()
     If(scalar != expected, [&] { result = 1; });
     return result;
 }
+
+Scalar SequenceLogicalAndTest()
+{
+    int fourInt = 4;
+    Scalar twoScalar = 2;
+    Scalar fourScalar = 4;
+
+    Scalar fourGTTwo = fourInt > twoScalar;
+    Scalar fourGTFour = fourInt > fourScalar;
+
+    Scalar ok = Allocate<int>(ScalarLayout);
+    ok = 1;
+    If((fourGTTwo && fourGTFour),
+        [&]() {
+            DebugPrint("Error! 4 > 2 && 4 > 4\n");
+        })
+    .ElseIf(fourGTTwo,
+        [&]() {
+            ok = 0;
+        })
+    .ElseIf(fourGTFour,
+        [&]() {
+            DebugPrint("Error! 4 <= 2 && 4 > 4\n");
+        })
+    .Else(
+        [&]() {
+            DebugPrint("Error! 4 <= 2 && 4 <= 4\n");
+        });
+    return ok;
+}
+
+Scalar SequenceLogicalAndTestWithCopy()
+{
+    int fourInt = 4;
+    Scalar twoScalar = 2;
+    Scalar fourScalar = 4;
+
+    Scalar fourGTTwo = fourInt > twoScalar;
+    Scalar copyFourGTTwo = fourInt > twoScalar;
+    Scalar fourGTFour = fourInt > fourScalar;
+    Scalar copyFourGTFour = fourInt > fourScalar;
+
+    Scalar ok = Allocate<int>(ScalarLayout);
+    ok = 1;
+    If((fourGTTwo && fourGTFour),
+        [&]() {
+            DebugPrint("Error! 4 > 2 && 4 > 4\n");
+        })
+    .ElseIf(copyFourGTTwo,
+        [&]() {
+            ok = 0;
+        })
+    .ElseIf(copyFourGTFour,
+        [&]() {
+            DebugPrint("Error! 4 <= 2 && 4 > 4\n");
+        })
+    .Else(
+        [&]() {
+            DebugPrint("Error! 4 <= 2 && 4 <= 4\n");
+        });
+    return ok;
+}
+
 } // namespace ell

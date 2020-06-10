@@ -10,15 +10,7 @@
 
 #include "NodeOperations.h"
 
-#include <emitters/include/CompilableFunction.h>
-#include <emitters/include/IRAsyncTask.h>
-#include <emitters/include/IREmitter.h>
-#include <emitters/include/IRVectorUtilities.h>
-#include <emitters/include/LLVMUtilities.h>
-
-#include <model/include/CompilableNode.h>
-#include <model/include/CompilableNodeUtilities.h>
-#include <model/include/IRMapCompiler.h>
+#include <model/include/CompilableCodeNode.h>
 #include <model/include/Model.h>
 #include <model/include/ModelTransformer.h>
 #include <model/include/Node.h>
@@ -26,6 +18,13 @@
 
 #include <utilities/include/Exception.h>
 #include <utilities/include/TypeName.h>
+
+#include <value/include/Array.h>
+#include <value/include/EmitterContext.h>
+#include <value/include/Scalar.h>
+
+#include <value/include/loopnests/CodeGenerator.h>
+#include <value/include/loopnests/LoopNest.h>
 
 #include <functional>
 #include <numeric>
@@ -37,6 +36,10 @@ namespace ell
 {
 namespace nodes
 {
+    using UnaryScalarFunction = value::Scalar (*)(value::Scalar);
+    using BinaryScalarFunction = value::Scalar (*)(value::Scalar, value::Scalar);
+    using TernaryScalarFunction = value::Scalar (*)(value::Scalar, value::Scalar, value::Scalar);
+
     /// <summary>
     ///
     /// Broadcast operation nodes perform elementwise operations on multidimensional arrays, using "broadcast" semantics. If the
@@ -51,7 +54,7 @@ namespace nodes
 
     // Base class for broadcast nodes
     template <typename ValueType, typename FunctionType>
-    class BroadcastOperationNode : public model::CompilableNode
+    class BroadcastOperationNode : public model::CompilableCodeNode
     {
     public:
         /// @name Output Port
@@ -60,6 +63,8 @@ namespace nodes
         /// @}
 
     protected:
+        using KernelFunctionType = std::function<void(const std::vector<value::Value>& args)>;
+
         BroadcastOperationNode(const std::vector<model::InputPortBase*>& inputsPortRefs,
                                const std::vector<const model::OutputPortBase*>& inputs,
                                ValueType padding = 0);
@@ -75,59 +80,36 @@ namespace nodes
         const model::OutputPort<ValueType>& GetOutput() const;
         const model::InputPort<ValueType>& GetInput(int index) const;
 
-        const FunctionType& GetFunction() const;
-        template <typename OpFunctionType>
-        void SetFunction(OpFunctionType&& function);
-        virtual ValueType ComputeOperation(const std::vector<ValueType>& args) const = 0;
-        virtual emitters::IRLocalScalar CompileOperation(const std::vector<emitters::IRLocalScalar>& args) const = 0;
-
-        void Compute() const override;
-        void Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function) override;
+        void Define(ell::value::FunctionDeclaration& fn) override;
+        KernelFunctionType MakeKernel(FunctionType f) const;
+        virtual KernelFunctionType GetKernelFunction() const = 0;
+        value::Scalar CallKernelFunction(FunctionType f, std::vector<value::Array> inputs, std::vector<std::vector<value::Scalar>> indices) const;
 
         bool HasState() const override { return true; } // stored state: function and padding value
 
-    protected:
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        void ComputeDimensionLoop(int dimension,
-                                  const std::vector<int>& prevInputDimensionOffsets,
-                                  const std::vector<int>& lastActiveInputDimensions,
-                                  const std::vector<ValueType>& inputValues,
-                                  int prevOutputDimensionOffset,
-                                  std::vector<ValueType>& output) const;
-
-        void CompileDimensionLoop(model::IRMapCompiler& compiler,
-                                  emitters::IRFunctionEmitter& function,
-                                  int dimension,
-                                  const std::vector<emitters::IRLocalArray>& inputs,
-                                  const std::vector<emitters::IRLocalScalar>& prevInputDimensionOffsets,
-                                  const std::vector<int>& lastActiveInputDimensions,
-                                  const std::vector<emitters::IRLocalScalar>& inputValues,
-                                  emitters::IRLocalScalar prevOutputDimensionOffset,
-                                  emitters::IRLocalArray& output) const;
-        std::vector<int> GetLastActiveInputDimensions() const;
-
         utilities::ArchiveVersion GetArchiveVersion() const override;
         bool CanReadArchiveVersion(const utilities::ArchiveVersion& version) const override;
 
         ValueType GetOutputPadding() const { return _paddingValue; }
 
         model::OutputPort<ValueType> _output;
-        std::unique_ptr<FunctionType> _function;
         ValueType _paddingValue;
     };
 
     //
     // BroadcastUnaryOperationNode
     //
+
     template <typename ValueType>
-    class BroadcastUnaryOperationNode : public BroadcastOperationNode<ValueType, UnaryFunctionType<ValueType>>
+    class BroadcastUnaryOperationNode : public BroadcastOperationNode<ValueType, UnaryScalarFunction>
     {
     public:
         using OperationType = UnaryOperationType;
-        using FunctionType = UnaryFunctionType<ValueType>;
+        using FunctionType = UnaryScalarFunction;
 
         /// <summary> Default constructor. </summary>
         BroadcastUnaryOperationNode();
@@ -166,16 +148,15 @@ namespace nodes
 
     protected:
         using BroadcastOperationNode<ValueType, FunctionType>::GetOutput;
-        using BroadcastOperationNode<ValueType, FunctionType>::GetFunction;
-        using BroadcastOperationNode<ValueType, FunctionType>::SetFunction;
-        ValueType ComputeOperation(const std::vector<ValueType>& args) const override;
-        emitters::IRLocalScalar CompileOperation(const std::vector<emitters::IRLocalScalar>& args) const override;
+        using BroadcastOperationNode<ValueType, FunctionType>::MakeKernel;
+        using KernelFunctionType = typename BroadcastOperationNode<ValueType, FunctionType>::KernelFunctionType;
+
+        KernelFunctionType GetKernelFunction() const override;
 
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        void SetOperationFunction();
         void Copy(model::ModelTransformer& transformer) const override;
 
         model::InputPort<ValueType> _input;
@@ -186,11 +167,11 @@ namespace nodes
     // BroadcastBinaryOperationNode
     //
     template <typename ValueType>
-    class BroadcastBinaryOperationNode : public BroadcastOperationNode<ValueType, BinaryFunctionType<ValueType>>
+    class BroadcastBinaryOperationNode : public BroadcastOperationNode<ValueType, BinaryScalarFunction>
     {
     public:
         using OperationType = BinaryOperationType;
-        using FunctionType = BinaryFunctionType<ValueType>;
+        using FunctionType = BinaryScalarFunction;
 
         /// <summary> Default constructor. </summary>
         BroadcastBinaryOperationNode();
@@ -236,16 +217,15 @@ namespace nodes
 
     protected:
         using BroadcastOperationNode<ValueType, FunctionType>::GetOutput;
-        using BroadcastOperationNode<ValueType, FunctionType>::GetFunction;
-        using BroadcastOperationNode<ValueType, FunctionType>::SetFunction;
-        ValueType ComputeOperation(const std::vector<ValueType>& args) const override;
-        emitters::IRLocalScalar CompileOperation(const std::vector<emitters::IRLocalScalar>& args) const override;
+        using BroadcastOperationNode<ValueType, FunctionType>::MakeKernel;
+        using KernelFunctionType = typename BroadcastOperationNode<ValueType, FunctionType>::KernelFunctionType;
+
+        KernelFunctionType GetKernelFunction() const override;
 
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        void SetOperationFunction();
         void Copy(model::ModelTransformer& transformer) const override;
 
         model::InputPort<ValueType> _input1;
@@ -257,11 +237,11 @@ namespace nodes
     // BroadcastTernaryOperationNode
     //
     template <typename ValueType>
-    class BroadcastTernaryOperationNode : public BroadcastOperationNode<ValueType, TernaryFunctionType<ValueType>>
+    class BroadcastTernaryOperationNode : public BroadcastOperationNode<ValueType, TernaryScalarFunction>
     {
     public:
         using OperationType = TernaryOperationType;
-        using FunctionType = TernaryFunctionType<ValueType>;
+        using FunctionType = TernaryScalarFunction;
 
         /// <summary> Default constructor. </summary>
         BroadcastTernaryOperationNode();
@@ -308,16 +288,15 @@ namespace nodes
 
     protected:
         using BroadcastOperationNode<ValueType, FunctionType>::GetOutput;
-        using BroadcastOperationNode<ValueType, FunctionType>::GetFunction;
-        using BroadcastOperationNode<ValueType, FunctionType>::SetFunction;
-        ValueType ComputeOperation(const std::vector<ValueType>& args) const override;
-        emitters::IRLocalScalar CompileOperation(const std::vector<emitters::IRLocalScalar>& args) const override;
+        using BroadcastOperationNode<ValueType, FunctionType>::MakeKernel;
+        using KernelFunctionType = typename BroadcastOperationNode<ValueType, FunctionType>::KernelFunctionType;
+
+        KernelFunctionType GetKernelFunction() const override;
 
         void WriteToArchive(utilities::Archiver& archiver) const override;
         void ReadFromArchive(utilities::Unarchiver& archiver) override;
 
     private:
-        void SetOperationFunction();
         void Copy(model::ModelTransformer& transformer) const override;
 
         model::InputPort<ValueType> _input1;
@@ -345,7 +324,7 @@ namespace nodes
     BroadcastOperationNode<ValueType, FunctionType>::BroadcastOperationNode(const std::vector<model::InputPortBase*>& inputPortRefs,
                                                                             const std::vector<const model::OutputPortBase*>& inputs,
                                                                             ValueType paddingValue) :
-        CompilableNode(inputPortRefs, { &_output }),
+        CompilableCodeNode("BroadcastOperationNode", inputPortRefs, { &_output }),
         _output(this, ell::model::Node::defaultOutputPortName, ComputeBroadcastedLayout(inputs)),
         _paddingValue(paddingValue)
     {
@@ -356,7 +335,7 @@ namespace nodes
                                                                             const std::vector<const model::OutputPortBase*>& inputs,
                                                                             const model::PortMemoryLayout& outputLayout,
                                                                             ValueType paddingValue) :
-        CompilableNode(inputPortRefs, { &_output }),
+        CompilableCodeNode("BroadcastOperationNode", inputPortRefs, { &_output }),
         _output(this, ell::model::Node::defaultOutputPortName, outputLayout),
         _paddingValue(paddingValue)
     {
@@ -389,215 +368,99 @@ namespace nodes
     }
 
     template <typename ValueType, typename FunctionType>
-    template <typename OpFunctionType>
-    void BroadcastOperationNode<ValueType, FunctionType>::SetFunction(OpFunctionType&& function)
+    void BroadcastOperationNode<ValueType, FunctionType>::Define(ell::value::FunctionDeclaration& fn)
     {
-        _function = std::make_unique<OpFunctionType>(std::move(function));
-    }
+        using namespace value::loopnests;
 
-    template <typename ValueType, typename FunctionType>
-    const FunctionType& BroadcastOperationNode<ValueType, FunctionType>::GetFunction() const
-    {
-        return *_function;
-    }
-
-    //
-    // Arbitrary-depth nested loops are generated recursively. The EmitComputeDimensionLoop
-    // function emits `numDimensions` nested loops of the form:
-    //
-    // for(iz = 0; iz < sz; ++iz)
-    // {
-    //     zOffset = (iz+offset[2]) * stride[2];
-    //     for(iy = 0; iy < sy; ++iy)
-    //     {
-    //         yOffset = zOffset + (iy+offset[1]) * stride[1];
-    //         for(ix = 0; ix < sx; ++ix)
-    //         {
-    //             offset = yOffset + (ix+offset[0]) * stride[0];
-    //             x = arr[offset];
-    //             val = f(x);
-    //             output[offset] = val;
-    //         }
-    //     }
-    // }
-    //
-
-    template <typename ValueType, typename FunctionType>
-    std::vector<int> BroadcastOperationNode<ValueType, FunctionType>::GetLastActiveInputDimensions() const
-    {
-        const auto numDimensions = NumDimensions();
-        auto numInputs = NumInputPorts();
-        std::vector<int> lastActiveInputDimensions(numInputs, 0);
-        for (int i = 0; i < numInputs; ++i)
-        {
-            const auto& inputLayout = GetInput(i).GetMemoryLayout();
-            const auto& activeSize = inputLayout.GetLogicalDimensionActiveSize();
-            for (int j = numDimensions - 1; j >= 0; --j)
+        (void)fn.Define([this](const std::vector<value::Value>& args) {
+            if (static_cast<int>(args.size()) != (this->NumInputPorts() + this->NumOutputPorts()))
             {
-                if (activeSize[j] != 1)
-                {
-                    lastActiveInputDimensions[i] = j;
-                    break;
-                }
-            }
-        }
-
-        return lastActiveInputDimensions;
-    }
-
-    template <typename ValueType, typename FunctionType>
-    void BroadcastOperationNode<ValueType, FunctionType>::ComputeDimensionLoop(int dimension,
-                                                                               const std::vector<int>& prevInputDimensionOffsetsIn,
-                                                                               const std::vector<int>& lastActiveInputDimensions,
-                                                                               const std::vector<ValueType>& inputValuesIn,
-                                                                               int prevOutputDimensionOffset,
-                                                                               std::vector<ValueType>& output) const
-    {
-        auto prevInputDimensionOffsets = prevInputDimensionOffsetsIn;
-        auto inputValues = inputValuesIn;
-        const auto& outputLayout = GetOutputMemoryLayout();
-        const auto outputGlobalOffset = outputLayout.GetFirstEntryOffset();
-        const auto& outputSize = outputLayout.GetLogicalDimensionActiveSize();
-        const auto& outputIncrement = outputLayout.GetLogicalDimensionIncrement();
-
-        const auto numDimensions = outputLayout.NumDimensions();
-        const auto numInputs = NumInputPorts();
-
-        for (int loopIndex = 0; loopIndex < outputSize[dimension]; ++loopIndex)
-        {
-            auto thisOutputDimensionOffset = prevOutputDimensionOffset + loopIndex * outputIncrement[dimension];
-            std::vector<int> thisInputDimensionOffsets(numInputs, 0);
-            for (int inputIndex = 0; inputIndex < numInputs; ++inputIndex)
-            {
-                const auto& input = GetInput(inputIndex);
-                const auto& inputLayout = input.GetMemoryLayout();
-                const auto inputGlobalOffset = inputLayout.GetFirstEntryOffset();
-                const auto& inputSize = inputLayout.GetLogicalDimensionActiveSize();
-                const auto& inputIncrement = inputLayout.GetLogicalDimensionIncrement();
-
-                // Account for broadcasting dimensions by setting loopIndex to 0 if this is a broadcast dimension for this input
-                auto thisLoopIndex = inputSize[dimension] == 1 ? 0 : loopIndex;
-                auto thisInputDimensionOffset = prevInputDimensionOffsets[inputIndex] + thisLoopIndex * inputIncrement[dimension];
-                thisInputDimensionOffsets[inputIndex] = thisInputDimensionOffset;
-                if (dimension == lastActiveInputDimensions[inputIndex])
-                {
-                    inputValues[inputIndex] = input[inputGlobalOffset + thisInputDimensionOffset];
-                }
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
             }
 
-            if (dimension < numDimensions - 1)
+            auto outputLayout = this->GetOutputMemoryLayout();
+            auto numDim = outputLayout.NumDimensions();
+
+            // Create the indices and ranges for the loop nest
+            std::vector<Index> indices;
+            std::vector<IndexRange> ranges;
+            for (int d = 0; d < numDim; ++d)
             {
-                // Recursive call to emit nested loop
-                ComputeDimensionLoop(dimension + 1, thisInputDimensionOffsets, lastActiveInputDimensions, inputValues, thisOutputDimensionOffset, output);
-            }
-            else
-            {
-                // We're in the innermost loop --- compute the value
-                auto outputValue = ComputeOperation(inputValues);
-                output[outputGlobalOffset + thisOutputDimensionOffset] = outputValue;
-            }
-        }
-    }
-
-    template <typename ValueType, typename FunctionType>
-    void BroadcastOperationNode<ValueType, FunctionType>::CompileDimensionLoop(model::IRMapCompiler& compiler,
-                                                                               emitters::IRFunctionEmitter& function,
-                                                                               int dimension,
-                                                                               const std::vector<emitters::IRLocalArray>& inputsIn,
-                                                                               const std::vector<emitters::IRLocalScalar>& prevInputDimensionOffsetsIn,
-                                                                               const std::vector<int>& lastActiveInputDimensions,
-                                                                               const std::vector<emitters::IRLocalScalar>& inputValuesIn,
-                                                                               emitters::IRLocalScalar prevOutputDimensionOffset,
-                                                                               emitters::IRLocalArray& output) const
-    {
-        auto inputs = inputsIn;
-        auto prevInputDimensionOffsets = prevInputDimensionOffsetsIn;
-        auto inputValues = inputValuesIn;
-
-        model::PortMemoryLayout outputLayout = GetOutputMemoryLayout();
-        const auto outputGlobalOffset = static_cast<int>(outputLayout.GetFirstEntryOffset());
-        const auto& outputSize = outputLayout.GetLogicalDimensionActiveSize();
-        const auto& outputIncrement = outputLayout.GetLogicalDimensionIncrement();
-
-        const auto numDimensions = outputLayout.NumDimensions();
-        const auto numInputs = NumInputPorts();
-
-        function.For(0, outputSize[dimension], [&](emitters::IRFunctionEmitter& function, auto loopIndex) {
-            auto thisOutputDimensionOffset = prevOutputDimensionOffset + loopIndex * outputIncrement[dimension];
-            std::vector<emitters::IRLocalScalar> thisInputDimensionOffsets(numInputs, function.LocalScalar<int>(0));
-            for (int inputIndex = 0; inputIndex < numInputs; ++inputIndex)
-            {
-                const auto& inputPort = GetInput(inputIndex);
-                const auto& inputLayout = inputPort.GetMemoryLayout();
-                const auto inputGlobalOffset = static_cast<int>(inputLayout.GetFirstEntryOffset());
-                const auto& inputSize = inputLayout.GetLogicalDimensionActiveSize();
-                const auto& inputIncrement = inputLayout.GetLogicalDimensionIncrement();
-                const auto& input = inputs[inputIndex];
-
-                // Account for broadcasting dimensions by setting loopIndex to 0 if this is a broadcast dimension for this input
-                auto thisLoopIndex = inputSize[dimension] == 1 ? function.LocalScalar<int>(0) : loopIndex;
-                auto thisInputDimensionOffset = prevInputDimensionOffsets[inputIndex] + thisLoopIndex * inputIncrement[dimension];
-                thisInputDimensionOffsets[inputIndex] = thisInputDimensionOffset;
-                if (dimension == lastActiveInputDimensions[inputIndex])
-                {
-                    inputValues[inputIndex] = input[thisInputDimensionOffset + inputGlobalOffset];
-                }
+                auto name = "i_" + std::to_string(d);
+                Index i(name);
+                indices.emplace_back(i);
+                int size = static_cast<int>(outputLayout.GetLogicalDimensionActiveSize()[d]);
+                ranges.push_back({ i, { 0, size } });
             }
 
-            if (dimension < numDimensions - 1)
-            {
-                // Recursive call to emit nested loop
-                CompileDimensionLoop(compiler, function, dimension + 1, inputs, thisInputDimensionOffsets, lastActiveInputDimensions, inputValues, thisOutputDimensionOffset, output);
-            }
-            else
-            {
-                // We're in the innermost loop --- compute the value
-                auto outputValue = CompileOperation(inputValues);
-                output[outputGlobalOffset + thisOutputDimensionOffset] = outputValue;
-            }
+            LoopNest loop(ranges);
+            auto kernel = value::loopnests::Kernel("kernel")
+                              .Inputs(args)
+                              .Indices(indices)
+                              .Define(GetKernelFunction());
+            loop.AddKernel(kernel);
+
+            CodeGenerator generator;
+            generator.Run(loop);
         });
     }
 
     template <typename ValueType, typename FunctionType>
-    void BroadcastOperationNode<ValueType, FunctionType>::Compute() const
+    auto BroadcastOperationNode<ValueType, FunctionType>::MakeKernel(FunctionType f) const -> KernelFunctionType
     {
-        const auto& outputLayout = GetOutputMemoryLayout();
-        const auto numInputs = NumInputPorts();
+        // # args = # inputs + # outputs
+        // the rest are indices
+        return [this, f = std::move(f)](const std::vector<value::Value>& args) {
+            if (static_cast<int>(args.size()) != NumDimensions() + NumInputPorts() + 1)
+            {
+                throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
+            }
 
-        auto outputSize = outputLayout.GetMemorySize();
-        auto output = std::vector<ValueType>(outputSize);
+            const int numInputs = this->NumInputPorts();
+            std::vector<value::Array> inputs;
+            auto it = args.begin();
+            for (int i = 0; i < numInputs; ++i)
+            {
+                inputs.push_back({ *it++ });
+            }
+            auto output = value::Array(*it++);
+            std::vector<std::vector<value::Scalar>> indices(numInputs);
+            std::vector<value::Scalar> outputIndices;
+            int dimension = 0;
+            for (; it != args.end(); ++it)
+            {
+                for (int i = 0; i < numInputs; ++i)
+                {
+                    indices[i].push_back(GetInputMemoryLayout(i).GetLogicalDimensionActiveSize(dimension) > 1 ? value::Scalar{ *it } : value::Scalar(0));
+                }
+                outputIndices.push_back({ *it });
+                ++dimension;
+            }
 
-        const int startDimension = 0;
-        std::vector<int> prevInputOffsets(numInputs, 0);
-        auto lastActiveInputDimensions = GetLastActiveInputDimensions();
-        std::vector<ValueType> inputValues(numInputs);
-        const int startOffset = 0;
-        ComputeDimensionLoop(startDimension, prevInputOffsets, lastActiveInputDimensions, inputValues, startOffset, output);
-
-        GetOutput().SetOutput(output);
+            output(outputIndices) = CallKernelFunction(f, inputs, indices);
+        };
     }
 
     template <typename ValueType, typename FunctionType>
-    void BroadcastOperationNode<ValueType, FunctionType>::Compile(model::IRMapCompiler& compiler, emitters::IRFunctionEmitter& function)
+    value::Scalar BroadcastOperationNode<ValueType, FunctionType>::CallKernelFunction(FunctionType f, std::vector<value::Array> inputs, std::vector<std::vector<value::Scalar>> indices) const
     {
-        const auto numInputs = NumInputPorts();
-
-        std::vector<emitters::IRLocalArray> inputs;
-        for (int index = 0; index < numInputs; ++index)
+        // TODO: if FunctionType was a function that took a vector of inputs, then we could dispense with this `if constexpr` block
+        if constexpr(std::is_same_v<FunctionType, UnaryScalarFunction>)
         {
-            const auto& inputPort = GetInput(index);
-            auto inputVar = function.LocalArray(compiler.EnsurePortEmitted(inputPort));
-            inputs.push_back(inputVar);
+            return f(inputs[0](indices[0]));
         }
-
-        auto output = function.LocalArray(compiler.EnsurePortEmitted(GetOutput(), this->GetOutputPadding()));
-
-        const int startDimension = 0;
-        std::vector<emitters::IRLocalScalar> prevInputOffsets(numInputs, function.LocalScalar<int>(0));
-        auto lastActiveInputDimensions = GetLastActiveInputDimensions();
-        std::vector<emitters::IRLocalScalar> inputValues(numInputs, function.LocalScalar());
-        const emitters::IRLocalScalar startOffset = function.LocalScalar<int>(0);
-        CompileDimensionLoop(compiler, function, startDimension, inputs, prevInputOffsets, lastActiveInputDimensions, inputValues, startOffset, output);
+        else if constexpr(std::is_same_v<FunctionType, BinaryScalarFunction>)
+        {
+            return f(inputs[0](indices[0]), inputs[1](indices[1]));
+        }
+        else if constexpr(std::is_same_v<FunctionType, TernaryScalarFunction>)
+        {
+            return f(inputs[0](indices[0]), inputs[1](indices[1]), inputs[2](indices[2]));
+        }
+        else
+        {
+            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
+        }
     }
 
     template <typename ValueType, typename FunctionType>
@@ -619,7 +482,7 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastOperationNode<ValueType, FunctionType>::WriteToArchive(utilities::Archiver& archiver) const
     {
-        model::CompilableNode::WriteToArchive(archiver);
+        model::CompilableCodeNode::WriteToArchive(archiver);
         auto outputLayout = GetOutputMemoryLayout();
         archiver["outputLayout"] << outputLayout;
         archiver["padding"] << _paddingValue;
@@ -628,7 +491,7 @@ namespace nodes
     template <typename ValueType, typename FunctionType>
     void BroadcastOperationNode<ValueType, FunctionType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
-        model::CompilableNode::ReadFromArchive(archiver);
+        model::CompilableCodeNode::ReadFromArchive(archiver);
         model::PortMemoryLayout outputLayout;
         archiver["outputLayout"] >> outputLayout;
         _output.SetMemoryLayout(outputLayout);
@@ -641,7 +504,7 @@ namespace nodes
     template <typename ValueType>
     BroadcastUnaryOperationNode<ValueType>::BroadcastUnaryOperationNode() :
         BroadcastOperationNode<ValueType, FunctionType>({ &_input }, {}, static_cast<ValueType>(0)),
-        _input(this, {}, model::CompilableNode::defaultInputPortName),
+        _input(this, {}, model::CompilableCodeNode::defaultInputPortName),
         _operation(OperationType::none)
     {
     }
@@ -649,39 +512,17 @@ namespace nodes
     template <typename ValueType>
     BroadcastUnaryOperationNode<ValueType>::BroadcastUnaryOperationNode(const model::OutputPort<ValueType>& input, OperationType operation, ValueType paddingValue) :
         BroadcastOperationNode<ValueType, FunctionType>({ &_input }, { &input }, paddingValue),
-        _input(this, input, model::CompilableNode::defaultInputPortName),
+        _input(this, input, model::CompilableCodeNode::defaultInputPortName),
         _operation(operation)
     {
-        SetOperationFunction();
     }
 
     template <typename ValueType>
     BroadcastUnaryOperationNode<ValueType>::BroadcastUnaryOperationNode(const model::OutputPort<ValueType>& input, const model::PortMemoryLayout& outputLayout, OperationType operation, ValueType paddingValue) :
         BroadcastOperationNode<ValueType, FunctionType>({ &_input }, { &input }, outputLayout, paddingValue),
-        _input(this, input, model::CompilableNode::defaultInputPortName),
+        _input(this, input, model::CompilableCodeNode::defaultInputPortName),
         _operation(operation)
     {
-        SetOperationFunction();
-    }
-
-    template <typename ValueType>
-    ValueType BroadcastUnaryOperationNode<ValueType>::ComputeOperation(const std::vector<ValueType>& args) const
-    {
-        if (args.size() != 1)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
-        }
-        return GetFunction().Compute(args[0]);
-    }
-
-    template <typename ValueType>
-    emitters::IRLocalScalar BroadcastUnaryOperationNode<ValueType>::CompileOperation(const std::vector<emitters::IRLocalScalar>& args) const
-    {
-        if (args.size() != 1)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
-        }
-        return GetFunction().Compile(args[0].function, args[0]);
     }
 
     template <typename ValueType>
@@ -698,7 +539,7 @@ namespace nodes
     void BroadcastUnaryOperationNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         BroadcastOperationNode<ValueType, FunctionType>::WriteToArchive(archiver);
-        archiver[model::CompilableNode::defaultInputPortName] << _input;
+        archiver[model::CompilableCodeNode::defaultInputPortName] << _input;
         archiver["operation"] << ToString(_operation);
     }
 
@@ -706,11 +547,10 @@ namespace nodes
     void BroadcastUnaryOperationNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         BroadcastOperationNode<ValueType, FunctionType>::ReadFromArchive(archiver);
-        archiver[model::CompilableNode::defaultInputPortName] >> _input;
+        archiver[model::CompilableCodeNode::defaultInputPortName] >> _input;
         std::string operation;
         archiver["operation"] >> operation;
         _operation = FromString<UnaryOperationType>(operation);
-        SetOperationFunction();
     }
 
     //
@@ -719,8 +559,8 @@ namespace nodes
     template <typename ValueType>
     BroadcastBinaryOperationNode<ValueType>::BroadcastBinaryOperationNode() :
         BroadcastOperationNode<ValueType, FunctionType>({ &_input1, &_input2 }, {}),
-        _input1(this, {}, model::CompilableNode::defaultInput1PortName),
-        _input2(this, {}, model::CompilableNode::defaultInput2PortName),
+        _input1(this, {}, model::CompilableCodeNode::defaultInput1PortName),
+        _input2(this, {}, model::CompilableCodeNode::defaultInput2PortName),
         _operation(OperationType::none)
     {
     }
@@ -731,11 +571,10 @@ namespace nodes
                                                                           OperationType operation,
                                                                           ValueType paddingValue) :
         BroadcastOperationNode<ValueType, FunctionType>({ &_input1, &_input2 }, { &input1, &input2 }, paddingValue),
-        _input1(this, input1, model::CompilableNode::defaultInput1PortName),
-        _input2(this, input2, model::CompilableNode::defaultInput2PortName),
+        _input1(this, input1, model::CompilableCodeNode::defaultInput1PortName),
+        _input2(this, input2, model::CompilableCodeNode::defaultInput2PortName),
         _operation(operation)
     {
-        SetOperationFunction();
     }
 
     template <typename ValueType>
@@ -745,31 +584,10 @@ namespace nodes
                                                                           OperationType operation,
                                                                           ValueType paddingValue) :
         BroadcastOperationNode<ValueType, FunctionType>({ &_input1, &_input2 }, { &input1, &input2 }, outputLayout, paddingValue),
-        _input1(this, input1, model::CompilableNode::defaultInput1PortName),
-        _input2(this, input2, model::CompilableNode::defaultInput2PortName),
+        _input1(this, input1, model::CompilableCodeNode::defaultInput1PortName),
+        _input2(this, input2, model::CompilableCodeNode::defaultInput2PortName),
         _operation(operation)
     {
-        SetOperationFunction();
-    }
-
-    template <typename ValueType>
-    ValueType BroadcastBinaryOperationNode<ValueType>::ComputeOperation(const std::vector<ValueType>& args) const
-    {
-        if (args.size() != 2)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
-        }
-        return GetFunction().Compute(args[0], args[1]);
-    }
-
-    template <typename ValueType>
-    emitters::IRLocalScalar BroadcastBinaryOperationNode<ValueType>::CompileOperation(const std::vector<emitters::IRLocalScalar>& args) const
-    {
-        if (args.size() != 2)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
-        }
-        return GetFunction().Compile(args[0].function, args[0], args[1]);
     }
 
     template <typename ValueType>
@@ -788,8 +606,8 @@ namespace nodes
     void BroadcastBinaryOperationNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         BroadcastOperationNode<ValueType, FunctionType>::WriteToArchive(archiver);
-        archiver[model::CompilableNode::defaultInput1PortName] << _input1;
-        archiver[model::CompilableNode::defaultInput1PortName] << _input2;
+        archiver[model::CompilableCodeNode::defaultInput1PortName] << _input1;
+        archiver[model::CompilableCodeNode::defaultInput2PortName] << _input2;
         archiver["operation"] << ToString(_operation);
     }
 
@@ -797,12 +615,11 @@ namespace nodes
     void BroadcastBinaryOperationNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         BroadcastOperationNode<ValueType, FunctionType>::ReadFromArchive(archiver);
-        archiver[model::CompilableNode::defaultInput1PortName] >> _input1;
-        archiver[model::CompilableNode::defaultInput1PortName] >> _input2;
+        archiver[model::CompilableCodeNode::defaultInput1PortName] >> _input1;
+        archiver[model::CompilableCodeNode::defaultInput2PortName] >> _input2;
         std::string operation;
         archiver["operation"] >> operation;
         _operation = FromString<BinaryOperationType>(operation);
-        SetOperationFunction();
     }
 
     //
@@ -811,9 +628,9 @@ namespace nodes
     template <typename ValueType>
     BroadcastTernaryOperationNode<ValueType>::BroadcastTernaryOperationNode() :
         BroadcastOperationNode<ValueType, FunctionType>({ &_input1, &_input2, &_input3 }, {}),
-        _input1(this, {}, model::CompilableNode::defaultInput1PortName),
-        _input2(this, {}, model::CompilableNode::defaultInput2PortName),
-        _input3(this, {}, model::CompilableNode::defaultInput3PortName),
+        _input1(this, {}, model::CompilableCodeNode::defaultInput1PortName),
+        _input2(this, {}, model::CompilableCodeNode::defaultInput2PortName),
+        _input3(this, {}, model::CompilableCodeNode::defaultInput3PortName),
         _operation(OperationType::none)
     {
     }
@@ -825,12 +642,11 @@ namespace nodes
                                                                             OperationType operation,
                                                                             ValueType paddingValue) :
         BroadcastOperationNode<ValueType, FunctionType>({ &_input1, &_input2, &_input3 }, { &input1, &input2, &input3 }, paddingValue),
-        _input1(this, input1, model::CompilableNode::defaultInput1PortName),
-        _input2(this, input2, model::CompilableNode::defaultInput2PortName),
-        _input3(this, input3, model::CompilableNode::defaultInput3PortName),
+        _input1(this, input1, model::CompilableCodeNode::defaultInput1PortName),
+        _input2(this, input2, model::CompilableCodeNode::defaultInput2PortName),
+        _input3(this, input3, model::CompilableCodeNode::defaultInput3PortName),
         _operation(operation)
     {
-        SetOperationFunction();
     }
 
     template <typename ValueType>
@@ -841,32 +657,11 @@ namespace nodes
                                                                             OperationType operation,
                                                                             ValueType paddingValue) :
         BroadcastOperationNode<ValueType, FunctionType>({ &_input1, &_input2, &_input3 }, { &input1, &input2, &input3 }, outputLayout, paddingValue),
-        _input1(this, input1, model::CompilableNode::defaultInput1PortName),
-        _input2(this, input2, model::CompilableNode::defaultInput2PortName),
-        _input3(this, input3, model::CompilableNode::defaultInput3PortName),
+        _input1(this, input1, model::CompilableCodeNode::defaultInput1PortName),
+        _input2(this, input2, model::CompilableCodeNode::defaultInput2PortName),
+        _input3(this, input3, model::CompilableCodeNode::defaultInput3PortName),
         _operation(operation)
     {
-        SetOperationFunction();
-    }
-
-    template <typename ValueType>
-    ValueType BroadcastTernaryOperationNode<ValueType>::ComputeOperation(const std::vector<ValueType>& args) const
-    {
-        if (args.size() != 3)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
-        }
-        return GetFunction().Compute(args[0], args[1], args[2]);
-    }
-
-    template <typename ValueType>
-    emitters::IRLocalScalar BroadcastTernaryOperationNode<ValueType>::CompileOperation(const std::vector<emitters::IRLocalScalar>& args) const
-    {
-        if (args.size() != 3)
-        {
-            throw utilities::LogicException(utilities::LogicExceptionErrors::illegalState);
-        }
-        return GetFunction().Compile(args[0].function, args[0], args[1], args[2]);
     }
 
     template <typename ValueType>
@@ -887,9 +682,9 @@ namespace nodes
     void BroadcastTernaryOperationNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         BroadcastOperationNode<ValueType, FunctionType>::WriteToArchive(archiver);
-        archiver[model::CompilableNode::defaultInput1PortName] << _input1;
-        archiver[model::CompilableNode::defaultInput2PortName] << _input2;
-        archiver[model::CompilableNode::defaultInput3PortName] << _input3;
+        archiver[model::CompilableCodeNode::defaultInput1PortName] << _input1;
+        archiver[model::CompilableCodeNode::defaultInput2PortName] << _input2;
+        archiver[model::CompilableCodeNode::defaultInput3PortName] << _input3;
         archiver["operation"] << ToString(_operation);
     }
 
@@ -897,45 +692,44 @@ namespace nodes
     void BroadcastTernaryOperationNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         BroadcastOperationNode<ValueType, FunctionType>::ReadFromArchive(archiver);
-        archiver[model::CompilableNode::defaultInput1PortName] >> _input1;
-        archiver[model::CompilableNode::defaultInput2PortName] >> _input2;
-        archiver[model::CompilableNode::defaultInput3PortName] >> _input3;
+        archiver[model::CompilableCodeNode::defaultInput1PortName] >> _input1;
+        archiver[model::CompilableCodeNode::defaultInput2PortName] >> _input2;
+        archiver[model::CompilableCodeNode::defaultInput3PortName] >> _input3;
         std::string operation;
         archiver["operation"] >> operation;
         _operation = FromString<TernaryOperationType>(operation);
-        SetOperationFunction();
     }
 
     template <typename ValueType>
-    void BroadcastUnaryOperationNode<ValueType>::SetOperationFunction()
+    auto BroadcastUnaryOperationNode<ValueType>::GetKernelFunction() const -> KernelFunctionType
     {
         switch (_operation)
         {
         case UnaryOperationType::abs:
-            SetFunction(AbsFunction<ValueType>());
+            return MakeKernel(value::Abs);
             break;
         case UnaryOperationType::exp:
-            SetFunction(ExpFunction<ValueType>());
+            return MakeKernel(value::Exp);
             break;
         case UnaryOperationType::log:
-            SetFunction(LogFunction<ValueType>());
+            return MakeKernel(value::Log);
             break;
         case UnaryOperationType::sqrt:
-            SetFunction(SqrtFunction<ValueType>());
+            return MakeKernel(value::Sqrt);
             break;
         case UnaryOperationType::logicalNot:
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Not implemented");
         case UnaryOperationType::tanh:
-            SetFunction(TanhFunction<ValueType>());
+            return MakeKernel(value::Tanh);
             break;
         case UnaryOperationType::square:
-            SetFunction(SquareFunction<ValueType>());
+            return MakeKernel(value::Square);
             break;
         case UnaryOperationType::sin:
-            SetFunction(SinFunction<ValueType>());
+            return MakeKernel(value::Sin);
             break;
         case UnaryOperationType::cos:
-            SetFunction(CosFunction<ValueType>());
+            return MakeKernel(value::Cos);
             break;
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Illegal operation");
@@ -943,21 +737,24 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void BroadcastBinaryOperationNode<ValueType>::SetOperationFunction()
+    auto BroadcastBinaryOperationNode<ValueType>::GetKernelFunction() const -> KernelFunctionType
     {
         switch (_operation)
         {
         case BinaryOperationType::add:
-            SetFunction(AddFunction<ValueType>());
+            return MakeKernel(value::Add);
             break;
         case BinaryOperationType::subtract:
-            SetFunction(SubtractFunction<ValueType>());
+            return MakeKernel(value::Subtract);
             break;
         case BinaryOperationType::multiply:
-            SetFunction(MultiplyFunction<ValueType>());
+            return MakeKernel(value::Multiply);
             break;
         case BinaryOperationType::divide:
-            SetFunction(DivideFunction<ValueType>());
+            return MakeKernel(value::Divide);
+            break;
+        case BinaryOperationType::modulo:
+            return MakeKernel(value::Modulo);
             break;
         case BinaryOperationType::logicalAnd:
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Not implemented");
@@ -971,12 +768,12 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void BroadcastTernaryOperationNode<ValueType>::SetOperationFunction()
+    auto BroadcastTernaryOperationNode<ValueType>::GetKernelFunction() const -> KernelFunctionType
     {
         switch (_operation)
         {
         case TernaryOperationType::fma:
-            SetFunction(FMAFunction<ValueType>());
+            return MakeKernel(value::FusedMultiplyAdd);
             break;
         default:
             throw utilities::InputException(utilities::InputExceptionErrors::invalidArgument, "Illegal operation");

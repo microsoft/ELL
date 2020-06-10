@@ -45,7 +45,7 @@ if(${PYTHON_ENABLED})
         message(ERROR "LLVM not found, please check that LLVM is installed.")
         return()
     endif()
-
+    
     set(OUTPUT_DIR ${CMAKE_BINARY_DIR})
 
     set(JSON "{ \"llc\": \"${LLC_EXECUTABLE}\", \"swig\": \"${SWIG_EXECUTABLE}\", \"compile\": \"${GLOBAL_BIN_DIR}/compile\", \"blas\": \"${BLAS_LIBS}\", \"opt\": \"${OPT_EXECUTABLE}\", \"cmake_generator\": \"${CMAKE_GENERATOR}\", \"cmake_version\": \"${CMAKE_VERSION}\" }")

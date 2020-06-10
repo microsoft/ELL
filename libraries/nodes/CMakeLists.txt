@@ -25,7 +25,9 @@ set(src
     src/IIRFilterNode.cpp
     src/IRNode.cpp
     src/LSTMNode.cpp
+    src/MatrixMatrixMultiplyCodeNode.cpp
     src/MatrixMatrixMultiplyNode.cpp
+    src/MatrixMatrixMultiplyCodeNode.cpp
     src/MatrixVectorMultiplyNode.cpp
     src/NeuralNetworkPredictorNode.cpp
     src/PoolingLayerNode.cpp
@@ -79,6 +81,7 @@ set(include
     include/L2NormSquaredNode.h
     include/LSTMNode.h
     include/LinearPredictorNode.h
+    include/MatrixMatrixMultiplyCodeNode.h
     include/MatrixMatrixMultiplyNode.h
     include/MatrixVectorMultiplyNode.h
     include/MatrixVectorProductNode.h
@@ -94,6 +97,7 @@ set(include
     include/RNNNode.h
     include/RegionDetectionLayerNode.h
     include/ReinterpretLayoutNode.h
+    include/ReorderDataCodeNode.h
     include/ReorderDataNode.h
     include/ScalingLayerNode.h
     include/SimpleConvolutionNode.h
@@ -101,6 +105,7 @@ set(include
     include/SinkNode.h
     include/SoftmaxLayerNode.h
     include/SourceNode.h
+    include/SpatialConvolutionNode.h
     include/SquaredEuclideanDistanceNode.h
     include/SumNode.h
     include/TypeCastNode.h

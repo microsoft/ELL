@@ -157,6 +157,9 @@ def test():
         return 1
     else:
         return 0
+    if x > (1 - bias) / scale:
+        return 1
+    return (scale * x) + bias
 
 
 if __name__ == '__main__':

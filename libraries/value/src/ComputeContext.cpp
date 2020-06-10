@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstring>
 #include <future>
 #include <iostream>
 #include <string>
@@ -30,21 +31,34 @@ namespace value
     using namespace detail;
     using namespace utilities;
 
-    struct ComputeContext::FunctionScope
-    {
-        FunctionScope(ComputeContext& context, std::string fnName) :
-            context(context)
-        {
-            context._stack.push({ fnName, {} });
-        }
-
-        ~FunctionScope() { context._stack.pop(); }
-
-        ComputeContext& context;
-    };
-
     namespace
     {
+        struct
+        {
+            int Current()
+            {
+                std::lock_guard lock{ _mutex };
+
+                auto it = _idMap.find(std::this_thread::get_id());
+                if (it == _idMap.end())
+                {
+                    it = _idMap.emplace_hint(it, std::this_thread::get_id(), ++_nextThreadId);
+                }
+
+                return it->second;
+            }
+
+            void Clear()
+            {
+                std::lock_guard lock{ _mutex };
+                _idMap.clear();
+                _nextThreadId = 0;
+            }
+
+            std::mutex _mutex;
+            std::unordered_map<std::thread::id, int> _idMap;
+            int _nextThreadId = 0;
+        } ThreadIds;
 
         // TODO: Make this the basis of an iterator for MemoryLayout
         bool IncrementMemoryCoordinateImpl(int dimension, std::vector<int>& coordinate, const std::vector<int>& maxCoordinate)
@@ -351,6 +365,10 @@ namespace value
                         {
                             throw InputException(InputExceptionErrors::invalidArgument);
                         }
+                        else if constexpr (!std::is_same_v<DataType1, DataType2>)
+                        {
+                            throw InputException(InputExceptionErrors::typeMismatch);
+                        }
                         else
                         {
                             return Value(std::copysign(*data1, *data2));
@@ -361,9 +379,185 @@ namespace value
             }
         };
 
+        struct FmaFunctionIntrinsic
+        {
+            auto operator()(std::vector<Value> args) const -> Value
+            {
+                if (args.size() != 3)
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+
+                if (std::any_of(args.begin(), args.end(), [](Value& value) { return value.IsConstrained() && value.GetLayout() != ScalarLayout; }))
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+
+                const auto& value1 = args[0];
+                const auto& value2 = args[1];
+                const auto& value3 = args[2];
+
+                return std::visit(
+                    [](auto&& data1, auto&& data2, auto&& data3) -> Value {
+                        using Type1 = std::decay_t<decltype(data1)>;
+                        using Type2 = std::decay_t<decltype(data2)>;
+                        using Type3 = std::decay_t<decltype(data3)>;
+                        using DataType1 = std::remove_pointer_t<Type1>;
+                        using DataType2 = std::remove_pointer_t<Type2>;
+                        using DataType3 = std::remove_pointer_t<Type3>;
+
+                        if constexpr (IsOneOf<DataType1, Emittable, Boolean> ||
+                                      IsOneOf<DataType2, Emittable, Boolean> ||
+                                      IsOneOf<DataType3, Emittable, Boolean>)
+                        {
+                            throw InputException(InputExceptionErrors::invalidArgument);
+                        }
+                        else if constexpr (!utilities::AllSame<DataType1, DataType2, DataType3>)
+                        {
+                            throw InputException(InputExceptionErrors::typeMismatch);
+                        }
+                        else
+                        {
+                            return Value(static_cast<DataType1>(std::fma(*data1, *data2, *data3)));
+                        }
+                    },
+                    value1.GetUnderlyingData(),
+                    value2.GetUnderlyingData(),
+                    value3.GetUnderlyingData());
+            }
+        };
+
+        enum class MemIntrinsicOp
+        {
+            Copy,
+            Move,
+            Set
+        };
+        template <MemIntrinsicOp op>
+        struct MemOpFunctionIntrinsic
+        {
+            auto operator()(std::vector<Value> args) const -> Value
+            {
+                if (args.size() != 3)
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+
+                if (!std::all_of(args.begin(), args.end(), [](const Value& value) { return value.IsConstant(); }))
+                {
+                    throw InputException(InputExceptionErrors::invalidArgument);
+                }
+
+                const auto& value1 = args[0];
+                const auto& value2 = args[1];
+                const auto& value3 = args[2];
+
+                if (!value3.IsConstrained() || value3.GetLayout() != ScalarLayout)
+                {
+                    throw InputException(InputExceptionErrors::invalidArgument);
+                }
+
+                if constexpr (MemIntrinsicOp::Set == op)
+                {
+                    assert((value2.IsConstrained() && value2.GetLayout() == ScalarLayout && value2.GetType() == std::pair{ ValueType::Char8, 1 }));
+                }
+
+                std::visit(
+                    [](auto&& data1, auto&& data2, auto&& data3) {
+                        using Type1 = std::decay_t<decltype(data1)>;
+                        using Type2 = std::decay_t<decltype(data2)>;
+                        using Type3 = std::decay_t<decltype(data3)>;
+                        if constexpr (utilities::IsOneOf<Emittable, Type1, Type2, Type3>)
+                        {
+                            assert(false);
+                            return;
+                        }
+                        else
+                        {
+                            // Once we move away from VS 2017, this code can be uncommented and the code following can be simplified (lines 496-523)
+
+                            //constexpr auto memFn = [] {
+                            //    // static_casts needed because MSVC in VS 2017 can't handle the code without it
+                            //    if constexpr (static_cast<int>(MemIntrinsicOp::Set) == static_cast<int>(op))
+                            //    {
+                            //        return &std::memset;
+                            //    }
+                            //    else if constexpr (static_cast<int>(MemIntrinsicOp::Copy) == static_cast<int>(op))
+                            //    {
+                            //        return &std::memcpy;
+                            //    }
+                            //    else if constexpr (static_cast<int>(MemIntrinsicOp::Move) == static_cast<int>(op))
+                            //    {
+                            //        return &std::memmove;
+                            //    }
+                            //    else
+                            //    {
+                            //        static_assert(utilities::FalseType<Type1, Type2, Type3>{}, "Unknown enum value");
+                            //    }
+                            //}();
+
+                            constexpr bool isSet = op == MemIntrinsicOp::Set;
+                            std::decay_t<std::conditional_t<isSet, decltype(data2[0]), decltype(data2)>> real2ndParam;
+                            std::conditional_t<isSet, decltype(&std::memset), decltype(&std::memcpy)> memFn;
+                            switch (op)
+                            {
+                            case MemIntrinsicOp::Set:
+                                if constexpr (isSet)
+                                {
+                                    memFn = &std::memset;
+                                    real2ndParam = *data2;
+                                }
+                                break;
+                            case MemIntrinsicOp::Copy:
+                                if constexpr (!isSet)
+                                {
+                                    memFn = &std::memcpy;
+                                    real2ndParam = data2;
+                                }
+                                break;
+                            case MemIntrinsicOp::Move:
+                                if constexpr (!isSet)
+                                {
+                                    memFn = &std::memmove;
+                                    real2ndParam = data2;
+                                }
+                                break;
+                            default:
+                                assert(false);
+                            }
+
+                            memFn(data1, real2ndParam, *data3 * sizeof(data1[0]));
+                        }
+                    },
+                    value1.GetUnderlyingData(),
+                    value2.GetUnderlyingData(),
+                    value3.GetUnderlyingData());
+
+                return {}; // ignored
+            }
+        };
     } // namespace
 
+    struct ComputeContext::FunctionScope
+    {
+        FunctionScope(ComputeContext& context, std::string fnName) :
+            context(context)
+        {
+            std::lock_guard lock{ context._mutex };
+            context._stack.push({ fnName, {} });
+        }
+
+        ~FunctionScope()
+        {
+            std::lock_guard lock{ context._mutex };
+            context._stack.pop();
+        }
+
+        ComputeContext& context;
+    };
+
     ComputeContext::ComputeContext(std::string moduleName) :
+        EmitterContext(emitters::GetTargetDevice("host")),
         _moduleName(std::move(moduleName))
     {
         // we always have at least one stack entry, in case the top level function needs to return something
@@ -379,42 +573,49 @@ namespace value
 
         using Iterator = ConstantDataList::const_iterator;
 
-        auto it =
-            std::visit(VariantVisitor{ [](Emittable) -> Iterator { return {}; },
-                                       [this](auto&& data) -> Iterator {
-                                           using Type = std::decay_t<decltype(data)>;
-                                           using RealType = std::remove_pointer_t<Type>;
-                                           using VectorType = std::vector<RealType>;
+        auto it = std::visit(
+            VariantVisitor{
+                [](Emittable) -> Iterator { return {}; },
+                [this](auto&& data) -> Iterator {
+                    using Type = std::decay_t<decltype(data)>;
+                    using RealType = std::remove_pointer_t<Type>;
+                    using VectorType = std::vector<RealType>;
 
-                                           const auto& frame = GetTopFrame();
-                                           auto it =
-                                               std::find_if(frame.second.begin(),
-                                                            frame.second.end(),
-                                                            [data](const ConstantData& constData) {
-                                                                if (auto ptr = std::get_if<VectorType>(&constData))
-                                                                {
-                                                                    return ptr->data() <= data &&
-                                                                           data < (ptr->data() + ptr->size());
-                                                                }
+                    const auto& frame = GetTopFrame();
+                    auto it =
+                        std::find_if(frame.second.begin(),
+                                     frame.second.end(),
+                                     [data](const ConstantData& constData) {
+                                         if (auto ptr = std::get_if<VectorType>(&constData))
+                                         {
+                                             return ptr->data() <= data &&
+                                                    data < (ptr->data() + ptr->size());
+                                         }
 
-                                                                return false;
-                                                            });
+                                         return false;
+                                     });
 
-                                           return it;
-                                       } },
-                       value.GetUnderlyingData());
+                    return it;
+                } },
+            value.GetUnderlyingData());
 
         return *it;
     }
 
-    Value ComputeContext::AllocateImpl(ValueType type, MemoryLayout layout)
+    Value ComputeContext::AllocateImpl(ValueType type, MemoryLayout layout, size_t /* alignment */, AllocateFlags flags)
     {
+        if (flags != AllocateFlags::None)
+        {
+            throw LogicException(LogicExceptionErrors::notImplemented);
+        }
+
         // special case the scalar case
         auto size = layout == ScalarLayout ? 1u : layout.GetMemorySize();
 
         auto constantData = AllocateConstantData(type, size);
         Value value = StoreConstantData(std::move(constantData));
         value.SetLayout(layout);
+
         return value;
     }
 
@@ -430,8 +631,13 @@ namespace value
         return std::nullopt;
     }
 
-    Value ComputeContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data, MemoryLayout layout)
+    Value ComputeContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ConstantData data, MemoryLayout layout, AllocateFlags flags)
     {
+        if ((flags & AllocateFlags::ThreadLocal) == AllocateFlags::ThreadLocal)
+        {
+            throw LogicException(LogicExceptionErrors::illegalState, "Thread local storage cannot be specified for constant data");
+        }
+
         std::string adjustedName = GetScopeAdjustedName(scope, name);
 
         if (_globals.find(adjustedName) != _globals.end())
@@ -440,26 +646,45 @@ namespace value
                                  "Unexpected collision in global data allocation");
         }
 
-        auto& globalData = _globals[adjustedName];
-        globalData.first = std::move(data);
-        globalData.second = std::move(layout);
+        auto& globalData = [&]() -> decltype(auto) {
+            std::lock_guard lock{ _mutex };
+            auto& globalData = _globals[adjustedName];
+            globalData.first = std::move(data);
+            globalData.second = std::move(layout);
+            return globalData;
+        }();
 
         return ConstantDataToValue(globalData.first, globalData.second);
     }
 
-    Value ComputeContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type, MemoryLayout layout)
+    Value ComputeContext::GlobalAllocateImpl(GlobalAllocationScope scope, std::string name, ValueType type, MemoryLayout layout, AllocateFlags flags)
     {
         // special case the scalar case
         auto size = layout == ScalarLayout ? 1u : layout.GetMemorySize();
         auto constantData = AllocateConstantData(type, size);
-        return GlobalAllocateImpl(scope, name, constantData, layout);
+        if ((flags & AllocateFlags::ThreadLocal) == AllocateFlags::ThreadLocal)
+        {
+            name += std::to_string(ThreadIds.Current());
+
+            if (auto globalValue = EmitterContext::GetGlobalValue(scope, name, layout))
+            {
+                return *globalValue;
+            }
+
+            flags &= ~AllocateFlags::ThreadLocal;
+        }
+        return GlobalAllocateImpl(scope, name, constantData, layout, flags);
     }
 
     Value ComputeContext::StoreConstantDataImpl(ConstantData data)
     {
         Value value = ConstantDataToValue(data);
 
-        GetTopFrame().second.push_front(std::move(data));
+        {
+            std::lock_guard lock{ _mutex };
+            GetTopFrame().second.push_front(std::move(data));
+        }
+
         return value;
     }
 
@@ -507,68 +732,58 @@ namespace value
     {
         ConstantData movedOutOfScope;
 
-        std::visit(VariantVisitor{ [](Emittable) {},
-                                   [&movedOutOfScope, this](auto&& data) {
-                                       using Type = std::decay_t<decltype(data)>;
-                                       using RealType = std::remove_pointer_t<Type>;
-                                       using VectorType = std::vector<RealType>;
+        std::lock_guard lock{ _mutex };
 
-                                       const auto& frame = GetTopFrame();
-                                       if (auto stackFrameIt =
-                                               std::find_if(frame.second.begin(),
-                                                            frame.second.end(),
-                                                            [data](const ConstantData& constData) {
-                                                                if (auto ptr = std::get_if<VectorType>(&constData))
-                                                                {
-                                                                    return ptr->data() <= data &&
-                                                                           data < (ptr->data() + ptr->size());
-                                                                }
+        std::visit(
+            VariantVisitor{
+                [](Emittable) {},
+                [&movedOutOfScope,
+                 size = (value.IsConstrained() ? value.GetLayout().GetMemorySize() : 1)](auto&& data) {
+                    using Type = std::decay_t<decltype(data)>;
+                    using RealType = std::remove_pointer_t<Type>;
+                    using VectorType = std::vector<RealType>;
 
-                                                                return false;
-                                                            });
-                                           stackFrameIt == frame.second.end())
-                                       {
-                                           throw LogicException(LogicExceptionErrors::illegalState,
-                                                                "Could not extract expected data");
-                                       }
-                                       else
-                                       {
-                                           movedOutOfScope = std::move(*stackFrameIt);
-                                       }
-                                   } },
-                   value.GetUnderlyingData());
+                    movedOutOfScope = VectorType(data, data + size);
+                } },
+            value.GetUnderlyingData());
 
         return movedOutOfScope;
     }
 
     bool ComputeContext::IsGlobalValue(Value value) const
     {
-        return std::visit(VariantVisitor{ [](Emittable) -> bool {
-                                             throw LogicException(LogicExceptionErrors::illegalState);
-                                         },
-                                          [this](auto&& data) -> bool {
-                                              using Type = std::decay_t<decltype(data)>;
-                                              using RealType = std::remove_pointer_t<Type>;
-                                              using VectorType = std::vector<RealType>;
+        std::lock_guard lock{ _mutex };
 
-                                              return std::find_if(_globals.begin(),
-                                                                  _globals.end(),
-                                                                  [data](const auto& kvp) {
-                                                                      if (auto ptr = std::get_if<VectorType>(
-                                                                              &kvp.second.first))
-                                                                      {
-                                                                          return ptr->data() <= data &&
-                                                                                 data < (ptr->data() + ptr->size());
-                                                                      }
-                                                                      return false;
-                                                                  }) != _globals.end();
-                                          } },
-                          value.GetUnderlyingData());
+        return std::visit(
+            VariantVisitor{
+                [](Emittable) -> bool {
+                    throw LogicException(LogicExceptionErrors::illegalState);
+                },
+
+                [this](auto&& data) -> bool {
+                    using Type = std::decay_t<decltype(data)>;
+                    using RealType = std::remove_pointer_t<Type>;
+                    using VectorType = std::vector<RealType>;
+
+                    return std::find_if(
+                               _globals.begin(),
+                               _globals.end(),
+                               [data](const auto& kvp) {
+                                   if (auto ptr = std::get_if<VectorType>(
+                                           &kvp.second.first))
+                                   {
+                                       return ptr->data() <= data &&
+                                              data < (ptr->data() + ptr->size());
+                                   }
+                                   return false;
+                               }) != _globals.end();
+                } },
+            value.GetUnderlyingData());
     }
 
     detail::ValueTypeDescription ComputeContext::GetTypeImpl(Emittable)
     {
-        throw LogicException(LogicExceptionErrors::notImplemented);
+        throw LogicException(LogicExceptionErrors::illegalState);
     }
 
     EmitterContext::DefinedFunction ComputeContext::CreateFunctionImpl(FunctionDeclaration decl, EmitterContext::DefinedFunction fn)
@@ -578,6 +793,8 @@ namespace value
         {
             throw InputException(InputExceptionErrors::invalidArgument, "Specified function is an intrinsic");
         }
+
+        std::lock_guard lock{ _mutex };
 
         if (auto it = _definedFunctions.find(decl); it != _definedFunctions.end())
         {
@@ -591,7 +808,9 @@ namespace value
             const auto& fnName = decl.GetFunctionName();
             assert(expectedArgs.size() == args.size());
 
-            if (const auto& returnType = decl.GetReturnType(); returnType)
+            auto fnArgs = NormalizeReferenceLevels(args, expectedArgs);
+
+            if (const auto& returnType = decl.GetReturnType(); returnType.has_value())
             {
                 Value expectedReturn = *returnType;
 
@@ -599,18 +818,10 @@ namespace value
                 std::optional<Value> maybeGlobal;
                 {
                     FunctionScope scope(*this, fnName);
-                    std::vector<Value> fnArgs;
-                    fnArgs.reserve(expectedArgs.size());
-                    for (auto arg : expectedArgs)
-                    {
-                        fnArgs.push_back(Value(arg.GetBaseType(), arg.GetLayout()));
-                    }
-
-                    std::copy(args.begin(), args.end(), fnArgs.begin());
 
                     Value returnValue = expectedReturn;
-                    auto fnReturn = fn(args);
-                    if (!fnReturn)
+                    auto fnReturn = fn(fnArgs);
+                    if (!fnReturn.has_value())
                     {
                         throw LogicException(LogicExceptionErrors::illegalState, "Function definition was expected to return a value, but optional was empty");
                     }
@@ -641,8 +852,10 @@ namespace value
             }
             else
             {
+                FunctionScope scope(*this, fnName);
+
                 // equivalent of a void return type
-                (void)fn(args);
+                (void)fn(fnArgs);
 
                 return std::nullopt;
             }
@@ -660,40 +873,64 @@ namespace value
             return true;
         }
 
+        std::lock_guard lock{ _mutex };
         return _definedFunctions.find(decl) != _definedFunctions.end();
     }
 
     void ComputeContext::CopyDataImpl(const Value& source, Value& destination)
     {
-        std::visit(VariantVisitor{ [](Emittable) {},
-                                   [&destination, &source](auto&& sourceData) {
-                                       using SourceDataType = std::decay_t<decltype(sourceData)>;
+        std::visit(
+            VariantVisitor{
+                [](Emittable) {},
+                [&destination, &source](auto&& sourceData) {
+                    using SourceDataType = std::decay_t<decltype(sourceData)>;
 
-                                       auto& destinationData =
-                                           std::get<SourceDataType>(destination.GetUnderlyingData());
-                                       if (source.GetLayout().IsContiguous() && destination.GetLayout().IsContiguous())
-                                       {
-                                           auto numElements = destination.GetLayout().NumElements();
-                                           std::copy(sourceData, sourceData + numElements, destinationData);
-                                       }
-                                       else
-                                       {
-                                           auto& sourceLayout = source.GetLayout();
-                                           auto maxCoordinate = sourceLayout.GetActiveSize().ToVector();
-                                           decltype(maxCoordinate) coordinate(maxCoordinate.size());
+                    if (source.PointerLevel() == destination.PointerLevel())
+                    {
+                        if (source.PointerLevel() == 1)
+                        {
+                            auto& destinationData = std::get<SourceDataType>(destination.GetUnderlyingData());
+                            if (source.GetLayout().IsContiguous() && destination.GetLayout().IsContiguous())
+                            {
+                                auto numElements = destination.GetLayout().NumElements();
+                                std::copy(sourceData, sourceData + numElements, destinationData);
+                            }
+                            else
+                            {
+                                auto& sourceLayout = source.GetLayout();
+                                auto maxCoordinate = sourceLayout.GetActiveSize().ToVector();
+                                decltype(maxCoordinate) coordinate(maxCoordinate.size());
 
-                                           do
-                                           {
-                                               auto logicalCoordinates = sourceLayout.GetLogicalCoordinates(coordinate);
-                                               auto sourceOffset =
-                                                   sourceLayout.GetLogicalEntryOffset(logicalCoordinates);
-                                               auto destinationOffset =
-                                                   destination.GetLayout().GetLogicalEntryOffset(logicalCoordinates);
-                                               *(destinationData + destinationOffset) = *(sourceData + sourceOffset);
-                                           } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
-                                       }
-                                   } },
-                   source.GetUnderlyingData());
+                                do
+                                {
+                                    auto logicalCoordinates = sourceLayout.GetLogicalCoordinates(coordinate);
+                                    auto sourceOffset =
+                                        sourceLayout.GetLogicalEntryOffset(logicalCoordinates);
+                                    auto destinationOffset =
+                                        destination.GetLayout().GetLogicalEntryOffset(logicalCoordinates);
+                                    *(destinationData + destinationOffset) = *(sourceData + sourceOffset);
+                                } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+                            }
+                        }
+                        else
+                        {
+                            std::get<IntPtrT*>(destination.GetUnderlyingData())[0] = std::get<IntPtrT*>(source.GetUnderlyingData())[0];
+                            if (source.IsConstrained())
+                            {
+                                destination.SetLayout(source.GetLayout());
+                            }
+                            else
+                            {
+                                destination.ClearLayout();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw LogicException(LogicExceptionErrors::illegalState);
+                    }
+                } },
+            source.GetUnderlyingData());
     }
 
     void ComputeContext::MoveDataImpl(Value& source, Value& destination)
@@ -705,7 +942,7 @@ namespace value
         source.Reset();
     }
 
-    void ComputeContext::ForImpl(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn)
+    void ComputeContext::ForImpl(MemoryLayout layout, std::function<void(std::vector<Scalar>)> fn, [[maybe_unused]] const std::string& name)
     {
         auto maxCoordinate = layout.GetActiveSize().ToVector();
         decltype(maxCoordinate) coordinate(maxCoordinate.size());
@@ -717,7 +954,7 @@ namespace value
         } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
     }
 
-    void ComputeContext::ForImpl(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn)
+    void ComputeContext::ForImpl(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn, [[maybe_unused]] const std::string& name)
     {
         if (!(start.GetValue().IsConstant() && stop.GetValue().IsConstant() && step.GetValue().IsConstant()))
         {
@@ -736,6 +973,7 @@ namespace value
                     auto startNum = start.Get<Type>();
                     auto stopNum = stop.Get<Type>();
                     auto stepNum = step.Get<Type>();
+
                     for (; startNum < stopNum; startNum += stepNum)
                     {
                         fn(startNum);
@@ -821,7 +1059,11 @@ namespace value
                 }
                 else
                 {
-                    throw LogicException(LogicExceptionErrors::illegalState);
+                    detail::ValueTypeDescription typeDesc{ source.GetBaseType(), 0 };
+                    Value value{ typeDesc, utilities::ScalarLayout };
+
+                    value.SetData(*data);
+                    return value;
                 }
             },
             source.GetUnderlyingData());
@@ -856,42 +1098,58 @@ namespace value
         std::visit(
             VariantVisitor{
                 [](Emittable) {},
-                [](Boolean*) {},
                 [&destination, &source, op](auto&& destinationData) {
                     using DestinationDataType =
                         std::remove_pointer_t<std::decay_t<decltype(destinationData)>>;
 
                     std::function<DestinationDataType(DestinationDataType, DestinationDataType)>
                         opFn;
-                    switch (op)
+                    if constexpr (!std::is_same_v<DestinationDataType, Boolean>)
                     {
-                    case ValueBinaryOperation::add:
-                        opFn = [](auto dst, auto src) { return dst + src; };
-                        break;
-                    case ValueBinaryOperation::subtract:
-                        opFn = [](auto dst, auto src) { return dst - src; };
-                        break;
-                    case ValueBinaryOperation::multiply:
-                        opFn = [](auto dst, auto src) { return dst * src; };
-                        break;
-                    case ValueBinaryOperation::divide:
-                        opFn = [](auto dst, auto src) { return dst / src; };
-                        break;
-
-                    default:
-                        if constexpr (std::is_integral_v<DestinationDataType>)
+                        switch (op)
                         {
-                            switch (op)
+                        case ValueBinaryOperation::add:
+                            opFn = [](auto dst, auto src) { return dst + src; };
+                            break;
+                        case ValueBinaryOperation::subtract:
+                            opFn = [](auto dst, auto src) { return dst - src; };
+                            break;
+                        case ValueBinaryOperation::multiply:
+                            opFn = [](auto dst, auto src) { return dst * src; };
+                            break;
+                        case ValueBinaryOperation::divide:
+                            opFn = [](auto dst, auto src) { return dst / src; };
+                            break;
+
+                        default:
+                            if constexpr (std::is_integral_v<DestinationDataType>)
                             {
-                            case ValueBinaryOperation::modulus:
-                                opFn = [](auto dst, auto src) { return dst % src; };
-                                break;
-                            default:
+                                switch (op)
+                                {
+                                case ValueBinaryOperation::modulus:
+                                    opFn = [](auto dst, auto src) { return dst % src; };
+                                    break;
+                                default:
+                                    throw LogicException(LogicExceptionErrors::illegalState);
+                                }
+                            }
+                            else
+                            {
                                 throw LogicException(LogicExceptionErrors::illegalState);
                             }
                         }
-                        else
+                    }
+                    else
+                    {
+                        switch (op)
                         {
+                        case ValueBinaryOperation::logicalAnd:
+                            opFn = [](auto dst, auto src) { return dst && src; };
+                            break;
+                        case ValueBinaryOperation::logicalOr:
+                            opFn = [](auto dst, auto src) { return dst || src; };
+                            break;
+                        default:
                             throw LogicException(LogicExceptionErrors::illegalState);
                         }
                     }
@@ -1110,6 +1368,34 @@ namespace value
         return { std::make_unique<ComputeContext::IfContextImpl>(state) };
     }
 
+    void ComputeContext::WhileImpl(Scalar test, std::function<void()> fn)
+    {
+        if (!(test.GetValue().IsConstant()))
+        {
+            throw InputException(InputExceptionErrors::invalidArgument, "start/stop/step values must be constant for ComputeContext");
+        }
+
+        std::visit(
+            [&](auto&& data) {
+                using Type = std::remove_pointer_t<std::decay_t<decltype(data)>>;
+                if constexpr (IsOneOf<Type, Boolean>)
+                {
+                    auto testVal = test.Get<Boolean>();
+
+                    while (testVal)
+                    {
+                        fn();
+                        testVal = test.Get<Boolean>();
+                    }
+                }
+                else
+                {
+                    // error?
+                }
+            },
+            test.GetValue().GetUnderlyingData());
+    }
+
     std::optional<Value> ComputeContext::CallImpl(FunctionDeclaration func, std::vector<Value> args)
     {
         if (!std::all_of(args.begin(), args.end(), [this](const Value& value) { return ValidateValue(value); }))
@@ -1123,9 +1409,18 @@ namespace value
             return IntrinsicCall(func, args);
         }
 
-        if (auto it = _definedFunctions.find(func); it != _definedFunctions.end())
+        if (func.IsPointerSet())
         {
-            return it->second(args);
+            auto ptr = func.GetPointer();
+            return (*reinterpret_cast<DefinedFunction*>(reinterpret_cast<void*>(ptr.Get<IntPtrT>())))(args);
+        }
+
+        {
+            std::lock_guard lock{ _mutex };
+            if (auto it = _definedFunctions.find(func); it != _definedFunctions.end())
+            {
+                return it->second(args);
+            }
         }
 
         throw InputException(InputExceptionErrors::invalidArgument, "Specified function is not defined for this context");
@@ -1136,6 +1431,8 @@ namespace value
 
     void ComputeContext::ParallelizeImpl(int numTasks, std::vector<Value> captured, std::function<void(Scalar, std::vector<Value>)> fn)
     {
+        ThreadIds.Clear();
+
         std::vector<std::future<void>> futures;
         futures.reserve(numTasks);
         for (int i = 0; i < numTasks; ++i)
@@ -1178,6 +1475,11 @@ namespace value
         }
     } // namespace
 
+    void ComputeContext::DebugBreakImpl()
+    {
+        throw 0; // TODO: throw a real exception (of type value::Exception::DebugTrapException, perhaps)
+    }
+
     void ComputeContext::DebugDumpImpl(Value value, std::string tag, std::ostream& stream) const
     {
         PrintValue(value, stream);
@@ -1219,17 +1521,34 @@ namespace value
 
     void ComputeContext::SetNameImpl(const Value& value, const std::string& name)
     {
+        std::lock_guard lock{ _mutex };
         _namedValues[value] = name;
     }
 
     std::string ComputeContext::GetNameImpl(const Value& value) const
     {
+        std::lock_guard lock{ _mutex };
         if (auto it = _namedValues.find(value); it != _namedValues.end())
         {
             return it->second;
         }
 
         return {};
+    }
+
+    void ComputeContext::ImportCodeFileImpl(std::string) { throw LogicException(LogicExceptionErrors::notImplemented); }
+
+    Scalar ComputeContext::GetFunctionAddressImpl(const FunctionDeclaration& fn)
+    {
+        {
+            std::lock_guard lock{ _mutex };
+            if (auto it = _definedFunctions.find(fn); it != _definedFunctions.end())
+            {
+                return reinterpret_cast<IntPtrT>(reinterpret_cast<void*>(&(it->second)));
+            }
+        }
+
+        throw InputException(InputExceptionErrors::invalidArgument, "ComputeContext can't take address of function that hasn't been defined");
     }
 
     Value ComputeContext::IntrinsicCall(FunctionDeclaration intrinsic, std::vector<Value> args)
@@ -1251,6 +1570,10 @@ namespace value
             { FloorFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::floor(n); }) },
             { CeilFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::ceil(n); }) },
             { CopySignFunctionDeclaration, CopySignFunctionIntrinsic{} },
+            { FmaFunctionDeclaration, FmaFunctionIntrinsic{} },
+            { MemCopyFunctionDeclaration, MemOpFunctionIntrinsic<MemIntrinsicOp::Copy>{} },
+            { MemMoveFunctionDeclaration, MemOpFunctionIntrinsic<MemIntrinsicOp::Move>{} },
+            { MemSetFunctionDeclaration, MemOpFunctionIntrinsic<MemIntrinsicOp::Set>{} },
         };
 
         if (auto it = intrinsics.find(intrinsic); it != intrinsics.end())
@@ -1273,10 +1596,13 @@ namespace value
         auto pointerLevel1 = value1.PointerLevel();
         auto pointerLevel2 = value2.PointerLevel();
 
-        if (value1.GetBaseType() == value2.GetBaseType() &&
-            pointerLevel1 == pointerLevel2 &&
+        if (pointerLevel1 == pointerLevel2 &&
             pointerLevel1 == 1)
         {
+            if (value1.GetBaseType() != value2.GetBaseType())
+            {
+                throw InputException(InputExceptionErrors::typeMismatch);
+            }
             return true;
         }
 
@@ -1322,6 +1648,7 @@ namespace value
         // Our stack always has one empty "scope" pushed to it, which we
         // can use to create our global prefix.
 
+        std::lock_guard lock{ _mutex };
         return GetGlobalScopedName(GetTopFrame().first + "_" + name);
     }
 
@@ -1329,5 +1656,16 @@ namespace value
 
     const ComputeContext::Frame& ComputeContext::GetTopFrame() const { return _stack.top(); }
 
+    void swap(ComputeContext& l, ComputeContext& r) noexcept
+    {
+        using std::swap;
+
+        swap(static_cast<EmitterContext&>(l), static_cast<EmitterContext&>(r));
+        swap(l._stack, r._stack);
+        swap(l._globals, r._globals);
+        swap(l._definedFunctions, r._definedFunctions);
+        swap(l._namedValues, r._namedValues);
+        swap(l._moduleName, r._moduleName);
+    }
 } // namespace value
 } // namespace ell

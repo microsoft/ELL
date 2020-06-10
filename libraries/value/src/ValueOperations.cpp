@@ -28,6 +28,11 @@ namespace value
         });
     }
 
+    void For(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn)
+    {
+        GetContext().For(start, stop, step, fn);
+    }
+
     Value Cast(Value value, ValueType type)
     {
         if (value.GetBaseType() == type)

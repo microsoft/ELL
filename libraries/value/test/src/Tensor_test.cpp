@@ -154,21 +154,21 @@ Scalar Tensor_test1()
                 {
                     Vector mathSlicedVector = math::GetSlice<Dimension::row>(mathTensor, column, channel).ToArray();
                     auto slicedVector = tensor.Slice(Slice::All, column, channel);
-                    If(Verify(slicedVector, mathSlicedVector) != 0, [&] {
+                    If(VerifySame(slicedVector, mathSlicedVector) != 0, [&] {
                         ok2 = 1;
                     });
                 }
                 {
                     Vector mathSlicedVector = math::GetSlice<Dimension::column>(mathTensor, row, channel).ToArray();
                     auto slicedVector = tensor.Slice(row, Slice::All, channel);
-                    If(Verify(slicedVector, mathSlicedVector) != 0, [&] {
+                    If(VerifySame(slicedVector, mathSlicedVector) != 0, [&] {
                         ok2 = 1;
                     });
                 }
             }
             Vector mathSlicedVector = math::GetSlice<Dimension::channel>(mathTensor, row, column).ToArray();
             auto slicedVector = tensor.Slice(row, column, Slice::All);
-            If(Verify(slicedVector, mathSlicedVector) != 0, [&] {
+            If(VerifySame(slicedVector, mathSlicedVector) != 0, [&] {
                 ok2 = 1;
             });
         }
@@ -251,7 +251,7 @@ Scalar Tensor_test3()
                     std::vector<float>{ 3.2f + s, 2.1f + s } },
             };
         Tensor actual = t + testScalar;
-        If(Verify(actual, expected) != 0, [&] {
+        If(VerifySame(actual, expected) != 0, [&] {
             ok = 1;
             DebugPrint("Tensor_test3: Tensor scalar addition failed\n");
         });
@@ -267,7 +267,7 @@ Scalar Tensor_test3()
                     std::vector<float>{ 3.2f - s, 2.1f - s } },
             };
         Tensor actual = t - testScalar;
-        If(Verify(actual, expected) != 0, [&] {
+        If(VerifySame(actual, expected) != 0, [&] {
             ok = 1;
             DebugPrint("Tensor_test3: Tensor scalar subtraction failed\n");
         });
@@ -283,7 +283,7 @@ Scalar Tensor_test3()
                     std::vector<float>{ 3.2f * s, 2.1f * s } },
             };
         Tensor actual = t * testScalar;
-        If(Verify(actual, expected) != 0, [&] {
+        If(VerifySame(actual, expected) != 0, [&] {
             ok = 1;
             DebugPrint("Tensor_test3: Tensor scalar multiplication failed\n");
         });
@@ -299,7 +299,7 @@ Scalar Tensor_test3()
                     std::vector<float>{ 3.2f / s, 2.1f / s } },
             };
         Tensor actual = t / testScalar;
-        If(Verify(actual, expected) != 0, [&] {
+        If(VerifySame(actual, expected) != 0, [&] {
             ok = 1;
             DebugPrint("Tensor_test3: Tensor scalar division failed\n");
         });
@@ -384,7 +384,7 @@ Scalar Tensor_slice_test1()
         Matrix mathMatrix = ToMatrix(mathTensor.GetSlice<Dimension::row, Dimension::column>(0));
         auto matrix = inputTensor.Slice(Slice::All, Slice::All, 0);
 
-        If(Verify(matrix, mathMatrix) != 0, [&] {
+        If(VerifySame(matrix, mathMatrix) != 0, [&] {
             ok = 1;
             DebugPrint("Tensor_slice_test1: Tensor row-column GetSlice failed\n");
         });
@@ -396,7 +396,7 @@ Scalar Tensor_slice_test1()
         Matrix mathMatrix = ToMatrix(slice);
         auto matrix = inputTensor.Slice(0, Slice::All, Slice::All);
 
-        If(Verify(matrix, mathMatrix) != 0, [&] {
+        If(VerifySame(matrix, mathMatrix) != 0, [&] {
             ok = 1;
             DebugPrint("Tensor_slice_test1: Tensor column-channel GetSlice failed\n");
         });
@@ -406,7 +406,7 @@ Scalar Tensor_slice_test1()
         Vector mathVector = mathTensor.GetSlice<Dimension::channel>(0, 0).ToArray();
         auto vector = inputTensor.Slice(0, 0, Slice::All);
 
-        If(Verify(mathVector, vector) != 0, [&] {
+        If(VerifySame(mathVector, vector) != 0, [&] {
             ok = 1;
             DebugPrint("Tensor_slice_test1: Tensor channel vector failed\n");
         });
@@ -416,7 +416,7 @@ Scalar Tensor_slice_test1()
         Vector mathVector = mathTensor.GetSlice<Dimension::column>(0, 0).ToArray();
         auto vector = inputTensor.Slice(0, Slice::All, 0);
 
-        If(Verify(mathVector, vector) != 0, [&] {
+        If(VerifySame(mathVector, vector) != 0, [&] {
             ok = 1;
             DebugPrint("Tensor_slice_test1: Tensor column vector failed");
         });
@@ -426,7 +426,7 @@ Scalar Tensor_slice_test1()
         Vector mathVector = mathTensor.GetSlice<Dimension::row>(0, 0).ToArray();
         auto vector = inputTensor.Slice(Slice::All, 0, 0);
 
-        If(Verify(mathVector, vector) != 0, [&] {
+        If(VerifySame(mathVector, vector) != 0, [&] {
             ok = 1;
             DebugPrint("Tensor_slice_test1: Tensor row vector failed");
         });

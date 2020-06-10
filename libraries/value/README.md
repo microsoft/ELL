@@ -27,7 +27,7 @@ littering it with namespace-level qualifications. NB: this may not be necessary
 due to ADL, depending on what one is trying to do.
 
 As this API will be type-erased (more below), usage of this API does not need
-to be templated and thus does not need to be in `.h`/`.tcc` files.
+to be templated and thus does not need to be in `.h` files.
 
 ## Classes
 * `Value` - top-level type-erased class that will be the basis of all

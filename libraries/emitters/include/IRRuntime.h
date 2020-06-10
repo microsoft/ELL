@@ -88,6 +88,12 @@ namespace emitters
         template <typename ValueType>
         LLVMFunction GetTanhFunction();
 
+        /// <summary> Get the fma function </summary>
+        ///
+        /// <returns> An LLVM function pointer to the function. </returns>
+        template <typename ValueType>
+        LLVMFunction GetFmaFunction();
+
         // emitter types
         LLVMFunction GetSqrtFunction(VariableType argType);
         LLVMFunction GetAbsFunction(VariableType argType);
@@ -103,6 +109,7 @@ namespace emitters
         LLVMFunction GetFloorFunction(VariableType argType);
         LLVMFunction GetCeilFunction(VariableType argType);
         LLVMFunction GetCopySignFunction(VariableType argType);
+        LLVMFunction GetFmaFunction(VariableType argType);
 
         // llvm types
         LLVMFunction GetSqrtFunction(LLVMType argType);
@@ -119,6 +126,7 @@ namespace emitters
         LLVMFunction GetFloorFunction(LLVMType argType);
         LLVMFunction GetCeilFunction(LLVMType argType);
         LLVMFunction GetCopySignFunction(LLVMType argType);
+        LLVMFunction GetFmaFunction(LLVMType argType);
 
         LLVMFunction GetPrefetchFunction();
 
@@ -172,7 +180,7 @@ namespace emitters
 
     private:
         friend IRModuleEmitter;
-        IRRuntime(IRModuleEmitter& module);
+        explicit IRRuntime(IRModuleEmitter& module);
 
         LLVMType GetIntType(); // returns LLVM type for native `int`
 

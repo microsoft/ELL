@@ -1,0 +1,21 @@
+#
+# cmake file for MatrixMatrixMultiplyCodeNode timing scripts
+#
+
+cmake_minimum_required(VERSION 2.8)
+project(MatrixMatrixMultiplyCodeNodeRunner)
+set(CMAKE_CXX_STANDARD 11)
+
+@ADD_SUBDIRECTORIES@
+
+add_definitions(-DRUN_COUNT=@RUN_COUNT@)
+add_definitions(-DWARMUP_COUNT=@WARMUP_COUNT@)
+add_executable(Runner Runner.cpp)
+
+if(MSVC)
+    target_link_libraries(Runner @LINK_LIBRARIES@)
+elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
+    target_link_libraries(Runner @LINK_LIBRARIES@ -Wl)
+else()
+    target_link_libraries(Runner @LINK_LIBRARIES@ -Wl,--gc-sections)
+endif()

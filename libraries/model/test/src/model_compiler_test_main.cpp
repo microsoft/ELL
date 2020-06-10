@@ -11,6 +11,7 @@
 #include "CompilerTest.h"
 #include "ModelHeaderOutputTest.h"
 #include "PerformanceCountersTest.h"
+#include <nodes/include/MatrixMatrixMultiplyCodeNode.h>
 
 #include <model_testing/include/ModelTestUtilities.h>
 
@@ -22,8 +23,25 @@ using namespace ell;
 using namespace ell::emitters;
 using namespace ell::predictors::neural;
 
+void TestMatrixMatrixMultiplyCodeNodeImplementations()
+{
+    const int fallbackPanelM = 1;
+    const int fallbackPanelN = 1;
+    const int fallbackPanelK = 1;
+    const int fallbackKernelM = 1;
+    const int fallbackKernelN = 1;
+    const int fallbackKernelK = 1;
+    // Naive for-loop implementation
+    TestMatrixMatrixMultiplyCodeNode(1, 1, 1, fallbackPanelM, fallbackPanelN, fallbackPanelK, fallbackKernelM, fallbackKernelN, fallbackKernelK, nodes::MatrixMatrixMultiplyImplementation::SimpleForLoops);
+    TestMatrixMatrixMultiplyCodeNode(4, 4, 4, fallbackPanelM, fallbackPanelN, fallbackPanelK, fallbackKernelM, fallbackKernelN, fallbackKernelK, nodes::MatrixMatrixMultiplyImplementation::SimpleForLoops);
+    TestMatrixMatrixMultiplyCodeNode(4, 8, 8, fallbackPanelM, fallbackPanelN, fallbackPanelK, fallbackKernelM, fallbackKernelN, fallbackKernelK, nodes::MatrixMatrixMultiplyImplementation::SimpleForLoops);
+    TestMatrixMatrixMultiplyCodeNode(4, 4, 8, fallbackPanelM, fallbackPanelN, fallbackPanelK, fallbackKernelM, fallbackKernelN, fallbackKernelK, nodes::MatrixMatrixMultiplyImplementation::SimpleForLoops);
+}
+
 void TestIRCompiler()
 {
+    // TestIRNode(); // Failing on Windows
+
     TestBufferNode<float>();
     TestBufferNode<double>();
     TestBufferNode<int>();
@@ -99,6 +117,8 @@ void TestIRCompiler()
 
     // TestMatrixMatrixMultiplyNode(15, 25600, 27, false); // Fails due to numerical  issues
 
+    TestMatrixMatrixMultiplyCodeNodeImplementations();
+
     TestCompilableScalarOutputNode();
     TestCompilableVectorOutputNode();
     TestCompilableAccumulatorNode();
@@ -120,7 +140,11 @@ void TestIRCompiler()
     TestReorderDataNode1();
     TestReorderDataNode2();
     TestReorderDataNode3();
-    TestReceptiveFieldMatrixNode(1, true); // new version
+    TestReorderDataCodeNode1();
+    TestReorderDataCodeNode2();
+    TestReorderDataCodeNode3();
+	TestReorderDataCodeNode4();
+	TestReceptiveFieldMatrixNode(1, true); // new version
     TestReceptiveFieldMatrixNode(1, false); // old (slow) version
     TestReceptiveFieldMatrixNode(2, true); // new version
     // TestReceptiveFieldMatrixNode(2, false); // old (slow) version -- Fails
@@ -238,6 +262,9 @@ void TestIRCompiler()
     TestConvolutionalLayerNode(ConvolutionMethod::winograd, 1, 0);
     TestConvolutionalLayerNode2(ConvolutionMethod::winograd, 1, 0);
     TestConvolutionalLayerNode3(ConvolutionMethod::winograd, 1, 0);
+
+	//BUGBUG: This test currently fails for Compute but passes for Compile.
+	//TestSpatialConvolutionNode(1, 0);
 
     TestFullyConnectedLayerNode();
     // TestFullyConnectedLayerNode(0, 1); // Fully-connected layer nodes can't have padding (yet)

@@ -43,7 +43,7 @@ class DriveTest:
                  model=None, labels=None, target="pi3", target_dir="/home/pi/test",
                  username="pi", password="raspberry", iterations=1, expected=None,
                  blas=True, compile=COMPILE_INCREMENTAL, test=True, timeout=None, apikey=None,
-                 gitrepo=None, wrap_options=None):
+                 skip_ellcode=False, gitrepo=None, wrap_options=None):
         self.ipaddress = ipaddress
         self.build_root = find_ell.find_ell_build()
         self.ell_root = os.path.dirname(self.build_root)
@@ -63,6 +63,7 @@ class DriveTest:
         self.compile = compile
         self.test = test
         self.prediction_time = None
+        self.skip_ellcode = skip_ellcode
         self.logger = logger.get()
         self.rePlatform = "ARMv7.*"
         if target == "pi0":
@@ -295,6 +296,9 @@ class DriveTest:
         if self.wrap_options:
             builder_args += ['--'] + self.wrap_options
 
+        if self.skip_ellcode:
+            builder_args.append("--skip_ellcode")
+
         builder.parse_command_line(builder_args)
         builder.run()
 
@@ -370,7 +374,6 @@ class DriveTest:
                     sys.path.append(os.path.join(current_path, "..", "..", "wrap", "test"))
                     mpp = __import__("wrap_test")
                     mpp.make_project(self.output_dir)
-
                     cmd = ["python",
                            os.path.join(current_path, "..", "pythonlibs", "vision", "demo.py"),
                            self.labels_file,

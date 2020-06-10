@@ -495,6 +495,9 @@ struct MapCompilerOptions
 
     /// <summary> Emit debug code. </summary>
     bool debug = false;
+
+    /// <summary> Skip ELLCode optimization. </summary>
+    bool skip_ellcode = false;
 };
 
 //

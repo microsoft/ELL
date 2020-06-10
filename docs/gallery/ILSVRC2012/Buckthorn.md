@@ -6,12 +6,12 @@ permalink: /gallery/ILSVRC2012/Buckthorn
 
 [Back to Gallery](/ELL/gallery)
 
-## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (57.57% top 1 accuracy, 80.55% top 5 accuracy, 171ms/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
+## ILSVRC2012 Classification: 64x64x3 Convolutional Neural Network (57.57% top 1 accuracy, 80.55% top 5 accuracy, 113ms/frame on Raspberry Pi 3 (Raspbian) @ 700MHz)
 
 <table class="table table-striped table-bordered">
     <tr>
         <td> Download </td>
-        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Buckthorn/Buckthorn_pi3.ell.zip">Buckthorn_pi3.ell.zip</a></td>
+        <td colspan="3"> <a href="https://github.com/Microsoft/ELL-models/raw/master/models/ILSVRC2012/Buckthorn/Buckthorn.ell.zip">Buckthorn.ell.zip</a></td>
     </tr>
     <tr>
         <td> Accuracy </td>
@@ -19,7 +19,7 @@ permalink: /gallery/ILSVRC2012/Buckthorn
     </tr>
     <tr>
         <td> Performance </td>
-        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz : 171ms/frame </td>
+        <td colspan="3"> Raspberry Pi 3 (Raspbian) @ 700MHz : 113ms/frame </td>
     </tr>
     <tr>
         <td> Uncompressed Size </td>

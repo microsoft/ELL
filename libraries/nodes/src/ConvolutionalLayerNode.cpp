@@ -8,8 +8,9 @@
 
 #include "ConvolutionalLayerNode.h"
 #include "DiagonalConvolutionNode.h"
-#include "ReorderDataNode.h"
+#include "ReorderDataCodeNode.h"
 #include "SimpleConvolutionNode.h"
+#include "SpatialConvolutionNode.h"
 #include "UnrolledConvolutionNode.h"
 #include "WinogradConvolutionNode.h"
 
@@ -48,7 +49,7 @@ namespace nodes
         auto convInputLayout = originalInputLayout.ReorderedCopy({ shouldReorderToChannelMajor ? utilities::ChannelMajorTensorOrder : utilities::RowMajorTensorOrder });
         auto convOutputLayout = originalOutputLayout.ReorderedCopy({ shouldReorderToChannelMajor ? utilities::ChannelMajorTensorOrder : utilities::RowMajorTensorOrder });
 
-        const auto& preConvReorder = ReorderData(*newInput, originalInputLayout, convInputLayout);
+        const auto& preConvReorder = ReorderDataWithCodeNode(*newInput, originalInputLayout, convInputLayout);
         newInput = &preConvReorder;
 
         const model::OutputPort<ValueType>* convOutput;
@@ -57,8 +58,16 @@ namespace nodes
         {
         case ConvolutionMethod::simple:
         {
-            auto convNode = transformer.AddNode<SimpleConvolutionNode<ValueType>>(*newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
-            convOutput = &convNode->output;
+            if (isDepthwiseSeparable)
+            {
+                auto convNode = transformer.AddNode<SpatialConvolutionNode<ValueType>>(*newInput, this->GetLayer(), convOutputLayout);
+                convOutput = &convNode->output;
+            }
+            else
+            {
+                auto convNode = transformer.AddNode<SimpleConvolutionNode<ValueType>>(*newInput, convInputLayout, convOutputLayout, weights, convParams.stride);
+                convOutput = &convNode->output;
+            }
         }
         break;
         case ConvolutionMethod::unrolled:
@@ -86,7 +95,7 @@ namespace nodes
         // Copy metadata
         const_cast<model::Node*>(convOutput->GetNode())->GetMetadata() = this->GetMetadata();
 
-        const auto& postConvReorder = ReorderData(*convOutput, originalOutputLayout);
+        const auto& postConvReorder = ReorderDataWithCodeNode(*convOutput, originalOutputLayout);
         transformer.MapNodeOutput(this->output, postConvReorder);
 
         return true;

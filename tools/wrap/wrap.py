@@ -13,6 +13,7 @@ import argparse
 import json
 import logging
 import os
+import platform
 import sys
 import time
 from shutil import copyfile
@@ -64,6 +65,12 @@ class ModuleBuilder:
             "default": "host",
             "help": "the target platform",
             "choices": ["pi3", "pi0", "orangepi0", "pi3_64", "aarch64", "host"]
+        },
+        "skip_ellcode":
+        {
+            "short": "skip_ellcode",
+            "default": False,
+            "help": "skip ELLCode"
         },
         "language":
         {
@@ -161,6 +168,13 @@ If '0' or 'g', opt is not run (default '3')",
             "default": False,
             "help": "emit debug code"
         },
+        "global_value_alignment":
+        {
+            "short": "gva",
+            "default": 32,
+            "help": "The number of bytes to align global buffers to",
+            "type": int
+        },
         "stats":
         {
             "short": "stats",
@@ -193,6 +207,7 @@ If '0' or 'g', opt is not run (default '3')",
         self.func_name = "Predict"
         self.objext = "o"
         self.logger = None
+        self.skip_ellcode = False
 
     def str2bool(self, v):
         return v.lower() in ("yes", "true", "t", "1")
@@ -215,19 +230,22 @@ The supported target platforms are:
 
         for arg in self.arguments.keys():
             argdef = self.arguments[arg]
+            arg_type = str
+            if "type" in argdef.keys():
+                arg_type = argdef["type"]
             if "required" in argdef.keys():
                 arg_parser.add_argument("--" + arg, "-" + argdef["short"],
-                                        help=argdef["help"], required=True)
+                                        help=argdef["help"], type=arg_type, required=True)
             elif "choices" in argdef.keys():
                 arg_parser.add_argument("--" + arg, "-" + argdef["short"],
-                                        help=argdef["help"], default=argdef["default"],
+                                        help=argdef["help"], type=arg_type, default=argdef["default"],
                                         choices=argdef["choices"])
             elif type(argdef["default"]) is bool and not argdef["default"]:
                 arg_parser.add_argument("--" + arg, "-" + argdef["short"],
                                         help=argdef["help"], action="store_true", default=False)
             else:
                 arg_parser.add_argument("--" + arg, "-" + argdef["short"],
-                                        help=argdef["help"], default=argdef["default"])
+                                        help=argdef["help"], type=arg_type, default=argdef["default"])
 
         compile_args = []
         if '--' in args:
@@ -247,6 +265,7 @@ The supported target platforms are:
             self.model_name = self.model_file_base.replace('-', '_')
         self.language = args.language
         self.target = args.target
+        self.skip_ellcode = args.skip_ellcode
         self.objext = self.get_objext(self.target)
         self.output_dir = args.outdir
         if self.output_dir is None:
@@ -273,18 +292,23 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
         self.swig = self.language != "cpp"
         self.cpp_header = self.language == "cpp"
         self.compile_args = compile_args
+        self.global_value_alignment = args.global_value_alignment
         self.stats = args.stats
         self.times = {}
 
     def find_files(self):
         __script_path = os.path.dirname(os.path.abspath(__file__))
         self.cmake_template = os.path.join(__script_path, "templates/CMakeLists.%s.txt.in" % (self.language))
-        if (not os.path.isfile(self.cmake_template)):
+
+        if not os.path.isfile(self.cmake_template):
             raise Exception("Could not find CMakeLists template: %s" % (self.cmake_template))
+
         if self.language == "python":
             self.module_init_template = os.path.join(__script_path, "templates/__init__.py.in")
+
             if not os.path.isfile(self.module_init_template):
                 raise Exception("Could not find __init__.py template: %s" % (self.module_init_template))
+
         self.files.append(os.path.join(self.ell_root, "CMake/OpenBLASSetup.cmake"))
 
     def copy_files(self, filelist, folder):
@@ -292,14 +316,19 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
             target_dir = self.output_dir
         else:
             target_dir = os.path.join(self.output_dir, folder)
+
         os.makedirs(target_dir, exist_ok=True)
+
         for path in filelist:
             if not os.path.isfile(path):
                 raise Exception("expected file not found: " + path)
+
             _, file_name = os.path.split(path)
             dest = os.path.join(target_dir, file_name)
+
             if self.verbose:
                 self.logger.info("copy \"%s\" \"%s\"" % (path, dest))
+
             copyfile(path, dest)
 
     def create_template_file(self, template_filename, output_filename):
@@ -312,6 +341,10 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
         template = template.replace("@Arch@", self.target)
         template = template.replace("@OBJECT_EXTENSION@", self.objext)
         template = template.replace("@ELL_ROOT@", os.path.join(self.ell_root, "external").replace("\\", "/"))
+        shell_type = "UNIX"
+        if self.target == "host" and platform.system() == "Windows":
+            shell_type = "WINDOWS"
+        template = template.replace("@SHELL_TYPE@", shell_type)
         output_template = os.path.join(self.output_dir, output_filename)
         with open(output_template, 'w') as f:
             f.write(template)
@@ -358,6 +391,7 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
             func_name=self.func_name,
             model_name=self.model_name,
             target=self.target,
+            skip_ellcode=self.skip_ellcode,
             output_dir=self.output_dir,
             use_blas=self.blas,
             fuse_linear_ops=self.fuse_linear_ops,
@@ -372,6 +406,7 @@ Please specify a different outdir.".format(self.output_dir + ".py", self.output_
             swig=self.swig,
             header=self.cpp_header,
             objext="." + self.objext,
+            global_value_alignment=self.global_value_alignment,
             extra_options=self.compile_args)
         self.stop_timer("compile")
         if self.swig:

@@ -2,7 +2,7 @@
 //
 //  Project:  Embedded Learning Library (ELL)
 //  File:     IRFunctionEmitter.h (emitters)
-//  Authors:  Umesh Madan, Chuck Jacobs
+//  Authors:  Umesh Madan, Chuck Jacobs, Kern Handa
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -25,6 +25,8 @@
 #include "LLVMUtilities.h"
 #include "Variable.h"
 
+#include <utilities/include/FunctionUtils.h>
+
 #include <llvm/IR/Argument.h>
 #include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Constant.h>
@@ -33,10 +35,12 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/LLVMContext.h>
 
+#include <any>
 #include <functional>
 #include <initializer_list>
 #include <ostream>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace ell
@@ -48,6 +52,15 @@ namespace emitters
     /// <summary> A list of IRLocalScalar values </summary>
     using IRScalarList = std::vector<IRLocalScalar>;
 
+    /// <summary> Helper enum used to specify whether a FunctionDeclaration should be inlined </summary>
+    enum class FunctionInlining
+    {
+        defaultInline,
+        always,
+        prefer,
+        never
+    };
+
     /// <summary> Used to emit code into an existing LLVM IR Function </summary>
     class IRFunctionEmitter
     {
@@ -57,7 +70,11 @@ namespace emitters
         {
             None = 0,
             /// <summary> Suppress alias analysis </summary>
-            NoAlias
+            NoAlias,
+            /// <summary> This indicates that the parameter or return pointer is dereferenceable.
+            /// This attribute may only be applied to pointer typed parameters. A pointer that is
+            /// dereferenceable can be loaded from speculatively without a risk of trapping. </summary>
+            Dereferenceable
         };
 
         /// <summary> Query if this IRFunctionEmitter is valid. </summary>
@@ -705,18 +722,19 @@ namespace emitters
         ///
         /// <param name="index"> The index of the argument </param>
         /// <param name="attribute"> The attribute </param>
-        void SetAttributeForArgument(size_t index, Attributes attribute);
+        /// <param name="extra"> Any extra information that the attribute might make use of </param>
+        void SetAttributeForArgument(size_t index, Attributes attribute, const std::any& extra = {});
 
         /// <summary> Sets an attribute for all arguments </summary>
         ///
         /// <param name="attribute"> The attribute </summary>
-        void SetAttributeForArguments(Attributes attribute);
+        void SetAttributeForArguments(Attributes attribute, const std::any& extra = {});
 
         /// <summary> Sets an attribute for arguments at the specified indices </summary>
         ///
         /// <param name="indices"> The indices of the arguments </param>
         /// <param name="attribute"> The attribute </param>
-        void SetAttributeForArguments(std::vector<size_t> indices, Attributes attribute);
+        void SetAttributeForArguments(std::vector<size_t> indices, Attributes attribute, const std::any& extra = {});
 
         /// <summary> Emit a stack variable. </summary>
         ///
@@ -756,15 +774,6 @@ namespace emitters
         /// <returns> Pointer to the array. </returns>
         llvm::AllocaInst* Variable(VariableType type, int size);
 
-        /// <summary> Emit a 2D stack array of the given dimensions. </summary>
-        ///
-        /// <param name="type"> The array entry type. </param>
-        /// <param name="rows"> The number of rows in the array. </param>
-        /// <param name="columns"> The number of columns in the array. </param>
-        ///
-        /// <returns> Pointer to the array. </returns>
-        llvm::AllocaInst* Variable(VariableType type, int rows, int columns);
-
         /// <summary> Emit a stack array of the given size. </summary>
         ///
         /// <param name="type"> The array entry type. </param>
@@ -772,15 +781,6 @@ namespace emitters
         ///
         /// <returns> Pointer to the array. </returns>
         llvm::AllocaInst* Variable(LLVMType type, int size);
-
-        /// <summary> Emit a 2D stack array of the given dimensions. </summary>
-        ///
-        /// <param name="type"> The array entry type. </param>
-        /// <param name="rows"> The number of rows in the array. </param>
-        /// <param name="columns"> The number of columns in the array. </param>
-        ///
-        /// <returns> Pointer to the array. </returns>
-        llvm::AllocaInst* Variable(LLVMType type, int rows, int columns);
 
         /// <summary> Return an emitted stack variable and assign it a name. </summary>
         ///
@@ -1034,9 +1034,23 @@ namespace emitters
 
         /// <summary> Emits a for loop counting from zero to a constant end value. </summary>
         ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="count"> The number of iterations to make. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::string& tag, int count, ForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from zero to a constant end value. </summary>
+        ///
         /// <param name="count"> The number of iterations to make. </param>
         /// <param name="body"> A function that emits the body of the loop. </param>
         void For(LLVMValue count, ForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from zero to a constant end value. </summary>
+        ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="count"> The number of iterations to make. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::string& tag, LLVMValue count, ForLoopBodyFunction body);
 
         /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value. </summary>
         ///
@@ -1047,10 +1061,26 @@ namespace emitters
 
         /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value. </summary>
         ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="beginValue"> The starting value of the loop iterator. </param>
+        /// <param name="endValue"> The ending value of the loop iterator. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::string& tag, int beginValue, int endValue, ForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value. </summary>
+        ///
         /// <param name="beginValue"> The starting value of the loop iterator. </param>
         /// <param name="endValue"> The ending value of the loop iterator. </param>
         /// <param name="body"> A function that emits the body of the loop. </param>
         void For(LLVMValue beginValue, LLVMValue endValue, ForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value. </summary>
+        ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="beginValue"> The starting value of the loop iterator. </param>
+        /// <param name="endValue"> The ending value of the loop iterator. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::string& tag, LLVMValue beginValue, LLVMValue endValue, ForLoopBodyFunction body);
 
         /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value with a given increment. </summary>
         ///
@@ -1062,11 +1092,29 @@ namespace emitters
 
         /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value with a given increment. </summary>
         ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="beginValue"> The starting value of the loop iterator. </param>
+        /// <param name="endValue"> The ending value of the loop iterator. </param>
+        /// <param name="increment"> The increment for the iterator. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::string& tag, int beginValue, int endValue, int increment, ForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value with a given increment. </summary>
+        ///
         /// <param name="beginValue"> The starting value of the loop iterator. </param>
         /// <param name="endValue"> The ending value of the loop iterator. </param>
         /// <param name="increment"> The increment for the iterator. </param>
         /// <param name="body"> A function that emits the body of the loop. </param>
         void For(LLVMValue beginValue, LLVMValue endValue, LLVMValue increment, ForLoopBodyFunction body);
+
+        /// <summary> Emits a for loop counting from a begin value up to (but not including) a constant end value with a given increment. </summary>
+        ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="beginValue"> The starting value of the loop iterator. </param>
+        /// <param name="endValue"> The ending value of the loop iterator. </param>
+        /// <param name="increment"> The increment for the iterator. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::string& tag, LLVMValue beginValue, LLVMValue endValue, LLVMValue increment, ForLoopBodyFunction body);
 
         //
         // Extended for loops
@@ -1080,9 +1128,23 @@ namespace emitters
 
         /// <summary> Emits a set of nested for loops, each counting from a begin value up to (but not including) an end value. </summary>
         ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="ranges"> The range objects describing the ranges to iterate over (begin, end). </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::string& tag, const std::vector<ConstLoopRange>& ranges, MultiDimForLoopBodyFunction body);
+
+        /// <summary> Emits a set of nested for loops, each counting from a begin value up to (but not including) an end value. </summary>
+        ///
         /// <param name="ranges"> The range objects describing the ranges to iterate over (begin, end). </param>
         /// <param name="body"> A function that emits the body of the loop. </param>
         void For(const std::vector<LoopRange>& ranges, MultiDimForLoopBodyFunction body);
+
+        /// <summary> Emits a set of nested for loops, each counting from a begin value up to (but not including) an end value. </summary>
+        ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="ranges"> The range objects describing the ranges to iterate over (begin, end). </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::string& tag, const std::vector<LoopRange>& ranges, MultiDimForLoopBodyFunction body);
 
         /// <summary> Emits a tiled for loop counting from a begin value up to (but not including) an end value with a given increment. </summary>
         ///
@@ -1092,9 +1154,23 @@ namespace emitters
 
         /// <summary> Emits a tiled for loop counting from a begin value up to (but not including) an end value with a given increment. </summary>
         ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="range"> The range object describing the range to iterate over (begin, end, and increment). </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::string& tag, ConstTiledLoopRange range, TiledForLoopBodyFunction body);
+
+        /// <summary> Emits a tiled for loop counting from a begin value up to (but not including) an end value with a given increment. </summary>
+        ///
         /// <param name="range"> The range object describing the range to iterate over (begin, end, and increment). </param>
         /// <param name="body"> A function that emits the body of the loop. </param>
         void For(TiledLoopRange range, TiledForLoopBodyFunction body);
+
+        /// <summary> Emits a tiled for loop counting from a begin value up to (but not including) an end value with a given increment. </summary>
+        ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="range"> The range object describing the range to iterate over (begin, end, and increment). </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::string& tag, TiledLoopRange range, TiledForLoopBodyFunction body);
 
         /// <summary> Emits a set of nested tiled for loops, each counting from a begin value up to (but not including) an end value, with a given increment. </summary>
         ///
@@ -1104,9 +1180,23 @@ namespace emitters
 
         /// <summary> Emits a set of nested tiled for loops, each counting from a begin value up to (but not including) an end value, with a given increment. </summary>
         ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="ranges"> The range objects describing the ranges to iterate over (begin, end, increment). </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::string& tag, const std::vector<ConstTiledLoopRange>& ranges, TiledMultiDimForLoopBodyFunction body);
+
+        /// <summary> Emits a set of nested tiled for loops, each counting from a begin value up to (but not including) an end value, with a given increment. </summary>
+        ///
         /// <param name="ranges"> The range objects describing the ranges to iterate over (begin, end, increment). </param>
         /// <param name="body"> A function that emits the body of the loop. </param>
         void For(const std::vector<TiledLoopRange>& ranges, TiledMultiDimForLoopBodyFunction body);
+
+        /// <summary> Emits a set of nested tiled for loops, each counting from a begin value up to (but not including) an end value, with a given increment. </summary>
+        ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="ranges"> The range objects describing the ranges to iterate over (begin, end, increment). </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void For(const std::string& tag, const std::vector<TiledLoopRange>& ranges, TiledMultiDimForLoopBodyFunction body);
 
         /// <summary> Emits a parallel for loop counting from zero to a constant end value. </summary>
         ///
@@ -1166,10 +1256,23 @@ namespace emitters
 
         /// <summary> Emits a while loop. </summary>
         ///
-        /// </param name="condition"> A function the emits code returning a single-bit boolean test value </param>
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="pTestValuePointer"> Pointer to a memory location that will be dereferenced for the test value. </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void While(const std::string& tag, LLVMValue pTestValuePointer, WhileLoopBodyFunction body);
+
+        /// <summary> Emits a while loop. </summary>
         ///
+        /// <param name="condition"> A function the emits code returning a single-bit boolean test value </param>
         /// <param name="body"> A function that emits the body of the loop. </param>
         void While(std::function<LLVMValue(IRFunctionEmitter&)> condition, WhileLoopBodyFunction body);
+
+        /// <summary> Emits a while loop. </summary>
+        ///
+        /// <param name="tag"> Tag to use when naming the basic block regions </param>
+        /// <param name="condition"> A function the emits code returning a single-bit boolean test value </param>
+        /// <param name="body"> A function that emits the body of the loop. </param>
+        void While(const std::string& tag, std::function<LLVMValue(IRFunctionEmitter&)> condition, WhileLoopBodyFunction body);
 
         /// <summary> Emits an if statement. </summary>
         ///
@@ -1311,6 +1414,13 @@ namespace emitters
         ///
         /// <returns> Pointer to the return value of the call to the printf function. </returns>
         LLVMValue Printf(std::initializer_list<LLVMValue> arguments);
+
+        /// <summary> Emits a printf call. </summary>
+        ///
+        /// <param name="arguments"> Arguments to the printf call. </param>
+        ///
+        /// <returns> Pointer to the return value of the call to the printf function. </returns>
+        LLVMValue Printf(std::vector<LLVMValue> arguments);
 
         /// <summary> Emits a printf call. </summary>
         ///
@@ -1636,6 +1746,9 @@ namespace emitters
         /// <summary> Gets the CPU id of the currently-running thread. Currently only available on Linux. Returns -1 if unavailable. </summary>
         LLVMValue GetCpu();
 
+        /// <summary> Emits a system call to trap into the debugger </summary>
+        void DebugBreak();
+
         //
         // Information about the current function begin emitted
         //
@@ -1701,6 +1814,12 @@ namespace emitters
         /// <summary> Tags a profiling function to be included in the SWIG interface. </summary>
         void IncludeInSwigInterface();
 
+        /// <summary> Tags a function to be inlined or not, depending on the value passed in. </summary>
+        void SetInlineState(FunctionInlining inlineState);
+
+        /// <summary> Tags an LLVM function pointer to be inlined or not, depending on the value passed in. </summary>
+        static void SetInlineState(LLVMFunction function, FunctionInlining inlineState);
+
     private:
         friend class IRModuleEmitter;
 
@@ -1713,13 +1832,11 @@ namespace emitters
         {
         public:
             EntryBlockScope(IRFunctionEmitter& function);
-            void ExitScope();
             ~EntryBlockScope();
 
         private:
             IRFunctionEmitter& _function;
             llvm::IRBuilder<>::InsertPoint _oldPos;
-            bool _inScope = true;
         };
 
         LLVMValue PtrOffsetA(LLVMValue pPointer, int offset);
@@ -1735,6 +1852,21 @@ namespace emitters
         LLVMValue SetValueAtH(LLVMValue pPointer, int offset, LLVMValue pValue);
 
         llvm::BasicBlock* GetEntryBlock() { return _entryBlock; }
+
+        template <typename FunctionType>
+        auto ExecuteInEntryBlock(FunctionType&& fn) -> utilities::FunctionReturnType<FunctionType>
+        {
+            EntryBlockScope scope(*this);
+            if constexpr (utilities::HasReturnValue<FunctionType>())
+            {
+                return fn();
+            }
+            else
+            {
+                fn();
+            }
+        }
+
         void SetUpFunction();
 
         void RegisterFunctionArgs(const NamedVariableTypeList& args);

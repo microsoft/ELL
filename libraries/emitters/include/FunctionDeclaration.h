@@ -51,6 +51,7 @@ namespace emitters
 
         /// <summary> Get the LLVM type, if we have it. </summary>
         LLVMType GetLLVMType() const { return _llvmType; }
+
     private:
         std::string _name;
         VariableType _type;
@@ -58,7 +59,7 @@ namespace emitters
         LLVMType _llvmType;
     };
 
-    ///<summary> Collections of argument flags</summary>
+    /// <summary> Collections of argument flags </summary>
     using FunctionArgumentList = std::vector<FunctionArgument>;
 
     /// <summary> A function definition that defines the name, return type and arguments of a function </summary>

@@ -330,6 +330,32 @@ namespace emitters
         return type;
     }
 
+    VariableType GetNonPointerType(VariableType type)
+    {
+        switch (type)
+        {
+        case VariableType::VoidPointer:
+            return VariableType::Void;
+        case VariableType::BytePointer:
+            return VariableType::Byte;
+        case VariableType::Int16Pointer:
+            return VariableType::Int16;
+        case VariableType::Int32Pointer:
+            return VariableType::Int32;
+        case VariableType::Int64Pointer:
+            return VariableType::Int64;
+        case VariableType::FloatPointer:
+            return VariableType::Float;
+        case VariableType::DoublePointer:
+            return VariableType::Double;
+        case VariableType::Char8Pointer:
+            return VariableType::Char8;
+        default:
+            break;
+        }
+        return type;
+    }
+
     template <>
     TypedOperator GetAddForValueType<float>()
     {

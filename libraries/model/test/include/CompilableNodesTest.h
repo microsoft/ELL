@@ -19,6 +19,7 @@
 
 #include <nodes/include/ConstantNode.h>
 #include <nodes/include/DotProductNode.h>
+#include <nodes/include/MatrixMatrixMultiplyCodeNode.h>
 
 #include <predictors/neural/include/ConvolutionalLayer.h>
 #include <predictors/neural/include/Layer.h>
@@ -50,6 +51,10 @@ void TestReinterpretLayoutNode();
 void TestReorderDataNode1();
 void TestReorderDataNode2();
 void TestReorderDataNode3();
+void TestReorderDataCodeNode1();
+void TestReorderDataCodeNode2();
+void TestReorderDataCodeNode3();
+void TestReorderDataCodeNode4();
 void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape);
 void TestCompilableAccumulatorNodeFunction();
 void TestCompilableSourceNode();
@@ -70,6 +75,7 @@ void TestBufferNode();
 void TestMatrixVectorMultiplyNode(int m, int n, bool useBlas);
 void TestMatrixMatrixMultiplyNode(int m, int n, int k, bool useBlas);
 void TestOrderedMatrixMatrixMultiplyNode(int m, int n, int k, bool transposeA, bool transposeB, bool transposeC, bool useBlas);
+void TestMatrixMatrixMultiplyCodeNode(int m, int n, int k, int panelM, int panelN, int panelK, int kernelM, int kernelN, int kernelK, nodes::MatrixMatrixMultiplyImplementation gemmImpl);
 
 void TestBroadcasUnaryOperationNodeCompile();
 void TestBroadcasBinaryOperationNodeCompileAdd();
@@ -107,8 +113,10 @@ void TestMaxPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, s
 void TestMeanPoolingLayerNode(size_t inRows, size_t inCols, size_t numChannels, size_t outRows, size_t outCols, size_t poolingSize, size_t poolingStride, size_t inputPadding = 0, size_t outputPadding = 0);
 void TestScalingLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
 void TestSoftmaxLayerNode(size_t inputPadding = 0, size_t outputPadding = 0);
+void TestSpatialConvolutionNode(size_t inputPadding = 1, size_t outputPadding = 0);
 void TestFusedLinearLayerNodes(size_t rows, size_t columns, size_t channels);
 void TestRegionDetectionNode();
+void TestIRNode();
 
 #pragma region implementation
 

@@ -8,7 +8,7 @@
 
 #include "NeuralNetworkPredictorNode.h"
 #include "ConstantNode.h"
-#include "ReorderDataNode.h"
+#include "ReorderDataCodeNode.h"
 
 #include <data/include/DenseDataVector.h>
 
@@ -122,7 +122,7 @@ namespace nodes
             // If the input layer wants padding on its output, add a ReorderDataNode to add padding
             model::PortMemoryLayout inputNodeLayout(model::MemoryShape{ (int)inputShape.NumRows(), (int)inputShape.NumColumns(), (int)inputShape.NumChannels() });
             model::PortMemoryLayout paddedInputNodeLayout(model::MemoryShape{ (int)inputShape.NumRows(), (int)inputShape.NumColumns(), (int)inputShape.NumChannels() }, model::MemoryShape{ (int)padding, (int)padding, 0 });
-            const auto& paddedInput = ReorderData(*newInputElements, inputNodeLayout, paddedInputNodeLayout, predictors::neural::GetPaddingValue<ValueType>(outputPadding.paddingScheme));
+            const auto& paddedInput = ReorderDataWithCodeNode(*newInputElements, inputNodeLayout, paddedInputNodeLayout, predictors::neural::GetPaddingValue<ValueType>(outputPadding.paddingScheme));
             newInputElements = &paddedInput;
         }
 

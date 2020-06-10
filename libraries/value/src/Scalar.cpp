@@ -103,32 +103,27 @@ namespace value
     // Free function operator overloads
     Scalar operator+(Scalar s1, Scalar s2)
     {
-        Scalar copy = s1.Copy();
-        return copy += s2;
+        return Add(s1, s2);
     }
 
     Scalar operator-(Scalar s1, Scalar s2)
     {
-        Scalar copy = s1.Copy();
-        return copy -= s2;
+        return Subtract(s1, s2);
     }
 
     Scalar operator*(Scalar s1, Scalar s2)
     {
-        Scalar copy = s1.Copy();
-        return copy *= s2;
+        return Multiply(s1, s2);
     }
 
     Scalar operator/(Scalar s1, Scalar s2)
     {
-        Scalar copy = s1.Copy();
-        return copy /= s2;
+        return Divide(s1, s2);
     }
 
     Scalar operator%(Scalar s1, Scalar s2)
     {
-        Scalar copy = s1.Copy();
-        return copy %= s2;
+        return Modulo(s1, s2);
     }
 
     Scalar operator-(Scalar s)

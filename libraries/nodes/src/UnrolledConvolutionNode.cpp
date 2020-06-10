@@ -9,8 +9,10 @@
 #include "UnrolledConvolutionNode.h"
 #include "ConstantNode.h"
 #include "MatrixMatrixMultiplyNode.h"
+#include "MatrixMatrixMultiplyCodeNode.h"
 #include "ReceptiveFieldMatrixNode.h"
-#include "ReorderDataNode.h"
+#include "ReorderDataCodeNode.h"
+#include <value/include/LLVMContext.h>
 
 #include <utilities/include/Unused.h>
 
@@ -91,6 +93,23 @@ namespace nodes
     }
 
     template <typename ValueType>
+    bool UnrolledConvolutionNode<ValueType>::IsELLCodeTarget(model::ModelTransformer& transformer) const
+    {
+        auto compiler = dynamic_cast<const model::IRMapCompiler*>(transformer.GetContext().GetCompiler());
+        if(compiler != nullptr)
+        {
+            auto device_name = compiler->GetCompilerOptions().targetDevice.deviceName;
+            bool skip_ELLCode = compiler->GetCompilerOptions().skip_ellcode;
+            if (device_name.compare("pi3") == 0 && !skip_ELLCode)
+            {
+               return true;
+            }
+        }
+ 
+        return false;
+    }
+
+    template <typename ValueType>
     void UnrolledConvolutionNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         const auto& newInput = transformer.GetCorrespondingInputs(_input);
@@ -148,6 +167,7 @@ namespace nodes
         std::array<int, 3> dataOrder = useNewMethod ? drcOrder : rcdOrder;
         assert(outputPadding == 0 && "Unrolled convolution node output padding not supported yet");
 
+        bool isELLCodeTarget = IsELLCodeTarget(transformer);
         // weights: numFilters x fieldVolumeSize == m x k
         // ShapedInput: fieldVolumeSize x outputRows == k x n
         // Matrix multiply output: numFilters x outputRows = m x n
@@ -155,20 +175,39 @@ namespace nodes
         if (dataOrder == rcdOrder) // don't reorder input -- use old method
         {
             auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(newInput, inputLayout, filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
-            auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weights, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);
-
-            if (outputPadding != 0)
+            if(isELLCodeTarget)
             {
-                // Add padding
-                model::PortMemoryLayout outputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters });
-                model::PortMemoryLayout paddedOutputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 });
-                const auto& reorderedOutput = ReorderData(matrixMultNode->output, outputLayout, paddedOutputLayout);
-                transformer.MapNodeOutput(this->output, reorderedOutput);
+                auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyCodeNode<ValueType>>(weights, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);
+                if (outputPadding != 0)
+                {
+                    // Add padding
+                    model::PortMemoryLayout outputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters });
+                    model::PortMemoryLayout paddedOutputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 });
+                    const auto& reorderedOutput = ReorderDataWithCodeNode(matrixMultNode->output, outputLayout, paddedOutputLayout);
+                    transformer.MapNodeOutput(this->output, reorderedOutput);
+                }
+                else
+                {
+                    transformer.MapNodeOutput(this->output, matrixMultNode->output);
+                }
             }
             else
             {
-                transformer.MapNodeOutput(this->output, matrixMultNode->output);
+                auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weights, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);
+                if (outputPadding != 0)
+                {
+                    // Add padding
+                    model::PortMemoryLayout outputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters });
+                    model::PortMemoryLayout paddedOutputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 });
+                    const auto& reorderedOutput = ReorderDataWithCodeNode(matrixMultNode->output, outputLayout, paddedOutputLayout);
+                    transformer.MapNodeOutput(this->output, reorderedOutput);
+                }
+                else
+                {
+                    transformer.MapNodeOutput(this->output, matrixMultNode->output);
+                }
             }
+            
         }
         else // reorder input to be channels x rows x columns (drc) (then we can use the 'new' receptive field matrix generation)
         {
@@ -177,23 +216,41 @@ namespace nodes
             // Remove padding and transpose to channel-major order
             model::PortMemoryLayout inputLayout(model::MemoryShape{ inputHeight, inputWidth, inputDepth }, model::MemoryShape{ inputPadding, inputPadding, 0 });
             model::PortMemoryLayout transposedInputLayout(model::MemoryShape{ inputDepth, inputHeight, inputWidth }, model::DimensionOrder{ 2, 0, 1 }); // Note: memory layout constructor takes the sizes in physical dimension order
-            const auto& reorderedInput = ReorderData(newInput, inputLayout, transposedInputLayout);
+            const auto& reorderedInput = ReorderDataWithCodeNode(newInput, inputLayout, transposedInputLayout);
 
             auto receptiveFieldMatrixNode = transformer.AddNode<ReceptiveFieldMatrixNode<ValueType>>(reorderedInput, reorderedInput.GetMemoryLayout(), _filterSize, _stride, inputPadding, dataOrder, outputImageWidth, outputImageHeight);
-            auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weights, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);
-
-            if (outputPadding != 0)
+            if(isELLCodeTarget)
             {
-                // Add padding
-                model::PortMemoryLayout outputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters });
-                model::PortMemoryLayout paddedOutputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 });
-                const auto& reorderedOutput = ReorderData(matrixMultNode->output, outputLayout, paddedOutputLayout);
-                transformer.MapNodeOutput(this->output, reorderedOutput);
+                auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyCodeNode<ValueType>>(weights, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);
+                if (outputPadding != 0)
+                {
+                    // Add padding
+                    model::PortMemoryLayout outputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters });
+                    model::PortMemoryLayout paddedOutputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 });
+                    const auto& reorderedOutput = ReorderDataWithCodeNode(matrixMultNode->output, outputLayout, paddedOutputLayout);
+                    transformer.MapNodeOutput(this->output, reorderedOutput);
+                }
+                else
+                {
+                    transformer.MapNodeOutput(this->output, matrixMultNode->output);
+                }
             }
             else
             {
-                transformer.MapNodeOutput(this->output, matrixMultNode->output);
-            }
+                auto matrixMultNode = transformer.AddNode<MatrixMatrixMultiplyNode<ValueType>>(weights, m, n, k, lda, false, receptiveFieldMatrixNode->output, ldb, false, ldc, true);    
+                if (outputPadding != 0)
+                {
+                    // Add padding
+                    model::PortMemoryLayout outputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters });
+                    model::PortMemoryLayout paddedOutputLayout(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputPadding, outputPadding, 0 });
+                    const auto& reorderedOutput = ReorderDataWithCodeNode(matrixMultNode->output, outputLayout, paddedOutputLayout);
+                    transformer.MapNodeOutput(this->output, reorderedOutput);
+                }
+                else
+                {
+                    transformer.MapNodeOutput(this->output, matrixMultNode->output);
+                }
+            }       
         }
         return true;
     }

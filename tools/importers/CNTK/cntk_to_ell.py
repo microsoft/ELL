@@ -200,7 +200,7 @@ def get_node_output_in_ell_order(cntk_node_results):
             np.float).reshape(original_shape[1], 1, original_shape[0])
     elif len(original_shape) == 1:
         ordered_weights = ordered_weights.ravel().astype(
-            np.float).reshape(1, 1, original_shape.size)
+            np.float).reshape(1, 1, cntk_node_results.size)
     else:
         raise NotImplementedError(
             "Unsupported tensor dimensions {}".format(len(original_shape)))
@@ -242,7 +242,7 @@ def verify_ell_nodes_in_vision_model(ell_map, cntk_model, cntk_nodes, ordered_im
 
         # Feed input to the ELL model
         _logger.info("Getting computed ELL results")
-        ell_map.Compute(ell_input_tensor, dtype=np.float32)
+        ell_map.Compute(ell_input_tensor)
 
         # Walk list of importer nodes
         for importer_node in ordered_importer_nodes:
@@ -355,16 +355,15 @@ def verify_ell_output_in_vision_model(ell_map, cntk_model, testing_info):
 
         # Get computed ELL result
         _logger.info("Getting computed ELL results")
-        result_from_compute = np.array(ell_map.Compute(ell_input_tensor, dtype=np.float32))
+        result_from_compute = np.array(ell_map.Compute(ell_input_tensor))
 
         # Get compiled ELL result
         _logger.info("Getting compiled ELL results")
         compiler_options = ell.model.MapCompilerOptions()
         compiler_options.useBlas = True
-        compiled_ell_map = ell_map.Compile("host", "model", "predict", compilerOptions=compiler_options,
-                                           dtype=np.float32)
+        compiled_ell_map = ell_map.Compile("host", "model", "predict", compilerOptions=compiler_options)
 
-        result_from_compiled = np.array(compiled_ell_map.Compute(ell_input_tensor, dtype=np.float32))
+        result_from_compiled = np.array(compiled_ell_map.Compute(ell_input_tensor))
 
         # Verify the computed result against the cntk result
         np.testing.assert_array_almost_equal(
@@ -406,7 +405,7 @@ def verify_ell_output_in_vision_model(ell_map, cntk_model, testing_info):
 
 
 def verify_compiled_ell_nodes_in_vision_model(modelFile, cntk_model, model_cntk_nodes, ordered_importer_nodes,
-                                              step_interval_msec=0, lag_threshold_msec=0, plot_model=False,
+                                              step_interval_msec=None, lag_threshold_msec=None, plot_model=False,
                                               verify_model={"audio": False, "vision": False}):
 
     _logger = logger.get()
@@ -450,7 +449,7 @@ def verify_compiled_ell_nodes_in_vision_model(modelFile, cntk_model, model_cntk_
 
             # Feed input to the ELL model
             _logger.info("Getting computed ELL results")
-            ell_map.Compute(ell_input_tensor, dtype=np.float32)
+            ell_map.Compute(ell_input_tensor)
             model_clone = None
             if cntk_node.op_name != "UserFunction":
                 model_clone = cntk_node.clone(CloneMethod.clone)
@@ -470,10 +469,9 @@ def verify_compiled_ell_nodes_in_vision_model(modelFile, cntk_model, model_cntk_
                     _logger.info("Getting compiled ELL results")
                     compiler_options = ell.model.MapCompilerOptions()
                     compiler_options.useBlas = True
-                    compiled_ell_map = ell_map.Compile("host", "model", "predict", compilerOptions=compiler_options,
-                                                       dtype=np.float32)
+                    compiled_ell_map = ell_map.Compile("host", "model", "predict", compilerOptions=compiler_options)
 
-                    result_from_compiled = np.array(compiled_ell_map.Compute(ell_input_tensor, dtype=np.float32))
+                    result_from_compiled = np.array(compiled_ell_map.Compute(ell_input_tensor))
                     output_shape = cntk_output.shape
                     if (len(output_shape) == 3):
                         if cntk_output.size == result_from_compiled.size:
@@ -487,6 +485,13 @@ def verify_compiled_ell_nodes_in_vision_model(modelFile, cntk_model, model_cntk_
                             # Remove padding and look at active region only
                             result_from_compiled = result_from_compiled[padding:output_shape[0] + padding,
                                                                         padding:output_shape[1] + padding, :]
+
+                    # Put the ELL results into same order as CNTK
+                    # if prefix_ordered_importer_nodes[-1].output_shapes[0][1] == "channel_row_column":
+                    print(result_from_compiled.shape, cntk_output.shape)
+                    # result_from_compiled = memory_shapes.get_tensor_in_ell_order(result_from_compiled, "xyz")
+                    # print(result_from_compiled)
+                    # print(cntk_output)
 
                     # Compare results. Some layers have large numbers (e.g > 500.734) and some small numbers
                     # (e.g. 0.0038453). To make the comparison more resilient and meaningful for large numbers,
@@ -553,8 +558,9 @@ def map_from_cntk_model_using_new_engine(modelFile, step_interval_msec=None, lag
         testing_info = {"apply_softmax": False}
         try:
             ordered_importer_nodes, node_mapping = importer_engine.get_importer_node_to_ell_mapping()
-            verify_ell_nodes_in_vision_model(ell_map, cntk_model, cntk_nodes, ordered_importer_nodes, node_mapping,
-                                             testing_info)
+            # RESTORE:
+            # verify_ell_nodes_in_vision_model(ell_map, cntk_model, cntk_nodes, ordered_importer_nodes, node_mapping,
+            # testing_info)
             verify_compiled_ell_nodes_in_vision_model(modelFile, cntk_model, cntk_nodes, ordered_importer_nodes,
                                                       verify_model=verify_model)
             verify_ell_output_in_vision_model(ell_map, cntk_model, testing_info)

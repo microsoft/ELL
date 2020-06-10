@@ -79,10 +79,10 @@ namespace emitters
         IRIfEmitter& operator=(const IRIfEmitter&) = delete;
 
         /// <summary> Move constructor </summary>
-        IRIfEmitter(IRIfEmitter&& other);
+        IRIfEmitter(IRIfEmitter&& other) noexcept;
 
         /// <summary> Move assignment operator </summary>
-        IRIfEmitter& operator=(IRIfEmitter&& other);
+        IRIfEmitter& operator=(IRIfEmitter&& other) noexcept;
 
         /// <summary> Emits an 'if' block. </summary>
         ///

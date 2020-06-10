@@ -32,7 +32,6 @@ namespace model
     public:
         OutputPortBase() = default;
         OutputPortBase(const OutputPortBase& other) = delete;
-        OutputPortBase(OutputPortBase&& other) = default;
 
         /// <summary> Constructor </summary>
         ///

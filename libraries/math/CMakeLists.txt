@@ -9,6 +9,7 @@ if(MSVC)
 endif()
 
 include (OpenBLASSetup)
+add_compile_options(-DUSE_OPENBLAS=1)
 
 set(src src/BlasWrapper.cpp
          src/Tensor.cpp

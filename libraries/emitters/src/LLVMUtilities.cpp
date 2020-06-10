@@ -9,9 +9,11 @@
 #include "LLVMUtilities.h"
 #include "EmitterException.h"
 
-#include <llvm/IR/Type.h>
-#include <llvm/IR/DerivedTypes.h>
+#include "build/LLVMEmitterTargets.h"
+
 #include <llvm/IR/Value.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Target/TargetMachine.h>
 
 namespace ell
 {
@@ -90,16 +92,20 @@ namespace emitters
         }
         else
         {
-            if (type->isVoidTy()) {
+            if (type->isVoidTy())
+            {
                 return VariableType::Void;
             }
-            else if (type->isDoubleTy()) {
+            else if (type->isDoubleTy())
+            {
                 return VariableType::Double;
             }
-            else if (type->isFloatTy()) {
+            else if (type->isFloatTy())
+            {
                 return VariableType::Float;
             }
-            else if (type->isIntegerTy()) {
+            else if (type->isIntegerTy())
+            {
                 switch (type->getIntegerBitWidth())
                 {
                 case 8:
@@ -114,6 +120,76 @@ namespace emitters
             }
         }
         return VariableType::Custom;
+    }
+
+    namespace
+    {
+        void InitializeLLVMTargets()
+        {
+            // This block is part of a X-Macro. LLVM_EMITTER_TARGETS below is
+            // defined in build/LLVMEmitterTargets.h at CMake configure time.
+            // It is dependent on the value of the CMake variable LLVM_EMITTER_TARGETS.
+            // For each LLVM target specified in that variable, EMITTER_TARGET_ACTION
+            // below gets called
+#define EMITTER_TARGET_ACTION(TargetName)     \
+    LLVMInitialize##TargetName##TargetInfo(); \
+    LLVMInitialize##TargetName##Target();     \
+    LLVMInitialize##TargetName##TargetMC();   \
+    LLVMInitialize##TargetName##AsmPrinter(); \
+    LLVMInitialize##TargetName##AsmParser();  \
+    LLVMInitialize##TargetName##Disassembler();
+            LLVM_EMITTER_TARGETS
+#undef EMITTER_TARGET_ACTION
+
+            llvm::InitializeNativeTarget();
+        }
+
+        void InitializeGlobalPassRegistry()
+        {
+            // Get the global pass registry
+            llvm::PassRegistry* registry = llvm::PassRegistry::getPassRegistry();
+
+            // Initialize all of the optimization passes (probably unnecessary)
+            llvm::initializeCore(*registry);
+            llvm::initializeScalarOpts(*registry);
+            llvm::initializeVectorization(*registry);
+            llvm::initializeIPO(*registry);
+            llvm::initializeAnalysis(*registry);
+            llvm::initializeTransformUtils(*registry);
+            llvm::initializeInstCombine(*registry);
+            llvm::initializeAggressiveInstCombine(*registry);
+            llvm::initializeInstrumentation(*registry);
+            llvm::initializeTarget(*registry);
+            llvm::initializeGlobalISel(*registry);
+
+            // For codegen passes, only passes that do IR to IR transformation are
+            // supported.
+            llvm::initializeExpandMemCmpPassPass(*registry);
+            llvm::initializeScalarizeMaskedMemIntrinPass(*registry);
+            llvm::initializeCodeGenPreparePass(*registry);
+            llvm::initializeAtomicExpandPass(*registry);
+            llvm::initializeRewriteSymbolsLegacyPassPass(*registry);
+            llvm::initializeWinEHPreparePass(*registry);
+            llvm::initializeDwarfEHPreparePass(*registry);
+            llvm::initializeSafeStackLegacyPassPass(*registry);
+            llvm::initializeSjLjEHPreparePass(*registry);
+            llvm::initializePreISelIntrinsicLoweringLegacyPassPass(*registry);
+            llvm::initializeGlobalMergePass(*registry);
+            llvm::initializeIndirectBrExpandPassPass(*registry);
+            llvm::initializeInterleavedLoadCombinePass(*registry);
+            llvm::initializeInterleavedAccessPass(*registry);
+            llvm::initializeEntryExitInstrumenterPass(*registry);
+            llvm::initializePostInlineEntryExitInstrumenterPass(*registry);
+            llvm::initializeUnreachableBlockElimLegacyPassPass(*registry);
+            llvm::initializeExpandReductionsPass(*registry);
+            llvm::initializeWriteBitcodePassPass(*registry);
+        }
+    } // namespace
+
+    void InitializeLLVM()
+    {
+        InitializeLLVMTargets();
+        InitializeGlobalPassRegistry();
     }
 
 } // namespace emitters

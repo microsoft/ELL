@@ -1,0 +1,134 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  Project:  Embedded Learning Library (ELL)
+//  File:     Runner.template.cpp / Runner.cpp
+//  Authors:  Mason Remy
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <cstdlib>
+#include <iostream>
+#include <stdio.h>
+#include <numeric>
+#include <chrono>
+#include <random>
+
+#define @MODEL_NAME@_MAIN
+
+#include "@MODEL_DIR@/@MODEL_NAME@.h"
+
+#ifndef RUN_COUNT
+#define RUN_COUNT 1000
+#endif
+
+#ifndef WARMUP_COUNT
+#define WARMUP_COUNT 100
+#endif
+
+using dtype = @DATA_TYPE@;
+
+const unsigned int BUFFER_ROWS = 0;
+
+// makes a row major matrix
+static inline void randomInitMatrix(dtype* A, unsigned int rows, unsigned int cols)
+{
+    for (unsigned int i = 0; i < rows; ++i)
+    {
+        for (unsigned int j = 0; j < cols; ++j)
+        {
+            A[i * cols + j] = (dtype)(rand()) / RAND_MAX;
+        }
+    }
+    for (unsigned int i = rows; i < rows + BUFFER_ROWS; ++i)
+    {
+        for (unsigned int j = 0; j < cols; ++j)
+        {
+            A[i * cols + j] = 0;
+        }
+    }
+}
+
+class Timer
+{
+private:
+    using clock_t = std::chrono::high_resolution_clock;
+    using second_t = std::chrono::duration<double, std::ratio<1> >;
+    std::chrono::time_point<clock_t> _start;
+public:
+    Timer() : _start(clock_t::now()) {}
+    double elapsed() const
+    {
+        return std::chrono::duration_cast<second_t>(clock_t::now() - _start).count();
+    }
+};
+
+void PrintMat(const std::vector<dtype>& data, int rows, int cols)
+{
+    for (int r = 0; r < rows; ++r)
+    {
+        for (int c = 0; c < cols; ++c)
+        {
+            std::cout << std::fixed << data[r * cols + c] << "\t";
+        }
+        std::cout << std::endl;
+    }
+}
+
+template<typename WrapperType>
+double RunCheck(WrapperType& wrapper)
+{
+    TensorShape inputShape = wrapper.GetInputShape();
+    int M = inputShape.columns;
+    int N = inputShape.channels;
+    
+    std::vector<dtype> A(M * N);
+    std::vector<dtype> results(M * N);
+
+    // Return the sum of the first result so algorithm correctness can be verified (if the model was built without a fixed seed this is meaningless)
+    randomInitMatrix(A.data(), M, N);
+    results = wrapper.Predict(A);
+    dtype firstValSum = std::accumulate(results.begin(), results.end(), static_cast<dtype>(0));
+    return firstValSum;
+}
+
+template<typename WrapperType>
+double RunTiming(WrapperType& wrapper)
+{
+    TensorShape inputShape = wrapper.GetInputShape();
+    int M = inputShape.columns;
+    int N = inputShape.channels;
+    
+    std::vector<dtype> A(M * N);
+    std::vector<dtype> results(M * N);
+
+    randomInitMatrix(A.data(), M, N);
+    for (int i = 0; i < WARMUP_COUNT; i++)
+    {
+        randomInitMatrix(A.data(), M, N);
+        results = wrapper.Predict(A);
+    }
+
+    Timer t;
+    for (int i = 0; i < RUN_COUNT; i++)
+    {
+        randomInitMatrix(A.data(), M, N);
+        results = wrapper.Predict(A);
+    }
+    double duration = t.elapsed();
+
+    return duration;
+}
+
+int main(int argc, char** argv)
+{
+    srand(0);
+
+    @ALLCAPS_MODEL_NAME@Wrapper modelWrapper;
+
+    double correctnessCheck = RunCheck(modelWrapper);
+    double duration = RunTiming(modelWrapper);
+
+    std::cout << "@MODEL_NAME@ time = " << std::fixed << duration << "\tcheck = " << std::fixed << correctnessCheck << std::endl;
+
+    return 0;
+}

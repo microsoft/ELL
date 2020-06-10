@@ -40,6 +40,7 @@ namespace common
         bool useBlas = false;
         bool debug = false;
         utilities::Optional<bool> positionIndependentCode = false; // for generating -fPIC object code
+        int globalValueAlignment = 32;
 
         // potentially per-node options:
         bool enableVectorization = true;
@@ -67,6 +68,7 @@ namespace common
         std::string targetArchitecture = "";
         std::string targetFeatures = "";
         std::string targetDataLayout = "";
+        bool skip_ellcode = false;
 
         /// <summary> Gets a `MapCompilerOptions` with the settings specified in the commandline arguments. </summary>
         ///

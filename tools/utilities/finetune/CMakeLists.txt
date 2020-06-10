@@ -5,7 +5,7 @@
 # finetune tool
 set(tool_name finetune)
 
-set(common_src 
+set(common_src
     src/DataStatistics.cpp
     src/DataUtils.cpp
     src/FineTuneArguments.cpp
@@ -43,13 +43,13 @@ source_group("include" FILES ${include})
 
 # create executable in build\bin
 set (GLOBAL_BIN_DIR ${CMAKE_BINARY_DIR}/bin)
-set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR}) 
+set (EXECUTABLE_OUTPUT_PATH ${GLOBAL_BIN_DIR})
 add_executable(${tool_name} ${docs} ${src} ${main_src} ${include})
 target_include_directories(${tool_name} PRIVATE include ${ELL_LIBRARIES_DIR})
 target_link_libraries(${tool_name} common data dsp emitters evaluators functions model nodes optimization passes predictors utilities)
 copy_shared_libraries(${tool_name})
 
-# put this project in the utilities folder in the IDE 
+# put this project in the utilities folder in the IDE
 set_property(TARGET ${tool_name} PROPERTY FOLDER "tools/trainers")
 
 #
@@ -80,9 +80,6 @@ set(test_include
     test/include/TestModelUtils.h
     test/include/TestOptimizationUtils.h
     test/include/TestTransformData.h
-)   
-
-set(test_tcc
 )
 
 source_group("src" FILES ${test_src})

@@ -15,6 +15,7 @@ namespace ell
 value::Scalar Matrix_test1();
 value::Scalar Matrix_test2();
 value::Scalar Matrix_test3();
+value::Scalar Matrix_test4();
 value::Scalar Reshape_test();
 value::Scalar GEMV_test();
 value::Scalar MatrixReferenceTest();

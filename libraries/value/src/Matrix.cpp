@@ -62,7 +62,7 @@ namespace value
 
     Scalar Matrix::operator()(Scalar rowIndex, Scalar columnIndex)
     {
-        Value indexedValue = GetContext().Offset(_value, { rowIndex, columnIndex });
+		Value indexedValue = GetContext().Offset(_value, { rowIndex, columnIndex });
         indexedValue.SetLayout(ScalarLayout);
 
         return indexedValue;
@@ -134,6 +134,11 @@ namespace value
     size_t Matrix::Rows() const { return static_cast<size_t>(_value.GetLayout().GetLogicalDimensionActiveSize(0)); }
 
     size_t Matrix::Columns() const { return static_cast<size_t>(_value.GetLayout().GetLogicalDimensionActiveSize(1)); }
+
+    Matrix::MatrixLayout Matrix::GetMatrixLayout() const
+    {
+        return _value.GetLayout().IsCanonicalOrder() ? MatrixLayout::rowMajor : MatrixLayout::columnMajor;
+    }
 
     ValueType Matrix::Type() const { return _value.GetBaseType(); }
 

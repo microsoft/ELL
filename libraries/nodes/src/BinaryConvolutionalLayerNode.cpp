@@ -8,7 +8,7 @@
 
 #include "BinaryConvolutionalLayerNode.h"
 #include "ConstantNode.h"
-#include "ReorderDataNode.h"
+#include "ReorderDataCodeNode.h"
 
 #include <emitters/include/IRAsyncTask.h>
 #include <emitters/include/IREmitter.h>
@@ -240,7 +240,7 @@ namespace nodes
         // Output of xnor is in (f x h x w) order, need to transpose to the canonical (h x w x f) order
         model::PortMemoryLayout outputShape(model::MemoryShape{ numFilters, outputImageHeight, outputImageWidth }, model::DimensionOrder{ 2, 0, 1 }); // Note: memory layout constructor takes the sizes in physical dimension order
         model::PortMemoryLayout transposedOutputShape(model::MemoryShape{ outputImageHeight, outputImageWidth, numFilters }, model::MemoryShape{ outputDataPadding, outputDataPadding, 0 }, model::DimensionOrder{ 0, 1, 2 });
-        const auto& reorderedOutput = ReorderData(xnorOutput, outputShape, transposedOutputShape);
+        const auto& reorderedOutput = ReorderDataWithCodeNode(xnorOutput, outputShape, transposedOutputShape);
         transformer.MapNodeOutput(this->output, reorderedOutput);
         return true;
     }

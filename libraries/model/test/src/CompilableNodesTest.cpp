@@ -49,6 +49,7 @@
 #include <nodes/include/FullyConnectedLayerNode.h>
 #include <nodes/include/IRNode.h>
 #include <nodes/include/L2NormSquaredNode.h>
+#include <nodes/include/MatrixMatrixMultiplyCodeNode.h>
 #include <nodes/include/MatrixMatrixMultiplyNode.h>
 #include <nodes/include/MatrixVectorMultiplyNode.h>
 #include <nodes/include/MatrixVectorProductNode.h>
@@ -59,10 +60,12 @@
 #include <nodes/include/ReceptiveFieldMatrixNode.h>
 #include <nodes/include/RegionDetectionLayerNode.h>
 #include <nodes/include/ReinterpretLayoutNode.h>
+#include <nodes/include/ReorderDataCodeNode.h>
 #include <nodes/include/ReorderDataNode.h>
 #include <nodes/include/SinkNode.h>
 #include <nodes/include/SoftmaxLayerNode.h>
 #include <nodes/include/SourceNode.h>
+#include <nodes/include/SpatialConvolutionNode.h>
 #include <nodes/include/SumNode.h>
 #include <nodes/include/TypeCastNode.h>
 #include <nodes/include/UnaryOperationNode.h>
@@ -1174,6 +1177,135 @@ void TestReorderDataNode3()
     VerifyCompiledOutput(map, compiledMap, signal, "ReorderDataNode");
 }
 
+void TestReorderDataCodeNode1()
+{
+    using ElementType = float;
+    int numRows = 2;
+    int numColumns = 3;
+    int numChannels = 16;
+    model::Model model;
+    model::PortMemoryLayout inputLayout(model::MemoryShape{ numRows, numColumns, numChannels }); // Default order: 0, 1, 2 == rows, columns, channels
+    auto outputLayout = inputLayout.ReorderedCopy({ 2, 0, 1 });
+
+    size_t inputSize = inputLayout.GetMemorySize();
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
+    const auto& testOutput = ReorderDataWithCodeNode(inputNode->output, inputLayout, outputLayout);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testOutput } });
+
+    // First, create the input tensor and expected output
+    math::ChannelColumnRowTensor<float> input(numRows, numColumns, numChannels);
+    math::ColumnRowChannelTensor<float> expectedOutput(numRows, numColumns, numChannels);
+
+    // Next, verify that the compiled output is correct
+    FillTensor<float>(input, 1, 1);
+    FillTensor<float>(expectedOutput, 1, 1);
+
+	Log() << "Input:" << EOL << input.ToArray() << EOL;
+
+    std::string name = "TestReorderDataCodeNode1";
+    TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
+        model::IRMapCompiler compiler;
+        auto compiledMap = compiler.Compile(map);
+
+        // compare output
+        std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+        std::vector<std::vector<ElementType>> expected = { expectedOutput.ToArray() };
+        VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
+    });
+}
+
+void TestReorderDataCodeNode2()
+{
+    using ElementType = float;
+    int numRows = 3;
+    int numColumns = 3;
+    int numChannels = 16;
+    int padding = 1;
+    model::Model model;
+    model::PortMemoryLayout inputLayout(model::MemoryShape{ numRows, numColumns, numChannels }, model::MemoryShape{ padding, padding, 0 }); // Default order: 0, 1, 2 == rows, columns, channels
+	auto outputLayout = inputLayout.ReorderedCopy({ 2, 0, 1 });
+
+    size_t inputSize = inputLayout.GetMemorySize();
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
+    const auto& testOutput = ReorderDataWithCodeNode(inputNode->output, inputLayout, outputLayout, std::vector<int>{ 2, 0, 1 });
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testOutput } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    std::vector<ElementType> input(inputSize);
+    FillVector(input, 1.0f);
+	Log() << "Input:" << EOL << input << EOL;
+
+    // compare output
+    std::vector<std::vector<ElementType>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, "ReorderDataCodeNode2");
+}
+
+void TestReorderDataCodeNode3()
+{
+    using ElementType = float;
+    int numRows = 3;
+    int numColumns = 4;
+    int numChannels = 2;
+    int padding = 1;
+    model::Model model;
+    model::PortMemoryLayout inputLayout(model::MemoryShape{ numRows, numColumns, numChannels }, model::MemoryShape{ padding, padding, 0 }); // Default order: 0, 1, 2 == rows, columns, channels
+	auto outputLayout = inputLayout.ReorderedCopy({ 2, 0, 1 });
+
+    size_t inputSize = inputLayout.GetMemorySize();
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
+    const auto& testOutput = ReorderDataWithCodeNode(inputNode->output, inputLayout, outputLayout);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testOutput } });
+    model::IRMapCompiler compiler;
+    auto compiledMap = compiler.Compile(map);
+
+    std::vector<ElementType> input(inputSize);
+    FillVector(input, 1.0f);
+	Log() << "Input:" << EOL << input << EOL;
+
+    // compare output
+    std::vector<std::vector<ElementType>> signal = { input };
+    VerifyCompiledOutput(map, compiledMap, signal, "ReorderDataCodeNode3");
+}
+
+void TestReorderDataCodeNode4()
+{
+    using ElementType = float;
+    int numRows = 2;
+    int numColumns = 5;
+    model::Model model;
+    model::PortMemoryLayout inputLayout(model::MemoryShape{ numRows, numColumns });
+    auto outputLayout = inputLayout.ReorderedCopy({ 1, 0 });
+
+    size_t inputSize = inputLayout.GetMemorySize();
+    auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
+    const auto& testOutput = ReorderDataWithCodeNode(inputNode->output, inputLayout, outputLayout);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", testOutput } });
+
+    // First, create the input tensor and expected output
+    math::RowMatrix<float> input(numRows, numColumns);
+    math::ColumnMatrix<float> expectedOutput(numRows, numColumns);
+
+    // Next, verify that the compiled output is correct
+    FillMatrix<float>(input, 1, 1);
+    FillMatrix<float>(expectedOutput, 1, 1);
+
+    std::vector<std::vector<ElementType>> signal = { input.ToArray() };
+	std::vector<std::vector<ElementType>> expected = { expectedOutput.ToArray() };
+
+	Log() << "Input:" << EOL << input.ToArray() << EOL;
+
+	std::string name = "TestReorderDataCodeNode4";
+    TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
+        model::IRMapCompiler compiler;
+        auto compiledMap = compiler.Compile(map);
+
+        // compare output
+        VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
+    });
+}
+
+
 void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape)
 {
     const std::array<int, 3> rcdOrder = std::array<int, 3>{ 0, 1, 2 };
@@ -1641,6 +1773,59 @@ void TestOrderedMatrixMatrixMultiplyNode(int m, int n, int k, bool transposeA, b
         id << std::boolalpha << "OrderedMatrixMatrixMultiplyNode(m = " << m << ", n = " << n << ", k = " << k << ", transposeA = "
            << transposeA << ", transposeB = " << transposeB << ", transposeC = " << transposeC << ", useBlas = " << useBlas << ") iteration " << iteration;
         VerifyCompiledOutput(map, compiledMap, signal, id.str());
+    });
+}
+
+void TestMatrixMatrixMultiplyCodeNode(int m, int n, int k, int panelM, int panelN, int panelK, int kernelM, int kernelN, int kernelK, MatrixMatrixMultiplyImplementation gemmImpl)
+{
+    using ValueType = float;
+    std::vector<ValueType> matrixBVals(k * n);
+    FillRandomVector(matrixBVals);
+
+    model::Model model;
+    auto inputMatrixNode = model.AddNode<model::InputNode<ValueType>>(m * k);
+    auto matrixBNode = model.AddNode<ConstantNode<ValueType>>(matrixBVals);
+
+    int lda = k;
+    int ldb = n;
+    int ldc = n;
+
+    auto matMatMultNode = model.AddNode<MatrixMatrixMultiplyCodeNode<ValueType>>(inputMatrixNode->output, m, n, k, lda, matrixBNode->output, ldb, ldc, panelM, panelN, panelK, kernelM, kernelN, kernelK, gemmImpl);
+
+    auto map = model::Map(model, { { "inputMatrix", inputMatrixNode } }, { { "output", matMatMultNode->output } });
+
+    std::string name = "MatrixMatrixMultiplyCodeNode";
+    TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
+        // compare output
+        std::vector<ValueType> matrixAVals(m * k);
+        FillRandomVector(matrixAVals);
+        std::vector<std::vector<ValueType>> signal = { matrixAVals };
+
+        model::MapCompilerOptions settings;
+        model::ModelOptimizerOptions optimizerOptions;
+        model::IRMapCompiler compiler(settings, optimizerOptions);
+        auto compiledMap = compiler.Compile(map);
+
+        std::vector<ValueType> expectedResult(m * n);
+        for (int i = 0; i < m; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                for (int kVal = 0; kVal < k; kVal++)
+                {
+                    expectedResult[i * n + j] += matrixAVals[i * k + kVal] * matrixBVals[kVal * n + j];
+                }
+            }
+        }
+
+        std::vector<std::vector<ValueType>> expected { expectedResult };
+        std::stringstream id;
+        id << std::boolalpha << "MatrixMatrixMultiplyCodeNode(impl = " << static_cast<int>(gemmImpl)
+           << ", m = " << m << ", n = " << n << ", k = " << k
+           << ", panelM = " << panelM << ", panelN =" << panelN << ", panelK = " << panelK
+           << ", kernelM = " << kernelM << ", kernelN = " << kernelN << ", kernelK" << kernelK << ") iteration " << iteration;
+
+        VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, id.str());
     });
 }
 
@@ -3624,4 +3809,107 @@ void TestBroadcasBinaryOperationNodeCompileWithOrdering()
 
     auto computed = compiledMap.Compute<double>(input1Vals);
     testing::ProcessTest("TestBroadcastBinaryOperationNodeCompileWithOrdering", testing::IsEqual(computed, expected));
+}
+
+void TestSpatialConvolutionNode(size_t inputPaddingSize, size_t outputPaddingSize)
+{
+    // Abbreviations:
+    //
+    // r == # input rows
+    // c == # input columns
+    // ch == # input channels
+    // fw == filter width
+    // nf == # filters
+    // pi == input padding amount
+    // po == output padding amount
+
+    // Data dimensions:
+    //
+    // Input: r x c x ch, with padding -> r+2pi x c+2pi x ch
+    //     == 1 x 2 x 2, with padding == 1 -> 3 x 4 x 2
+    // Weights: nf x fw x fw x ch
+    //       == 2 x 3 x 3 x 2, (2 3x3 filters, with 2 input channels each)
+    // Output: r x c x nf, with padding -> 1+2po x 2+2po x 2
+    //      == 1 x 2 x 2, with padding == 0 -> 1 x 2 x 2
+
+    using ElementType = double;
+    using LayerParameters = typename Layer<ElementType>::LayerParameters;
+    using TensorType = typename Layer<ElementType>::TensorType;
+    using TensorReferenceType = typename Layer<ElementType>::TensorReferenceType;
+    using Shape = typename Layer<ElementType>::Shape;
+
+    assert(inputPaddingSize == 1);
+    TensorType inputWithPadding(2 + 2 * inputPaddingSize, 2 + 2 * inputPaddingSize, 2);
+    TensorReferenceType input = inputWithPadding.GetSubTensor({ inputPaddingSize, inputPaddingSize, 0 }, { 2, 2, 2 });
+    inputWithPadding.Fill(0);
+    input(0, 0, 0) = 2;
+    input(0, 1, 0) = 1;
+    input(0, 0, 1) = 3;
+    input(0, 1, 1) = 2;
+    // Input channel 0: [2, 3], input channel 1: [1, 2]
+
+    Shape outputShape = { 2, 2, 2 };
+
+    LayerParameters parameters{ inputWithPadding, ZeroPadding(inputPaddingSize), outputShape, ZeroPadding(outputPaddingSize) };
+    ConvolutionalParameters convolutionalParams{ 3, 1, ConvolutionMethod::automatic, 2 };
+
+    // Filter weights in `weightsVector` are in numFilters x numChannels x filterSize x filterSize order
+    // clang-format off
+    std::vector<ElementType> weightsVector {
+        1, 3, 2,   3, 1, 1,   2, 3, 1,   // Filter 1, channel 1
+        1, 2, 1,   2, 3, 2,   1, 2, 1}; // Filter 2, channel 2
+    // clang-format on
+
+    // Viewed as planar filters (ch x fw x fw):
+    //
+    //       1 3 2
+    // f0 =  3 1 1
+    //       2 3 1
+    //
+    //       1 2 1
+    // f1 =  2 3 2
+    //       1 2 1
+
+    // Filter weights in `weights` tensor are in numFilters x filterSize x filterSize x 1 order
+    TensorType weights(convolutionalParams.receptiveField * outputShape.NumChannels(), convolutionalParams.receptiveField, 1);
+
+    size_t vectorIndex = 0;
+    for (size_t f = 0; f < outputShape.NumChannels(); ++f)
+    {
+        for (size_t k = 0; k < 1; ++k)
+        {
+            for (size_t i = 0; i < convolutionalParams.receptiveField; ++i)
+            {
+                for (size_t j = 0; j < convolutionalParams.receptiveField; ++j)
+                {
+                    weights(f * convolutionalParams.receptiveField + i, j, k) = weightsVector[vectorIndex++];
+                }
+            }
+        }
+    }
+
+    //
+    // Verify ConvolutionalLayerNode
+    //
+    ConvolutionalLayer<ElementType> layer(parameters, convolutionalParams, weights);
+    layer.Compute();
+    auto output = layer.GetOutput();
+
+    // Create model
+    model::Model model;
+    auto inputMemoryLayout = utilities::MemoryLayout(
+        utilities::MemoryShape{ 2, 2, 2 },
+        utilities::MemoryShape{ static_cast<int>(inputPaddingSize), static_cast<int>(inputPaddingSize), 0 });
+    // BUGBUG: This fails when the order is not canonical order.
+    auto inputNode = model.AddNode<model::InputNode<double>>(inputMemoryLayout.ReorderedCopy({ 2, 0, 1 }));
+    auto outputMemoryLayout = utilities::MemoryLayout(utilities::MemoryShape{ 2, 2, 2 });
+    auto computeNode = model.AddNode<SpatialConvolutionNode<double>>(inputNode->output, layer, outputMemoryLayout);
+    auto map = model::Map(model, { { "input", inputNode } }, { { "output", computeNode->output } });
+
+    const auto info = "TestSpatialConvolutionalLayer";
+
+    VerifyLayerMap<ElementType>(map, computeNode, inputWithPadding, output, info);
+
+    // Test archiving / unarchiving produces same result
+    VerifyArchiveAndUnarchivingMap<ElementType>(map, computeNode, inputWithPadding, output, info);
 }

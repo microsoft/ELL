@@ -26,6 +26,7 @@ set(_sources
     common/include/CallbackInterface.h
     common/include/DatasetInterface.h
     common/include/DatasetInterfaceImpl.h
+    common/include/MatrixMatrixMultiplyImplementation.h
     common/include/MathInterface.h
     common/include/ModelBuilderInterface.h
     common/include/ModelInterface.h

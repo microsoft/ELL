@@ -41,6 +41,7 @@ else()
     # SWIG has this GCC 7 warning.
     add_compile_options("-Wno-psabi")
 endif()
+
 include(OpenBLASSetup.cmake)
 
 find_package(PythonInterp 3.4)

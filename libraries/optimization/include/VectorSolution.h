@@ -33,7 +33,7 @@ namespace optimization
 
         /// <summary> Solutions are expected to have a ParameterType. Empty here because this solution type doesn't need any parameters. </summary>
         struct ParametersType {};
-        
+
         /// <summary> Default constructor. </summary>
         VectorSolution() = default;
 

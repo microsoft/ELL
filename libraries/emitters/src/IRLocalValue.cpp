@@ -8,6 +8,7 @@
 
 #include "IRLocalValue.h"
 #include "IRFunctionEmitter.h"
+#include "IRLocalScalar.h"
 
 #include <utilities/include/Exception.h>
 
@@ -87,5 +88,29 @@ namespace emitters
         this->value = value;
         return *this;
     }
+
+    //
+    // IRLocalPointer
+    //
+    IRLocalValue IRLocalPointer::Load() const
+    {
+        return { function, function.Load(value) };
+    }
+
+    IRLocalPointer IRLocalPointer::Offset(int offset) const
+    {
+        return { function, function.PointerOffset(value, offset) };
+    }
+
+    IRLocalPointer IRLocalPointer::Offset(LLVMValue offset) const
+    {
+        return { function, function.PointerOffset(value, offset) };
+    }
+
+    IRLocalPointer IRLocalPointer::Offset(const IRLocalScalar& offset) const
+    {
+        return { function, function.PointerOffset(value, offset) };
+    }
+
 } // namespace emitters
 } // namespace ell

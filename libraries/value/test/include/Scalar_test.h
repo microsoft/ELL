@@ -21,4 +21,6 @@ value::Scalar RefScalarRefTest();
 value::Scalar RefScalarRefCtorsTest();
 value::Scalar RefScalarRefRefTest();
 value::Scalar RefScalarRefRefRefTest();
+value::Scalar SequenceLogicalAndTest();
+value::Scalar SequenceLogicalAndTestWithCopy();
 } // namespace ell

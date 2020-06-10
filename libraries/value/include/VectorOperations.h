@@ -49,5 +49,11 @@ namespace value
     /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>
     void For(Vector vector, std::function<void(Scalar)> fn);
 
+    /// <summary> Creates a for loop over the vector </summary>
+    /// <param name="name"> A name that can be used by the emitter context to tag this loop in the emitted code </param>
+    /// <param name="vector"> The instance of Vector that references the data over which to iterate </param>
+    /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>
+    void For(const std::string& name, Vector vector, std::function<void(Scalar)> fn);
+
 } // namespace value
 } // namespace ell

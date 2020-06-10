@@ -42,7 +42,7 @@ namespace emitters
     using LLVMException = utilities::ErrorCodeException<std::error_code>;
 
     /// <summary>
-    /// Wraps the LLVM API with an easy to use object model that hides some unncessary detail.
+    /// Wraps the LLVM API with an easy to use object model that hides some unnecessary detail.
     /// Incorporates our own x-compiler abstractions such as VariableType and TypedOperator.
     ///
     /// Note: IREmitter is stateful. It has a "current block" that it is emitting IR into.
@@ -53,7 +53,6 @@ namespace emitters
         IREmitter(const IREmitter&) = delete;
         IREmitter(IREmitter&&) = default;
         IREmitter& operator=(const IREmitter&) = delete;
-        IREmitter& operator=(IREmitter&&) = default;
         ~IREmitter() = default;
 
         /// <summary> Get the LLVM Type information for a VariableType. </summary>
@@ -1115,7 +1114,7 @@ namespace emitters
     private:
         friend class IRModuleEmitter;
 
-        IREmitter(IRModuleEmitter& moduleEmitter, llvm::LLVMContext& context);
+        IREmitter(llvm::LLVMContext& context, llvm::Module& module);
 
         LLVMType GetBaseVariableType(VariableType type) const;
         llvm::Constant* Integer(VariableType type, const size_t value);
@@ -1131,7 +1130,7 @@ namespace emitters
         LLVMFunction CreateFunction(llvm::Module* pModule, const std::string& name, llvm::Function::LinkageTypes linkage, llvm::FunctionType* pFunctionType);
         LLVMValue Zero();
 
-        IRModuleEmitter& _moduleEmitter;
+        llvm::Module& _module;
         llvm::LLVMContext& _llvmContext; // LLVM global context
         mutable llvm::IRBuilder<> _irBuilder; // IRBuilder API
         IRValueTable _stringLiterals; // String literals are emitted as constants. We have to track them ourselves to prevent dupes.

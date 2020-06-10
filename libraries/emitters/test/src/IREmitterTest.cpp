@@ -23,6 +23,8 @@
 #include <utilities/include/TypeAliases.h>
 #include <utilities/include/Unused.h>
 
+#include <llvm/Transforms/Utils/Cloning.h>
+
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -1163,4 +1165,77 @@ void TestCastToConditionalBool()
     TestCastToConditionalBool<int64_t>();
     TestCastToConditionalBool<float>();
     TestCastToConditionalBool<double>();
+}
+
+void TestInlineAssembly()
+{
+    VariableType inType = emitters::GetVariableType<int>();
+    VariableType outType = emitters::GetVariableType<int>();
+
+    auto module = MakeHostModuleEmitter("TestInlineAssembly");
+    auto targetDevice = module.GetCompilerOptions().targetDevice;
+    auto functionIdentifier = targetDevice.IsMacOS() ? "_square" : "square";
+    auto functionName = "square";
+
+    std::string asmStr;
+    if(targetDevice.IsWindows())
+    {
+     asmStr= R"XX(
+    .globl FUNCTION
+FUNCTION:
+    movl    %ecx, %eax
+    imull   %ecx, %eax
+    retq
+)XX";
+    }
+    else
+    {
+     asmStr= R"XX(
+    .globl     FUNCTION
+FUNCTION:
+    imull      %edi, %edi
+    movl       %edi, %eax
+    retq
+)XX";
+    }
+
+    ReplaceAll(asmStr, "FUNCTION", functionIdentifier);
+
+    module.GetLLVMModule()->appendModuleInlineAsm(asmStr);
+
+    module.DeclareFunction(functionName, outType, { inType });
+    module.DebugDump();
+
+    const emitters::NamedVariableTypeList parameters = { { "x", inType } };
+    auto fn = module.BeginFunction("InlineAssembly", outType, parameters);
+    {
+        auto arguments = fn.Arguments().begin();
+        auto x = fn.LocalScalar(&(*arguments++));
+        auto squareFn = module.GetFunction(functionName);
+        squareFn->addFnAttr(llvm::Attribute::AttrKind::AlwaysInline);
+        auto result = fn.Call(squareFn, {x});
+
+        fn.Return(result);
+    }
+    module.EndFunction();
+
+#if 0
+    module.DebugDump();
+    module.WriteToStream(std::cout, ModuleOutputFormat::assembly);
+#endif
+    fn.Verify();
+
+    IRExecutionEngine jit(std::move(module));
+    auto testFn = jit.GetFunction<int(int)>("InlineAssembly");
+
+    bool success = true;
+    auto trials = std::vector<int>{ 1, 2, 35 };
+    for (auto val : trials)
+    {
+        auto result = testFn(val);
+        auto expected = val * val;
+        success = success && (result == expected);
+    }
+
+    testing::ProcessTest("Testing InlineAssembly", success);
 }

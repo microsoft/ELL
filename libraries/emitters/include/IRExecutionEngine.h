@@ -37,13 +37,13 @@ namespace emitters
         ///
         /// <param name="module"> The module. </param>
         /// <param name="verify"> Indicates if the execution engine should run a verification pass before running the code. </param>
-        IRExecutionEngine(IRModuleEmitter&& module, bool verify = false);
+        IRExecutionEngine(IRModuleEmitter&& module, bool verify = true, llvm::CodeGenOpt::Level optLevel = llvm::CodeGenOpt::Level::Default);
 
         /// <summary> Inject the primary "owner" module into the execution engine. </summary>
         ///
         /// <param name="pModule"> The module. </param>
         /// <param name="verify"> Indicates if the execution engine should run a verification pass before running the code. </param>
-        IRExecutionEngine(std::unique_ptr<llvm::Module> pModule, bool verify = false);
+        IRExecutionEngine(std::unique_ptr<llvm::Module> pModule, bool verify = false, llvm::CodeGenOpt::Level optLevel = llvm::CodeGenOpt::Level::Default);
 
         /// <summary> Destructor </summary>
         ~IRExecutionEngine();
@@ -102,6 +102,12 @@ namespace emitters
         /// <param name="func"> The function being defined. </param>
         /// <param name="address"> The address of the function being defined. </param>
         void DefineFunction(LLVMFunction func, utilities::UIntPtrT address);
+
+        /// <summary> Set the address of a named function already defined elsewhere in the binary. </summary>
+        ///
+        /// <param name="name"> The function name being defined. </param>
+        /// <param name="address"> The address of the function being referenced. </param>
+        void DefineFunction(const std::string& name, utilities::UIntPtrT address);
 
         /// <summary>
         /// Return a main function that takes no arguments - if one exists. Returns nullptr if not found.

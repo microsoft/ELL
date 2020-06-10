@@ -404,6 +404,9 @@ namespace value
         /// <returns> The underlying data storage </returns>
         const UnderlyingDataType& GetUnderlyingData() const;
 
+        /// <summary> Gets a reference to the complete type description being held </summary>
+        const detail::ValueTypeDescription& GetType() const { return _type; }
+
         /// <summary> Set the name for this instance with the current emitter context </summary>
         /// <param name="name"> The name </param>
         void SetName(const std::string& name);
@@ -427,12 +430,16 @@ namespace value
     /// `Value GetValue()` </summary>
     struct ViewAdapter
     {
-        template <typename ViewType>
-        ViewAdapter(ViewType view) :
+        template <typename View>
+        ViewAdapter(View view) :
             _value(detail::GetValue(view))
         {}
 
-        inline operator Value() const { return _value; }
+        inline operator const Value&() const { return _value; }
+        inline operator Value&() { return _value; }
+
+        inline Value& GetValue() { return _value; }
+        inline const Value& GetValue() const { return _value;  }
 
     private:
         Value _value;

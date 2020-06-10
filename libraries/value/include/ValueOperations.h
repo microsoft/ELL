@@ -27,6 +27,13 @@ namespace value
     /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>
     void For(utilities::MemoryLayout layout, std::function<void(Scalar)> fn);
 
+    /// <summary> Creates a for loop beggining at `start`, ending at `stop`, and incrementing by `step` </summary>
+    /// <param name="start"> The value used to initialize the loop counter </param>
+    /// <param name="stop"> The terminal value of the loop </param>
+    /// <param name="step"> The value by which the loop counter is incremented </param>
+    /// <param name="fn"> The function to be called for each coordinate where there is an active element </param>
+    void For(Scalar start, Scalar stop, Scalar step, std::function<void(Scalar)> fn);
+
     /// <summary> Cast a value to another type, returning a new value </summary>
     /// <param name="value"> The data to convert </param>
     /// <param name="type"> The type to which the data should be casted </param>
