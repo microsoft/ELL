@@ -1,22 +1,6 @@
 [
   {
     "accuracy": {
-      "top1": "52.07",
-      "top5": "76.40"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Asparagus\\Asparagus.ell",
-    "filter_size": 3,
-    "image_size": "64x64",
-    "increase_factor": 0,
-    "model": "densenet_test_3_bn",
-    "name": "Asparagus",
-    "secs_per_frame": {
-      "pi3": "0.108"
-    },
-    "friendly_name": "Asparagus"
-  },
-  {
-    "accuracy": {
       "top1": "55.12",
       "top5": "78.21"
     },
@@ -27,7 +11,7 @@
     "model": "resnetconf",
     "name": "resnetconf_I128x128x3_ADS",
     "secs_per_frame": {
-      "pi3": "0.144"
+      "pi3": "0.087"
     },
     "friendly_name": "Bean"
   },
@@ -43,25 +27,9 @@
     "model": "resnetconf_bottleneck",
     "name": "resnetconf_bottleneck_I64x64x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.171"
+      "pi3": "0.113"
     },
     "friendly_name": "Buckthorn"
-  },
-  {
-    "accuracy": {
-      "top1": "64.61",
-      "top5": "85.63"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Carrot\\Carrot.ell",
-    "filter_size": 3,
-    "image_size": "128x128",
-    "increase_factor": 112,
-    "model": "resnetconf",
-    "name": "resnetconf_I128x128x3_1AS",
-    "secs_per_frame": {
-      "pi3": "0.397"
-    },
-    "friendly_name": "Carrot"
   },
   {
     "accuracy": {
@@ -75,25 +43,9 @@
     "model": "resnetconf",
     "name": "resnetconf_I128x128x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.178"
+      "pi3": "0.106"
     },
     "friendly_name": "CashewNut"
-  },
-  {
-    "accuracy": {
-      "top1": "58.74",
-      "top5": "81.59"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Chalta\\Chalta.ell",
-    "filter_size": 3,
-    "image_size": "64x64",
-    "increase_factor": 112,
-    "model": "resnetconf_bottleneck",
-    "name": "resnetconf_bottleneck_I64x64x3_1AS",
-    "secs_per_frame": {
-      "pi3": "0.221"
-    },
-    "friendly_name": "Chalta"
   },
   {
     "accuracy": {
@@ -107,7 +59,7 @@
     "model": "resnetconf_bottleneck",
     "name": "resnetconf_bottleneck_I128x128x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.506"
+      "pi3": "0.361"
     },
     "friendly_name": "Clary"
   },
@@ -123,7 +75,7 @@
     "model": "resnetconf_bottleneck",
     "name": "resnetconf_bottleneck_I64x64x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.126"
+      "pi3": "0.090"
     },
     "friendly_name": "Clover"
   },
@@ -139,7 +91,7 @@
     "model": "resnetconf",
     "name": "resnetconf_I64x64x3_ADS",
     "secs_per_frame": {
-      "pi3": "0.046"
+      "pi3": "0.030"
     },
     "friendly_name": "Coconut"
   },
@@ -155,7 +107,7 @@
     "model": "resnetconf",
     "name": "resnetconf_I128x128x3_ADS",
     "secs_per_frame": {
-      "pi3": "0.205"
+      "pi3": "0.122"
     },
     "friendly_name": "Ginger"
   },
@@ -171,7 +123,7 @@
     "model": "resnet152",
     "name": "resnet152_f_I64x64x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.804"
+      "pi3": "0.525"
     },
     "friendly_name": "Mashua"
   },
@@ -187,41 +139,9 @@
     "model": "resnetconf_bottleneck",
     "name": "resnetconf_bottleneck_I64x64x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.347"
+      "pi3": "0.239"
     },
     "friendly_name": "PandanFlower"
-  },
-  {
-    "accuracy": {
-      "top1": "50.08",
-      "top5": "74.74"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\Pear\\Pear.ell",
-    "filter_size": 7,
-    "image_size": "64x64",
-    "increase_factor": 0,
-    "model": "densenet_test_3_bn_dw",
-    "name": "Pear",
-    "secs_per_frame": {
-      "pi3": "0.09038"
-    },
-    "friendly_name": "Pear"
-  },
-  {
-    "accuracy": {
-      "top1": "66.04",
-      "top5": "86.59"
-    },
-    "directory": "D:\\Work\\ELL-models\\models\\ILSVRC2012\\SevenSisters\\SevenSisters.ell",
-    "filter_size": 3,
-    "image_size": "128x128",
-    "increase_factor": 112,
-    "model": "resnetconf",
-    "name": "resnetconf_I128x128x3_ADS",
-    "secs_per_frame": {
-      "pi3": "0.489"
-    },
-    "friendly_name": "SevenSisters"
   },
   {
     "accuracy": {
@@ -235,7 +155,7 @@
     "model": "resnetconf_bottleneck",
     "name": "resnetconf_bottleneck_I128x128x3_1AS",
     "secs_per_frame": {
-      "pi3": "1.012"
+      "pi3": "0.719"
     },
     "friendly_name": "Sweetsop"
   },
@@ -251,7 +171,7 @@
     "model": "resnetconf_bottleneck",
     "name": "resnetconf_bottleneck_I128x128x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.665"
+      "pi3": "0.470"
     },
     "friendly_name": "Tamarind"
   },
@@ -267,7 +187,7 @@
     "model": "resnetconf_bottleneck",
     "name": "resnetconf_bottleneck_I64x64x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.269"
+      "pi3": "0.186"
     },
     "friendly_name": "WaterApple"
   },
@@ -283,7 +203,7 @@
     "model": "resnet101",
     "name": "resnet101_f_I64x64x3_1AS",
     "secs_per_frame": {
-      "pi3": "0.601"
+      "pi3": "0.350"
     },
     "friendly_name": "Wattleseed"
   }
