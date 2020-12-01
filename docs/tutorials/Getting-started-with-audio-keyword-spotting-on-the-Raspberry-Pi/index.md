@@ -80,10 +80,10 @@ unzip GRU110KeywordSpotter.ell.zip
 [Windows] ren GRU110KeywordSpotter.ell classifier.ell
 ```
 
-Next, download the **categories.txt** file from [here](https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/categories.txt) and save it in the directory.
+Next, download the **categories.txt** file from [here](hthttps://github.com/microsoft/ELL-models/raw/master/models/speech_commands_v0.01/BluePaloVerde/categories.txt) and save it in the directory.
 
 ```shell
-curl --location -o categories.txt https://github.com/Microsoft/ELL-models/raw/master/models/speech_commands_v0.01/categories.txt
+curl --location -o categories.txt https://github.com/microsoft/ELL-models/raw/master/models/speech_commands_v0.01/BluePaloVerde/categories.txt
 ```
 
 This file contains the names of the 30 keywords that the model is trained to recognize and one category reserved for background noise.

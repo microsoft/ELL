@@ -1,0 +1,17 @@
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-16.04'  
+
+container: cjlovett/ell-dependencies:latest
+
+steps:
+- script: |
+    bundle install
+  displayName: 'install gem packages'
+
+- script: |
+    bundle exec jekyll build --verbose
+  displayName: 'build website'

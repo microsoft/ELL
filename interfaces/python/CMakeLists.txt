@@ -26,7 +26,7 @@ if (TARGET _ELL_python)
     target_compile_options(_ELL_python PRIVATE -Wno-stringop-truncation -Wno-class-memaccess)
   endif()
   if(${CMAKE_CXX_COMPILER_ID} STREQUAL Clang)
-    target_compile_options(_ELL_python PRIVATE -Wno-parentheses-equality)
+    target_compile_options(_ELL_python PRIVATE -Wno-parentheses-equality -Wno-missing-field-initializers)
   endif()
 
   set(PYTHON_DIR ${CMAKE_BINARY_DIR}/interfaces/python)

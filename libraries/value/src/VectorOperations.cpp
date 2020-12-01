@@ -72,6 +72,7 @@ namespace value
                               Value({ ValueType::Int32, 0 }, ScalarLayout)); /*incy*/
 
             auto result = InvokeForContext<ComputeContext>([&] {
+#ifdef USE_BLAS
                 auto wrapper = fn.Define([](Scalar n, Vector x, Scalar incx, Vector y, Scalar incy) -> Scalar {
                     return math::Blas::Dot(n.Get<int>(), x.GetValue().Get<float*>(), incx.Get<int>(), y.GetValue().Get<float*>(), incy.Get<int>());
                 });
@@ -82,6 +83,10 @@ namespace value
                     static_cast<int>(v1.GetValue().GetLayout().GetCumulativeIncrement(0)),
                     v2,
                     static_cast<int>(v2.GetValue().GetLayout().GetCumulativeIncrement(0)));
+#else
+                return defaultImpl(v1, v2);
+#endif
+
             });
 
             if (result)
@@ -127,6 +132,7 @@ namespace value
                               Value({ ValueType::Int32, 0 }, ScalarLayout)); /*incy*/
 
             auto result = InvokeForContext<ComputeContext>([&] {
+#ifdef USE_BLAS
                 auto wrapper = fn.Define([](Scalar n, Vector x, Scalar incx, Vector y, Scalar incy) -> Scalar {
                     return math::Blas::Dot(n.Get<int>(), x.GetValue().Get<double*>(), incx.Get<int>(), y.GetValue().Get<double*>(), incy.Get<int>());
                 });
@@ -137,6 +143,9 @@ namespace value
                     static_cast<int>(v1.GetValue().GetLayout().GetCumulativeIncrement(0)),
                     v2,
                     static_cast<int>(v2.GetValue().GetLayout().GetCumulativeIncrement(0)));
+#else
+                return defaultImpl(v1, v2);
+#endif
             });
 
             if (result)

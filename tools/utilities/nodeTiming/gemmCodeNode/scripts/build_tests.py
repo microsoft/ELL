@@ -74,7 +74,7 @@ def make_runner_cpp(srcdir, outdir, dir_name, model_name, data_type):
 def make_build_script(outdir, dir_name, model_name, use_mkl):
     win_build_script_str = ('mkdir build_{}\n'
                         'cd build_{}\n'
-                        'cmake -G "Visual Studio 15 2017 Win64" -Thost=x64 {} .. && cmake --build . --config release -- /m /verbosity:minimal\n'
+                        'cmake -G "Visual Studio 16 2019" -Thost=x64 {} .. && cmake --build . --config release -- /m /verbosity:minimal\n'
                         'cd ..')
     unix_build_script_str = ('mkdir build_{}\n'
                         'cd build_{}\n'
@@ -89,8 +89,8 @@ def make_build_script(outdir, dir_name, model_name, use_mkl):
     use_mkl_str = '-DUSE_MKL=1' if use_mkl else ''
     win_build_str = win_build_script_str.format(model_name, model_name, use_mkl_str)
     unix_build_str = unix_build_script_str.format(model_name, model_name, use_mkl_str)
-    win_outfile = os.path.join(outdir, "{}/build.cmd".format(dir_name))
-    unix_outfile = os.path.join(outdir, "{}/build.sh".format(dir_name))
+    win_outfile = os.path.join(outdir, "{}/scripts/build.cmd".format(dir_name))
+    unix_outfile = os.path.join(outdir, "{}/scripts/build.sh".format(dir_name))
     with open(win_outfile, 'w') as f:
         f.write(win_build_str)
     with open(unix_outfile, 'w', newline='\n') as f:
@@ -101,8 +101,8 @@ def make_build_all_script(ell_models, outdir):
                             'call build.cmd\n'
                             'cd ..\n\n')
     unix_build_script_str = ('cd {}\n'
-                            'chmod +x build.sh\n'
-                            './build.sh\n'
+                            'chmod +x scripts/build.sh\n'
+                            './scripts/build.sh\n'
                             'cd ..\n\n')
     win_str_list = [win_build_script_str.format(model_name) for (model_name, model_filename, model_relpath, model_path) in ell_models]
     unix_str_list = [unix_build_script_str.format(model_name) for (model_name, model_filename, model_relpath, model_path) in ell_models]

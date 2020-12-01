@@ -23,9 +23,6 @@ namespace trainers
     class KMeansTrainer
     {
     public:
-        /// <summary> Default constructor </summary>
-        ///
-        KMeansTrainer() = default;
 
         /// <summary> Constructs an instance of KMeansTrainer trainer </summary>
         ///

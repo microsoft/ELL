@@ -1,0 +1,33 @@
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-16.04'  
+
+container: cjlovett/ell-dependencies:latest
+
+steps:
+- bash: |
+   source activate py37
+   conda env list
+   mkdir build_gcc8
+   cd build_gcc8
+   cmake -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 -DCMAKE_C_COMPILER=/usr/bin/gcc-8 -DCMAKE_BUILD_TYPE=Release -DSTRICT_MODE=ON -DUSE_COMPILER_CACHE=ON -DCMAKE_VERBOSE_MAKEFILE=ON -DONNX=ON ..
+   make -j8
+  displayName: 'ELL build using G++'
+
+- bash: |
+    source activate py37
+    conda env list
+    ctest -j4 -VV --timeout 600 -T Test
+  displayName: 'Run ctest in build_gcc8'
+  workingDirectory: 'build_gcc8'
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results **/Test.xml'
+  inputs:
+    testResultsFormat: CTest
+    testResultsFiles: '**/Test.xml'
+    searchFolder: '$(Build.SourcesDirectory)/build_gcc8/Testing'
+  condition: succeededOrFailed()

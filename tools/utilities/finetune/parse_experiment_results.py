@@ -43,24 +43,24 @@ def get_out_file(filename):
         return sys.stdout
 
 
-def add_rest(l, iter):
+def add_rest(x, iter):
     try:
         while True:
-            l.append(next(iter))
+            x.append(next(iter))
     except StopIteration:
         return
 
 
 def merge_lists(lists):
     result = lists[0]
-    for l in lists[1:]:
+    for x in lists[1:]:
         temp = result
         result = []
         avals = set(temp)
-        bvals = set(l)
+        bvals = set(x)
 
         iter1 = iter(temp)
-        iter2 = iter(l)
+        iter2 = iter(x)
         try:
             while True:
                 a = next(iter1)
@@ -88,7 +88,7 @@ def print_experiment_output(test_results_filenames, output_filename, format="tsv
         items, ordered_keys = read_experiment_output(test_results_filename)
         results += [(items, ordered_keys)]
 
-    ordered_keys = merge_lists([l[1] for l in results])
+    ordered_keys = merge_lists([x[1] for x in results])
     ordered_keys += ["Total_NumWeights", "Total_NumZeros", "Total_Sparsity"]
     key_fn = sort_rows_key_fn(ordered_keys.copy())
     ordered_keys.sort(key=key_fn)
@@ -145,7 +145,7 @@ def print_items(output_dicts, ordered_keys, output_filename, format):
 def read_experiment_output(test_results_filename):
     lines = get_raw_experiment_data(test_results_filename)
 
-    lines = [l.strip() for l in lines]
+    lines = [x.strip() for x in lines]
     # read data and collect set of unique "key" names
     items = []
     ordered_keys = []

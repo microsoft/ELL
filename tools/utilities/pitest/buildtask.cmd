@@ -47,7 +47,7 @@ REM this needs to be run under VSTS agent user account (NTSERVICE account)
 git lfs install
 
 echo ===================================== BUILD ==================================
-call .\rebuild.cmd %VS_VERSION% /ONNX %ONNX% /CNTK %CNTK%
+call .\scripts\rebuild.cmd %VS_VERSION% /ONNX %ONNX% /CNTK %CNTK%
 if ERRORLEVEL 1 exit /B 1
 
 cd build

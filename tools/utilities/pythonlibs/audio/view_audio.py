@@ -285,6 +285,7 @@ class AudioDemo(Frame):
 
     def accumulate_feature(self, feature_data):
         """ accumulate the feature data and pass feature data to classifier """
+        vad_signal = 1
         if self.vad:
             vad_signal = self.vad.predict(feature_data)
             if self.previous_vad != vad_signal:
@@ -312,7 +313,8 @@ class AudioDemo(Frame):
         if self.classifier and self.show_classifier_output:
             self.classifier_feature_data = np.vstack((self.classifier_feature_data,
                                                       feature_data))[-self.num_classifier_features:, :]
-            self.evaluate_classifier()
+            if vad_signal:
+                self.evaluate_classifier()
 
     def accumulate_spectrogram_image(self, feature_data):
         """ accumulate the feature data into the spectrogram image """

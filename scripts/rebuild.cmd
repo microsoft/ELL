@@ -2,6 +2,7 @@
 Setlocal EnableDelayedExpansion
 
 pushd %~dp0
+
 if not exist build goto :build
 
 set retry=10

@@ -95,7 +95,7 @@ class Dataset(object):
     def _compute_class_weights(self):
         total_entries = len(self.raw_labels)
         unique_labels = set(self.raw_labels)
-        self.class_distribution = {l: 0 for l in set(unique_labels)}  # init to zero
+        self.class_distribution = {ul: 0 for ul in set(unique_labels)}  # init to zero
         for label in self.raw_labels:
             self.class_distribution[label] += 1
         self.class_weights = {label: (total_entries / self.class_distribution[label]) for label in unique_labels}

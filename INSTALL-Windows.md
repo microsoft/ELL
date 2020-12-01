@@ -1,6 +1,6 @@
 # Building a 64-bit version of the Embedded Learning Library (ELL) on Windows
 
-ELL enables you to design and deploy intelligent machine-learned models onto single-board computers, like Raspberry Pi and Arduino. Most of your interaction with ELL occurs on a laptop or desktop computer, rather than the single-board machine itself. The steps below describe how to build ELL on a laptop or desktop running Windows. You can also use `SETUP-Windows.cmd` to setup your computer.
+ELL enables you to design and deploy intelligent machine-learned models onto single-board computers, like Raspberry Pi and Arduino. Most of your interaction with ELL occurs on a laptop or desktop computer, rather than the single-board machine itself. The steps below describe how to build ELL on a laptop or desktop running Windows. You can also use `scripts\SETUP-Windows.cmd` to setup your computer.
 
 ## Cloning the ELL repository
 

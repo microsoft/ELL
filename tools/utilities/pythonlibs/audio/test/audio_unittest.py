@@ -42,15 +42,7 @@ example_data = os.path.join(script_path, "..", "..", "..", "..", "..", "examples
 class AudioUnitTest(unittest.TestCase):
 
     def get_test_model_repo(self):
-        config_file = os.path.join(find_ell.find_ell_build(), "config.json")
-        if os.path.isfile(config_file):
-            with open(config_file, "r") as f:
-                config = json.load(f)
-                if "test_models_repo" in config:
-                    return clone_repo(config["test_models_repo"], get_home_path())  # noqa: F405
-            return None
-        else:
-            raise Exception("Missing config.json file: {}".format(config_file))
+        return "https://github.com/microsoft/ELL-models/"
 
     def wrap_model(self, model, target_dir, module_name, language):
         if os.path.isdir(target_dir):
@@ -83,36 +75,36 @@ class AudioUnitTest(unittest.TestCase):
         os.chdir(current_path)
 
     def make_featurizer(self, model_path, filename):
-        with open(os.path.join(model_path, "train_results.json"), "r") as f:
+        folder = os.path.dirname(os.path.abspath(model_path))
+        with open(os.path.join(folder, "train_results.json"), "r") as f:
             train_data = json.load(f)
-        item = train_data[0]
+        item = train_data["dataset"]
         self.input_size = item["input_size"]
         self.num_filters = item["num_filters"]
         self.sample_rate = item["sample_rate"]
+        self.auto_scale = item["auto_scale"] if "auto_scale" in item else False
 
         return make_featurizer.make_featurizer(filename, self.sample_rate, self.input_size, self.input_size,
                                                filterbank_type="mel", filterbank_size=self.num_filters, log_node=True,
-                                               filterbank_nfft=256)
+                                               filterbank_nfft=512, hamming_window=True)
 
     def compile_model(self, model_file, outputdir, module_name):
         self.wrap_model(model_file, outputdir, module_name, "python")
         self.make_project(outputdir)
 
     def download_model(self):
+        # https://github.com/microsoft/ELL-models/raw/master/models/speech_commands_v0.01/BluePaloVerde/GRU110KeywordSpotter.onnx.zip
         path = self.get_test_model_repo()
-        path = os.path.join(path, "models", "speech_commands_v0.01")
-        if os.path.exists(path):
-            _log.info("Found test models at {}".format(path))
-        else:
-            raise Exception("Audio test models missing from {}".format(path))
-
-        filename = os.path.join(path, "GRU100KeywordSpotter.onnx.zip")
-        local_onnx_file = download_and_extract_model(filename, model_extension=".onnx",  # noqa: F405
+        classifier = path + "raw/master/models/speech_commands_v0.01/BluePaloVerde/GRU110KeywordSpotter.onnx.zip"
+        categories = path + "raw/master/models/speech_commands_v0.01/BluePaloVerde/categories.txt"
+        train_results = path + "raw/master/models/speech_commands_v0.01/BluePaloVerde/train_results.json"
+        local_onnx_file = download_and_extract_model(classifier, model_extension=".onnx",  # noqa: F405
                                                      local_folder="test")
-        self.categories_file = download_file(os.path.join(path, "categories.txt"), local_folder="test")  # noqa: F405
+        self.train_results_file = download_file(train_results, local_folder="test")  # noqa: F405
+        self.categories_file = download_file(categories, local_folder="test")  # noqa: F405
         _log.info("Unzipped: {}".format(local_onnx_file))
         self.classifier_model = onnx_import.convert(local_onnx_file)
-        self.featurizer_model = self.make_featurizer(path, "test/featurizer.ell")
+        self.featurizer_model = self.make_featurizer(self.classifier_model, "test/featurizer.ell")
 
     def add_vad_callback(self):
         import model_editor
@@ -142,10 +134,10 @@ class AudioUnitTest(unittest.TestCase):
                                                      classifier,
                                                      self.categories_file,
                                                      wav_dir,
-                                                     threshold=0.95,
+                                                     threshold=0.80,
                                                      sample_rate=self.sample_rate,
                                                      output_speaker=False,
-                                                     auto_scale=True,
+                                                     auto_scale=self.auto_scale,
                                                      reset=True)
         print(result)
         if len(result) != 2:

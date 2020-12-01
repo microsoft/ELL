@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # get path of current script: https://stackoverflow.com/a/39340259/207661
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 
 # usage: build.sh build_dir nproc dailyclean cmakeargs
 # This script checks to make sure you have required tools instealled then builds ELL.

@@ -1,0 +1,33 @@
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-16.04'  
+
+container: cjlovett/ell-dependencies:latest
+
+steps:
+- bash: |
+    source activate py37
+    conda env list
+    mkdir build_clang8
+    cd build_clang8
+    cmake -DCMAKE_CXX_COMPILER=/usr/bin/clang++-8 -DCMAKE_C_COMPILER=/usr/bin/clang-8 -DCMAKE_BUILD_TYPE=Release -DSTRICT_MODE=ON -DUSE_COMPILER_CACHE=ON -DONNX=ON ..
+    make -j8
+  displayName: 'ELL Build with clang'
+
+- bash: |
+    source activate py37
+    conda env list
+    ctest -j4 -VV --timeout 600 -T Test
+  displayName: 'Run ctest in build_gcc8'
+  workingDirectory: 'build_clang8'
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results **/Test.xml'
+  inputs:
+    testResultsFormat: CTest
+    testResultsFiles: '**/Test.xml'
+    searchFolder: '$(Build.SourcesDirectory)/build_clang8/Testing'
+  condition: succeededOrFailed()

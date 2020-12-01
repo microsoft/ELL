@@ -153,7 +153,7 @@ class PiBoardTable:
             elif r.current_task_name != a.current_task_name:
                 raise Exception("Lock failed on machine {}, already used by task {}".format(ip, r.current_task_name))
             elif r.lock_key != a.lock_key:
-                raise Exception("Lock failed on machine {}, lock key mismatch {}".format(ip))
+                raise Exception("Lock failed on machine {}, lock key mismatch".format(ip))
         else:
             raise Exception("Lock failed, machine {} not found".format(ip))
         return r

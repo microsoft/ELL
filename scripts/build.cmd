@@ -2,7 +2,7 @@
 Setlocal EnableDelayedExpansion
 
 cd %~dp0
-
+cd ..
 if EXIST external\nuget.exe goto :restore
 curl --output external\nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 if ERRORLEVEL 1 goto :nocurl
