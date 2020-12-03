@@ -18,7 +18,12 @@ git clone https://github.com/Microsoft/ELL.git
 
 ## Prerequisites for building ELL
 
-Ubunto provides the Advanced Packaging Tool `apt` for downloading and installing prerequisites. First, make sure that `apt` is up to date by running:
+There is a [docker image](https://hub.docker.com/repository/docker/cjlovett/ell-dependencies)
+already setup with all the pre-requisites for building and running ELL. This image was built using
+this [Dockerfile](https://github.com/microsoft/ELL/blob/master/scripts/CI/Linux/Dockerfile).
+
+
+Ubuntu provides the Advanced Packaging Tool `apt` for downloading and installing prerequisites. First, make sure that `apt` is up to date by running:
 
 ```shell
 sudo apt-get -y update
@@ -122,7 +127,7 @@ cd build
 Invoke CMake by typing
 
 ```shell
-cmake ..
+cmake -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 -DCMAKE_C_COMPILER=/usr/bin/gcc-8 -DONNX=ON ..
 ```
 
 Don't forget the two dots (..) at the end of the command! This creates a makefile for the project. Next, invoke the makefile by typing

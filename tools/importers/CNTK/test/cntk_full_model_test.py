@@ -285,7 +285,7 @@ class FullModelTest:
         # Compare compiled results
         self.compare_arrays(
             expectedFloats, ca,
-            "results for %s layer do not match ELL compiled output !".format(module_name),
+            "results for {} layer do not match ELL compiled output !".format(module_name),
             precision)
 
     def load_labels(self, fileName):

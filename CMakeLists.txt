@@ -62,6 +62,7 @@ set(RPI_KEY "$ENV{RPI_APIKEY}")
 
 if(DISABLE_PYTHON)
   message(STATUS "Python has been explicitly disabled")
+  set(PYTHON_ENABLED OFF)
 else()
   foreach(PYTHON_VERSION 3.7 3.6)
     find_package(PythonInterp ${PYTHON_VERSION} QUIET)

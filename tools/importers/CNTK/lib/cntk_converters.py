@@ -501,8 +501,8 @@ class CntkElementTimesConverter(CntkStandardConverter):
         # input that is not an output to denote the scale.
         indexes = [index for index, value in enumerate(cntk_node.inputs) if not value.is_output]
         if len(indexes) < 1:
-            raise Exception("ElementTimes node {} cannot be converted, the CNTK importer does not currently support" +
-                            " arbitrary inputs""".format(cntk_node.uid))
+            msg = "ElementTimes node {} cannot be converted".format(cntk_node.uid)
+            raise Exception(msg + ", the CNTK importer does not currently support arbitrary inputs")
         parameter_indexes = [index for index, value in enumerate(cntk_node.inputs) if value.is_parameter]
         constant_indexes = [index for index, value in enumerate(cntk_node.inputs) if value.is_constant]
         if len(parameter_indexes) > 1 or len(constant_indexes) > 1:
