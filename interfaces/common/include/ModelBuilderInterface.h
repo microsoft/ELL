@@ -54,6 +54,7 @@ public:
     Node AddDotProductNode(Model model, PortElements input1, PortElements input2);
     Node AddNeuralNetworkPredictorNode(Model model, PortElements input, ell::api::predictors::NeuralNetworkPredictor predictor);
     Node AddFFTNode(Model model, PortElements input, int nfft = 0);
+    Node AddHannWindowNode(Model model, PortElements input);
     Node AddHammingWindowNode(Model model, PortElements input);
     Node AddIIRFilterNode(Model model, PortElements input, std::vector<double> bCoeffs, std::vector<double> aCoeffs);
     InputNode AddInputNode(Model model, const PortMemoryLayout& memoryLayout, PortType type);

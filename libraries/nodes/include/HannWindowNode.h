@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Project:  Embedded Learning Library (ELL)
-//  File:     HammingWindowNode.h (nodes)
-//  Authors:  Chuck Jacobs
+//  File:     HannWindowNode.h (nodes)
+//  Authors:  Chris Lovett
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -23,13 +23,12 @@ namespace ell
 {
 namespace nodes
 {
-    /// <summary> A node that contains data for a Hamming window. </summary>
+    /// <summary> A node that contains data for a Hann window. </summary>
     ///
     /// <typeparam name="ValueType"> The element type. </typeparam>
-    ///
-    /// <remarks> See https://en.wikipedia.org/wiki/Window_function#Hamming_window </remarks>
+    /// <remarks> See https://en.wikipedia.org/wiki/Window_function#Hann_window </remarks>
     template <typename ValueType>
-    class HammingWindowNode : public model::Node
+    class HannWindowNode : public model::Node
     {
     public:
         /// @name Input and Output Ports
@@ -39,17 +38,17 @@ namespace nodes
         /// @}
 
         /// <summary> Default Constructor </summary>
-        HammingWindowNode();
+        HannWindowNode();
 
         /// <summary> Constructor </summary>
         ///
         /// <param name="input"> The signal to apply the window to. </param>
-        HammingWindowNode(const model::OutputPort<ValueType>& input);
+        HannWindowNode(const model::OutputPort<ValueType>& input);
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
         /// <returns> The name of this type. </returns>
-        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("HammingWindowNode"); }
+        static std::string GetTypeName() { return utilities::GetCompositeTypeName<ValueType>("HannWindowNode"); }
 
         /// <summary> Gets the name of this type (for serialization). </summary>
         ///
@@ -82,7 +81,7 @@ namespace ell
 namespace nodes
 {
     template <typename ValueType>
-    HammingWindowNode<ValueType>::HammingWindowNode() :
+    HannWindowNode<ValueType>::HannWindowNode() :
         Node({ &_input }, { &_output }),
         _input(this, {}, defaultInputPortName),
         _output(this, defaultOutputPortName, 0)
@@ -90,7 +89,7 @@ namespace nodes
     }
 
     template <typename ValueType>
-    HammingWindowNode<ValueType>::HammingWindowNode(const model::OutputPort<ValueType>& input) :
+    HannWindowNode<ValueType>::HannWindowNode(const model::OutputPort<ValueType>& input) :
         Node({ &_input }, { &_output }),
         _input(this, input, defaultInputPortName),
         _output(this, defaultOutputPortName, input.Size())
@@ -98,10 +97,10 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void HammingWindowNode<ValueType>::Compute() const
+    void HannWindowNode<ValueType>::Compute() const
     {
         auto size = _input.Size();
-        auto window = dsp::HammingWindow<ValueType>(size);
+        auto window = dsp::HannWindow<ValueType>(size);
         auto result = std::vector<ValueType>(size);
         for (size_t index = 0; index < size; index++)
         {
@@ -111,32 +110,32 @@ namespace nodes
     }
 
     template <typename ValueType>
-    void HammingWindowNode<ValueType>::Copy(model::ModelTransformer& transformer) const
+    void HannWindowNode<ValueType>::Copy(model::ModelTransformer& transformer) const
     {
         const auto& newInputs = transformer.GetCorrespondingInputs(_input);
-        auto newNode = transformer.AddNode<HammingWindowNode<ValueType>>(newInputs);
+        auto newNode = transformer.AddNode<HannWindowNode<ValueType>>(newInputs);
         transformer.MapNodeOutput(output, newNode->output);
     }
 
     template <typename ValueType>
-    bool HammingWindowNode<ValueType>::Refine(model::ModelTransformer& transformer) const
+    bool HannWindowNode<ValueType>::Refine(model::ModelTransformer& transformer) const
     {
         const auto& newInputs = transformer.GetCorrespondingInputs(_input);
-        const auto& windowValue = Constant(transformer, dsp::HammingWindow<ValueType>(_input.Size()), newInputs.GetMemoryLayout());
+        const auto& windowValue = Constant(transformer, dsp::HannWindow<ValueType>(_input.Size()), newInputs.GetMemoryLayout());
         const auto& product = Multiply(newInputs, windowValue);
         transformer.MapNodeOutput(output, product);
         return true;
     }
 
     template <typename ValueType>
-    void HammingWindowNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
+    void HannWindowNode<ValueType>::WriteToArchive(utilities::Archiver& archiver) const
     {
         Node::WriteToArchive(archiver);
         archiver[defaultInputPortName] << _input;
     }
 
     template <typename ValueType>
-    void HammingWindowNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
+    void HannWindowNode<ValueType>::ReadFromArchive(utilities::Unarchiver& archiver)
     {
         Node::ReadFromArchive(archiver);
         archiver[defaultInputPortName] >> _input;

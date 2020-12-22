@@ -76,6 +76,7 @@ set(include
     include/FullyConnectedLayerNode.h
     include/GRUNode.h
     include/HammingWindowNode.h
+    include/HannWindowNode.h
     include/IIRFilterNode.h
     include/IRNode.h
     include/L2NormSquaredNode.h

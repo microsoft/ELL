@@ -35,6 +35,7 @@
 #include <nodes/include/FilterBankNode.h>
 #include <nodes/include/GRUNode.h>
 #include <nodes/include/HammingWindowNode.h>
+#include <nodes/include/HannWindowNode.h>
 #include <nodes/include/IIRFilterNode.h>
 #include <nodes/include/LSTMNode.h>
 #include <nodes/include/MatrixMatrixMultiplyNode.h>
@@ -809,6 +810,25 @@ Node ModelBuilder::AddHammingWindowNode(Model model, PortElements input)
         break;
     default:
         throw std::invalid_argument("Error: could not create HammingWindowNode of the requested type");
+    }
+    return Node(newNode, model.GetModel());
+}
+
+Node ModelBuilder::AddHannWindowNode(Model model, PortElements input)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel()->AddNode<ell::nodes::HannWindowNode<double>>(ell::model::PortElements<double>(elements));
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel()->AddNode<ell::nodes::HannWindowNode<float>>(ell::model::PortElements<float>(elements));
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create HannWindowNode of the requested type");
     }
     return Node(newNode, model.GetModel());
 }

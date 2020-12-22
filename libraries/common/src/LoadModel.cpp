@@ -36,6 +36,7 @@
 #include <nodes/include/ForestPredictorNode.h>
 #include <nodes/include/GRUNode.h>
 #include <nodes/include/HammingWindowNode.h>
+#include <nodes/include/HannWindowNode.h>
 #include <nodes/include/IIRFilterNode.h>
 #include <nodes/include/L2NormSquaredNode.h>
 #include <nodes/include/LSTMNode.h>
@@ -123,6 +124,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::FFTNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::GRUNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::HammingWindowNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::HannWindowNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::L2NormSquaredNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::IIRFilterNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::LinearPredictorNode<ElementType>>();
