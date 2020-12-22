@@ -228,7 +228,7 @@ After you copy the entire tutorial folder over to your Raspberry Pi, continue wi
 Install pyaudio components:
 
 ```shell
-sudo apt-get install python-pyaudio
+sudo apt-get install python-pyaudio python3-pyaudio portaudio19-dev
 pip install pyaudio
 ```
 

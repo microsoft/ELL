@@ -77,7 +77,7 @@ Then follow the PyTorch setup instructions for Anaconda and your version of CUDA
 
 This tutorial uses `pyaudio` which can be installed using:
 ```
-[Linux] sudo apt-get install python-pyaudio python3-pyaudio && pip install pyaudio
+[Linux] sudo apt-get install python-pyaudio python3-pyaudio portaudio19-dev && pip install pyaudio
 [Windows] pip install pyaudio
 [macOS] brew install portaudio && pip install pyaudio
 ```
