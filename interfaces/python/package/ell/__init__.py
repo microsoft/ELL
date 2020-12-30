@@ -35,9 +35,10 @@ def ensure_openblas():
             if (os.path.isfile(tools)):
                 import json
                 blas_libs = json.load(open(tools,"r"))["blas"] # ~/lib/libopenblas.dll.a
-                blas_bin = os.path.join(os.path.dirname(os.path.dirname(blas_libs)), "bin")
-                path += ";" + blas_bin
-                os.putenv("PATH", path)
+                if blas_libs != '':
+                    blas_bin = os.path.join(os.path.dirname(os.path.dirname(blas_libs)), "bin")
+                    path += ";" + blas_bin
+                    os.putenv("PATH", path)
                 return
             head,tail = os.path.split(head)
 

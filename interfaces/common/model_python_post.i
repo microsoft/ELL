@@ -47,7 +47,10 @@ class UnaryOperationType:
     hardSigmoid = UnaryOperationType_hardSigmoid
     hardTanh = UnaryOperationType_hardTanh
     log = UnaryOperationType_log
+    log10 = UnaryOperationType_log10
     logicalNot = UnaryOperationType_logicalNot
+    min = UnaryOperationType_min
+    max = UnaryOperationType_max
     sigmoid = UnaryOperationType_sigmoid
     sign = UnaryOperationType_sign
     sin = UnaryOperationType_sin
@@ -64,7 +67,10 @@ del UnaryOperationType_exp
 del UnaryOperationType_hardSigmoid
 del UnaryOperationType_hardTanh
 del UnaryOperationType_log
+del UnaryOperationType_log10
 del UnaryOperationType_logicalNot
+del UnaryOperationType_min
+del UnaryOperationType_max
 del UnaryOperationType_sigmoid
 del UnaryOperationType_sign
 del UnaryOperationType_sin
@@ -83,6 +89,8 @@ class BinaryOperationType:
     logicalAnd = BinaryOperationType_logicalAnd
     logicalOr = BinaryOperationType_logicalOr
     logicalXor = BinaryOperationType_logicalXor
+    minimum = BinaryOperationType_minimum
+    maximum = BinaryOperationType_maximum
 
 del BinaryOperationType_none
 del BinaryOperationType_add
@@ -92,6 +100,8 @@ del BinaryOperationType_divide
 del BinaryOperationType_logicalAnd
 del BinaryOperationType_logicalOr
 del BinaryOperationType_logicalXor
+del BinaryOperationType_minimum
+del BinaryOperationType_maximum
     
 import numpy as np
 

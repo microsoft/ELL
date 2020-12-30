@@ -77,6 +77,34 @@ def test_multiply(testing):
                         testing.IsEqual(np.array(result2), expected))
 
 
+def test_scaling_node(testing):
+
+    # Test a model that scales an input vector by a constant value
+    model = ell.model.Model()
+
+    scale = 2.5
+    a = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9]).astype(np.float)
+    layout = ell.model.PortMemoryLayout([len(a)])
+    input = model.AddInput(layout, ell.nodes.PortType.real)
+    scaled = model.AddScalingNode(input, scale)
+    output = model.AddOutput(layout, scaled)
+
+    map = ell.model.Map(model, input, output)
+
+    expected = a * scale
+    result = map.Compute(a)
+
+    testing.ProcessTest("Testing AddScalingNode Compute",
+                        testing.IsEqual(np.array(result), expected))
+
+    compiled = map.Compile("host", "multiply_test", "predict")
+
+    result2 = compiled.Compute(a)
+
+    testing.ProcessTest("Testing AddScalingNode Compiled",
+                        testing.IsEqual(np.array(result2), expected))
+
+
 class UnaryTest:
     def __init__(self, name, op, func):
         self.name = name
@@ -119,6 +147,8 @@ def sign(x):
 
 def test_unary(testing):
 
+    a = np.array(range(10)).astype(np.float32) + 1
+
     # Test a model that performs a unary operation
     for test in [UnaryTest("abs", ell.nodes.UnaryOperationType.abs, lambda x: abs(x)),
                  UnaryTest("cos", ell.nodes.UnaryOperationType.cos, lambda x: math.cos(x)),
@@ -126,6 +156,9 @@ def test_unary(testing):
                  UnaryTest("hardSigmoid", ell.nodes.UnaryOperationType.hardSigmoid, lambda x: hard_sigmoid(x)),
                  UnaryTest("hardTanh", ell.nodes.UnaryOperationType.hardTanh, lambda x: hard_tanh(x)),
                  UnaryTest("log", ell.nodes.UnaryOperationType.log, lambda x: math.log(x)),
+                 UnaryTest("log10", ell.nodes.UnaryOperationType.log10, lambda x: math.log10(x)),
+                 UnaryTest("min", ell.nodes.UnaryOperationType.min, lambda x: np.min(a)),
+                 UnaryTest("max", ell.nodes.UnaryOperationType.max, lambda x: np.max(a)),
                  UnaryTest("sigmoid", ell.nodes.UnaryOperationType.sigmoid, lambda x: sigmoid(x)),
                  UnaryTest("sign", ell.nodes.UnaryOperationType.sign, lambda x: sign(x)),
                  UnaryTest("sin", ell.nodes.UnaryOperationType.sin, lambda x: math.sin(x)),
@@ -139,7 +172,6 @@ def test_unary(testing):
         layout = ell.model.PortMemoryLayout([int(10)])
         input = model.AddInput(layout, ell.nodes.PortType.smallReal)
 
-        a = np.array(range(10)).astype(np.float32) + 1
         multiply = model.AddUnaryOperation(input, test.op)
         output = model.AddOutput(layout, multiply)
 
@@ -458,6 +490,42 @@ def test_hamming_node(testing):
     test_with_serialization(testing, map, "test_hamming_node", hamming_callback, None)
 
 
+def hanning_callback(testing, map, iteration, context):
+    size = map.GetInputShape().Size()
+    expected = np.hanning(size)
+    input = np.ones(size)
+    output = map.Compute(input)
+    testing.ProcessTest("test_hanning_node compute iteration {}".format(iteration), np.allclose(output, expected))
+
+    compiler_settings = ell.model.MapCompilerOptions()
+    compiler_settings.useBlas = False  # not resolvable on our Linux test machines...
+    optimizer_options = ell.model.ModelOptimizerOptions()
+    compiled_map = map.Compile("host", "hanningtest", "predict", compiler_settings, optimizer_options)
+
+    compiled_output = compiled_map.Compute(input)
+    testing.ProcessTest("test_hanning_node compiled iteration {}".format(iteration),
+                        np.allclose(compiled_output, expected))
+    return compiled_output
+
+
+def test_hanning_node(testing):
+    mb = ell.model.ModelBuilder()
+    model = ell.model.Model()
+
+    size = 400
+
+    input_shape = ell.model.PortMemoryLayout([size])
+    output_shape = ell.model.PortMemoryLayout([size])
+
+    input_node = mb.AddInputNode(model, input_shape, ell.nodes.PortType.real)
+    hanning_node = mb.AddHannWindowNode(model, ell.nodes.PortElements(input_node.GetOutputPort("output")))
+    outputNode = mb.AddOutputNode(model, output_shape, ell.nodes.PortElements(hanning_node.GetOutputPort("output")))
+
+    map = ell.model.Map(model, input_node, ell.nodes.PortElements(outputNode.GetOutputPort("output")))
+
+    test_with_serialization(testing, map, "test_hanning_node", hanning_callback, None)
+
+
 def mel_filterbank_callback(testing, map, iteration, context):
     size, num_filters, sample_rate = context
     try:
@@ -705,14 +773,18 @@ def test():
     test_typecast(testing)
     test_unary(testing)
     # test_multiply(testing)  # bugbug: crashing on Linux...
+    test_scaling_node(testing)
     test_voice_activity_node(testing)
     test_gru_node_with_vad_reset(testing)
     test_hamming_node(testing)
+    test_hanning_node(testing)
     test_mel_filterbank(testing)
     test_fftnode(testing)
     test_fastgrnn_node(testing)
-    return 0
+    return testing.GetFailedTests()
 
 
 if __name__ == "__main__":
-    test()
+    rc = test()
+    if rc:
+        print("### Test failed: {}", rc)

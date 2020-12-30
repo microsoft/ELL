@@ -190,6 +190,15 @@ namespace nodes
     const model::OutputPort<ValueType>& Divide(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
 
     template <typename ValueType>
+    const model::OutputPort<ValueType>& Modulo(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Maximum(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Minimum(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
+
+    template <typename ValueType>
     const model::OutputPort<ValueType>& LogicalAnd(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2);
 
     template <typename ValueType>
@@ -212,6 +221,15 @@ namespace nodes
 
         template <typename ValueType>
         ValueType Divide(ValueType a, ValueType b);
+
+        template <typename ValueType>
+        ValueType Modulo(ValueType a, ValueType b);
+
+        template <typename ValueType>
+        ValueType Maximum(ValueType a, ValueType b);
+
+        template <typename ValueType>
+        ValueType Minimum(ValueType a, ValueType b);
 
         template <typename ValueType>
         ValueType LogicalAnd(ValueType a, ValueType b);
@@ -279,6 +297,56 @@ namespace nodes
         inline bool Divide(bool a, bool b)
         {
             throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <typename ValueType>
+        ValueType Modulo(ValueType a, ValueType b)
+        {
+            return a % b;
+        }
+
+        template <>
+        inline double Modulo(double a, double b)
+        {
+            return fmod(a, b);
+        }
+
+        template <>
+        inline float Modulo(float a, float b)
+        {
+            return fmod(a, b);
+        }
+
+        template <>
+        inline bool Modulo(bool a, bool b)
+        {
+            throw utilities::InputException(utilities::InputExceptionErrors::typeMismatch);
+        }
+
+        template <typename ValueType>
+        ValueType Maximum(ValueType a, ValueType b)
+        {
+            return std::max(a, b);
+        }
+
+        template <>
+        inline bool Maximum(bool a, bool b)
+        {
+            // return true if one of them is true
+            return a || b;
+        }
+
+        template <typename ValueType>
+        ValueType Minimum(ValueType a, ValueType b)
+        {
+            return std::min(a, b);
+        }
+
+        template <>
+        inline bool Minimum(bool a, bool b)
+        {
+            // return false if one of them is false
+            return a && b;
         }
 
         //
@@ -426,6 +494,9 @@ namespace nodes
         case BinaryOperationType::divide:
             output = ComputeOutput(BinaryOperations::Divide<ValueType>);
             break;
+        case BinaryOperationType::modulo:
+            output = ComputeOutput(BinaryOperations::Modulo<ValueType>);
+            break;
         case BinaryOperationType::logicalAnd:
             output = ComputeOutput(BinaryOperations::LogicalAnd<ValueType>);
             break;
@@ -434,6 +505,12 @@ namespace nodes
             break;
         case BinaryOperationType::logicalXor:
             output = ComputeOutput(BinaryOperations::LogicalXor<ValueType>);
+            break;
+        case BinaryOperationType::maximum:
+            output = ComputeOutput(BinaryOperations::Maximum<ValueType>);
+            break;
+        case BinaryOperationType::minimum:
+            output = ComputeOutput(BinaryOperations::Minimum<ValueType>);
             break;
         default:
             throw utilities::LogicException(utilities::LogicExceptionErrors::notImplemented, "Unknown operation type");
@@ -737,6 +814,24 @@ namespace nodes
     const model::OutputPort<ValueType>& Divide(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
     {
         return BinaryOperation(input1, input2, BinaryOperationType::divide);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Modulo(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryOperation(input1, input2, BinaryOperationType::modulo);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Maximum(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryOperation(input1, input2, BinaryOperationType::maximum);
+    }
+
+    template <typename ValueType>
+    const model::OutputPort<ValueType>& Minimum(const model::OutputPort<ValueType>& input1, const model::OutputPort<ValueType>& input2)
+    {
+        return BinaryOperation(input1, input2, BinaryOperationType::minimum);
     }
 
     template <typename ValueType>

@@ -96,12 +96,15 @@ namespace emitters
         subtract,
         multiply,
         divide,
+        modulo,
         logicalAnd,
         logicalOr,
         logicalXor,
         shiftLeft,
         logicalShiftRight,
-        arithmeticShiftRight
+        arithmeticShiftRight,
+        minimum,
+        maximum
     };
 
     /// <summary> Untyped binary predicates. </summary>
@@ -135,8 +138,10 @@ namespace emitters
         multiply,
         ///<summary> Integer signed division - returns an integer </summary>
         divideSigned,
-        ///<summary> modulo </summary>
+        ///<summary> modulo integer version</summary>
         moduloSigned,
+        ///<summary> modulo float version</summary>
+        moduloFloat,
         ///<summary> Floating point addition </summary>
         addFloat,
         ///<summary> Floating point subtraction </summary>
@@ -156,7 +161,11 @@ namespace emitters
         ///<summary> Bit-shift right, padding with zeros </summary>
         logicalShiftRight,
         ///<summary> Bit-shift right, extending sign bit </summary>
-        arithmeticShiftRight
+        arithmeticShiftRight,
+        ///<summary> The minimum of two values </summary>
+        minimum,
+        ///<summary> The maximum of two values </summary>
+        maximum
     };
 
     ///<summary> An enumeration of strongly TYPED comparisons on numbers </summary>

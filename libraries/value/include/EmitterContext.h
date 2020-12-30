@@ -634,6 +634,7 @@ namespace value
     extern FunctionDeclaration FloorFunctionDeclaration;
     extern FunctionDeclaration CeilFunctionDeclaration;
     extern FunctionDeclaration FmaFunctionDeclaration;
+    extern FunctionDeclaration InitializeVectorFunctionDeclaration;
     extern FunctionDeclaration MemCopyFunctionDeclaration;
     extern FunctionDeclaration MemMoveFunctionDeclaration;
     extern FunctionDeclaration MemSetFunctionDeclaration;
@@ -667,6 +668,9 @@ namespace value
     Vector Log2(Vector v);
     Scalar Max(Vector v);
     Scalar Min(Vector v);
+    Vector Maximize(Vector v);
+    Vector Minimize(Vector v);
+    Vector InitVector(Vector v, Scalar value);
     Vector Pow(Vector bases, Scalar exp);
     Vector Sin(Vector v);
     Vector Sqrt(Vector v);

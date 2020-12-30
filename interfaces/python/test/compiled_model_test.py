@@ -1,3 +1,4 @@
+import ell_helper
 import ell
 import os
 import time
@@ -152,15 +153,10 @@ def test():
     test_callbacks(testing)
     test_multiple(testing)
     test_bitcode(testing)
-
-    if testing.DidTestFail():
-        return 1
-    else:
-        return 0
-    if x > (1 - bias) / scale:
-        return 1
-    return (scale * x) + bias
+    return testing.GetFailedTests()
 
 
-if __name__ == '__main__':
-    test()
+if __name__ == "__main__":
+    rc = test()
+    if rc:
+        print("### Test failed: {}", rc)

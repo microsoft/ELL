@@ -42,6 +42,7 @@ class Testing(object):
 
     def __init__(self):
         self.testFailedFlag = False
+        self.failed = []
 
     def ProcessTest(self, testDescription, success):
         print("%s ... " % (testDescription), end="")
@@ -50,6 +51,14 @@ class Testing(object):
         else:
             print("Failed")
             self.testFailedFlag = True
+            self.failed += [testDescription]
 
     def DidTestFail(self):
         return self.testFailedFlag
+
+    def GetReturnCode(self):
+        return 1 if self.DidTestFail() else 0
+
+    def GetFailedTests(self):
+        return self.failed
+

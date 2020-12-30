@@ -55,6 +55,7 @@
 #include <nodes/include/ReinterpretLayoutNode.h>
 #include <nodes/include/ReorderDataNode.h>
 #include <nodes/include/ReorderDataCodeNode.h>
+#include <nodes/include/ScalingNode.h>
 #include <nodes/include/SimpleConvolutionNode.h>
 #include <nodes/include/SinkNode.h>
 #include <nodes/include/SourceNode.h>
@@ -144,6 +145,7 @@ namespace common
         context.GetTypeFactory().AddType<model::Node, nodes::ReorderDataNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::ReinterpretLayoutNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::RNNNode<ElementType>>();
+        context.GetTypeFactory().AddType<model::Node, nodes::ScalingNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SimpleConvolutionComputeNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SimpleConvolutionNode<ElementType>>();
         context.GetTypeFactory().AddType<model::Node, nodes::SinkNode<ElementType>>();

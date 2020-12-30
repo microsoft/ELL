@@ -105,9 +105,10 @@ namespace emitters
 
     IRLocalScalar& IRLocalScalar::operator%=(const IRLocalScalar& rhs)
     {
-        VerifyArgTypesCompatible(*this, rhs, BothIntegral);
+        VerifyArgTypesCompatible(*this, rhs);
 
-        const auto op = emitters::TypedOperator::moduloSigned;
+        auto type = this->value->getType();
+        auto op = GetOperator(type, emitters::BinaryOperatorType::modulo);
 
         value = function.Operator(op, value, rhs);
 

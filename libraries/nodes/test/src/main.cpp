@@ -38,5 +38,10 @@ int main(int argc, char** argv)
         throw;
     }
 
-    return GetExitCode();
+    int rc = GetExitCode();
+    if (rc != 0)
+    {
+        std::cerr << "ERROR: a test failed" << std::endl;
+    }
+    return rc;
 }

@@ -35,6 +35,7 @@ set(src
     src/RNNNode.cpp
     src/RegionDetectionLayerNode.cpp
     src/ScalingLayerNode.cpp
+    src/ScalingNode.cpp
     src/SimpleConvolutionNode.cpp
     src/SingleElementThresholdNode.cpp
     src/SoftmaxLayerNode.cpp
@@ -101,6 +102,7 @@ set(include
     include/ReorderDataCodeNode.h
     include/ReorderDataNode.h
     include/ScalingLayerNode.h
+    include/ScalingNode.h
     include/SimpleConvolutionNode.h
     include/SingleElementThresholdNode.h
     include/SinkNode.h

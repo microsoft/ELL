@@ -46,18 +46,24 @@ except ImportError as err:
 
 def interface_test():
     rc = 0
+    failed = []
     for (test, name) in tests:
         try:
             ans = test()
-            if ans == 0:
+            if ans == [] or ans == 0:
                 print(name, "passed")
             else:
+                failed += ans
                 print(name, "failed")
-            rc |= ans
+                rc = 1
         except Exception as e:
             print(name, "failed")
             print("exception:", e)
+            failed += [name]
             rc = 1
+    if len(failed):
+        print("### Tests failed: {}", failed)
+
     sys.exit(rc)
 
 if not SkipTests:

@@ -15,6 +15,7 @@ void TestBasicMathNodes();
 void TestBinaryOperationNodeCompute();
 void TestBinaryOperationNodeCompute2();
 void TestUnaryOperationNodeCompute();
+void TestLogicalUnaryOperationNodeCompute();
 void TestBroadcastLinearFunctionNodeCompute();
 
 void TestBroadcastUnaryOperationNodeCompute();

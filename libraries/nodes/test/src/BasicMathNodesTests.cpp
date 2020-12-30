@@ -68,6 +68,7 @@ void TestBasicMathNodes()
     TestBinaryOperationNodeCompute();
     TestBinaryOperationNodeCompute2();
     TestUnaryOperationNodeCompute();
+    TestLogicalUnaryOperationNodeCompute();
 
     TestBroadcastUnaryOperationNodeCompute();
 
@@ -85,10 +86,10 @@ void TestBasicMathNodes()
 
 void TestUnaryOperationNodeCompute(UnaryOperationType op, double (*expectedTransform)(double))
 {
-    ComputeContext context("TestUnaryOperationNodeCompute");
+    ComputeContext context("TestUnaryOperationNodeCompute<double>");
     ContextGuard<> guard(context);
 
-    std::vector<std::vector<double>> data = { { 1 }, { 2 }, { 3 }, { 4 }, { 5 }, { 6 }, { 7 }, { 8 }, { 9 }, { 10 } };
+    std::vector<std::vector<double>> data = { { 0 ,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10 } };
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<double>>(data[0].size());
@@ -99,23 +100,38 @@ void TestUnaryOperationNodeCompute(UnaryOperationType op, double (*expectedTrans
         auto inputValue = data[index];
 
         inputNode->SetInput(inputValue);
-        std::vector<double> outputVec = model.ComputeOutput(outputNode->output);
+        auto outputVec = model.ComputeOutput(outputNode->output);
 
         for (size_t d = 0; d < inputValue.size(); ++d)
         {
             auto expectedOutput = expectedTransform(inputValue[d]);
-            testing::ProcessTest("Testing UnaryOperationNode compute for " + ToString(op),
+            testing::ProcessTest("Testing UnaryOperationNode<double> compute for " + ToString(op),
                                  testing::IsEqual(outputVec[d], expectedOutput));
         }
     }
 }
 
-void TestUnaryOperationNodeCompute(UnaryOperationType op, bool (*expectedTransform)(bool))
+void TestUnaryOperationNodeCompute()
+{
+    TestUnaryOperationNodeCompute(UnaryOperationType::abs, std::abs);
+    TestUnaryOperationNodeCompute(UnaryOperationType::cos, std::cos);
+    TestUnaryOperationNodeCompute(UnaryOperationType::exp, std::exp);
+    TestUnaryOperationNodeCompute(UnaryOperationType::log, std::log);
+    TestUnaryOperationNodeCompute(UnaryOperationType::log10, std::log10);
+    TestUnaryOperationNodeCompute(UnaryOperationType::max, [](double d) { return 10.0; }); // see data above
+    TestUnaryOperationNodeCompute(UnaryOperationType::min, [](double d) { return 0.0; }); // see data above
+    TestUnaryOperationNodeCompute(UnaryOperationType::sin, std::sin);
+    TestUnaryOperationNodeCompute(UnaryOperationType::sqrt, std::sqrt);
+    TestUnaryOperationNodeCompute(UnaryOperationType::square, [](double d) { return d * d; });
+    TestUnaryOperationNodeCompute(UnaryOperationType::tanh, std::tanh);
+}
+
+void TestLogicalUnaryOperationNodeCompute(UnaryOperationType op, bool (*expectedTransform)(bool))
 {
     ComputeContext context("TestUnaryOperationNodeCompute<bool>");
     ContextGuard<> guard(context);
 
-    std::vector<std::vector<bool>> data = { { true }, { false } };
+    std::vector<std::vector<bool>> data = { { false }, { true } };
 
     model::Model model;
     auto inputNode = model.AddNode<model::InputNode<bool>>(data[0].size());
@@ -126,26 +142,20 @@ void TestUnaryOperationNodeCompute(UnaryOperationType op, bool (*expectedTransfo
         auto inputValue = data[index];
 
         inputNode->SetInput(inputValue);
-        std::vector<bool> outputVec = model.ComputeOutput(outputNode->output);
+        auto outputVec = model.ComputeOutput(outputNode->output);
 
         for (size_t d = 0; d < inputValue.size(); ++d)
         {
             auto expectedOutput = expectedTransform(inputValue[d]);
-            testing::ProcessTest("Testing UnaryOperationNode compute for " + ToString(op),
+            testing::ProcessTest("Testing UnaryOperationNode<bool> compute for " + ToString(op),
                                  testing::IsEqual(outputVec[d], expectedOutput));
         }
     }
 }
 
-void TestUnaryOperationNodeCompute()
+void TestLogicalUnaryOperationNodeCompute()
 {
-    TestUnaryOperationNodeCompute(UnaryOperationType::abs, std::abs);
-    TestUnaryOperationNodeCompute(UnaryOperationType::exp, std::exp);
-    TestUnaryOperationNodeCompute(UnaryOperationType::log, std::log);
-    TestUnaryOperationNodeCompute(UnaryOperationType::sqrt, std::sqrt);
-    TestUnaryOperationNodeCompute(UnaryOperationType::logicalNot, [](bool b) { return !b; });
-    TestUnaryOperationNodeCompute(UnaryOperationType::square, [](double d) { return d * d; });
-    TestUnaryOperationNodeCompute(UnaryOperationType::tanh, std::tanh);
+    TestLogicalUnaryOperationNodeCompute(UnaryOperationType::logicalNot, [](bool b) { return !b; });
 }
 
 void TestBinaryOperationNodeCompute()

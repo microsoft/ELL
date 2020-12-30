@@ -714,6 +714,9 @@ namespace nodes
         case UnaryOperationType::log:
             return MakeKernel(value::Log);
             break;
+        case UnaryOperationType::log10:
+            return MakeKernel(value::Log10);
+            break;
         case UnaryOperationType::sqrt:
             return MakeKernel(value::Sqrt);
             break;

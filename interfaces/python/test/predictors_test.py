@@ -6,7 +6,7 @@ import ell
 import numpy as np
 
 def test_tensor(testing):
-    i = ell.math.DoubleTensor(np.array(range(8), dtype=np.float).reshape(2,2,2)).data.size()    
+    i = ell.math.DoubleTensor(np.array(range(8), dtype=np.float).reshape(2,2,2)).data.size()
     testing.ProcessTest("test_tensor", i == 8)
 
 def test_predictor(testing):
@@ -20,11 +20,14 @@ def test_predictor(testing):
     result = predictor.Predict(np.zeros(10))
     testing.ProcessTest("test_predictor", list(result) == bias and channels == input_shape.channels)
 
-def test():    
+def test():
     testing = Testing()
     test_tensor(testing)
     test_predictor(testing)
-    return 0
-    
+    return testing.GetFailedTests()
+
+
 if __name__ == "__main__":
-    test()
+    rc = test()
+    if rc:
+        print("### Test failed: {}", rc)

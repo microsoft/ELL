@@ -20,10 +20,9 @@ def testModelBuilder(testing):
 def test():
     testing = Testing()
     testModelBuilder(testing)
-    if testing.DidTestFail():
-        return 1
-    else:
-        return 0
+    return testing.GetFailedTests()
 
 if __name__ == '__main__':
-    test()
+    rc = test()
+    if rc:
+        print("### Test failed: {}", rc)

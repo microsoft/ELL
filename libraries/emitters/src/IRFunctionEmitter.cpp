@@ -11,6 +11,7 @@
 #include "IRAsyncTask.h"
 #include "IRBlockRegion.h"
 #include "IREmitter.h"
+#include "IRMath.h"
 #include "IRMetadata.h"
 #include "IRModuleEmitter.h"
 #include "IRParallelLoopEmitter.h"
@@ -400,7 +401,20 @@ namespace emitters
 
     LLVMValue IRFunctionEmitter::Operator(TypedOperator type, LLVMValue pLeftValue, LLVMValue pRightValue)
     {
-        return GetEmitter().BinaryOperation(type, pLeftValue, pRightValue);
+        if (type == TypedOperator::minimum)
+        {
+            // Note: _irBuilder.CreateMinimum(...) is not working for some reason.
+            return emitters::Min(this->LocalScalar(pLeftValue), this->LocalScalar(pRightValue));
+        }
+        else if (type == TypedOperator::maximum)
+        {
+            // Note: _irBuilder.CreateMaximum(...) is not working for some reason.
+            return emitters::Max(this->LocalScalar(pLeftValue), this->LocalScalar(pRightValue));
+        }
+        else
+        {
+            return GetEmitter().BinaryOperation(type, pLeftValue, pRightValue);
+        }
     }
 
     LLVMValue IRFunctionEmitter::Operator(TypedOperator type, llvm::iterator_range<llvm::Function::arg_iterator>& arguments)

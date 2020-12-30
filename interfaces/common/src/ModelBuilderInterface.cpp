@@ -45,6 +45,7 @@
 #include <nodes/include/NodeOperations.h>
 #include <nodes/include/ReinterpretLayoutNode.h>
 #include <nodes/include/ReorderDataCodeNode.h>
+#include <nodes/include/ScalingNode.h>
 #include <nodes/include/TypeCastNode.h>
 #include <nodes/include/UnaryOperationNode.h>
 #include <nodes/include/VoiceActivityDetectorNode.h>
@@ -495,6 +496,29 @@ Node ModelBuilder::AddReorderDataNode(Model model, PortElements input, std::vect
         newNode = model.GetModel()->AddNode<ell::nodes::ReorderDataCodeNode<float>>(
             ell::model::PortElements<float>(elements),
             order);
+        break;
+    default:
+        throw std::invalid_argument("Error: could not create ReorderDataNode of the requested type");
+    }
+    return Node(newNode, model.GetModel());
+}
+
+Node ModelBuilder::AddScalingNode(Model model, PortElements input, double scale)
+{
+    auto type = input.GetType();
+    auto elements = input.GetPortElements();
+    ell::model::Node* newNode = nullptr;
+    switch (type)
+    {
+    case PortType::real:
+        newNode = model.GetModel()->AddNode<ell::nodes::ScalingNode<double>>(
+            ell::model::PortElements<double>(elements),
+            scale);
+        break;
+    case PortType::smallReal:
+        newNode = model.GetModel()->AddNode<ell::nodes::ScalingNode<float>>(
+            ell::model::PortElements<float>(elements),
+            scale);
         break;
     default:
         throw std::invalid_argument("Error: could not create ReorderDataNode of the requested type");

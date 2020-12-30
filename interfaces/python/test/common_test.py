@@ -22,8 +22,14 @@ def TestLoadSaveModels():
 def test():
     try:
         TestLoadSaveModels()
-        return  0
+        return 0
     except:
         return 1
+
+
+if __name__ == "__main__":
+    rc = test()
+    if rc:
+        print("### Test failed")
 
 

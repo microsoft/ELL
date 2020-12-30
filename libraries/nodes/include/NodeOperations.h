@@ -28,7 +28,10 @@ namespace nodes
             hardSigmoid,
             hardTanh,
             log,
+            log10,
             logicalNot,
+            min,
+            max,
             sigmoid,
 			sign,
             sin,
@@ -60,7 +63,9 @@ namespace nodes
             logicalAnd,
             logicalOr,
             logicalXor,
-            modulo
+            modulo,
+            maximum,
+            minimum
         };
 
         template <typename ValueType>
@@ -188,7 +193,10 @@ namespace nodes
                 ADD_TO_STRING_ENTRY(UnaryOperationType, hardSigmoid);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, hardTanh);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, log);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, log10);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, logicalNot);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, min);
+                ADD_TO_STRING_ENTRY(UnaryOperationType, max);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, sigmoid);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, sign);
                 ADD_TO_STRING_ENTRY(UnaryOperationType, sin);
@@ -213,7 +221,10 @@ namespace nodes
             ADD_FROM_STRING_ENTRY(UnaryOperationType, hardSigmoid);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, hardTanh);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, log);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, log10);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, logicalNot);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, min);
+            ADD_FROM_STRING_ENTRY(UnaryOperationType, max);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, sigmoid);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, sign);
             ADD_FROM_STRING_ENTRY(UnaryOperationType, sin);
@@ -246,9 +257,12 @@ namespace nodes
                 ADD_TO_STRING_ENTRY(BinaryOperationType, subtract);
                 ADD_TO_STRING_ENTRY(BinaryOperationType, multiply);
                 ADD_TO_STRING_ENTRY(BinaryOperationType, divide);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, modulo);
                 ADD_TO_STRING_ENTRY(BinaryOperationType, logicalAnd);
                 ADD_TO_STRING_ENTRY(BinaryOperationType, logicalOr);
                 ADD_TO_STRING_ENTRY(BinaryOperationType, logicalXor);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, minimum);
+                ADD_TO_STRING_ENTRY(BinaryOperationType, maximum);
             default:
                 throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
             }
@@ -263,9 +277,12 @@ namespace nodes
             ADD_FROM_STRING_ENTRY(BinaryOperationType, subtract);
             ADD_FROM_STRING_ENTRY(BinaryOperationType, multiply);
             ADD_FROM_STRING_ENTRY(BinaryOperationType, divide);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, modulo);
             ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalAnd);
             ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalOr);
             ADD_FROM_STRING_ENTRY(BinaryOperationType, logicalXor);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, minimum);
+            ADD_FROM_STRING_ENTRY(BinaryOperationType, maximum);
 
             throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
         }
@@ -284,12 +301,18 @@ namespace nodes
                 return emitters::BinaryOperatorType::multiply;
             case BinaryOperationType::divide:
                 return emitters::BinaryOperatorType::divide;
+            case BinaryOperationType::modulo:
+                return emitters::BinaryOperatorType::modulo;
             case BinaryOperationType::logicalAnd:
                 return emitters::BinaryOperatorType::logicalAnd;
             case BinaryOperationType::logicalOr:
                 return emitters::BinaryOperatorType::logicalOr;
             case BinaryOperationType::logicalXor:
                 return emitters::BinaryOperatorType::logicalXor;
+            case BinaryOperationType::minimum:
+                return emitters::BinaryOperatorType::minimum;
+            case BinaryOperationType::maximum:
+                return emitters::BinaryOperatorType::maximum;
             default:
                 throw utilities::InputException(utilities::InputExceptionErrors::indexOutOfRange, "Unknown binary operation");
             }

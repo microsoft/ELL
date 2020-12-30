@@ -117,6 +117,10 @@ std::string ToShortString(BinaryOperationType op)
         return "^";
     case BinaryOperationType::modulo:
         return "%";
+    case BinaryOperationType::maximum:
+        return "max";
+    case BinaryOperationType::minimum:
+        return "min";
     }
     return "";
 }

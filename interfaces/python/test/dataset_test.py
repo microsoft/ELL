@@ -35,7 +35,9 @@ def test():
 
     testing.ProcessTest("Dataset eumeration test", True)
 
-    return 0
+    return testing.GetFailedTests()
 
 if __name__ == "__main__":
-    test()
+    rc = test()
+    if rc:
+        print("### Test failed: {}", rc)

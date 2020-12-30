@@ -71,6 +71,7 @@ enum class UnaryOperationType
     hardSigmoid = (int)ell::nodes::UnaryOperationType::hardSigmoid,
     hardTanh = (int)ell::nodes::UnaryOperationType::hardTanh,
     log = (int)ell::nodes::UnaryOperationType::log,
+    log10 = (int)ell::nodes::UnaryOperationType::log10,
     logicalNot = (int)ell::nodes::UnaryOperationType::logicalNot,
     sin = (int)ell::nodes::UnaryOperationType::sin,
     sigmoid = (int)ell::nodes::UnaryOperationType::sigmoid,
@@ -80,6 +81,8 @@ enum class UnaryOperationType
     cos = (int)ell::nodes::UnaryOperationType::cos,
     sqrt = (int)ell::nodes::UnaryOperationType::sqrt,
     tanh = (int)ell::nodes::UnaryOperationType::tanh,
+    min = (int)ell::nodes::UnaryOperationType::min,
+    max = (int)ell::nodes::UnaryOperationType::max,
 };
 
 //
@@ -94,7 +97,9 @@ enum class BinaryOperationType
     divide = (int)ell::nodes::BinaryOperationType::divide,
     logicalAnd = (int)ell::nodes::BinaryOperationType::logicalAnd,
     logicalOr = (int)ell::nodes::BinaryOperationType::logicalOr,
-    logicalXor = (int)ell::nodes::BinaryOperationType::logicalXor
+    logicalXor = (int)ell::nodes::BinaryOperationType::logicalXor,
+    maximum = (int)ell::nodes::BinaryOperationType::maximum,
+    minimum = (int)ell::nodes::BinaryOperationType::minimum
 };
 
 //
@@ -293,6 +298,7 @@ public:
     Node AddReinterpretLayout(Node input, PortMemoryLayout outputMemoryLayout);
     Node AddReorderData(Node input, std::vector<int> order);
     Node AddReorderData(Node input, PortMemoryLayout inputMemoryLayout, PortMemoryLayout outputMemoryLayout, std::vector<int> order = {}, double outputPaddingValue = 0.0);
+    Node AddScalingNode(Node input, double scale);
     Node AddRNN(Node input, Node reset, size_t hiddenUnits, Node inputWeights, Node hiddenWeights, Node inputBias, Node hiddenBias, ell::api::predictors::neural::ActivationType activation);
     SinkNode AddSink(Node input, const PortMemoryLayout& memoryLayout, const std::string& sinkFunctionName, Node trigger = Node());
     SourceNode AddSource(Node input, PortType outputType, const PortMemoryLayout& memoryLayout, const std::string& sourceFunctionName);

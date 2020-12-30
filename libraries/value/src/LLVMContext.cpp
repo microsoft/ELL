@@ -284,7 +284,7 @@ namespace value
 
                 if (value2.IsConstrained() && value2.GetLayout() != ScalarLayout)
                 {
-                    throw InputException(InputExceptionErrors::invalidSize);
+                    throw InputException(InputExceptionErrors::notScalar);
                 }
 
                 auto variableType = [type = value1.GetBaseType()] {
@@ -332,6 +332,56 @@ namespace value
                         resultValue = fnEmitter.Call(llvmFunc, { fnEmitter.CastValue<double>(fnEmitter.ValueAt(baseLLVMValue, offset)), expLLVMValue });
                     }
                     fnEmitter.SetValueAt(returnLLVMValue, offset, resultValue);
+
+                } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
+
+                return returnValue;
+            };
+        }
+
+        auto InitializeVectorIntrinsic() -> std::function<Value(IRFunctionEmitter&, std::vector<Value>)>
+        {
+            return [](IRFunctionEmitter& fnEmitter, std::vector<Value> args) -> Value {
+                if (args.size() != 2)
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+
+                const auto& value1 = args[0]; // the vector to initialize
+                const auto& value2 = args[1]; // the scalar value to set
+                if (value1.GetBaseType() != value2.GetBaseType())
+                {
+                    throw InputException(InputExceptionErrors::typeMismatch);
+                }
+
+                if (value2.IsConstrained() && value2.GetLayout() != ScalarLayout)
+                {
+                    throw InputException(InputExceptionErrors::notScalar);
+                }
+
+                Value returnValue = value::Allocate(value1.GetBaseType(),
+                                                    value1.IsConstrained() ? value1.GetLayout() : ScalarLayout);
+
+                const auto& returnLayout = returnValue.GetLayout();
+                auto maxCoordinate = returnLayout.GetActiveSize().ToVector();
+                decltype(maxCoordinate) coordinate(maxCoordinate.size());
+                auto setLLVMValue = [&] {
+                    if (value2.IsFloatingPoint())
+                    {
+                        return fnEmitter.ValueAt(ToLLVMValue(value2), 0);
+                    }
+                    else
+                    {
+                        return fnEmitter.CastValue<double>(fnEmitter.ValueAt(ToLLVMValue(value2), 0));
+                    }
+                }();
+
+                auto returnLLVMValue = ToLLVMValue(returnValue);
+                do
+                {
+                    auto logicalCoordinates = returnLayout.GetLogicalCoordinates(coordinate);
+                    auto offset = static_cast<int>(returnLayout.GetLogicalEntryOffset(logicalCoordinates));
+                    fnEmitter.SetValueAt(returnLLVMValue, offset, setLLVMValue);
 
                 } while (IncrementMemoryCoordinate(coordinate, maxCoordinate));
 
@@ -1809,6 +1859,7 @@ namespace value
             { MaxNumFunctionDeclaration, MaxMinIntrinsicFunction(MaxMinIntrinsic::Max) },
             { MinNumFunctionDeclaration, MaxMinIntrinsicFunction(MaxMinIntrinsic::Min) },
             { PowFunctionDeclaration, PowFunctionIntrinsic() },
+            { InitializeVectorFunctionDeclaration, InitializeVectorIntrinsic() },
             { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetSinFunction) },
             { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetSqrtFunction) },
             { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic(&IRRuntime::GetTanhFunction) },

@@ -29,6 +29,7 @@
 #include <nodes/include/MovingAverageNode.h>
 #include <nodes/include/MovingVarianceNode.h>
 #include <nodes/include/MultiplexerNode.h>
+#include <nodes/include/ScalingNode.h>
 #include <nodes/include/UnaryOperationNode.h>
 #include <nodes/include/ValueSelectorNode.h>
 
@@ -120,6 +121,9 @@ namespace common
 
         builder.RegisterNodeCreator<nodes::SumNode<int>, const model::PortElements<int>&>();
         builder.RegisterNodeCreator<nodes::SumNode<double>, const model::PortElements<double>&>();
+
+        builder.RegisterNodeCreator<nodes::ScalingNode<float>, const model::PortElements<float>&, float>();
+        builder.RegisterNodeCreator<nodes::ScalingNode<double>, const model::PortElements<double>&, double>();
 
         builder.RegisterNodeCreator<nodes::TypeCastNode<bool, int>, const model::PortElements<bool>&>();
         builder.RegisterNodeCreator<nodes::TypeCastNode<int, double>, const model::PortElements<int>&>();

@@ -351,6 +351,7 @@ namespace value
             std::ref(FloorFunctionDeclaration),
             std::ref(CeilFunctionDeclaration),
             std::ref(FmaFunctionDeclaration),
+            std::ref(InitializeVectorFunctionDeclaration),
             std::ref(MemCopyFunctionDeclaration),
             std::ref(MemMoveFunctionDeclaration),
             std::ref(MemSetFunctionDeclaration),
@@ -653,9 +654,27 @@ namespace value
         return *GetContext().Call(MinNumFunctionDeclaration, { v.GetValue() });
     }
 
+    Vector Maximize(Vector v)
+    {
+        Scalar s = Max(v);
+        auto r = InitVector(v, s);
+        return r;
+    }
+
+    Vector Minimize(Vector v)
+    {
+        Scalar s = Min(v);
+        return InitVector(v, s);
+    }
+
     Vector Pow(Vector bases, Scalar exp)
     {
         return *GetContext().Call(PowFunctionDeclaration, { bases.GetValue(), exp.GetValue() });
+    }
+
+    Vector InitVector(Vector v, Scalar value)
+    {
+        return *GetContext().Call(InitializeVectorFunctionDeclaration, { v.GetValue(), value.GetValue() });
     }
 
     Vector Sin(Vector v)
@@ -692,9 +711,9 @@ namespace value
             If(v == Cast(0, v.GetType()), [&] {
                 r = Cast(1, v.GetType());
             })
-                .Else([&] {
-                    r = Cast(0, v.GetType());
-                });
+            .Else([&] {
+                r = Cast(0, v.GetType());
+            });
         }
         return r;
     }

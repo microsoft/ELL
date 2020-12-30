@@ -23,5 +23,6 @@ def test():
         print("trainer.Update(...) succeeded")
     except msg as TypeError:
         print("trainer.Update(...) threw a TypeError exception", msg)
-        return 1
-    return 0
+        return ["SGDIncrementalTrainer"]
+
+    return []

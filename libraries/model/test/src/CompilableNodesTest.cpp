@@ -428,6 +428,9 @@ std::vector<std::vector<double>> GetExpectedUnaryOperationOutput(std::vector<std
                 case UnaryOperationType::log:
                     d = std::log(d);
                     break;
+                case UnaryOperationType::log10:
+                    d = std::log10(d);
+                    break;
                 case UnaryOperationType::logicalNot:
                     d = (d == 0) ? 1 : 0;
                     break;
@@ -765,6 +768,15 @@ std::vector<std::vector<double>> GetExpectedBinaryOperationResult(std::vector<st
             case BinaryOperationType::divide:
                 d = a / b;
                 break;
+            case BinaryOperationType::modulo:
+                d = fmod(a, b);
+                break;
+            case BinaryOperationType::maximum:
+                d = std::max(a, b);
+                break;
+            case BinaryOperationType::minimum:
+                d = std::min(a, b);
+                break;
             default:
                 break;
             }
@@ -784,11 +796,22 @@ void TestCompilableBinaryOperationNode()
         "multiply",
         "divide",
         "logicalAnd",
-        "logicalOr ",
-        "logicalXor"
+        "logicalOr",
+        "logicalXor",
+        "modulo",
+        "maximum",
+        "minimum"
     };
 
-    for (auto op : std::vector<BinaryOperationType>{ BinaryOperationType::add, BinaryOperationType::subtract, BinaryOperationType::multiply, BinaryOperationType::divide })
+    for (auto op : std::vector<BinaryOperationType>{
+             BinaryOperationType::add,
+             BinaryOperationType::subtract,
+             BinaryOperationType::multiply,
+             BinaryOperationType::divide,
+             BinaryOperationType::modulo,
+             BinaryOperationType::maximum,
+             BinaryOperationType::minimum 
+        })
     {
         model::Model model;
         auto inputNode = model.AddNode<model::InputNode<double>>(3);
@@ -1200,7 +1223,7 @@ void TestReorderDataCodeNode1()
     FillTensor<float>(input, 1, 1);
     FillTensor<float>(expectedOutput, 1, 1);
 
-	Log() << "Input:" << EOL << input.ToArray() << EOL;
+    Log() << "Input:" << EOL << input.ToArray() << EOL;
 
     std::string name = "TestReorderDataCodeNode1";
     TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
@@ -1223,7 +1246,7 @@ void TestReorderDataCodeNode2()
     int padding = 1;
     model::Model model;
     model::PortMemoryLayout inputLayout(model::MemoryShape{ numRows, numColumns, numChannels }, model::MemoryShape{ padding, padding, 0 }); // Default order: 0, 1, 2 == rows, columns, channels
-	auto outputLayout = inputLayout.ReorderedCopy({ 2, 0, 1 });
+    auto outputLayout = inputLayout.ReorderedCopy({ 2, 0, 1 });
 
     size_t inputSize = inputLayout.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
@@ -1234,7 +1257,7 @@ void TestReorderDataCodeNode2()
 
     std::vector<ElementType> input(inputSize);
     FillVector(input, 1.0f);
-	Log() << "Input:" << EOL << input << EOL;
+    Log() << "Input:" << EOL << input << EOL;
 
     // compare output
     std::vector<std::vector<ElementType>> signal = { input };
@@ -1250,7 +1273,7 @@ void TestReorderDataCodeNode3()
     int padding = 1;
     model::Model model;
     model::PortMemoryLayout inputLayout(model::MemoryShape{ numRows, numColumns, numChannels }, model::MemoryShape{ padding, padding, 0 }); // Default order: 0, 1, 2 == rows, columns, channels
-	auto outputLayout = inputLayout.ReorderedCopy({ 2, 0, 1 });
+    auto outputLayout = inputLayout.ReorderedCopy({ 2, 0, 1 });
 
     size_t inputSize = inputLayout.GetMemorySize();
     auto inputNode = model.AddNode<model::InputNode<ElementType>>(inputSize);
@@ -1261,7 +1284,7 @@ void TestReorderDataCodeNode3()
 
     std::vector<ElementType> input(inputSize);
     FillVector(input, 1.0f);
-	Log() << "Input:" << EOL << input << EOL;
+    Log() << "Input:" << EOL << input << EOL;
 
     // compare output
     std::vector<std::vector<ElementType>> signal = { input };
@@ -1291,11 +1314,11 @@ void TestReorderDataCodeNode4()
     FillMatrix<float>(expectedOutput, 1, 1);
 
     std::vector<std::vector<ElementType>> signal = { input.ToArray() };
-	std::vector<std::vector<ElementType>> expected = { expectedOutput.ToArray() };
+    std::vector<std::vector<ElementType>> expected = { expectedOutput.ToArray() };
 
-	Log() << "Input:" << EOL << input.ToArray() << EOL;
+    Log() << "Input:" << EOL << input.ToArray() << EOL;
 
-	std::string name = "TestReorderDataCodeNode4";
+    std::string name = "TestReorderDataCodeNode4";
     TestWithSerialization(map, name, [&](model::Map& map, int iteration) {
         model::IRMapCompiler compiler;
         auto compiledMap = compiler.Compile(map);
@@ -1304,7 +1327,6 @@ void TestReorderDataCodeNode4()
         VerifyCompiledOutputAndResult(map, compiledMap, signal, expected, utilities::FormatString("%s iteration %d", name.c_str(), iteration));
     });
 }
-
 
 void TestReceptiveFieldMatrixNode(size_t numChannels, bool useNewReshape)
 {
@@ -1818,7 +1840,7 @@ void TestMatrixMatrixMultiplyCodeNode(int m, int n, int k, int panelM, int panel
             }
         }
 
-        std::vector<std::vector<ValueType>> expected { expectedResult };
+        std::vector<std::vector<ValueType>> expected{ expectedResult };
         std::stringstream id;
         id << std::boolalpha << "MatrixMatrixMultiplyCodeNode(impl = " << static_cast<int>(gemmImpl)
            << ", m = " << m << ", n = " << n << ", k = " << k
@@ -1875,26 +1897,24 @@ void TestCompilableClockNode()
     auto getTicksFunction = reinterpret_cast<GetTicksUntilNextInterval*>(jitter.ResolveFunctionAddress("Test_GetTicksUntilNextInterval"));
 
     // compare output
-    std::vector<std::vector<TimeTickType>> signal =
-        {
-            { start },
-            { start + interval * 1 + lagThreshold / 2 }, // within threshold
-            { start + interval * 2 }, // on time
-            { start + interval * 3 + lagThreshold }, // late (expect notification)
-            { start + interval * 4 + lagThreshold * 20 }, // really late (expect notification)
-            { start + interval * 5 } // on time
-        };
+    std::vector<std::vector<TimeTickType>> signal = {
+        { start },
+        { start + interval * 1 + lagThreshold / 2 }, // within threshold
+        { start + interval * 2 }, // on time
+        { start + interval * 3 + lagThreshold }, // late (expect notification)
+        { start + interval * 4 + lagThreshold * 20 }, // really late (expect notification)
+        { start + interval * 5 } // on time
+    };
 
     std::vector<TimeTickType> getTicksResults;
-    std::vector<TimeTickType> expectedGetTicksResults =
-        {
-            interval,
-            interval - lagThreshold / 2,
-            interval,
-            interval - lagThreshold,
-            interval - lagThreshold * 20,
-            interval
-        };
+    std::vector<TimeTickType> expectedGetTicksResults = {
+        interval,
+        interval - lagThreshold / 2,
+        interval,
+        interval - lagThreshold,
+        interval - lagThreshold * 20,
+        interval
+    };
 
     lagNotificationCallbackCount = 0;
     for (const auto& input : signal)

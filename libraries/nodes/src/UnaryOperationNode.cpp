@@ -63,6 +63,14 @@ namespace nodes
             {
                 Softmax(data, result);
             }
+            else if (op == UnaryOperationType::min)
+            {
+                result = Minimize(data);
+            }
+            else if (op == UnaryOperationType::max)
+            {
+                result = Maximize(data);
+            }
             else
             {
                 For(data, [&](Scalar index) {
@@ -101,6 +109,9 @@ namespace nodes
                         break;
                     case UnaryOperationType::log:
                         v = Log(v);
+                        break;
+                    case UnaryOperationType::log10:
+                        v = Log10(v);
                         break;
                     case UnaryOperationType::sigmoid:
                         v = emittable_functions::Sigmoid(v);

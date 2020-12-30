@@ -612,6 +612,8 @@ namespace emitters
             return _irBuilder.CreateSDiv(pLeftValue, pRightValue, variableName);
         case TypedOperator::moduloSigned:
             return _irBuilder.CreateSRem(pLeftValue, pRightValue, variableName);
+        case TypedOperator::moduloFloat:
+            return _irBuilder.CreateFRem(pLeftValue, pRightValue, variableName);
         case TypedOperator::addFloat:
             return _irBuilder.CreateFAdd(pLeftValue, pRightValue, variableName);
         case TypedOperator::subtractFloat:

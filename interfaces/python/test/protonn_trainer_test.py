@@ -83,11 +83,10 @@ def test():
         print("Compiled Accuracy %f" % (accuracy))
         testing.ProcessTest("ProtoNN compiled accuracy test", testing.IsEqual(int(accuracy), 1))
 
-    if testing.DidTestFail():
-        raise Exception("protonn_trainer_test failed")
-
-    return 0
+    return testing.GetFailedTests()
 
 
 if __name__ == "__main__":
-    test()
+    rc = test()
+    if rc:
+        print("### Test failed: {}", rc)

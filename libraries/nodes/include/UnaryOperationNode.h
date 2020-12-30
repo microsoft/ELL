@@ -105,6 +105,9 @@ namespace nodes
     template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
     const model::OutputPort<ValueType>& Log(const model::OutputPort<ValueType>& input);
 
+    template <typename ValueType, utilities::IsNotBoolean<ValueType> = true>
+    const model::OutputPort<ValueType>& Log10(const model::OutputPort<ValueType>& input);
+
     template <typename ValueType, utilities::IsBoolean<ValueType> = true>
     const model::OutputPort<ValueType>& LogicalNot(const model::OutputPort<ValueType>& input);
 
@@ -182,6 +185,12 @@ namespace nodes
     const model::OutputPort<ValueType>& Log(const model::OutputPort<ValueType>& input)
     {
         return UnaryOperation(input, UnaryOperationType::log);
+    }
+
+    template <typename ValueType, utilities::IsNotBoolean<ValueType>>
+    const model::OutputPort<ValueType>& Log10(const model::OutputPort<ValueType>& input)
+    {
+        return UnaryOperation(input, UnaryOperationType::log10);
     }
 
     template <typename ValueType, utilities::IsBoolean<ValueType>>

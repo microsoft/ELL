@@ -301,7 +301,7 @@ namespace value
                 auto& exp = args[1];
                 if (exp.IsConstrained() && exp.GetLayout() != ScalarLayout)
                 {
-                    throw InputException(InputExceptionErrors::invalidSize);
+                    throw InputException(InputExceptionErrors::notScalar);
                 }
                 return std::visit(
                     [&base](auto&& data1, auto&& data2) -> Value {
@@ -334,6 +334,55 @@ namespace value
                     },
                     base.GetUnderlyingData(),
                     exp.GetUnderlyingData());
+            }
+        };
+
+        
+        struct InitializeVectorFunctionIntrinsic
+        {
+            auto operator()(std::vector<Value> args) const -> Value
+            {
+                if (args.size() != 2)
+                {
+                    throw InputException(InputExceptionErrors::invalidSize);
+                }
+
+                auto& targetVector = args[0];
+                auto& copyValue = args[1];
+                if (copyValue.IsConstrained() && copyValue.GetLayout() != ScalarLayout)
+                {
+                    throw InputException(InputExceptionErrors::notScalar);
+                }
+                return std::visit(
+                    [&targetVector](auto&& data1, auto&& data2) -> Value {
+                        using Type1 = std::decay_t<decltype(data1)>;
+                        using Type2 = std::decay_t<decltype(data2)>;
+                        using DataType1 = std::remove_pointer_t<Type1>;
+                        using DataType2 = std::remove_pointer_t<Type2>;
+
+                        if constexpr (IsOneOf<DataType1, Emittable, Boolean> ||
+                                      IsOneOf<DataType2, Emittable, Boolean>)
+                        {
+                            throw InputException(InputExceptionErrors::invalidArgument);
+                        }
+                        else if constexpr (!std::is_same_v<DataType1, DataType2>)
+                        {
+                            throw InputException(InputExceptionErrors::typeMismatch);
+                        }
+                        else
+                        {
+                            auto data1Begin = data1;
+                            auto data1End = data1 + (targetVector.IsConstrained() ? targetVector.GetLayout().GetMemorySize() : 1u);
+                            std::vector<DataType1> returnData(data1Begin, data1End);
+                            std::transform(returnData.begin(), returnData.end(), returnData.begin(), [target = *data2](auto n) {
+                                return target;
+                            });
+
+                            return Value(returnData, targetVector.IsConstrained() ? std::optional<MemoryLayout>{ targetVector.GetLayout() } : std::optional<MemoryLayout>{ std::nullopt });
+                        }
+                    },
+                    targetVector.GetUnderlyingData(),
+                    copyValue.GetUnderlyingData());
             }
         };
 
@@ -1563,6 +1612,7 @@ namespace value
             { MaxNumFunctionDeclaration, SimpleMinMaxNumFunctionIntrinsic{}(MaxFn{}) },
             { MinNumFunctionDeclaration, SimpleMinMaxNumFunctionIntrinsic{}(MinFn{}) },
             { PowFunctionDeclaration, PowFunctionIntrinsic{} },
+            { InitializeVectorFunctionDeclaration, InitializeVectorFunctionIntrinsic{} },
             { SinFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::sin(n); }) },
             { SqrtFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::sqrt(n); }) },
             { TanhFunctionDeclaration, SimpleNumericalFunctionIntrinsic{}([](auto n) { return std::tanh(n); }) },

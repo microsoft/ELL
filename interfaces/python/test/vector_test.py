@@ -3,8 +3,8 @@ import ell_helper
 import ell
 from testing import Testing
 
-def test_double():
-    testing = Testing()
+
+def test_double(testing):
 
     # empty vector
     e = ell.math.DoubleVector()
@@ -55,9 +55,7 @@ def assert_compare_floats(a, b):
     d = np.array(list(b), dtype=np.float32)
     np.testing.assert_equal(c, d)
 
-def test_float():
-    testing = Testing()
-
+def test_float(testing):
     # empty vector
     e = ell.math.FloatVector()
     np.testing.assert_equal(e.size(), 0)
@@ -104,9 +102,13 @@ def test_float():
 
 
 def test():
-    test_double()
-    test_float()
-    return 0
+    testing = Testing()
+    test_double(testing)
+    test_float(testing)
+    return testing.GetFailedTests()
+
 
 if __name__ == "__main__":
-    test()
+    rc = test()
+    if rc:
+        print("### Test failed: {}", rc)

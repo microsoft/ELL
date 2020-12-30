@@ -27,6 +27,12 @@ namespace emitters
             return TypedOperator::multiplyFloat;
         case BinaryOperatorType::divide:
             return TypedOperator::divideFloat;
+        case BinaryOperatorType::modulo:
+            return TypedOperator::moduloFloat;
+        case BinaryOperatorType::minimum:
+            return TypedOperator::minimum;
+        case BinaryOperatorType::maximum:
+            return TypedOperator::maximum;
         default:
             throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
         }
@@ -44,6 +50,12 @@ namespace emitters
             return TypedOperator::multiply;
         case BinaryOperatorType::divide:
             return TypedOperator::divideSigned;
+        case BinaryOperatorType::modulo:
+            return TypedOperator::moduloSigned;
+        case BinaryOperatorType::minimum:
+            return TypedOperator::minimum;
+        case BinaryOperatorType::maximum:
+            return TypedOperator::maximum;
         default:
             throw EmitterException(EmitterError::binaryOperationTypeNotSupported);
         }

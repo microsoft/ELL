@@ -43,7 +43,11 @@ def test():
     hingeLossTest(testing)
     logLossTest(testing)
     squaredLossTest(testing)
-    if testing.DidTestFail():
-        return 1
-    else:
-        return 0
+    return testing.GetFailedTests()
+
+
+if __name__ == '__main__':
+    rc = test()
+    if rc:
+        print("### Test failed: {}", rc)
+

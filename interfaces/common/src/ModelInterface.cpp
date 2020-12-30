@@ -561,6 +561,11 @@ Node Model::AddReorderData(Node input, std::vector<int> order)
     return builder.AddReorderDataNode(Model(_model), GetDefaultOutputPort(input), order);
 }
 
+Node Model::AddScalingNode(Node input, double scale)
+{
+    return builder.AddScalingNode(Model(_model), GetDefaultOutputPort(input), scale);
+}
+
 Node Model::AddRNN(Node input, Node reset, size_t hiddenUnits, Node inputWeights, Node hiddenWeights, Node inputBias, Node hiddenBias, ell::api::predictors::neural::ActivationType activation)
 {
     return builder.AddRNNNode(Model(_model), GetDefaultOutputPort(input), GetDefaultOutputPort(reset), hiddenUnits, GetDefaultOutputPort(inputWeights), GetDefaultOutputPort(hiddenWeights), GetDefaultOutputPort(inputBias), GetDefaultOutputPort(hiddenBias), activation);

@@ -206,6 +206,7 @@ namespace value
     /*extern*/ FunctionDeclaration FloorFunctionDeclaration = DeclareFunction("Floor").Decorated(false);
     /*extern*/ FunctionDeclaration CeilFunctionDeclaration = DeclareFunction("Ceil").Decorated(false);
     /*extern*/ FunctionDeclaration FmaFunctionDeclaration = DeclareFunction("Fma").Decorated(false);
+    /*extern*/ FunctionDeclaration InitializeVectorFunctionDeclaration = DeclareFunction("InitVector").Decorated(false);
     /*extern*/ FunctionDeclaration MemCopyFunctionDeclaration = DeclareFunction("MemCpy").Decorated(false);
     /*extern*/ FunctionDeclaration MemMoveFunctionDeclaration = DeclareFunction("MemMove").Decorated(false);
     /*extern*/ FunctionDeclaration MemSetFunctionDeclaration = DeclareFunction("MemSet").Decorated(false);

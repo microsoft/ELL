@@ -90,11 +90,17 @@ void TestIRCompiler()
     TestLinearPredictor<float>();
     // TestMultiplexer(); // FAILS -- crash
     // TestForest(); // FAILS -- crash
+#ifdef USE_BLAS
     TestMatrixVectorMultiplyNode(10, 5, true);
+#endif
     TestMatrixVectorMultiplyNode(10, 5, false);
+
+#ifdef USE_BLAS
     TestMatrixMatrixMultiplyNode(4, 5, 6, true);
+#endif
     TestMatrixMatrixMultiplyNode(4, 5, 6, false);
 
+#ifdef USE_BLAS
     // Using BLAS
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, false, false, true);
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, false, false, true);
@@ -104,6 +110,7 @@ void TestIRCompiler()
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, false, true, true);
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, true, true, true);
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, true, true, true, true);
+#endif
 
     // Not using BLAS
     TestOrderedMatrixMatrixMultiplyNode(4, 5, 6, false, false, false, false);
