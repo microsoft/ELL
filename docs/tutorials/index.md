@@ -10,6 +10,7 @@ permalink: /tutorials/
 
 * [Raspberry Pi Setup](/ELL/tutorials/Raspberry-Pi-setup)
 * [Active cooling your Raspberry Pi 3](/ELL/tutorials/Active-cooling-your-Raspberry-Pi-3)
+* [Google Colaboratory Setup](/ELL/tutorials/Google-Colaboratory-setup)
 
 ## Image Classification Tutorials in Python
 
