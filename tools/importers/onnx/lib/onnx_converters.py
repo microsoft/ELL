@@ -124,6 +124,13 @@ class OnnxNodeConverter(object):
         return {}
 
     def get_output_shapes(self):
+        """
+        if this method is not overridden then we don't care about multiple outputs so trip any
+        extraneous output shapes.
+        """
+        if len(self.node.outputs) > 1:
+            self.node.outputs = self.node.outputs[0:1]
+
         return self.node.input_shapes
 
     def get_weights(self):
